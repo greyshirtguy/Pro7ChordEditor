@@ -15,7 +15,7 @@ QtObject {
     function next() {
         if (editing) {
             const blocks = editScreen.editor.song().map(b => ({ slide: b.row, group: b.group, startsItsGroup: b.groupStart, element: b.element,
-                                                               words: b.text, chords: b.chords }))
+                                                               words: b.text, chords: b.chords, blank: b.blank }))
             testInput.say("SONG " + JSON.stringify({ file: names[at] + ".pro", key: editScreen.editor.key, textBoxes: blocks }))
             stopEditing()
             ++at

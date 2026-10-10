@@ -53,6 +53,9 @@ import proread
 ROOT = os.path.dirname(HERE)
 CLEAN = os.path.join(ROOT, "testdata", "files", "made-by-simple-presenter")
 OLD = os.path.join(ROOT, "testdata", "files", "as-the-old-windows-app-left-them")
+# What ProPresenter itself wrote. It is only described: nothing is made of it, and it
+# is not one of the files the checks are tried on (repairs.json).
+BY_PROPRESENTER = os.path.join(ROOT, "testdata", "files", "made-by-propresenter")
 EXPECTED = os.path.join(ROOT, "testdata", "files", "expected")
 VECTORS = os.path.join(ROOT, "testdata", "vectors")
 
@@ -78,17 +81,33 @@ def as_placed_by_hand(words, start):
 
 # ---- The checks (the reference for spec/08-repair.md)
 
+# White space as the rules have it (spec/02-chord-rules.md, "To the letter"), by number,
+# since none of it can be seen: what a line of chords alone may hold beside U+200B.
+_WHITE = set(chr(code) for code in list(range(0x09, 0x0E)) + [0x20, 0x85, 0xA0, 0x1680] + list(range(0x2000, 0x200B))
+             + [0x2028, 0x2029, 0x202F, 0x205F, 0x3000])
+
+
+def is_placeholders(line):
+    """A line of chords alone: not empty, and nothing in it but U+200B and white space."""
+    return line != "" and all(character == chr(0x200B) or character in _WHITE for character in line)
+
+
 def right_ranges(words, starts_and_names):
-    """What a text box's chords are written as: from the chord to the next chord or the
-    end of its line, whichever comes first, and never empty. (chords::ranges of Simple
-    Presenter; testdata/vectors/ranges.json has it from the C++.)"""
+    """What a text box's chords are written as. On a line of chords alone, the chord's
+    own stand-in and no more: one long. On any other line, from the chord to the next
+    chord or the end of its line, whichever comes first, and never empty.
+    (chords::ranges of Simple Presenter; testdata/vectors/ranges.json has it from the
+    C++, and main() below holds this to that file.)"""
     ordered = sorted(starts_and_names, key=lambda chord: chord[0])
     made = []
     for i, (start, name) in enumerate(ordered):
+        line_start = words.rfind("\n", 0, start) + 1
         end = words.find("\n", start)
         if end < 0:
             end = len(words)
-        if i + 1 < len(ordered):
+        if is_placeholders(words[line_start:end]):
+            end = start + 1
+        elif i + 1 < len(ordered):
             end = min(end, ordered[i + 1][0])
         made.append({"start": start, "end": max(end, start + 1), "name": name})
     return made
@@ -181,6 +200,17 @@ def main():
     wrong = proread.check_plain_text(VECTORS)
     if wrong:
         sys.exit("the reader of RTF here disagrees with the vectors made from Simple Presenter's: %s" % wrong)
+    # The rule for ranges here is held to the C++ too: tidy.json and ranges.json are of
+    # the same cases, and the second is the first's chords with their ranges.
+    with open(os.path.join(VECTORS, "tidy.json"), encoding="utf-8") as tidied, open(os.path.join(VECTORS, "ranges.json"), encoding="utf-8") as ranged:
+        for tidy_case, range_case in zip(json.load(tidied)["cases"], json.load(ranged)["cases"]):
+            # (Counted as the file counts: a character from beyond the first 65,536 is two.)
+            raw = tidy_case["text"].encode("utf-16-le", "surrogatepass")
+            counted = "".join(chr(int.from_bytes(raw[i:i + 2], "little")) for i in range(0, len(raw), 2))
+            mine = right_ranges(counted, [(chord["at"], chord["name"]) for chord in tidy_case["out"]])
+            if tidy_case["text"] != range_case["text"] or mine != range_case["out"]:
+                sys.exit("right_ranges() here disagrees with ranges.json, made from Simple Presenter's: %r gives %r, not %r"
+                         % (tidy_case["text"], mine, range_case["out"]))
     for folder in (OLD, EXPECTED):
         os.makedirs(folder, exist_ok=True)
 
@@ -199,8 +229,8 @@ def main():
 
     own, offered = keyfit.tables(VECTORS)
     described = {}
-    for folder in (CLEAN, OLD):
-        for name in sorted(os.listdir(folder)):
+    for folder in (CLEAN, OLD, BY_PROPRESENTER):
+        for name in sorted(os.listdir(folder)) if os.path.isdir(folder) else []:
             if not name.endswith(".pro"):
                 continue
             about = look.describe(os.path.join(folder, name))

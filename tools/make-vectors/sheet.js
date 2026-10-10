@@ -110,11 +110,21 @@ function tidy(text, chords) {
 
 // ---- The stand-in document
 
+// A text box's words are nothing to a song: none, or only white space, with none of the
+// characters that chords with no words hang on. (As noWords in presentationeditor.cpp.)
+function noWords(text) {
+    return text.trim() === "" && !text.includes(ZW) && !text.includes(QUAD)
+}
+
 function makeEditor(blocks, key) {
     const editor = {
         blocks: JSON.parse(JSON.stringify(blocks)),
         key: key,
         calls: [],
+        // The text boxes that were added for a slide's chords, as the real one remembers
+        // them while the song is open (PresentationEditor::setChordsAlone): they go
+        // again when the chords do.
+        added: [],
         song() {
             return JSON.parse(JSON.stringify(this.blocks))
         },
@@ -136,6 +146,21 @@ function makeEditor(blocks, key) {
         setChordsAlone(row, element, line, names, joined) {
             this.calls.push({ ask: "setChordsAlone", row, element, line, names: names.slice(), joined: joined === true })
             const block = this.find(row, element)
+            // A blank slide's box: nothing there and nothing to put changes nothing. Its
+            // first chords become all it holds, on zero-width spaces; and a slide with
+            // no text box (no id) is given one for them.
+            if (block.chords.length === 0 && noWords(block.text)) {
+                if (names.length === 0)
+                    return ""
+                if (block.element === "") {
+                    block.element = "(a text box added for the chords)"
+                    this.added.push(block.element)
+                }
+                block.text = placeholders(names.length, ZW)
+                block.chords = names.map((name, i) => ({ at: i * 2, name: tidied(name) }))
+                block.blank = false
+                return ""
+            }
             const lines = block.text.split("\n")
             const old = lines[line]
             const standIn = !old.includes(ZW) && old.includes(" ") ? " " : ZW
@@ -155,6 +180,15 @@ function makeEditor(blocks, key) {
             block.text = lines.join("\n")
             names.forEach((name, i) => kept.push({ at: start + i * 2, name: tidied(name) }))
             block.chords = tidy(block.text, kept)
+            // With its last chord gone a slide that has nothing else on it is blank
+            // again: handed over with no words, and without the text box if that was
+            // only added for the chords.
+            if (block.chords.length === 0 && noWords(block.text) && this.blocks.filter(other => other.row === block.row).length === 1) {
+                block.text = ""
+                block.blank = true
+                if (this.added.includes(block.element))
+                    block.element = ""
+            }
             return ""
         },
         setKey(name) {
@@ -251,8 +285,8 @@ function chordsOfSong(sheet) {
 
 // ---- The songs the vectors are made on
 
-function block(row, element, group, groupStart, text, chords) {
-    return { row, slideId: "slide-" + row, group, groupColor: "", groupStart, label: "", element, text, chords }
+function block(row, element, group, groupStart, text, chords, blank) {
+    return { row, slideId: "slide-" + row, group, groupColor: "", groupStart, label: "", element, text, chords, blank: blank === true }
 }
 
 const SONGS = {
@@ -292,6 +326,32 @@ const SONGS = {
             block(0, "A", "", false, "Halle  lujah\n\nAmen", [{ at: 3, name: "F" }, { at: 9, name: "C/E" }]),
             block(1, "B", "Chorus", true, "First box", []),
             block(1, "C", "Chorus", true, "Second box\nof two", [{ at: 7, name: "Am" }]),
+        ],
+    },
+    // Blank slides: an intro made as a slide with an empty text box, a verse, a blank
+    // slide in the middle of the verse's group, and the verse's last slide. Row 0 is
+    // the name "Intro" and row 1 the intro's one empty line; row 2 is "Verse 1", rows
+    // 3 and 4 its first slide's lines, row 5 the blank slide's line, and row 6 the last
+    // slide's.
+    "blank": {
+        key: "G",
+        blocks: [
+            block(0, "A", "Intro", true, "", [], true),
+            block(1, "B", "Verse 1", true, "Amazing grace how sweet the sound\nThat saved a wretch like me", [{ at: 0, name: "G" }, { at: 17, name: "C" }]),
+            block(2, "C", "Verse 1", false, "", [], true),
+            block(3, "D", "Verse 1", false, "I once was lost", [{ at: 7, name: "D" }]),
+        ],
+    },
+    // A blank slide that has no text box at all: what is handed over for it has no id.
+    // (This is Simple Presenter's own. It adds a text box to such a slide when a chord
+    // is put there, and takes it off again with the last chord. An app that makes no
+    // text boxes leaves such a slide out, and has no use for this song.) Row 0 is the
+    // slide with words, row 1 the name "Ending" and row 2 the bare slide's empty line.
+    "bare": {
+        key: "G",
+        blocks: [
+            block(0, "A", "", false, "Amazing grace", [{ at: 0, name: "G" }]),
+            block(1, "", "Ending", true, "", [], true),
         ],
     },
 }
@@ -365,6 +425,10 @@ model.walks = [
     walk("intro", { row: 3, at: 0 }, Array(3).fill("Left")),
     walk("odd", null, Array(8).fill("Right")),
     walk("odd", null, Array(14).fill("Shift+Right")),
+    walk("blank", null, Array(9).fill("Right")),
+    walk("blank", { row: 6, at: 0 }, Array(9).fill("Left")),
+    walk("blank", { row: 4, at: 20 }, Array(4).fill("Shift+Right")),
+    walk("bare", null, Array(4).fill("Right")),
 ]
 
 // One change at a time: what the document is asked, and the song after it
@@ -405,6 +469,20 @@ model.edits = [
     edit("intro", { row: 6, at: 0 }, { put: "A", note: "one chord hung on a plain space: the space stays a space" }, s => s.put(s.spotRow, s.spotAt, "A")),
     edit("odd", { row: 0, at: 7 }, { put: "G" }, s => s.put(s.spotRow, s.spotAt, "G")),
     edit("odd", { row: 5, at: 0 }, { put: "F", note: "the second text box of a slide" }, s => s.put(s.spotRow, s.spotAt, "F")),
+    edit("blank", { row: 1, at: 0 }, { put: "G", note: "a blank slide: its first chord. Its line is a line of chords alone with none yet" }, s => s.put(s.spotRow, s.spotAt, "G")),
+    edit("blank", { row: 5, at: 0 }, { key: 4, note: "the key 4, on a blank slide in the middle of a group" }, s => s.put(s.spotRow, s.spotAt, ["G", "Am", "Bm", "C", "D", "Em", "F#dim"][3])),
+    edit("blank", { row: 1, at: 0 }, { put: "hello", note: "not a chord: refused, and nothing asked" }, s => s.put(s.spotRow, s.spotAt, "hello")),
+    edit("blank", { row: 1, at: 0 }, { take: true, note: "a blank slide has nothing to take: nothing asked" }, s => s.take(s.spotRow, s.spotAt)),
+    edit("blank", { row: 1, at: 0 }, { put: "G", then: { put: "D", at: 2 }, note: "a second chord after the first: the line is asked for both" },
+         s => s.put(1, 0, "G") && s.put(1, 2, "D")),
+    edit("blank", { row: 1, at: 0 }, { put: "G", then: { take: true }, note: "put, and taken off again: asked for none, and the slide is blank as it was" },
+         s => s.put(1, 0, "G") && s.take(1, 0)),
+    edit("blank", { row: 3, at: 0 }, { move: { row: 1, at: 0 }, note: "from a word to a blank slide: put there, then taken from here, joined" }, s => s.move(3, 0, 1, 0, false)),
+    edit("blank", { row: 3, at: 17 }, { copy: { row: 5, at: 0 }, note: "with Ctrl held, onto a blank slide: put there, and left here" }, s => s.move(3, 17, 5, 0, true)),
+    edit("bare", { row: 2, at: 0 }, { put: "D", note: "a slide with no text box: the line is asked for, with no id. Simple Presenter then adds a text box for it" },
+         s => s.put(s.spotRow, s.spotAt, "D")),
+    edit("bare", { row: 2, at: 0 }, { put: "D", then: { take: true }, note: "and taken off again: the text box that was added goes with it" },
+         s => s.put(2, 0, "D") && s.take(2, 0)),
 ]
 
 // Typing a chord: the bubble opened, what was typed kept or thrown away
@@ -454,6 +532,10 @@ model.typing = [
            [{ spot: { row: 1, at: 13 }, press: "F" }, { typed: "f#m/a" }, { finish: "Enter" }]),
     typing("intro", "on a line of chords alone, a click past the last while one is being typed there lands one further along",
            [{ spot: { row: 1, at: 6 }, press: "B" }, { typed: "Bm" }, { click: { row: 1, at: 6 } }, { typed: "A" }, { finish: "Enter" }]),
+    typing("blank", "on a blank slide: a click opens the bubble, and a click on the same place while typing keeps the chord and opens on the next",
+           [{ click: { row: 1, at: 0 } }, { typed: "G" }, { click: { row: 1, at: 0 } }, { typed: "D" }, { finish: "Enter" }]),
+    typing("blank", "Tab on a blank slide keeps the chord and moves the spot on, to the new place after it",
+           [{ spot: { row: 5, at: 0 }, press: "C" }, { typed: "C" }, { finish: "Tab" }]),
 ]
 
 // Copying a line's chords, or a whole group's, and putting them on other lines
@@ -481,12 +563,17 @@ model.copyPaste = [
     copyPaste("intro", "words onto a line of chords alone: nothing", { row: 3, at: 0 }, false, { row: 1, at: 0 }),
     copyPaste("intro", "a line of chords alone onto another", { row: 1, at: 0 }, false, { row: 6, at: 0 }),
     copyPaste("odd", "a chord in the middle of a word keeps its place in the word", { row: 0, at: 0 }, false, { row: 4, at: 0 }),
+    copyPaste("blank", "words onto a blank slide: nothing", { row: 3, at: 0 }, false, { row: 1, at: 0 }),
+    copyPaste("blank", "a blank slide's none, onto words: nothing", { row: 1, at: 0 }, false, { row: 3, at: 0 }),
+    copyPaste("intro", "a line of chords alone onto a line it empties and fills again: the same chords", { row: 1, at: 0 }, false, { row: 1, at: 0 }),
 ]
 
 write("sheet-model.json",
       "What the chord sheet does with a song. `songs` are the songs these are made on, as the document hands them over: one entry for each "
       + "text box that has words, with `row` the slide it is on (counted from 0), its words and its chords (each `at` counted along the "
-      + "whole text box, a line break being one). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for "
+      + "whole text box, a line break being one), and for a blank slide one entry with no words and `blank` set (in the song `bare`, with "
+      + "no `element` either: a slide that has no text box, which Simple Presenter gives one when a chord is put there and an app that "
+      + "makes no text boxes leaves out; the id of the box it adds is its own to make, and stands here as a sentence in brackets). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for "
       + "each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. "
       + "`edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, "
       + "each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step "

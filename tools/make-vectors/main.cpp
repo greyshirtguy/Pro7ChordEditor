@@ -115,6 +115,9 @@ const QStringList someNames = {
     "B", "Bb", "Bbb", "B#", "E#", "Fb", "Cb", "C##", "A♭", "C♯m", "A♭/C", "G/", "G//", "G/B/D", "Am/", "C/E/", "C/x", "C/9", "D/F", "A/C#", "f#M7/a",
     "C /// | Am ///", "C][G", "[C]", "C]", "G-", "G-7", "Cm(maj7)", "C^7", "CΔ7", "Gø7", "G.", "G,", "G?", "G!", "Do", "do", "Am7/G", "E7sus4", "F#",
     "gb", "Gbm", "F#m", "ebm", "D#m", "A#", "a#dim", "Csus", "c/e", "C/Bb", "C/bb", "Dm7/C", "G/A#", "abmaj7",
+    // A flat after a sharp is not part of the note; and what follows the last slash is a
+    // bass only if it is a note and nothing more.
+    "G#b5", "C/Em", "c/em",
 };
 
 void chordNames()
@@ -156,7 +159,11 @@ void transposing()
     QJsonArray odd;
     const QList<QStringList> oddCases = {{"G", "", "D"}, {"G", "C", ""}, {"G", "H", "D"}, {"", "C", "D"}, {"N.C.", "C", "D"}, {"x", "C", "D"},
                                          {"C /// | Am ///", "C", "D"}, {"g", "C", "D"}, {"f#m/a", "A", "Bb"}, {"G", "C", "C"}, {"C/E/", "C", "D"},
-                                         {"C6/9", "C", "Eb"}, {"A♭", "Ab", "A"}};
+                                         {"C6/9", "C", "Eb"}, {"A♭", "Ab", "A"},
+                                         // What follows the last slash is no bass unless it is a note and no more.
+                                         {"C/Em", "C", "D"}, {"c/em", "C", "D"},
+                                         // The same key twice gives the chord back exactly as it was written.
+                                         {"g", "C", "C"}, {"A♭m7", "E", "E"}, {"f#m/a", "A", "A"}};
     for (const QStringList &c : oddCases)
         odd.append(QJsonObject {{"chord", c.at(0)}, {"from", c.at(1)}, {"to", c.at(2)}, {"out", transposed(c.at(0), c.at(1), c.at(2))}});
     write("transposed.json",
@@ -273,6 +280,18 @@ void keeping()
         {placeholders(2), chordList({{0, "C"}, {1, "G"}, {2, "Am"}})},
         {QStringLiteral(" "), chordList({{0, "E"}})},
         {verse, chordList({{0, "C /// | Am ///"}, {8, "g"}, {17, "f#m/a"}})},
+        // Lines of chords alone, which are written their own way: hung on spaces; fewer
+        // chords than the line has stand-ins; two such lines in one text box; and one
+        // between lines of words, where each line is written as what it is.
+        {placeholders(3, QChar(u' ')), chordList({{0, "D"}, {2, "F#m"}, {4, "E"}})},
+        {placeholders(3), chordList({{0, "C"}, {4, "Am"}})},
+        {placeholders(2) + QStringLiteral("\n") + placeholders(1), chordList({{0, "C"}, {2, "G"}, {4, "D"}})},
+        {QStringLiteral("One two\n") + placeholders(2) + QStringLiteral("\nThree"), chordList({{0, "G"}, {4, "D"}, {8, "C"}, {10, "G"}, {12, "Em"}})},
+        {QStringLiteral("   "), chordList({{0, "G"}, {2, "D"}})},
+        // Words with a character in them from beyond the first 65,536: it is two
+        // places, 4 and 5, and "to" starts at 7.
+        {QStringLiteral("Joy 🎉 to the world\nthe Lord is come"), chordList({{0, "D"}, {4, "G"}, {7, "A"}, {20, "D"}, {24, "G"}})},
+        {QStringLiteral("Joy 🎉 to the world"), chordList({{5, "G"}, {40, "D"}})},
     };
     QJsonArray tidyCases;
     QJsonArray rangeCases;
@@ -290,9 +309,10 @@ void keeping()
           "Names are trimmed and otherwise left alone. Places count a line break as one character.",
           {{"cases", tidyCases}});
     write("ranges.json",
-          "ranges(text, chords): the stretch of the text each chord is written over in the file. It starts at the chord and runs to the next "
-          "chord or to the end of its line, whichever comes first, and is never empty. This is what is written; on reading only `start` is "
-          "believed.",
+          "ranges(text, chords): the stretch of the text each chord is written over in the file. On a line of chords alone (a line with "
+          "nothing in it but U+200B and white space) it is the chord's own character and no more: one long. On any other line it starts "
+          "at the chord and runs to the next chord or to the end of its line, whichever comes first, and is never empty. This is what is "
+          "written, and it is how Multitracks writes both; on reading only `start` is believed.",
           {{"cases", rangeCases}});
 
     struct Carry
@@ -317,6 +337,14 @@ void keeping()
         {QStringLiteral("abc def ghi"), QStringLiteral("abc ghi"), chordList({{0, "C"}, {4, "G"}, {8, "Am"}})},
         {QStringLiteral("abc def ghi"), QStringLiteral("abc X ghi"), chordList({{4, "G"}, {5, "D"}, {8, "Am"}})},
         {verse, QStringLiteral("Amazing grace how sweet the sound\nThat saved a wretch like you"), {}},
+        // Unchanged words are only tidied: of two chords in one place the later stands.
+        {verse, verse, chordList({{0, "G"}, {0, "Em"}, {8, "C"}})},
+        // The shared end is not looked for inside the shared start.
+        {QStringLiteral("abab"), QStringLiteral("ab"), chordList({{2, "C"}})},
+        {QStringLiteral("abab"), QStringLiteral("ab"), chordList({{0, "G"}, {1, "D"}, {2, "C"}, {3, "Em"}})},
+        // A character of two places among the words, and one taken out before a chord
+        {QStringLiteral("Joy 🎉 to the world"), QStringLiteral("Joy to the world"), chordList({{0, "D"}, {4, "G"}, {7, "A"}, {14, "D"}})},
+        {QStringLiteral("Joy to the world"), QStringLiteral("Joy 🎉 to the world"), chordList({{0, "D"}, {4, "A"}, {11, "D"}})},
     };
     QJsonArray carryCases;
     for (const Carry &c : carries)
@@ -374,6 +402,9 @@ void chordPro()
         {QStringLiteral("Amazing grace\n\nhow sweet"), chordList({{0, "G"}, {15, "C"}})},
         {QStringLiteral("Amazing grace"), chordList({})},
         {QString(), chordList({})},
+        // Three lines, the middle one empty, and a chord on it: it is written on that line.
+        {QStringLiteral("One\n\nTwo"), chordList({{0, "C"}, {4, "G"}, {5, "D"}})},
+        {QStringLiteral("Joy 🎉 to the world\nthe Lord"), chordList({{4, "G"}, {7, "A"}, {20, "D"}})},
     };
     for (const auto &entry : texts) {
         const QString made = toChordPro(entry.first, entry.second);
@@ -382,6 +413,8 @@ void chordPro()
     const QStringList whole = {
         "[G]Amazing [G7]grace how [C]sweet the [G]sound\n[G]That saved a [D]wretch like me", "Amazing grace\nhow sweet", "[C] [G] [Am]\n[G]Amazing grace",
         "[]Amazing [ ]grace", "[g]Amazing [xyz]grace [C /// | Am ///]", "Ama[G]zing", "[G", "G]", "", "[G]\n[D]", "{c: Verse 1}\n[G]Amazing",
+        // A bracket is not closed on another line, nor round another bracket.
+        "Ama[zing\ngr]ace", "[[G]]Amazing", "[G[D]]grace", "Joy [G]🎉 [A]to the world",
     };
     for (const QString &text : whole) {
         ofText.append(QJsonObject {{"in", text}, {"out", chordsJson(chordsOf(text))}});
@@ -490,6 +523,8 @@ void rtfText()
          "{\\colortbl;\\red255\\green255\\blue255;}\n\\pard\\qc\n\\f0\\fs96 \\cf1 Amazing \\f1\\b grace\\f0\\b0  how sweet\\\nthe sound}"},
         {"a group inside the text", "", head + "Amazing {\\i grace} how sweet}"},
         {"line ends in the RTF that are not breaks", "A bare line end in the file is nothing.", head + "Amazing\n grace\r\nhow sweet}"},
+        {"a count of characters to pass over that is a group's own", "Set to none inside the braces; after them it is one again, and the ? is passed over.",
+         head + "{\\uc0 a}\\u233 ?b}"},
         {"nothing", "", head + "}"},
         {"only a space", "", head + " }"},
     };

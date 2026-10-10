@@ -12,6 +12,7 @@ them.
 | `keyfit.py` | The rule for which key a song is likely in, and its vectors |
 | `make-fixtures.py` | Makes the damaged test files from the clean ones, describes every test file, and is the reference for the mending checks |
 | `simple-presenter-scripts/` | Two scripts that Simple Presenter itself runs, to make the clean test files and to read every test file back |
+| `as-read.py` | Writes `testdata/files/expected/as-read-by-simple-presenter.json` from what the second of those printed |
 
 They need Python 3, `protoc`, and the submodule (`git submodule update --init`).
 `make-vectors` needs Qt 6, CMake, Node and a checkout of Simple Presenter.
@@ -20,8 +21,9 @@ They need Python 3, `protoc`, and the submodule (`git submodule update --init`).
 ## The clean test files, made with Simple Presenter
 
 `simple-presenter-scripts/import.qml` brings the songs of `testdata/songs` into a
-library, and `dump.qml` opens every presentation of a library in its editor and
-prints what the chord editors are handed. Both run inside a build of Simple Presenter
+library (and gives Blank Slides its blank slides, in the editor: the script says how),
+and `dump.qml` opens every presentation of a library in its editor and prints what
+the chord editors are handed. Both run inside a build of Simple Presenter
 that has its test hook (`-DSIMPLEPRESENTER_TEST_HOOK=ON`), without a screen, on an
 empty workspace, with settings and documents folders of their own so that nothing of
 anyone's is touched:
@@ -39,6 +41,12 @@ XDG_CONFIG_HOME=$T/config XDG_DATA_HOME=$T/data XDG_CACHE_HOME=$T/cache \
 cp $T/ws/Libraries/Songs/*.pro testdata/files/made-by-simple-presenter/
 ```
 
-and the same with `dump.qml`, on a library holding every file of `testdata/files`,
-taking the lines it prints that start `SONG ` as the entries of
-`testdata/files/expected/as-read-by-simple-presenter.json`.
+(One song's file has no title in it and comes out named after the file,
+`holy-holy-holy.pro`. It is kept in `testdata/files` as `Holy Holy Holy.pro`: rename
+that one by hand.)
+
+and the same with `dump.qml` (it needs no `sed`), on a library holding every `.pro`
+of `testdata/files` (those made by Simple Presenter, the damaged ones and the one
+ProPresenter wrote), with what it prints kept in a file. `tools/as-read.py` then makes
+`testdata/files/expected/as-read-by-simple-presenter.json` of that file: the lines
+that start `SONG ` are its entries.

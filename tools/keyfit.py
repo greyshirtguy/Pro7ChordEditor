@@ -111,6 +111,12 @@ SONGS = [
     ("all sevenths and suspensions", "", "Gmaj7 Dsus4 Em7 Cadd9 G/B D7 Gsus2"),
     ("jazz that fits no key well", "C", "Cmaj7 Eb7 Abmaj7 B7 Emaj7 G7"),
     ("a diminished chord of the key", "C", "C Dm G Bdim C F G C"),
+    ("the same written with the little circle", "C", "C Dm G B° C F G C"),
+    ("stated a fifth away, a key with four of its five chords: 0.2 below the best, and let be", "D", "G D Em Bm C"),
+    ("the same with three of its four: exactly a quarter below, which is not more than a quarter", "D", "G D Em C"),
+    ("stated a fifth away, a key with seven of its ten: 0.3 below, and doubtful", "D", "G D Em Bm G D Em C C C"),
+    ("no key has more than three of its five chords: nothing is doubtful, and nothing is suggested", "A", "G D Em Bb Ab"),
+    ("E flat's chords written with sharps, and C minor as often as E flat: the major before its relative minor", "", "D# G# A# Cm D# Cm"),
 ]
 
 
