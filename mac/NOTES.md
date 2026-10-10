@@ -117,16 +117,16 @@ mac/
   ProPresenter by a program, and it leaves those lines in.
 - **Swift 6.1 at least** is needed: the generated code marks its types `nonisolated`.
   So Xcode 16.3 or later; the workflow uses GitHub's `macos-26`.
+- **The workflow passes on GitHub's Mac** (first run, 2026-10-10, on `macos-26`, under
+  two minutes): the tests, and the app built and signed to run locally, from a clone
+  with no submodule and nothing installed. That was the last of M0's "done when".
+- **Pushing is over SSH.** The key on this Mac is one GitHub knows. Over https, the
+  token in the keychain may not change `.github/workflows`, and a push that touches a
+  workflow is refused. `gh` is installed and not signed in; it is not needed to push,
+  and the runs of a public repository can be read without it.
 
 ## Left rough, and what to ask
 
-- **The workflow has not been seen to run.** When M0 was pushed, GitHub refused the
-  one commit that adds `.github/workflows/mac.yml`: the token git uses on this Mac
-  is not allowed to change workflows. Everything else went up. Until the maintainer
-  has pushed that commit and the run has passed, M0's "the same on GitHub's machine"
-  is not proved; what is proved is a fresh clone on this Mac, with no submodule.
-  The workflow asks for `macos-26`, which is **a guess** at what GitHub calls its
-  newest Mac. Take this out when it has passed.
 - **No test draws a picture yet.** There is nothing to draw but a line of text. Where
   the views and their picture tests are to live is to be settled at M3, when there is
   a first real view. My proposal: a fourth library in `Core` for the views (SwiftUI
