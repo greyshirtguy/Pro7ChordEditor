@@ -125,8 +125,8 @@ seen in a picture and ask the maintainer to try them.
 
 - **Mac**: a build for anyone else must be signed with a Developer ID and notarized
   by Apple, or macOS will refuse to open it. That needs the maintainer's paid Apple
-  developer account, which he is renewing. Nothing before that step needs it: Xcode
-  builds and runs an unsigned or locally signed app on his own Mac. Give it out as a
+  developer account, which is being renewed. Nothing before that step needs it: Xcode
+  builds and runs an unsigned or locally signed app on their own Mac. Give it out as a
   zipped `.app` or a `.dmg` on the Releases page.
 - **Windows**: a self-contained `.exe` in a `.zip` on the Releases page, as the old
   editor was.

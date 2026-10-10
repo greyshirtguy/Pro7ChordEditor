@@ -28,9 +28,9 @@ machine, each through the same milestones.
 | **M0** | **Setting up.** The project and its three layers (rules, song, app), empty. The reader of the file format generated from `proto/autogen-proto`. A test that reads one vector file and one `.pro`. The workflow that builds and tests on every push | [10](10-platforms.md) | `swift test` / `dotnet test` runs and passes from a fresh clone; the same on GitHub's machine |
 | **M1** | **The rules.** Chord names, keys, moving to another key, notations, what is offered, a box's chords in order and as ranges, ChordPro text, the words of an RTF, which key is likely | [02](02-chord-rules.md), [01](01-file-format.md) (the words) | Every case of every file in `testdata/vectors` passes, bar `sheet-model.json` and `layout.json` |
 | **M2** | **The song.** Open a `.pro`; hand over its text boxes; set a box's chords; set the key; save safely; undo and redo | [01](01-file-format.md), [05](05-song-and-saving.md) | The proofs listed at the foot of page 05, on copies of `testdata/files` |
-| **M3** | **The library.** Find ProPresenter's folder; the lists; search; open a song and show it, read only, as plain lines with chords in brackets; know when ProPresenter is running | [06](06-library.md) | The maintainer can browse his own library and read any song. Nothing can be changed yet |
+| **M3** | **The library.** Find ProPresenter's folder; the lists; search; open a song and show it, read only, as plain lines with chords in brackets; know when ProPresenter is running | [06](06-library.md) | The maintainer can browse their own library and read any song. Nothing can be changed yet |
 | **M4** | **The copies.** Kept before a first change; listed; looked at; put back; taken back | [07](07-backups.md) | The proofs at the foot of page 07. (There is no editor yet: prove it with the song's own functions) |
-| **M5** | **The ChordPro editor.** | [04](04-chordpro-editor.md) | The maintainer can chord a song of his own, on a **copy** of his library, and see the chords in ProPresenter. This is the first build worth giving anyone |
+| **M5** | **The ChordPro editor.** | [04](04-chordpro-editor.md) | The maintainer can chord a song of their own, on a **copy** of their library, and see the chords in ProPresenter. This is the first build worth giving anyone |
 | **M6** | **The chord sheet.** First its model, held to the vectors; then drawn; then the pointer and the keys; then the typing bubble; then dragging; then copying a line | [03](03-chord-sheet.md) | Every case of `sheet-model.json` and `layout.json`; the pictures set beside `spec/pictures`; and the maintainer saying it is as quick as Simple Presenter's |
 | **M7** | **Chords with no words.** Adding to and taking from a line of chords alone, in both editors: the one place the app writes RTF | [01](01-file-format.md) (Chords with no words) | The RTF of every other line of a changed box is byte for byte what it was; a song so changed opens in ProPresenter with its chords in place |
 | **M8** | **Mending.** The checks; the marks; mending one song and all; the "(Chords)" copies | [08](08-repair.md) | The proofs at the foot of page 08. Check 2 built and left switched off until the maintainer has seen the fault in a real file |
@@ -52,7 +52,7 @@ M7 to M9 can change order to suit what the maintainer wants next.
   ([10-platforms.md](10-platforms.md), the last section.)
 - **At M5**: a copy of a real library to try on, and ProPresenter to look at the
   result in.
-- **During M6**: his hand on the mouse, more than once.
+- **During M6**: the maintainer's hand on the mouse, more than once.
 - **Before M8's check 2**: the one test with the old editor
   ([08-repair.md](08-repair.md)).
 - **Before M9**: a small presentation made in ProPresenter, of words anyone may use,

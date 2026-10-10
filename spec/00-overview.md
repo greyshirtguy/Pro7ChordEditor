@@ -57,7 +57,7 @@ a way to find and mend what an earlier chord editor did to some files.
 
 ## Decided already
 
-By the maintainer, on 2026-10-10 ([12-origin.md](12-origin.md) has his words):
+By the maintainer, on 2026-10-10 ([12-origin.md](12-origin.md) has the words):
 
 | | |
 | --- | --- |
