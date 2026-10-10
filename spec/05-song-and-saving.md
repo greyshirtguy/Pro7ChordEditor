@@ -75,6 +75,8 @@ looked at has such a name.
 
 Request 2, until M7 is built, is done only where the line has as many stand-ins as
 there are names (its chords renamed or put in another order), and is otherwise refused.
+For a blank slide it names the slide's box, or no box at all (an empty `element`) if
+the slide has none; no names for a blank slide that has none is nothing to do.
 
 ## The key
 
@@ -139,7 +141,9 @@ and answers with one of these, to be shown as it is. Both apps say the same.
 | No line of that number in the box | The text box has no such line. Nothing was changed. |
 | What was given is no key | “*key*” is not a key. Nothing was changed. |
 | The shown-in key, for a song with no key | This song does not say what key it is in. Set its key first, and then the key ProPresenter is to show it in. |
-| One more or fewer chords on a line of chords alone, before M7 | A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed. |
+| One more or fewer chords on a line of chords alone, or a first chord on a blank slide, before M7 | A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed. |
+| A chord for a slide with no text box, in a song with no box to copy | This song has no text box with words in it to model one on, so chords cannot be put on a slide that has none. Nothing was changed. |
+| A chord for a slide with no text box, that has one by now | That slide is no longer blank. Nothing was changed. |
 | ProPresenter is running | ProPresenter is running. Quit it to change chords here. Nothing was changed. |
 | The file was changed by something else | This song's file has been changed by something else since it was opened here. Nothing was changed. Open the song again to see it as it is now. |
 | The copy could not be kept | A copy of the song's file could not be kept first, so the song was not changed: *why* |

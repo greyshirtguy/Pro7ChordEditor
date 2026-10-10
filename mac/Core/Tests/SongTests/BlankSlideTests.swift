@@ -103,12 +103,38 @@ struct BlankSlideTests {
         made.cues[first.cue].actions[first.action].slide.presentation.baseSlide.elements[first.element].element.clearText()
         let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Shape.pro"), safeguards: bench.safeguards)
         let saved = try Data(contentsOf: song.url)
-        #expect(song.textBoxes.map(\.element) == [boxes[1].element, boxes[2].element, boxes[3].element])
+        // The slide is a blank one now, with no text box to its name.
+        #expect(song.textBoxes.map(\.element) == ["", boxes[1].element, boxes[2].element, boxes[3].element])
+        #expect(song.textBoxes.map(\.blank) == [true, false, false, false])
         #expect { try song.setChords(slide: 0, element: boxes[0].element, [Chord(at: 0, name: "G")]) } throws: { ($0 as? Refusal)?.reason == .textBoxGone }
+        #expect { try song.setChords(slide: 0, element: "", [Chord(at: 0, name: "G")]) } throws: { ($0 as? Refusal)?.reason == .textBoxGone }
         #expect(try Data(contentsOf: song.url) == saved)
     }
 
-    @Test("A blank box beside a box with words is not handed over; nor is a slide with no text box")
+    @Test("A slide with no text box at all is a blank slide too, handed over with no id")
+    func noTextBoxAtAll() throws {
+        let bench = try Workbench()
+        var (made, boxes) = try plainSong()
+        // The third slide is left with nothing on it at all.
+        let third = try #require(place(of: boxes[2].element, in: made))
+        made.cues[third.cue].actions[third.action].slide.presentation.baseSlide.elements.removeAll()
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Bare.pro"), safeguards: bench.safeguards)
+        let saved = try Data(contentsOf: song.url)
+
+        let now = song.textBoxes
+        #expect(now.map(\.element) == [boxes[0].element, boxes[1].element, "", boxes[3].element])
+        #expect(now[2].blank && now[2].words.isEmpty && now[2].chords.isEmpty)
+        #expect(now[2].slide == 2 && now[2].group == boxes[2].group && now[2].startsItsGroup == boxes[2].startsItsGroup)
+
+        // It cannot be given chords yet: that gives the slide a text box, which is M7.
+        #expect { try song.setChordsAlone(slide: 2, element: "", line: 0, names: ["G"]) } throws: { ($0 as? Refusal)?.reason == .notBuiltYet }
+        // (No chords on it is what it has already: nothing is made for it.)
+        try song.setChordsAlone(slide: 2, element: "", line: 0, names: [])
+        #expect(try Data(contentsOf: song.url) == saved)
+        #expect(!song.canUndo && bench.copiesKept.isEmpty)
+    }
+
+    @Test("A blank box beside a box with words is not handed over")
     func notEveryBlankBox() throws {
         let bench = try Workbench()
         var (made, boxes) = try plainSong()
@@ -118,17 +144,27 @@ struct BlankSlideTests {
         extra.element.uuid.string = "11111111-2222-3333-4444-555555555555"
         blanked(&extra)
         made.cues[first.cue].actions[first.action].slide.presentation.baseSlide.elements.insert(extra, at: 0)
-        // The third slide is left with nothing on it at all.
-        let third = try #require(place(of: boxes[2].element, in: made))
-        made.cues[third.cue].actions[third.action].slide.presentation.baseSlide.elements.removeAll()
 
         let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Beside.pro"))
         let now = song.textBoxes
-        #expect(now.map(\.element) == [boxes[0].element, boxes[1].element, boxes[3].element])
+        #expect(now.map(\.element) == boxes.map(\.element))
         #expect(now.allSatisfy { !$0.blank })
-        // The slides are still numbered as ProPresenter shows them: the empty one is the third.
-        #expect(now.map(\.slide) == [0, 1, 3])
-        #expect(song.slideCount == 4)
+        #expect(now.map(\.slide) == [0, 1, 2, 3])
+    }
+
+    @Test("A blank box that holds a stray space is handed over with no words")
+    func aStraySpace() throws {
+        let bench = try Workbench()
+        var (made, boxes) = try plainSong()
+        let second = try #require(place(of: boxes[1].element, in: made))
+        // (An RTF whose only text is one space.)
+        var rtf = String(decoding: Self.emptyRTF, as: UTF8.self)
+        let end = try #require(rtf.lastIndex(of: "}"))
+        rtf.insert(contentsOf: " ", at: end)
+        made.cues[second.cue].actions[second.action].slide.presentation.baseSlide.elements[second.element].element.text.rtfData = Data(rtf.utf8)
+        made.cues[second.cue].actions[second.action].slide.presentation.baseSlide.elements[second.element].element.text.attributes.customAttributes.removeAll(where: isChord)
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Space.pro"))
+        #expect(song.textBoxes[1].blank && song.textBoxes[1].words.isEmpty && song.textBoxes[1].element == boxes[1].element)
     }
 
     @Test("A box that shows a timer or another box's words is not handed over; one that is only sometimes seen is")
@@ -157,10 +193,11 @@ struct BlankSlideTests {
             $0.dataLinks = [link]
         }
         let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Links.pro"))
-        // The first two slides have no box of their own words at all, and are not blank
-        // slides either: a box with a link is not offered for chords.
-        #expect(song.textBoxes.map(\.element) == [boxes[2].element, boxes[3].element])
-        #expect(song.textBoxes.allSatisfy { !$0.blank })
+        // The first two slides have no box of their own words at all. A box with a link
+        // is not offered for chords, so each is a blank slide with no text box to its
+        // name: a chord put there would be given a box of its own.
+        #expect(song.textBoxes.map(\.element) == ["", "", boxes[2].element, boxes[3].element])
+        #expect(song.textBoxes.map(\.blank) == [true, true, false, false])
     }
 
     @Test("A slide that is switched off is not a slide of the song, and the rest are numbered without it")

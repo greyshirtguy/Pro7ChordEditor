@@ -116,24 +116,26 @@ so that chords can be put on it ([chords onto a blank slide](#chords-onto-a-blan
 
 - A blank box on a slide that has another box with words is not shown: that slide has
   somewhere to put a chord already.
-- A slide with no text box at all is left out, as before. The app does not make text
-  boxes.
+- A slide with **no such text box at all** (nothing on it, or only a picture or a
+  shape, or only boxes that show something else's words) is a blank slide too. It is
+  handed over as a blank box with **no id** (an empty `element`) and no words, and is
+  given a text box only when a chord is put there
+  ([a slide with no text box](#a-slide-with-no-text-box)). So every slide of a song
+  is handed over, as one entry at least.
+- A blank slide's box is handed over with no words, whatever stray space its text may
+  hold.
 
 This is **new**, decided by the maintainer on 2026-10-10: an intro or an instrumental
 that someone made as an empty slide had nowhere to take its chords. In the one library
 looked at, 27 slides of 383 had a blank text box, many of them in groups named Ending,
 Intro and Bridge, and one slide had nothing on it at all. Simple Presenter shows blank
 slides since the change that followed (`reference/`), and `testdata/files` has a song
-made for them, Blank Slides.
+made for them, Blank Slides, whose last slide has no text box:
+`as-read-by-simple-presenter.json` has it with an empty `element`.
 
-**Where Simple Presenter goes further.** It is an editor of slides and makes text
-boxes anyway, and a new slide made in it has nothing on it at all. So a slide with
-**no text box** is on its sheet as well: handed over as a blank box with no id, and
-given a text box when a chord is put there (a copy of the song's nearest text box
-with words, emptied). `as-read-by-simple-presenter.json` has such a slide with an
-empty `element`; the last slide of Blank Slides is one. As these pages stand, the
-apps here leave such a slide out and make no text boxes. Whether they are to do as
-Simple Presenter does is the maintainer's to say.
+(That a slide with no text box is one of them was decided a day later, 2026-10-11.
+Simple Presenter, being an editor of slides, did it first; until then these pages had
+the apps leave such a slide out.)
 
 `testdata/files/expected/as-read-by-simple-presenter.json` has every test file read
 this way: reading a file is right when it gives that.
@@ -299,28 +301,58 @@ Windows, and did name a font and a format.) So the RTF is made, from the song it
 4. Only the box's `rtf_data` and its chord entries change. Where the box is on the
    slide, its size and its fill, and `text.attributes`, stay as they were.
 
-If the song has no other box to take an opening from, the change is refused, with a
-sentence that says why. Taking the last chord off again leaves the box with that
-opening and no words: blank to look at as it was, and still shown as a blank slide.
-Undo puts the bytes back as they were.
+If the song has no other box to take an opening from, the change is refused: "This
+song has no text box with words in it to model one on, so chords cannot be put on a
+slide that has none. Nothing was changed." Undo puts the bytes back as they were.
 
-**A change of mind, as the maintainer asked it of Simple Presenter** (2026-10-10):
-"only add when needed - when user adds a chord to a blank slide - and leaves the
-chord(s) there! (if a textbox was automatically added - but the user changes mind and
-removes the chords - during that edit session - dont leave the added textbox behind -
-no need to track that particular state after a save". Simple Presenter does this:
-while a song is open in its editor it remembers each blank box's text as the file had
-it before the first chord, and taking the last chord off again puts that back, so the
-file is byte for byte what it was (a text box it had to add is taken off the slide).
-Once the song is closed it remembers nothing: chords taken off another day leave the
-box empty, as the paragraph above has it. That goes one step past "leaves the box
-with that opening": whether the apps here are to do the same is the maintainer's to
-say, and it is cheap to do, the bytes being in hand for undo already.
+#### A slide with no text box
+
+Decided by the maintainer on 2026-10-11, as Simple Presenter does it. The first chords
+put on a blank slide that has no text box of its own (its entry has no id) give the
+slide one. The app does it without asking, and only then: nothing is made for a slide
+until a chord is put on it.
+
+1. The box is a **copy of the song's own**: the element of the nearest box that is
+   shown and is not blank, the same one whose RTF gives the opening above (on a slide
+   before this one if there is one, else on one after). So it is placed, sized and set
+   as that one is, which is what a song from Multitracks has under an intro's chords.
+   It is a copy of something ProPresenter made, and not a text box of this app's
+   devising.
+2. Of the copy: its id is a new one (a UUID, written as the file's others are); its
+   name is the copied name, or that with ` 2`, ` 3` ... after it until no other
+   element of the slide has it; its `build_in`, `build_out`, `child_builds` and
+   `data_links` are cleared, being what tied the other box to things on its own slide;
+   its chord entries are taken off; and its RTF is made as steps 2 and 3 above make
+   it, the stand-ins after the copied opening.
+3. It is added after the slide's other elements, so that it is drawn over them.
+4. If the song has no box to copy, the change is refused with the sentence above. (The
+   apps do not devise a text box. Simple Presenter, which makes them anyway, does.)
+5. If the slide is found to have a box that would be shown by now, the change is
+   refused: "That slide is no longer blank. Nothing was changed."
+
+#### A change of mind
+
+Decided by the maintainer on 2026-10-11 for the apps, as asked of Simple Presenter the
+day before: "only add when needed - when user adds a chord to a blank slide - and
+leaves the chord(s) there! (if a textbox was automatically added - but the user
+changes mind and removes the chords - during that edit session - dont leave the added
+textbox behind - no need to track that particular state after a save".
+
+While a song is open, the app remembers each blank slide's box as the file had it
+before its first chord was put on here (its `text`, whole; or that the box was added).
+Taking the last chord off such a slide again, while the song is still open, puts that
+back: the text as it was, or the added box taken off the slide. The file is then
+**byte for byte what it was** before the first chord.
+
+Once the song is closed the app remembers nothing. Chords taken off another day leave
+the box with the opening it was given and no words: blank to look at as it was, and
+still shown as a blank slide. A text box that was added stays, empty.
 
 **A guess**, until it has been seen in ProPresenter: that a box so written shows its
 chords on a stage screen as an intro from Multitracks does, its text being the same
-shape; and that `text.attributes` may be left as they were. It is built with M7, and
-tried there before anyone is given it.
+shape; that `text.attributes` may be left as they were; and that a copied box's other
+custom attributes, whose ranges were over words that are no longer in it, do no harm
+left where they are. It is built with M7, and tried there before anyone is given it.
 
 ## The key
 

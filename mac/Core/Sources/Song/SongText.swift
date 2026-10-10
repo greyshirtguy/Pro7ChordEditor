@@ -35,8 +35,10 @@ public struct SongLine: Hashable, Sendable {
     /// The group's name, for a group's line; its colour, if the file gives it one.
     public var group: String = ""
     public var groupColour: Colour?
-    /// For a line of a box: the box, which line of it this is, where that line starts
-    /// in the box, and its words without chords.
+    /// For a line of a box: which of the boxes handed over it is (-1 for a line that is
+    /// no box's), the box's id, which line of the box this is, where that line starts in
+    /// the box, and its words without chords.
+    public var box: Int = -1
     public var element: String = ""
     public var line: Int = 0
     public var start: Int = 0
@@ -48,7 +50,7 @@ public enum SongText {
     public static func lines(of boxes: [TextBox]) -> [SongLine] {
         var lines: [SongLine] = []
         var slide: Int?
-        for box in boxes {
+        for (index, box) in boxes.enumerated() {
             if box.slide != slide {
                 if slide != nil {
                     lines.append(SongLine(kind: .gap, text: "", slide: box.slide))
@@ -59,7 +61,7 @@ public enum SongText {
                 slide = box.slide
             }
             if box.blank {
-                lines.append(SongLine(kind: .blankSlide, text: "", slide: box.slide, element: box.element, words: box.words))
+                lines.append(SongLine(kind: .blankSlide, text: "", slide: box.slide, box: index, element: box.element))
                 continue
             }
             var start = 0
@@ -71,7 +73,7 @@ public enum SongText {
                     .map { Chord(at: $0.at - start, name: $0.name) }
                 lines.append(SongLine(kind: Chords.isPlaceholders(words) ? .chordsAlone : .words,
                                       text: Chords.toChordPro(Chords.Line(text: words, chords: own)),
-                                      slide: box.slide, element: box.element, line: number, start: start, words: words))
+                                      slide: box.slide, box: index, element: box.element, line: number, start: start, words: words))
                 start += words.length + 1
             }
         }

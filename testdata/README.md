@@ -53,8 +53,8 @@ Presentations, as `.pro` files.
   ([`spec/01-file-format.md`](../spec/01-file-format.md), "A blank slide"): its
   intro, and the third of its verse's five slides, each have a text box with no text
   in it;
-  and its ending has nothing on it at all, no text box either, which only Simple
-  Presenter hands over (with an empty `element`). They were made in Simple
+  and its ending has nothing on it at all, no text box either, and is handed over
+  with an empty `element`. They were made in Simple
   Presenter's editor after the import (`tools/simple-presenter-scripts/import.qml`
   says how), so the two empty text boxes were written by it: their RTF still names a
   font, where a blank text box left by ProPresenter is an RTF with no font in it at
@@ -136,9 +136,8 @@ allowance is to be taken out, and there is more than one such case to hold to.
 in `as-read-by-simple-presenter.json`, where every text box now says whether it is
 `blank`; and in `vectors/sheet-model.json` the songs `blank` (its rows, where the spot
 stands and walks, and what is asked when a chord is put on a blank line, typed there,
-moved there and taken off again) and `bare` (a slide with no text box, which is
-Simple Presenter's own: [`spec/01-file-format.md`](../spec/01-file-format.md), "Where
-Simple Presenter goes further").
+moved there and taken off again) and `bare` (a slide with no text box:
+[`spec/01-file-format.md`](../spec/01-file-format.md), "A slide with no text box").
 
 **3. The file ProPresenter wrote**, `files/made-by-propresenter/Rock Of Ages
 (Toplady).pro`, is read by Simple Presenter into `as-read-by-simple-presenter.json`

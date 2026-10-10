@@ -279,11 +279,11 @@ struct LibraryTests {
         for box in boxes {
             // A blank slide is one line, and that line is empty.
             if box.blank {
-                let own = lines.filter { $0.element == box.element }
-                #expect(own.map(\.kind) == [.blankSlide] && own.first?.text == "" && own.first?.slide == box.slide)
+                let own = lines.filter { $0.box == boxes.firstIndex(of: box) }
+                #expect(own.map(\.kind) == [.blankSlide] && own.first?.text == "" && own.first?.slide == box.slide && own.first?.element == box.element)
                 continue
             }
-            let own = lines.filter { $0.element == box.element && ($0.kind == .words || $0.kind == .chordsAlone) }
+            let own = lines.filter { $0.box == boxes.firstIndex(of: box) && ($0.kind == .words || $0.kind == .chordsAlone) }
             #expect(own.map(\.text).joined(separator: "\n") == Chords.toChordPro(box.words, box.chords))
             #expect(own.map(\.words) == box.words.lines)
             #expect(own.map(\.line) == Array(own.indices))

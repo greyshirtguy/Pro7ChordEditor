@@ -13,7 +13,8 @@ public struct TextBox: Hashable, Sendable {
     public var groupColour: Colour?
     /// Whether this slide is the first of its group.
     public var startsItsGroup: Bool
-    /// The text box's id, by which a change names it.
+    /// The text box's id, by which a change names it. Empty for a blank slide that has
+    /// no text box yet: one is made when a chord is put there.
     public var element: String
     /// Its plain text.
     public var words: Words
@@ -21,7 +22,7 @@ public struct TextBox: Hashable, Sendable {
     /// them: a name is not tidied on the way in, nor held to being a chord.
     public var chords: [Chord]
     /// Whether it is a blank slide's box: no words, no chords, and handed over only so
-    /// that chords can be put on it. NEW: Simple Presenter hands none over.
+    /// that chords can be put on it.
     public var blank: Bool
 
     public init(slide: Int, group: String = "", groupColour: Colour? = nil, startsItsGroup: Bool = false,

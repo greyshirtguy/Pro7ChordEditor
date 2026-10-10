@@ -119,34 +119,41 @@ func readWords(_ text: RVData_Graphics.Text) -> Words {
 
 /// What the editors are handed.
 func readTextBoxes(of presentation: RVData_Presentation, rows: [SlideRow]) -> [TextBox] {
-    var boxes: [TextBox] = []
-    for (number, row) in rows.enumerated() {
-        let elements = slide(of: row, in: presentation).elements
-        func box(_ element: RVData_Slide.Element, words: Words, chords: [Chord], blank: Bool) -> TextBox {
-            TextBox(slide: number, group: row.group, groupColour: row.groupColour, startsItsGroup: row.startsItsGroup,
-                    element: element.element.uuid.string, words: words, chords: chords, blank: blank)
-        }
-        var shown: [TextBox] = []
-        for element in elements where showsItsOwnWords(element) {
-            let boxWords = readWords(element.element.text)
-            let boxChords = readChords(element.element.text)
-            // A box with no words is left out, unless it is a line of chords alone: it
-            // has chords, or the characters Multitracks hangs them on. (A box with only
-            // a stray space in it, which files are full of, is neither.)
-            if boxWords.isBlank && boxChords.isEmpty && !boxWords.contains(0x200B) && !boxWords.contains(0x2001) {
-                continue
-            }
-            shown.append(box(element, words: boxWords, chords: boxChords, blank: false))
-        }
-        // NEW (spec/01, "A blank slide"): a slide none of whose boxes is shown is handed
-        // over all the same, as its first text box that shows its own words, so that
-        // chords can be put on an intro that someone made as an empty slide.
-        if shown.isEmpty, let empty = elements.first(where: { $0.element.hasText && showsItsOwnWords($0) }) {
-            shown.append(box(empty, words: readWords(empty.element.text), chords: [], blank: true))
-        }
-        boxes += shown
+    rows.indices.flatMap { readTextBoxes(ofSlide: $0, of: presentation, rows: rows) }
+}
+
+/// What the editors are handed of one slide: one entry at least.
+func readTextBoxes(ofSlide number: Int, of presentation: RVData_Presentation, rows: [SlideRow]) -> [TextBox] {
+    let row = rows[number]
+    let elements = slide(of: row, in: presentation).elements
+    func box(_ element: String, words: Words, chords: [Chord], blank: Bool) -> TextBox {
+        TextBox(slide: number, group: row.group, groupColour: row.groupColour, startsItsGroup: row.startsItsGroup,
+                element: element, words: words, chords: chords, blank: blank)
     }
-    return boxes
+    var shown: [TextBox] = []
+    for element in elements where showsItsOwnWords(element) {
+        let boxWords = readWords(element.element.text)
+        let boxChords = readChords(element.element.text)
+        // A box with no words is left out, unless it is a line of chords alone: it
+        // has chords, or the characters Multitracks hangs them on. (A box with only
+        // a stray space in it, which files are full of, is neither.)
+        if boxWords.isBlank && boxChords.isEmpty && !boxWords.contains(0x200B) && !boxWords.contains(0x2001) {
+            continue
+        }
+        shown.append(box(element.element.uuid.string, words: boxWords, chords: boxChords, blank: false))
+    }
+    // NEW (spec/01, "A blank slide"): a slide none of whose boxes is shown is handed
+    // over all the same, as one box with no words, so that chords can be put on an
+    // intro that someone made as an empty slide.
+    //   - If it has a text box to put chords in, that is the box: its first that shows
+    //     its own words, whatever stray space that may hold.
+    //   - If it has none, the box has no id yet. Nothing is made for it here: a text
+    //     box is added to the slide only when a chord is put on it, which is M7.
+    if shown.isEmpty {
+        let empty = elements.first { $0.element.hasText && showsItsOwnWords($0) }
+        shown.append(box(empty?.element.uuid.string ?? "", words: Words(), chords: [], blank: true))
+    }
+    return shown
 }
 
 /// A key as a musician writes it, from the file's number for its note and its scale.

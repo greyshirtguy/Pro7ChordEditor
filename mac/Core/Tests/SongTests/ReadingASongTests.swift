@@ -62,17 +62,14 @@ struct ReadingASongTests {
             spell(slide: $0.slide, group: $0.group, starts: $0.startsItsGroup, element: $0.element, words: $0.words.units,
                   chords: $0.chords.map { ($0.at, $0.name) }, blank: $0.blank)
         }
-        // A slide with no text box at all is in the file with an empty `element`: that
-        // entry is Simple Presenter's own, which gives such a slide a text box when a
-        // chord is put there. This app makes no text boxes and hands nothing over for it
-        // (spec/01-file-format.md, "Where Simple Presenter goes further"). The slides
-        // are numbered with it all the same.
-        let want = expected.textBoxes.filter { !$0.element.isEmpty }.map {
+        // (A slide with no text box at all is there too, with an empty `element`: the
+        // last slide of Blank Slides is one.)
+        let want = expected.textBoxes.map {
             spell(slide: $0.slide, group: $0.group, starts: $0.startsItsGroup, element: $0.element, words: Array($0.words.utf16),
                   chords: $0.chords.map { ($0.at, $0.name) }, blank: $0.blank)
         }
         #expect(got == want)
-        #expect(song.slideCount > (expected.textBoxes.map(\.slide).max() ?? 0))
+        #expect(song.slideCount == (expected.textBoxes.map(\.slide).max() ?? -1) + 1)
         #expect(song.usedChords == expected.textBoxes.flatMap { $0.chords.map(\.name) })
     }
 

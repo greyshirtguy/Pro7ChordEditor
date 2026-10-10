@@ -139,8 +139,16 @@ public final class OpenSong {
     /// SO FAR only where the line has as many stand-ins as there are names: its chords
     /// can be renamed and put in another order. One more or one fewer means writing the
     /// line's stand-ins into the box's RTF, which is milestone M7, as is the first chord
-    /// on a blank slide; until then both are refused.
+    /// on a blank slide (and the text box it needs, if the slide has none); until then
+    /// both are refused.
     public func setChordsAlone(slide: Int, element: String, line: Int, names: [String], joined: Bool = false) throws {
+        guard rows.indices.contains(slide) else { throw Refusal.slideGone }
+        // A blank slide: its box, or no box at all (an empty `element`). No chords for
+        // one that has none is nothing to do, and the box is left exactly as it is.
+        if let blank = readTextBoxes(ofSlide: slide, of: presentation, rows: rows).first, blank.blank, blank.element == element {
+            if names.isEmpty { return }
+            throw Refusal.notBuiltYet
+        }
         try changeText(slide: slide, element: element, joined: joined) { text in
             let lines = readWords(text).lines
             guard lines.indices.contains(line) else { throw Refusal.lineGone }
