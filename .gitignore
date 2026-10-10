@@ -364,3 +364,14 @@ FodyWeavers.xsd
 
 # built and packaged releases
 *.zip
+
+# The Mac app, Xcode and Swift
+.DS_Store
+xcuserdata/
+DerivedData/
+.build/
+*.xcuserstate
+.swiftpm/
+
+# The tools
+__pycache__/
