@@ -52,16 +52,31 @@ extension Chords {
         return result.stablySorted { $0.at < $1.at }
     }
 
-    /// How each chord is written in the file (tidied first): from its place to the next
-    /// chord's place or the end of its line, whichever comes first, and never empty.
-    /// This is what is WRITTEN. On reading, only `start` is believed.
+    /// How each chord is written in the file (tidied first). On a line of chords alone,
+    /// its own place and no more: one long, the stand-in it hangs on. On any other line,
+    /// from its place to the next chord's place or the end of its line, whichever comes
+    /// first, and never empty. This is what is WRITTEN. On reading, only `start` is
+    /// believed.
+    ///
+    /// The first half is NOT the reference's, which has only the second for every line
+    /// and so runs a chord alone on over the em quad to the next. It is how Multitracks
+    /// writes such a line, in every one of 290 chords looked at, and was decided by the
+    /// maintainer on 2026-10-10 (spec/01-file-format.md, "Chords"). With it, a box given
+    /// the chords it already has is written exactly as it was.
     public static func ranges(_ text: Words, _ chords: [Chord]) -> [ChordRange] {
         let ordered = tidy(text, chords)
         var result: [ChordRange] = []
         for (i, chord) in ordered.enumerated() {
-            var end = text.units.indexOf(Words.lineBreak, from: chord.at)
-            if end < 0 { end = text.length }
-            if i + 1 < ordered.count { end = min(end, ordered[i + 1].at) }
+            var lineEnd = text.units.indexOf(Words.lineBreak, from: chord.at)
+            if lineEnd < 0 { lineEnd = text.length }
+            var lineStart = chord.at
+            while lineStart > 0 && text[lineStart - 1] != Words.lineBreak { lineStart -= 1 }
+            var end = lineEnd
+            if ChordRules.isPlaceholders(Array(text.units[lineStart..<lineEnd])) {
+                end = chord.at + 1
+            } else if i + 1 < ordered.count {
+                end = min(end, ordered[i + 1].at)
+            }
             result.append(ChordRange(start: chord.at, end: max(end, chord.at + 1), name: chord.name))
         }
         return result

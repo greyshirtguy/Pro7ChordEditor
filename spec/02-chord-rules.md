@@ -161,8 +161,9 @@ first, and never empty. Vectors: `ranges.json`.
 
 (The first of those is as Multitracks writes it, and was decided on 2026-10-10:
 [01-file-format.md](01-file-format.md), Chords. Simple Presenter has only the second,
-for every line, and `ranges.json` is still what it answers. The apps' `ranges` follows
-the file until it is made again.)
+for every line, and one case of `ranges.json` is still what it answers. The Mac app's
+`ranges` has both, and its test of that file says what it allows of the one case
+until the file is made again.)
 
 `carried(before, after, chords)`: where chords stand when the words under them are
 changed. Vectors: `carried.json`. Neither app changes words, so this is not needed to
