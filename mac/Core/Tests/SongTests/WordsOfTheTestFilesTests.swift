@@ -8,9 +8,9 @@
 // `expected/` has was read by tools/look.py, which has a reader of RTF of its own, in
 // Python; so this is two readers written apart agreeing on every box.
 //
-// There is no Song yet to say which boxes the editors show and in what order (that is
-// M2), so, as in PresentationsCanBeReadTests, the boxes of a file are compared as a
-// heap, sorted.
+// It is of the two readers, below the song, so, as in PresentationsCanBeReadTests, it
+// takes every element that has text and compares the boxes of a file as a heap, sorted.
+// Which boxes the editors are handed, and in what order, is ReadingASongTests'.
 
 import ChordRules
 import Foundation

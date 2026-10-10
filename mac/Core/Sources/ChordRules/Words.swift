@@ -53,6 +53,18 @@ public struct Words: Hashable, Sendable {
     public var lines: [Words] {
         units.split(at: Words.lineBreak).map(Words.init(units:))
     }
+
+    /// Whether there is nothing here to read: no units, or none but white space, as the
+    /// rules count white space (Units.swift). A zero-width space is not white space, so
+    /// a line of stand-ins is not blank.
+    public var isBlank: Bool {
+        units.allSatisfy(isSpace)
+    }
+
+    /// Whether a unit is anywhere in the words.
+    public func contains(_ unit: UInt16) -> Bool {
+        units.contains(unit)
+    }
 }
 
 extension Words: ExpressibleByStringLiteral {

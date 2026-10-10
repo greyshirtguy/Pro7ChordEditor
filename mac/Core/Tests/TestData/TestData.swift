@@ -56,6 +56,12 @@ public enum TestData {
         }
     }
 
+    /// Where a presentation of `testdata/files` is, by its name alone: "Plain Song.pro"
+    /// as "made-by-simple-presenter/Plain Song.pro". Nothing if there is none.
+    public static func presentationPath(named name: String) throws -> String? {
+        try presentationPaths().first { $0.split(separator: "/").last.map(String.init) == name }
+    }
+
     /// A file of `testdata/files`, by its path from there: "expected/Amazing Grace.json".
     public static func file(_ path: String) throws -> Data {
         try Data(contentsOf: root.appendingPathComponent("files").appendingPathComponent(path))

@@ -83,8 +83,10 @@ Presentation
 
 **The order of the slides** is the order of the groups, and inside each group the
 order of its `cue_identifiers`; after those, any cue that no group names, in the order
-of `cues`. A cue is left out if `isenabled` is false or if none of its actions is a
-slide, and a cue named twice is taken the first time. Number the slides from 1 in that
+of `cues`. A cue is left out if its `isenabled` is false, or if none of its actions is
+a presentation's slide that is itself switched on (the action has an `isenabled` of
+its own; the first such action is the cue's slide). A cue named twice is taken the
+first time, and an id that is no cue's is passed over. Number the slides from 1 in that
 order: it is the order ProPresenter shows them in. (A presentation also has
 `arrangements`, which play the groups in another order. They are not gone by here: the
 sheet is the song as it is laid down, each slide once.)
@@ -93,8 +95,10 @@ sheet is the song as it is laid down, each slide once.)
 chord editors show are those that
 
 - have `element.text` with `rtf_data`, and
-- have no `data_links` (a box with a link shows a clock, a timer or another slide's
-  words, not words of its own), and
+- show words of their own: none of their `data_links` is of a kind that puts something
+  else in the box (a clock, a timer, another element's or another slide's words, and
+  every other kind the descriptions name). The one kind that leaves a box its own
+  words is a `visibility_link`, which only says when the box is to be seen. And
 - have words: the plain text is not empty or blank. But a box whose text is blank is
   still shown if it has chords, or has a stand-in character in it (U+200B or U+2001):
   it is a [line of chords alone](#chords-with-no-words).
@@ -103,7 +107,8 @@ Nearly every song slide has exactly one such box. Where a slide has two, both ar
 shown, one after the other, in the order of `elements`.
 
 **A blank slide.** A slide none of whose boxes is shown by those rules is a blank
-slide if it has a text box (an element with `element.text`) that has no `data_links`.
+slide if it has a text box (an element with `element.text`) that shows words of its
+own, by the second of those rules.
 The first such box, in the order of `elements`, is shown too: as a
 [line of chords alone](#chords-with-no-words) that has no chords yet and no stand-ins,
 so that chords can be put on it ([chords onto a blank slide](#chords-onto-a-blank-slide)).

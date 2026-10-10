@@ -1,16 +1,26 @@
-// Song: a song as the editors see it, on top of ChordRules and ProFormat, with no
-// window in it.
+// Song: the song that is open, between its file and the two editors. No window in it.
 //
-// EMPTY SO FAR. This is milestone M0, which only sets the layers up. What is to come
-// here, and when (spec/11-plan.md):
+// It reads the file, hands the editors the words and chords, takes their changes, saves
+// each one at once, and can undo them. Neither editor touches a file. This is what
+// spec/05-song-and-saving.md describes, and it stands on the other two layers:
+// ChordRules for what a chord is and how it is written, ProFormat for the file.
 //
-//   M2  opening a .pro; handing over its text boxes; setting a box's chords; setting
-//       the key; saving safely; undo and redo        (spec/01-file-format.md, 05)
+//   OpenSong.swift     the song: what it hands over, what it may be asked, undo
+//   TextBox.swift      what the editors are handed
+//   Reading.swift      which slides, in what order; which boxes hold a song's words
+//   Writing.swift      a box's chords into the message; the message into the file
+//   Safeguards.swift   what a song must be given before it may save anything
+//   Refusal.swift      why a thing was not done, as a sentence for the person
+//
+// The type is `OpenSong`, not `Song`: a type named as its module is cannot be told from
+// it in code that imports it. "The song that is open" is what the page calls it.
+//
+// What is to come here, and when (spec/11-plan.md):
+//
 //   M3  finding ProPresenter's library and listing it; whether ProPresenter is running
-//                                                     (spec/06-library.md)
-//   M4  the copies kept before a first change         (spec/07-backups.md)
+//   M4  the copies kept before a first change           (spec/07-backups.md)
+//   M7  adding to and taking from a line of chords alone, and chords onto a blank slide
 //   M8  the checks for what the old Windows editor left, and the mending
-//                                                     (spec/08-repair.md)
 //
 // What holds for every line written here (AGENTS.md, "What must stay true"):
 //
@@ -19,12 +29,7 @@
 //     back with everything else as it came. Never build a file from the parts this
 //     app knows.
 //   - The words of a song are not this app's to change. Only chords are.
-//   - Nothing is written while ProPresenter is running.
+//   - Nothing is written while ProPresenter is running, nor before a copy of the file
+//     has been kept.
 //   - Tests never run on a real library: on testdata/files, or on copies in a
 //     temporary folder.
-//
-// The imports are here so that the three layers are joined from the start, and a
-// mistake in how they are joined shows at M0 and not at M2.
-
-import ChordRules
-import ProFormat

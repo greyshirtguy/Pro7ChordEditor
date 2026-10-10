@@ -2,12 +2,12 @@
 // testdata/files, finds in them what testdata/files/expected says is there, and writes
 // them back saying what they said.
 //
-// There is no Song yet (that is M2), so these go to the generated code directly, and
-// read a file the plainest way there is: every cue as it comes, every element that has
-// text. Which boxes the editors show, and in what order, is M2's to build and to hold
-// to expected/as-read-by-simple-presenter.json. Here the chords of a file are compared
-// as a heap, sorted, with no regard to which box or slide each is in, so that nothing
-// of M2's rules is assumed.
+// These are of the reader by itself, below the song, so they go to the generated code
+// directly and read a file the plainest way there is: every cue as it comes, every
+// element that has text. Which boxes the editors are handed, and in what order, is the
+// song's (ReadingASongTests holds that to expected/as-read-by-simple-presenter.json).
+// Here the chords of a file are compared as a heap, sorted, with no regard to which
+// box or slide each is in, so that nothing of the song's rules is assumed.
 //
 // The last tests are of the first thing that must stay true (AGENTS.md): that a file
 // written back holds everything it came with, what the descriptions of the format have

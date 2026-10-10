@@ -59,7 +59,20 @@ of undo with the change before it.
 3. **Set the key**: see below.
 
 If the text box named has gone (the file was changed by something else since), the
-answer says so and nothing is changed.
+answer says so and nothing is changed. The same if what is named is on the slide and
+has no text at all: chords are not put on a shape.
+
+A request that would change nothing saves nothing, keeps no copy, and is no step of
+undo.
+
+Request 1 tidies every name it is handed, those of chords that were there before among
+them, since an editor hands back the whole box. So a chord in a file whose name is not
+as `tidied` would have it ("g", or a name with a space at its end) is written tidied
+the first time anything in its box is changed. None of the 1,299 chords in the songs
+looked at has such a name.
+
+Request 2, until M7 is built, is done only where the line has as many stand-ins as
+there are names (its chords renamed or put in another order), and is otherwise refused.
 
 ## The key
 
@@ -72,12 +85,15 @@ written in, *original*, and the one ProPresenter shows them in, *user*.
    chord: it says what key the chords that are there are in.
 6. With it, the user key is set to the same, **if** the song had no key, or its two
    keys were the same. If they differed, someone chose to show the song in another key
-   and that is left alone.
+   and that is left alone. (A `music` with an `original` and no `user` in it is taken
+   as two keys the same: nobody chose another. **A guess**: no song looked at has one.)
 7. **New: a second picker, "ProPresenter shows it in"**, sets the user key alone. The
    old Windows editor had the two side by side, and people use it to have ProPresenter
    transpose a song for them. Put it in the song's header beside the first, quieter.
    (Simple Presenter has no such picker: it sets both together, always, and lets its
-   own show choose a key for the night.)
+   own show choose a key for the night.) For a song that states no key it is refused:
+   a `music` made with only a `user` in it would read as a song in A flat. The person
+   is told to set the song's key first.
 8. The editors never draw chords in the user key. They show what is in the file.
 
 A change of key is a step of undo like any other.
@@ -91,13 +107,39 @@ A change of key is a step of undo like any other.
     - ProPresenter is running ([06-library.md](06-library.md)), or
     - the file on disk is no longer the one that was read (its size or its time of last
       change differs): something else has changed it. The person is told, and offered
-      the song read again.
+      the song read again. Its bytes are compared as well, with what was last read from
+      it or written to it: a file brought down by a syncing service can come with its
+      old time on it, and a song is small.
+    - no way to save was given at all: a song opened only to be looked at.
+
+    They are asked in that order, and before the copy of rule 12 is made, so that a
+    refusal leaves no copy behind it.
 11. A save writes the whole file beside itself and swaps it in, then reads it back
     ([01-file-format.md](01-file-format.md), Writing). If any of that fails, the song
     in memory is put back as it was before the change and the answer says what
     happened. The file is then whatever it was.
 12. Before the first save to a file since it was opened, a copy of it is kept
     ([07-backups.md](07-backups.md)). If the copy cannot be made, the save is refused.
+
+## What a refusal says
+
+Whatever is refused changes nothing, in the file or in the song as the editors see it,
+and answers with one of these, to be shown as it is. Both apps say the same.
+
+| When | The sentence |
+| --- | --- |
+| The file is no presentation, or cannot be read | *name* could not be read as a ProPresenter presentation: *why* |
+| The song was opened only to be looked at | This song was opened only to be looked at. Nothing was changed. |
+| No slide of that number | That slide is no longer in the song. Nothing was changed. |
+| No text box of that id on the slide | That text box is no longer on the slide. Nothing was changed. |
+| No line of that number in the box | The text box has no such line. Nothing was changed. |
+| What was given is no key | “*key*” is not a key. Nothing was changed. |
+| The shown-in key, for a song with no key | This song does not say what key it is in. Set its key first, and then the key ProPresenter is to show it in. |
+| One more or fewer chords on a line of chords alone, before M7 | A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed. |
+| ProPresenter is running | ProPresenter is running. Quit it to change chords here. Nothing was changed. |
+| The file was changed by something else | This song's file has been changed by something else since it was opened here. Nothing was changed. Open the song again to see it as it is now. |
+| The copy could not be kept | A copy of the song's file could not be kept first, so the song was not changed: *why* |
+| The file could not be written, or did not read back as written | The song could not be saved, and is as it was: *why* |
 
 ## Undo
 
@@ -125,6 +167,11 @@ A change of key is a step of undo like any other.
 - A change to one box's chords leaves every other field of the file as it was: decode
   before and after, and the only lines that differ are that box's chord entries.
 - The same chords put on through request 1 as Simple Presenter's sheet asks for them
-  (`sheet-model.json` has what it asks) give the ranges `ranges.json` says.
+  (`sheet-model.json` has what it asks) give the ranges `ranges.json` says. (With each
+  name tidied, which request 1 does and `ranges` does not: one case of that file has
+  "g" and "f#m/a" in it. And only those cases whose text is the words of a box in a
+  test file can be tried on a file: ten of the twenty.)
+- The slides in the order of their groups, and a box's chords in order of place,
+  where the file has them otherwise. No test file does: make one.
 - A save with the file changed underneath it, and one with the copy impossible to
   make, are refused and leave everything as it was.
