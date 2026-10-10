@@ -74,7 +74,13 @@ extension Chords {
     /// The chords in ChordPro text typed in the editor, each at the place it has among
     /// the words as typed.
     public static func chordsOf(_ chordPro: String) -> [Chord] {
-        let chordPro = units(chordPro)
+        chordsOf(Words(units: units(chordPro)))
+    }
+
+    /// The same, of text held as its units: what the editor asks, which counts along
+    /// what is typed as the file counts along a song's words.
+    public static func chordsOf(_ chordPro: Words) -> [Chord] {
+        let chordPro = chordPro.units
         var result: [Chord] = []
         var at = 0
         var i = 0
@@ -97,7 +103,13 @@ extension Chords {
     /// ChordPro text with its chords taken out: the words alone. Every "[...]" that has
     /// no bracket and no line break inside it goes.
     public static func withoutChords(_ chordPro: String) -> String {
-        let chordPro = units(chordPro)
+        withoutChords(Words(units: units(chordPro))).string
+    }
+
+    /// The same, of text held as its units. The editor holds what is typed against a
+    /// song's words unit for unit, which two Strings that look alike need not be.
+    public static func withoutChords(_ chordPro: Words) -> Words {
+        let chordPro = chordPro.units
         var result: Units = []
         var i = 0
         while i < chordPro.count {
@@ -114,7 +126,7 @@ extension Chords {
             result.append(chordPro[i])
             i += 1
         }
-        return string(result)
+        return Words(units: result)
     }
 
     /// That many stand-ins with an em quad between them.

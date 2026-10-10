@@ -1,12 +1,11 @@
-// The song that is open, at the right of the window: its name, its key, and its lines
-// with their chords in brackets. So far (milestone M3) it is only shown. spec/06-library.md,
-// rules 12, 14 and 19; the ChordPro editor (M5) and the chord sheet (M6) take the place
-// of the lines.
+// The song that is open, at the right of the window: its name, its two keys, and the
+// song as ChordPro text to be typed in (ChordProView.swift). spec/06-library.md, rules
+// 12, 14 and 19; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules 5 to 7.
+// The chord sheet (M6) will stand beside the text, with a switch between the two.
 //
-// The lines are the song's text as the ChordPro editor will have it (Song/SongText.swift):
-// a group's name before its first slide, a gap between slides, each line of words with
-// its chords before the characters they stand over. Chords are orange, brackets and all,
-// as spec/04-chordpro-editor.md has them; the colouring never changes the text.
+// `SongLines` is a song's lines only to be looked at, each line of words with its chords
+// before the characters they stand over: what an earlier version of a song is shown as
+// (EarlierVersionsPanel.swift).
 
 import Song
 import SwiftUI
@@ -33,18 +32,21 @@ struct SongPane: View {
                         .textSelection(.enabled)
                         .padding(16)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                } else {
-                    // A line never wraps: the song scrolls both ways. One that is
-                    // shorter or narrower than the pane sits at its top left, which a
-                    // view that scrolls both ways does not do by itself.
-                    GeometryReader { pane in
-                        ScrollView([.vertical, .horizontal]) {
-                            SongLines(lines: shown.lines)
-                                .padding(16)
-                                .frame(minWidth: pane.size.width, minHeight: pane.size.height, alignment: .topLeading)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let chordPro = model.chordPro {
+                    // One line of help over the text; or, in a warmer colour, why this
+                    // song can be read here and not changed.
+                    Text(chordPro.barred ?? ChordProEditor.help)
+                        .font(.callout)
+                        .foregroundStyle(chordPro.barred == nil ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.orange))
+                        .lineLimit(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 6)
+                        .background(Color(nsColor: .windowBackgroundColor))
+                    Divider()
+                    ChordProView(model: model, shown: chordPro, canType: model.canType)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             } else {
                 Text(model.library == nil ? "" : model.songs.isEmpty ? "There are no songs in this library." : "Choose a song to look at it.")
@@ -56,8 +58,13 @@ struct SongPane: View {
                 Text(model.notice.isEmpty ? " " : model.notice)
                     .font(.callout)
                     .foregroundStyle(model.refusal == nil ? .secondary : .primary)
-                    .lineLimit(model.refusal == nil ? 1 : 3)
+                    .lineLimit(model.refusal == nil ? 2 : 4)
                     .fixedSize(horizontal: false, vertical: true)
+                if model.offersOpeningAgain {
+                    Button("Open Again") { model.openAgain() }
+                        .controlSize(.small)
+                        .help("Read the song again from its file, as it is now.")
+                }
                 if model.justPutBack != nil && model.refusal == nil {
                     // Undoing a putting-back is only putting back the copy that was
                     // made just before it. The offer goes after a few seconds; the copy
@@ -79,35 +86,80 @@ struct SongPane: View {
         .background(Color(nsColor: .textBackgroundColor))
     }
 
+    /// The song's name, and its keys: on one row where the pane is wide enough for the
+    /// name to be read, and otherwise the keys on a row of their own under it.
     private func header(_ shown: LibraryModel.ShownSong) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            Text(shown.name)
-                .font(.title2)
-                .lineLimit(1)
-                .truncationMode(.middle)
-            Spacer(minLength: 8)
-            if model.hasEarlierVersions {
-                Button("Earlier Versions") { model.showEarlierVersions() }
-                    .help("See this song as it was before it was changed here, and put a version back.")
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                name(shown, whole: true)
+                Spacer(minLength: 8)
+                earlierVersions
+                if shown.problem == nil {
+                    keys(shown)
+                }
             }
-            if shown.problem == nil {
-                if shown.key.isEmpty {
-                    Text("No key")
-                        .foregroundStyle(.secondary)
-                        .help("This song does not say what key it is in.")
-                } else {
-                    Text("Key \(shown.key)")
-                        .help("The key the song's chords are written in.")
-                    if shown.shownKey != shown.key && !shown.shownKey.isEmpty {
-                        Text("Shown in \(shown.shownKey)")
-                            .foregroundStyle(.secondary)
-                            .help("The key ProPresenter is set to show this song's chords in.")
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    name(shown, whole: false)
+                    Spacer(minLength: 8)
+                    earlierVersions
+                }
+                if shown.problem == nil {
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        keys(shown)
+                        Spacer(minLength: 0)
                     }
                 }
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
+    }
+
+    private func name(_ shown: LibraryModel.ShownSong, whole: Bool) -> some View {
+        Text(shown.name)
+            .font(.title2)
+            .lineLimit(1)
+            .truncationMode(.middle)
+            // (On the one row the name is not to be cut short to make room: if it
+            // would be, the row does not fit, and the keys go under it.)
+            .fixedSize(horizontal: whole, vertical: false)
+    }
+
+    @ViewBuilder
+    private var earlierVersions: some View {
+        if model.hasEarlierVersions {
+            Button("Earlier Versions") { model.showEarlierVersions() }
+                .help("See this song as it was before it was changed here, and put a version back.")
+        }
+    }
+
+    /// The song's two keys, each to be set: the key its chords are written in, and,
+    /// quieter beside it, the key ProPresenter is to show them in. Neither changes any
+    /// chord in the file.
+    @ViewBuilder
+    private func keys(_ shown: LibraryModel.ShownSong) -> some View {
+        Picker("Key", selection: Binding(get: { shown.key }, set: { model.setKey($0) })) {
+            if shown.key.isEmpty {
+                Text("None").tag("")
+            }
+            ForEach(model.keys, id: \.self) { Text($0).tag($0) }
+        }
+        .fixedSize()
+        .disabled(!model.canChange)
+        .help(shown.key.isEmpty ? "This song does not say what key it is in. Pick the key its chords are written in."
+                                : "The key the song's chords are written in. Changing it changes no chord.")
+        Picker("Shown in", selection: Binding(get: { shown.shownKey }, set: { model.setShownKey($0) })) {
+            if shown.shownKey.isEmpty {
+                Text("None").tag("")
+            }
+            ForEach(model.keys, id: \.self) { Text($0).tag($0) }
+        }
+        .fixedSize()
+        .foregroundStyle(.secondary)
+        .disabled(!model.canChange || shown.key.isEmpty)
+        .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
+                                : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
     }
 }
 
@@ -152,7 +204,7 @@ struct SongLines: View {
                     Text("(a blank slide)")
                         .font(.system(.body, design: .monospaced))
                         .foregroundStyle(.tertiary)
-                        .help("This slide has no words. Chords cannot be put on it yet.")
+                        .help("This slide has no words.")
                 case .words, .chordsAlone:
                     // (A line with nothing in it still takes a line's height.)
                     Text(line.text.isEmpty ? AttributedString(" ") : Self.coloured(line.text))

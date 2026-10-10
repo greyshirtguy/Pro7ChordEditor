@@ -9,14 +9,12 @@
 // Keep it so. A rule that finds its way into this folder cannot be proved by
 // `swift test`, and will be built a second time, differently, on Windows.
 //
-// So far (milestone M4) the window finds ProPresenter's libraries, lists their songs and
-// shows one to be looked at; and the copies the app keeps of a file before changing it
-// can be seen, in the song's Earlier Versions and in the settings, and one put back.
-// There is no way yet to change a chord.
+// So far (milestone M5) the window finds ProPresenter's libraries, lists their songs,
+// and shows one as ChordPro text in which chords can be typed, each change saved a
+// moment after it is typed, with a copy of the file as it was kept first. The copies can
+// be seen, in the song's Earlier Versions and in the settings, and one put back.
 //
 // One window and not a new one at every Command+N: there is one library to look at.
-// Whether a song should open in a window of its own is a question for when there is a
-// song to change.
 
 import AppViews
 import SwiftUI

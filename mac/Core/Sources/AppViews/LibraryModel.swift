@@ -7,10 +7,12 @@
 // SongText), which this calls; so that the rules are proved by `swift test` with no
 // window, and are the same in the Windows app.
 //
-// So far (milestone M4) there is one thing here that changes a song's file: putting an
-// earlier version of it back (spec/07-backups.md). For that the song is opened with its
-// real safeguards: nothing is saved while ProPresenter runs, nor before a copy is kept.
-// There is no way yet to change a chord.
+// A song is opened with its real safeguards: nothing is saved while ProPresenter runs,
+// nor before a copy of the file is kept. Three things here change a song's file: what
+// is typed in the ChordPro editor (spec/04-chordpro-editor.md; the rules of that are in
+// Song/ChordProEditor.swift, and this only says when to save), the two keys in the
+// song's header (spec/05-song-and-saving.md, rules 5 to 7), and putting an earlier
+// version back (spec/07-backups.md).
 //
 // It is handed what it would otherwise ask the Mac for (where the app keeps its own
 // things, how to find places, whether ProPresenter is running), so that tests can hand
@@ -60,9 +62,28 @@ public final class LibraryModel {
         var before: KeptCopy
     }
 
+    /// The song as ChordPro text, as the editor shows it.
+    public struct ChordProShown: Equatable, Sendable {
+        /// The text, as it last passed the editor's rule.
+        public var text: String
+        /// Counted up each time the text is set from here and not typed: the view then
+        /// puts it in place of what it has, and forgets its own undo.
+        public var version: Int
+        /// Counted up each time a song is opened or put back: the view then starts at
+        /// the top of the text. (Otherwise the caret stays where it was.)
+        public var sitting: Int
+        /// Why the song can be read here and not changed, as a sentence; nil if it can.
+        public var barred: String?
+    }
+
     private let appData: AppData
     private let copies: Copies
     private var openSong: OpenSong?
+    private var editor: ChordProEditor?
+    private var textVersion = 0
+    private var sitting = 0
+    /// The wait for the typing to stop, before what was typed is saved.
+    private var pause: Task<Void, Never>?
     private let finder: ([URL]) -> PlaceFinder
     private let askWhetherProPresenterIsRunning: () -> Bool
     private var started = false
@@ -86,6 +107,14 @@ public final class LibraryModel {
     public private(set) var justPutBack: PutBack?
     /// What went wrong with the last thing asked, as a sentence; nothing if nothing did.
     public private(set) var refusal: String?
+    /// Whether that was that the file has been changed by something else, so that the
+    /// song is offered read again.
+    public private(set) var offersOpeningAgain = false
+    /// The song as ChordPro text; nil if no song is open, or it could not be read.
+    public private(set) var chordPro: ChordProShown?
+
+    /// How long after the typing stops a change is saved (spec/04, rule 13).
+    public var pauseBeforeSaving: Duration = .milliseconds(700)
 
     /// What is typed in the search box, and what the list is narrowed to by mark.
     public var typed = ""
@@ -108,10 +137,21 @@ public final class LibraryModel {
     public var place: Place? { places.first { $0.id == placeID } }
     public var library: Library? { libraries.first { $0.id == libraryID } }
 
-    /// The songs of the library, narrowed by what is typed and by mark.
+    /// The songs of the library, narrowed by what is typed and by mark. The song that
+    /// is open stays in the list whatever it is narrowed to: its first chord must not
+    /// take it out of "without chords" from under the person typing it.
     public var listedSongs: [ListedSong] {
-        Listing.narrowed(songs, to: typed).filter { filter.lets(marks[$0.id]) }
+        let narrowed = Set(Listing.narrowed(songs, to: typed).filter { filter.lets(marks[$0.id]) }.map(\.id))
+        return songs.filter { narrowed.contains($0.id) || $0.id == songID }
     }
+
+    /// Whether the song that is open can be changed just now: it was read, ProPresenter
+    /// is not running, and (for typing) its text can say it exactly.
+    public var canChange: Bool { openSong != nil && !proPresenterIsRunning }
+    public var canType: Bool { canChange && chordPro != nil && chordPro?.barred == nil }
+
+    /// The keys a song can be said to be in, as the pickers list them.
+    public var keys: [String] { Chords.majorKeys() + Chords.minorKeys() }
 
     /// The quiet line under the song: what is there to be seen. Nothing here is a
     /// promise of what the app will do.
@@ -122,7 +162,9 @@ public final class LibraryModel {
             if shown.problem != nil { return "Nothing was done to this file." }
             let slides = shown.slides == 1 ? "1 slide" : "\(shown.slides) slides"
             let chords = shown.chords == 1 ? "1 chord" : "\(shown.chords) chords"
-            return "\(slides), \(chords). Nothing can be changed here yet."
+            // (There is no Save button to look for, so it says there is no need of one;
+            // but only where something can be typed.)
+            return canType ? "\(slides), \(chords). A change is saved a moment after it is typed." : "\(slides), \(chords)."
         }
         if library != nil {
             let withChords = songs.filter { marks[$0.id]?.hasChords == true }.count
@@ -157,39 +199,45 @@ public final class LibraryModel {
     /// have added songs meanwhile, and whether it is running is asked again.
     public func refresh() async {
         guard started else { return }
+        settle()
         let song = songID
         findPlaces(preferring: placeID, library: libraryID)
         proPresenterIsRunning = askWhetherProPresenterIsRunning()
+        // The song that is open stays open, with what was typed in it and its undo, if
+        // its file is still the one that was read. If something else has changed the
+        // file meanwhile, it is read again: nothing could be saved over it anyway.
         // (Not while the panel of earlier versions is open over it: that is put away
         // by the person, not by the app coming to the front.)
-        if let song, songs.contains(where: { $0.id == song }), earlier == nil {
+        if let song, songs.contains(where: { $0.id == song }), earlier == nil, openSong?.fileIsAsLastRead != true {
             open(song: song)
         }
         await marksAreWorkedOut()
     }
 
     public func choose(place id: Place.ID?) {
-        guard id != placeID else { return }
+        guard id != placeID, settle() else { return }
         placeID = id
         listLibraries(preferring: nil)
         remember()
     }
 
     public func choose(library id: Library.ID?) {
-        guard id != libraryID else { return }
+        guard id != libraryID, settle() else { return }
         libraryID = id
         listSongs()
         remember()
     }
 
     /// A click on a song opens it. One that cannot be read says so, and nothing is done
-    /// to it.
+    /// to it. What was being typed in the song that is left is saved first.
     public func open(song id: ListedSong.ID?) {
+        guard settle() else { return }
         songID = id
         earlier = nil
         justPutBack = nil
         refusal = nil
-        openSong = nil
+        offersOpeningAgain = false
+        close()
         guard let song = songs.first(where: { $0.id == id }), let kept = keptSong(song) else {
             shown = nil
             return
@@ -203,10 +251,101 @@ public final class LibraryModel {
                 keepCopy: { file, why in try copies.keep(file, of: kept, why: why) }))
             openSong = opened
             shown = Self.show(opened, named: song.name)
+            edit(opened)
             appData.log("Opened \(song.url.lastPathComponent).")
         } catch {
             shown = ShownSong(name: song.name, problem: (error as? Refusal)?.sentence ?? "\(song.url.lastPathComponent) could not be read.")
             appData.log("Could not read \(song.url.lastPathComponent).")
+        }
+    }
+
+    /// "Open Again": the song read afresh from its file, after something else changed it.
+    public func openAgain() {
+        open(song: songID)
+    }
+
+    // ---- The ChordPro editor (spec/04-chordpro-editor.md)
+
+    /// The text view asks before it lets a change through: may the text become this?
+    /// If it may, it is taken, and saved a moment after the typing stops. If it may
+    /// not, the text stays as it was; and where that is for want of something not built
+    /// yet, the line under the song says so.
+    public func textMayBecome(_ text: String) -> Bool {
+        guard let editor, canType else { return false }
+        switch editor.take(text) {
+        case .taken:
+            refusal = nil
+            offersOpeningAgain = false
+            chordPro?.text = text
+            pause?.cancel()
+            let wait = pauseBeforeSaving
+            pause = Task { [weak self] in
+                try? await Task.sleep(for: wait)
+                guard !Task.isCancelled else { return }
+                self?.settle()
+            }
+            return true
+        case .notTheWords:
+            return false
+        case .notYet(let sentence):
+            refusal = sentence
+            return false
+        }
+    }
+
+    /// Saves what has been typed, without waiting for the typing to pause: before the
+    /// song is left for another, before anything else is done to it, and when the app
+    /// is left or quit. Answers whether all is saved; false if a save was refused, and
+    /// then whatever was to be done next is not done, so that the sentence is seen
+    /// and not swept away with the song.
+    @discardableResult
+    public func settle() -> Bool {
+        pause?.cancel()
+        pause = nil
+        guard let editor, openSong != nil else { return true }
+        do {
+            if try editor.save() {
+                noteAChange()
+            }
+            return true
+        } catch {
+            // What was saved before the refusal stays saved. The text is made again
+            // from the song, so that what is seen is what the sentence says: nothing
+            // (more) was changed.
+            refuse(error)
+            editor.reload(keepingWhatIsTyped: false)
+            showText(of: editor)
+            noteAChange()
+            return false
+        }
+    }
+
+    /// Waits until what was typed has been saved, if a save is waiting.
+    public func whatWasTypedIsSaved() async {
+        await pause?.value
+    }
+
+    // ---- The two keys (spec/05-song-and-saving.md, rules 5 to 7)
+
+    /// Says what key the song's chords are written in. It changes no chord.
+    public func setKey(_ key: String) {
+        change { try $0.setKey(key) }
+    }
+
+    /// Says what key ProPresenter is to show the song's chords in, and that alone.
+    public func setShownKey(_ key: String) {
+        change { try $0.setShownKey(key) }
+    }
+
+    private func change(_ ask: (OpenSong) throws -> Void) {
+        guard settle(), let song = openSong else { return }
+        refusal = nil
+        offersOpeningAgain = false
+        do {
+            try ask(song)
+            noteAChange()
+        } catch {
+            refuse(error)
         }
     }
 
@@ -219,6 +358,7 @@ public final class LibraryModel {
 
     /// Opens the panel, with the newest copy picked.
     public func showEarlierVersions() {
+        guard settle() else { return }
         guard let song = songs.first(where: { $0.id == songID }), let kept = keptSong(song) else { return }
         let all = copies.copies(of: kept)
         guard !all.isEmpty else { return }
@@ -275,8 +415,9 @@ public final class LibraryModel {
     }
 
     private func putBack(_ copy: KeptCopy, undoing: Bool) {
-        guard let song = openSong, let listed = songs.first(where: { $0.id == songID }), let kept = keptSong(listed) else { return }
+        guard settle(), let song = openSong, let listed = songs.first(where: { $0.id == songID }), let kept = keptSong(listed) else { return }
         refusal = nil
+        offersOpeningAgain = false
         do {
             try song.putBack(try Data(contentsOf: copy.url))
         } catch {
@@ -285,9 +426,10 @@ public final class LibraryModel {
             earlier?.question = nil
             return
         }
-        // The song starts afresh from its file. The newest copy now is the file as it
-        // was just before: the one to put back, to take this back.
-        shown = Self.show(song, named: listed.name)
+        // The song starts afresh from its file, and so does its text. The newest copy
+        // now is the file as it was just before: the one to put back, to take this back.
+        edit(song)
+        noteAChange()
         earlier = nil
         let when = copies.when(copy.made)
         if undoing {
@@ -297,7 +439,6 @@ public final class LibraryModel {
             justPutBack = PutBack(sentence: "Put back the version of \(when).", before: before)
             appData.log("Put back an earlier version of \(listed.url.lastPathComponent), the one of \(when).")
         }
-        noteCopies()
     }
 
     private static func count(_ chords: Int, key: String) -> String {
@@ -320,8 +461,62 @@ public final class LibraryModel {
         songsWithCopies = place.flatMap { place in library.map { copies.namesWithCopies(place: place.name, library: $0.name) } } ?? []
     }
 
+    /// No song is open.
+    private func close() {
+        pause?.cancel()
+        pause = nil
+        openSong = nil
+        editor = nil
+        chordPro = nil
+    }
+
+    /// The song as text, made afresh from it: a new sitting at the editor.
+    private func edit(_ song: OpenSong) {
+        let made = ChordProEditor(song: song)
+        editor = made
+        sitting += 1
+        showText(of: made)
+    }
+
+    /// Sets the text the view shows from the editor's, in place of whatever was typed.
+    private func showText(of editor: ChordProEditor) {
+        textVersion += 1
+        chordPro = ChordProShown(text: editor.text, version: textVersion, sitting: sitting, barred: editor.barred)
+    }
+
+    /// Something was not done: its sentence, and what follows from why.
+    private func refuse(_ error: Error) {
+        let refused = error as? Refusal
+        refusal = refused?.sentence ?? "That could not be done: \(error.localizedDescription)"
+        offersOpeningAgain = refused?.reason == .changedByAnother
+        if refused?.reason == .proPresenterIsRunning {
+            proPresenterIsRunning = true
+        }
+        if let song = songs.first(where: { $0.id == songID }) {
+            appData.log("A change to \(song.url.lastPathComponent) was refused.")
+        }
+    }
+
+    /// The song's file has been changed from here: what is shown of it, its marks in
+    /// the list, and whether it has copies, are brought up to date.
+    private func noteAChange() {
+        guard let song = openSong, let index = songs.firstIndex(where: { $0.id == songID }) else { return }
+        shown = Self.show(song, named: songs[index].name)
+        // (A URL keeps what it was last told of its file; a new one asks again.)
+        let values = try? URL(fileURLWithPath: songs[index].url.path).resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
+        songs[index].size = values?.fileSize ?? songs[index].size
+        songs[index].modified = values?.contentModificationDate ?? songs[index].modified
+        let found = Marks.read(songs[index])
+        marks[songs[index].id] = found
+        keptMarks.keep(found, for: songs[index])
+        appData.marks = keptMarks
+        noteCopies()
+        appData.log("Saved \(songs[index].url.lastPathComponent).")
+    }
+
     /// A folder chosen by hand becomes a place, is remembered, and is opened.
     public func add(folder: URL) {
+        guard settle() else { return }
         if !chosenFolders.contains(where: { $0.standardizedFileURL == folder.standardizedFileURL }) {
             chosenFolders.append(folder)
         }
@@ -355,7 +550,7 @@ public final class LibraryModel {
         if !songs.contains(where: { $0.id == songID }) {
             songID = nil
             shown = nil
-            openSong = nil
+            close()
             earlier = nil
         }
         noteCopies()

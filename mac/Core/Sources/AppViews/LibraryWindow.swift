@@ -14,8 +14,9 @@
 // this into a picture file to be looked at (AppViewsTests): drawn off the screen, that
 // material comes out blank. The lists, fields and buttons are the system's own.
 //
-// So far (milestone M3) a song is only shown: SongView.swift. The editors take its
-// place at M5 and M6.
+// The song is SongView.swift: its header, and the ChordPro editor. What is being typed
+// is saved when the app is left, when it quits and when the window goes, as well as a
+// moment after the typing stops.
 
 import AppKit
 import Song
@@ -42,6 +43,13 @@ public struct LibraryWindow: View {
             EarlierVersionsPanel(model: model)
         }
         .task { await model.start() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willResignActiveNotification)) { _ in
+            model.settle()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+            model.settle()
+        }
+        .onDisappear { model.settle() }
         // When the app comes to the front the lists are read again: ProPresenter may
         // have added songs meanwhile, or been started or quit.
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in

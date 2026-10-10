@@ -34,7 +34,8 @@ and with it the app is already of use.
    chords, and whether it is a line of chords alone. Every rule below goes by that.
 
    A **blank slide** ([01-file-format.md](01-file-format.md)) is one line of the text,
-   and that line is empty. With the empty line that parts it from the slide before,
+   and that line is empty, whether the slide has an empty text box or none at all.
+   With the empty line that parts it from the slide before,
    the text has two empty lines running there, and only by what is kept beside the
    text does the editor know which is the slide. Chords typed on it are saved as a
    line of chords alone. (**New**, and the part of blank slides least sure to be
@@ -57,9 +58,17 @@ and with it the app is already of use.
    - a line of chords alone, with every `[...]` taken out, is nothing but spaces;
    - whatever is in any pair of brackets could become a chord (`couldBecome`, after
      trimming).
+
+   "Exactly" is unit for unit ([10-platforms.md](10-platforms.md), Counting
+   characters): an accented letter written as one character is not the same words as
+   that letter written as two, though the two look alike and many a string comparison
+   calls them equal. A pair of brackets is a `[`, then anything but a bracket or a
+   line break, then a `]`.
 7. A change that fails the rule is put back as it was, at once, with the caret left
    where the eye expects it: where it was for a deletion, one back for a character
-   typed.
+   typed. (Where the platform's text box asks before it changes, as the Mac's does,
+   the change is simply never made, which is the same to look at; and the system's
+   sound for "no" is made, as it is wherever the Mac will not take a key.)
 8. That single rule covers typing in the wrong place, pasting, cutting, dropping and
    undoing alike. Do not write a rule for each.
 
@@ -72,29 +81,51 @@ Since brackets are all there is to type:
 11. **Backspace** just after a `[` or a `]`, or **Delete** just before one, takes the
     whole chord, brackets and all. (Only when the caret is in or beside a chord on its
     own line; otherwise the key does what it always does, and rule 6 decides.)
-12. None of this happens while Ctrl, Alt or the Windows or Command key is down.
+12. None of this happens while Ctrl, Alt or the Windows or Command key is down. (On
+    the Mac the help is given to what arrives as typed text, whatever keys typed it:
+    a key pressed with Command or Control never does, Option with Delete is another
+    command than Delete, and several keyboards type `[` and `]` with Option held.)
+    What is pasted or dropped gets none of it: a pasted `[` is a stray bracket.
 
 ![Typing a chord as ChordPro](pictures/chordpro-type.png)
 
 ## Saving
 
 13. A change is saved **700 milliseconds after the typing stops**, and once more on the
-    way out of the editor (to the sheet, to another song, on quitting). Nothing is
+    way out of the editor (to the sheet, to another song, on quitting), when the app
+    is left for another program, and before anything else is done to the song (its
+    key set, its earlier versions looked at). Nothing is
     saved while the text fails rule 6, which it cannot for long.
 14. What is saved is each text box whose chords are no longer what the text says, as
     one change each ([05-song-and-saving.md](05-song-and-saving.md)). The chords of a
     line are read with `chordsOf`: each at the place it has among the line's words.
+    "No longer" is held against what the text said of the box when it was made from
+    the song (rule 24).
 15. **Empty brackets, and ones that hold what is not yet a chord (`isChord`), are left
     out of what is saved and left in the text.** Someone half way through typing `[F#`
     must not have it saved as a chord nor taken away from them.
 16. A chord typed after the last word of a line hangs on the line's last character.
 17. A line of chords alone is saved as its chords' names in order. Since that can
     change its text box's words (the stand-ins), the song is read again after it, and
-    any other lines still to be saved go in the next round.
-18. All the changes of one round of saving undo as one step.
-19. When the song changes from elsewhere (an undo, the other editor), the text is made
-    again from the song. When it changes because of what was just typed here, the text
-    is left exactly as typed.
+    any other lines still to be saved go in the next round, which follows at once.
+18. All the changes of one saving, however many rounds it took, undo as one step.
+    (In the reference the next round waits for the next pause, and is a step of its
+    own.)
+19. When the song changes from elsewhere (an undo, the other editor, an earlier
+    version put back), the text is made again from the song. When it changes because
+    of what was just typed here, the text is left exactly as typed.
+19a. **A save that is refused** ([05-song-and-saving.md](05-song-and-saving.md), What
+    a refusal says) shows its sentence on the line under the song, and the text is
+    made again from the song: the sentence says nothing was changed, and that is then
+    what is seen. What was typed and not saved is gone. If the save was the one made
+    on the way to something else (another song clicked, another library, a key set,
+    the earlier versions), that something is not done: the song stays open with its
+    sentence, and is left at the next asking. If the refusal is that the
+    file was changed by something else, a button beside the sentence, **Open Again**,
+    reads the song afresh from its file. (**New**: the reference leaves the text as
+    typed, saying one thing while the song says another.) While ProPresenter is
+    known to be running the text cannot be typed in at all
+    ([06-library.md](06-library.md), rule 19).
 
 ## Words that have brackets of their own
 
@@ -102,13 +133,36 @@ Since brackets are all there is to type:
     from chords. The song is then shown here but cannot be changed here, and the line
     of help says so, in a warmer colour: "This song's words have square brackets of
     their own in them, so it cannot be changed as ChordPro text. The chord sheet can
-    still be used."
+    still be used." (The last sentence only once there is a chord sheet, M6.)
+20a. The same if the text as it is made from the song does not itself pass rule 6,
+    since then nothing typed in it ever could: a chord in the file has a bracket or a
+    line break in its name, or the words have half a character in them that text
+    cannot hold. The line of help then says: "This song cannot be changed as ChordPro
+    text: one of its chords has a square bracket or a line break in its name, or its
+    words have a broken character in them." (**New**: in the reference such a song
+    takes no change and says nothing.)
 
 ## Which slide is picked
 
 21. The caret's line says which slide is picked: the same notion as on the sheet. When
     a slide is picked from elsewhere, the caret goes to the start of its first line and
-    the text scrolls to it.
+    the text scrolls to it. (Until there is an elsewhere, M6, nothing shows it.)
+
+## Until chords with no words are built (M7)
+
+The ChordPro editor is built before the app can add a stand-in to a line of chords
+alone or take one away ([11-plan.md](11-plan.md)). Until it can:
+
+- a line of chords alone that is changed must still have as many pairs of brackets as
+  it has stand-ins, so its chords can be renamed and that is all; and a blank
+  slide's line takes nothing. A change that would be let through by rule 6 and fails
+  this is not made, and the line under the song says the sentence of
+  [05-song-and-saving.md](05-song-and-saving.md) for it ("A chord cannot yet be added
+  to a line that has no words ...");
+- such a line with a bracket still empty is not saved until the bracket is filled.
+
+So the text never shows a chord that cannot be saved. With M7 both go, and rules 6
+and 17 stand as they are written.
 
 ## Different from the reference, on purpose
 
@@ -124,8 +178,18 @@ Since brackets are all there is to type:
     leaves is held to rule 6 and saved by rule 13 like anything typed, so the text and
     the song cannot come to say different things. That is how the reference does it.
     The song's own history ([05-song-and-saving.md](05-song-and-saving.md)) still gets
-    a step for each round of saving, which the sheet's Ctrl+Z will walk back through
-    later.
+    a step for each saving, which the sheet's Ctrl+Z will walk back through
+    later. The text box's undo is forgotten whenever the text is made again from the
+    song (rules 19 and 19a).
+24. **Only the boxes that were typed in are saved.** The reference saves a box when
+    what the text says is not what the *file* has, and the two can differ before
+    anything is typed: a chord whose name is not tidy ("g"), or one past the end of
+    its words, which the text cannot show as it is. Typing in one box then writes
+    every such box in the song, and drops what the text could not show. Here a box is
+    saved when what the text says of it is no longer what the text said when it was
+    made from the song. A song with such chords is the old editor's damage as often as
+    not, and is for mending on purpose ([08-repair.md](08-repair.md)), not by the
+    way.
 
 ## What to hold your build to
 
@@ -136,3 +200,8 @@ Since brackets are all there is to type:
   kind of line, and a paste.
 - What is saved (rules 14 to 17) against the same song changed on the sheet: the same
   chords put on both ways must give the same file.
+- Rule 24: a song with an untidy name and a chord past its words in one box, typed in
+  in another, has the first box's entries as they were, to the last field.
+- The text box itself, typed into a key at a time by a test: a character over a word
+  (nothing happens), `[` (its other comes), a name, `]` (stepped over), Backspace on
+  a bracket, a paste, the box's own undo; and after each, what the file has.

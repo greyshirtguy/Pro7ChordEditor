@@ -61,6 +61,11 @@ public struct Words: Hashable, Sendable {
         units.allSatisfy(isSpace)
     }
 
+    /// The words with the white space off their ends, as the rules count white space.
+    public var trimmed: Words {
+        Words(units: units.trimmed())
+    }
+
     /// Whether a unit is anywhere in the words.
     public func contains(_ unit: UInt16) -> Bool {
         units.contains(unit)

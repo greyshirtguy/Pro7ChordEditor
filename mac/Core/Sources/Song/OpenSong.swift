@@ -120,6 +120,14 @@ public final class OpenSong {
     public var canUndo: Bool { !undoSteps.isEmpty }
     public var canRedo: Bool { !redoSteps.isEmpty }
 
+    /// Whether the file on disk is still the one that was last read here or written
+    /// from here: in its size, its time of last change and its bytes. If it is not,
+    /// something else has changed it, and nothing will be saved over it.
+    public var fileIsAsLastRead: Bool {
+        guard let now = try? SongFile.stamp(of: url), now == stamp, let onDisk = try? Data(contentsOf: url) else { return false }
+        return onDisk == bytesOnDisk
+    }
+
     // ---- What the editors may ask
     //
     // Each changes the song and saves it at once, or throws a Refusal and changes
@@ -336,10 +344,7 @@ public final class OpenSong {
     private func maySave() throws -> Safeguards {
         guard let safeguards else { throw Refusal.onlyForReading }
         if safeguards.proPresenterIsRunning() { throw Refusal.proPresenterIsRunning }
-        guard let now = try? SongFile.stamp(of: url), now == stamp,
-              let onDisk = try? Data(contentsOf: url), onDisk == bytesOnDisk else {
-            throw Refusal.changedByAnother
-        }
+        guard fileIsAsLastRead else { throw Refusal.changedByAnother }
         return safeguards
     }
 

@@ -48,13 +48,16 @@ final class MadeUpMac {
     var appData: AppData { AppData(folder: folder.appendingPathComponent("Own", isDirectory: true)) }
 
     func model() -> LibraryModel {
+        // (A model can outlast its Mac by a moment: a save that was waiting for the
+        // typing to stop may come after the test is over. It then finds no place and a
+        // ProPresenter that is running, and so saves nothing.)
         LibraryModel(
             appData: appData,
-            finder: { [unowned self] chosen in
-                let listed: [[String: Any]] = hasAWorkspace ? [["name": "Sunday", "url": place.absoluteString, "isActive": true]] : []
+            finder: { [weak self] chosen in
+                let listed: [[String: Any]] = self.map { $0.hasAWorkspace ? [["name": "Sunday", "url": $0.place.absoluteString, "isActive": true]] : [] } ?? []
                 return PlaceFinder(proPresentersSetting: { $0 == "userWorkspaces" ? listed : nil }, documents: nil, chosen: chosen)
             },
-            proPresenterIsRunning: { [unowned self] in proPresenterIsRunning })
+            proPresenterIsRunning: { [weak self] in self?.proPresenterIsRunning ?? true })
     }
 
     /// Changes a song of the library as the app would, some days ago: with a copy kept

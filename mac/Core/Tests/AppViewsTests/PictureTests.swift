@@ -71,7 +71,7 @@ struct PictureTests {
         return model
     }
 
-    @Test("A song open, to be looked at")
+    @Test("A song open, as ChordPro text")
     func aSongOpen() async throws {
         let mac = try MadeUpMac()
         try draw(LibraryWindow(model: await modelWithASongOpen(mac)), named: "1 a song open")
@@ -159,5 +159,44 @@ struct PictureTests {
         model.read()
         model.pick(song: "Sunday/Songs/Plain Song")
         try draw(AllCopiesView(model: model), named: "9 all copies", size: NSSize(width: 940, height: 520))
+    }
+
+    @Test("A chord being typed: its brackets empty still on one line, and one typed on another")
+    func aChordBeingTyped() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac)
+        let text = try #require(model.chordPro?.text)
+        #expect(model.textMayBecome(text.replacingOccurrences(of: "That saved a wretch", with: "That [Em7]saved a []wretch")))
+        try draw(LibraryWindow(model: model), named: "10 a chord being typed")
+        model.settle()
+    }
+
+    @Test("A song whose words have brackets of their own: shown, and why it cannot be typed in")
+    func wordsWithBrackets() async throws {
+        let mac = try MadeUpMac()
+        let url = mac.place.appendingPathComponent("Libraries/Songs/Plain Song.pro")
+        var bytes = try Data(contentsOf: url)
+        let word = try #require(bytes.range(of: Data("Thirteen".utf8)))
+        bytes.replaceSubrange(word, with: Data("Thir[een".utf8))
+        try bytes.write(to: url)
+        try draw(LibraryWindow(model: await modelWithASongOpen(mac, song: "Plain Song")), named: "11 words with brackets")
+    }
+
+    @Test("A save refused because the file was changed by something else, and the offer to open it again")
+    func refused() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "Plain Song")
+        let text = try #require(model.chordPro?.text)
+        #expect(model.textMayBecome(text.replacingOccurrences(of: "One two", with: "One [A]two")))
+        try mac.change("Plain Song", daysAgo: 0) { try $0.setKey("E") }
+        model.settle()
+        #expect(model.offersOpeningAgain)
+        try draw(LibraryWindow(model: model), named: "12 a save refused")
+    }
+
+    @Test("A song with a blank slide and a line of chords alone, in the dark")
+    func blankSlidesInTheDark() async throws {
+        let mac = try MadeUpMac()
+        try draw(LibraryWindow(model: await modelWithASongOpen(mac, song: "Blank Slides")), named: "13 blank slides, dark", dark: true)
     }
 }

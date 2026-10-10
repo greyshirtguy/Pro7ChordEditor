@@ -97,18 +97,28 @@ maintainer; the old editor's two lists beside an editing area are its bones.
     last change so that the next start has them at once.
 11. A choice over the list narrows it by mark: all, with chords, without, wanting
     mending. A song whose marks are not worked out yet, or that cannot be read, is
-    shown only under "all": nobody knows whether it has chords.
+    shown only under "all": nobody knows whether it has chords. The song that is open
+    stays in the list whatever the list is narrowed to: its first chord must not take
+    it out of "without" from under the person typing it. A song's marks are worked
+    out again when it is saved.
 12. **The song** at the right: its name, its two keys
     ([05-song-and-saving.md](05-song-and-saving.md)), and a switch between the chord
     sheet and ChordPro. Under the editor, one quiet line says what the keys do, or for
     a few seconds what just happened ("4 chords copied…", or what went wrong).
+    Each key is a picker of the twenty-six keys ([02-chord-rules.md](02-chord-rules.md));
+    a song that states no key shows "None" in the first, and its second cannot be set
+    until the first is. Where the pane is too narrow for the name to be read beside
+    them, the keys go on a row of their own under it. What went wrong stays on the
+    quiet line until the next thing is done.
 13. A click on a song opens it. If a chord was being typed in the song being left, it
     is kept first ([03-chord-sheet.md](03-chord-sheet.md), rule 39;
     [04-chordpro-editor.md](04-chordpro-editor.md), rule 13).
 14. A song that cannot be read is listed and says so when clicked. Nothing is done to
     it.
 15. When the app comes to the front, the lists are read again: ProPresenter may have
-    added songs meanwhile.
+    added songs meanwhile. The song that is open stays as it is, with what is being
+    typed in it and its undo, if its file is still the one that was read; if
+    something else has changed the file, the song is read again.
 
 Later, and not to begin with: ProPresenter's playlists in the left column, so that
 Sunday's songs can be worked through in order (`Playlists/Library` in its folder;
@@ -129,9 +139,12 @@ words; dropping a `.pro` file on the window to open it.
 18. This is asked when the app starts, when it comes to the front, and **before every
     save**. The first two are for telling the person early; only the last is the
     safeguard.
-19. While it is running, everything can be looked at and nothing changed. A band
+19. While it is running, everything can be looked at and nothing changed: the text
+    cannot be typed in and the keys cannot be set. A band
     across the top of the song says: "ProPresenter is running. Quit it to change
-    chords here." The band goes by itself when ProPresenter does.
+    chords here." The band goes by itself when ProPresenter does. If it was started
+    without the app being told (the app was in front all the while), the next save is
+    refused, and the band is there from then.
 20. There is no way to switch this off in the app.
 
 ## What the app keeps of its own

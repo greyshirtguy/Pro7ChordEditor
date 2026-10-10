@@ -54,7 +54,7 @@ struct LibraryModelTests {
         #expect(shown.slides == 4 && shown.chords == 11)
         #expect(shown.lines.first?.text == "{c: Verse 1}")
         #expect(shown.lines.last?.text == "[G] [D/F#] [Em]")
-        #expect(model.notice == "4 slides, 11 chords. Nothing can be changed here yet.")
+        #expect(model.notice == "4 slides, 11 chords. A change is saved a moment after it is typed.")
 
         model.open(song: mac.song("Nonsense"))
         let broken = try #require(model.shown)

@@ -25,19 +25,18 @@ the slides and, on a slide, of its boxes:
 | group | The name of the slide's group, or nothing |
 | group colour | The group's colour, if the file gives it one |
 | starts its group | Whether this slide is the first of its group |
-| element | The text box's id, by which a change names it |
+| element | The text box's id, by which a change names it, with its slide. **It is not the only one of its name in a song**: a slide made by duplicating another keeps its boxes' ids, and in one real song the boxes of 27 slides had one id between them. A change names the slide as well for that reason, and an editor must never tell two boxes apart by id alone |
 | words | Its plain text |
 | chords | Its chords in order, each a place along the words and a name |
-| blank | Whether it is a blank slide's box: no words, no chords, and handed over only so that chords can be put on it ([01-file-format.md](01-file-format.md)). **New** |
+| blank | Whether it is a blank slide's box: no words, no chords, and handed over only so that chords can be put on it ([01-file-format.md](01-file-format.md)). Its `element` is empty if the slide has no text box yet. **New** |
 
 `usedChords()`: every chord's name in song order, one for each use. It is what the
 typing bubble's offers go by.
 
 `testdata/files/expected/as-read-by-simple-presenter.json` has this for every test
 file, the blank slides of Blank Slides among them. (Its last slide has no text box at
-all, and is there with an empty `element`: that one is Simple Presenter's own, and an
-app that makes no text boxes hands nothing over for it.
-[01-file-format.md](01-file-format.md), "Where Simple Presenter goes further".)
+all, and is there with an empty `element`: a chord put there gives the slide a box,
+[01-file-format.md](01-file-format.md), "A slide with no text box".)
 
 A group's colour: the file's cue group has one if someone set it in ProPresenter.
 Most have none, and ProPresenter then colours the group by its *name*, from a list it

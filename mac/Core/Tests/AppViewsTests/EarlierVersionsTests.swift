@@ -95,7 +95,7 @@ struct EarlierVersionsTests {
         #expect(try mac.bytes(of: "Plain Song") == now)
         #expect(model.shown?.key == "E" && model.shown?.chords == 8)
         #expect(model.justPutBack == nil)
-        #expect(model.notice == "4 slides, 8 chords. Nothing can be changed here yet.")
+        #expect(model.notice == "4 slides, 8 chords. A change is saved a moment after it is typed.")
     }
 
     @Test("Nothing is put back while ProPresenter is running, and the panel says why")
