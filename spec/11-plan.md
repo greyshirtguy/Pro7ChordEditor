@@ -47,8 +47,9 @@ M7 to M9 can change order to suit what the maintainer wants next.
 
 ## What the maintainer is asked for along the way
 
-- **Before M3**, on the Mac: where ProPresenter's `PathSettings.proPaths` is and what
-  its bundle identifier is; on Windows: a look at the RTF of a song made there.
+- **Before M3**, on the Mac: leave to read (only read) ProPresenter's own settings
+  folder, to learn how it records its workspaces, which was given on 2026-10-10; on
+  Windows: a look at the RTF of a song made there.
   ([10-platforms.md](10-platforms.md), the last section.)
 - **At M5**: a copy of a real library to try on, and ProPresenter to look at the
   result in.

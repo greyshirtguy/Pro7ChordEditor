@@ -137,8 +137,11 @@ seen in a picture and ask the maintainer to try them.
 
 ## One thing only the maintainer can find out, on each
 
-- **Mac**: where `PathSettings.proPaths` is, and ProPresenter's bundle identifier
-  ([06-library.md](06-library.md), rules 3 and 17).
+- **Mac**: how ProPresenter records its workspaces and where each one's library is.
+  There is no `PathSettings.proPaths` on the Mac. It is found by reading
+  ProPresenter's own settings on the maintainer's Mac, at M3
+  ([06-library.md](06-library.md), rule 3). (ProPresenter's bundle identifier, the
+  other thing once asked here, is found: rule 17.)
 - **Windows**: what the RTF of a song made in ProPresenter for Windows looks like
   ([01-file-format.md](01-file-format.md), Not known), and whether the old editor
   really did save hand-placed chords short ([08-repair.md](08-repair.md), B).
