@@ -1,0 +1,20 @@
+# What git is to leave alone under mac/: what Xcode and the Swift package manager make
+# for themselves, and what is one person's own arrangement of Xcode.
+#
+# Kept: the Xcode project, its shared scheme, and every Package.resolved (they say
+# which version of a dependency the app was built and tested with).
+
+# Build results
+.build/
+DerivedData/
+/build/
+
+# One person's own Xcode state
+xcuserdata/
+*.xcuserstate
+
+# The package manager's working folder, and the Xcode workspace it makes for a package
+.swiftpm/
+
+# What a test build writes where it is run from
+*.profraw
