@@ -50,4 +50,11 @@ it does not, each time under a heading or a rule that says so. The main ones:
   (`spec/09-chordpro-files.md`).
 - There is a second key, the one ProPresenter shows the song in
   (`spec/05-song-and-saving.md`).
+- A chord on a line of chords alone is written with a range one character long, its
+  stand-in only, as Multitracks writes it. This code runs it on to the next chord
+  (`chords::ranges`). Simple Presenter is to be changed to match, and the vectors made
+  again (`spec/01-file-format.md`, Chords; `testdata/README.md`, "To be made again").
+- A blank slide is shown, and chords can be put on it. This code leaves a blank text
+  box out (`PresentationEditor::song`), so an intro made as an empty slide can take no
+  chords (`spec/01-file-format.md`, "A blank slide" and "Chords onto a blank slide").
 - Everything about the library, the copies and the mending is new.

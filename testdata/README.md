@@ -81,6 +81,56 @@ python3 tools/make-fixtures.py
 disagree; `make-fixtures.py` checks its reader of RTF the same way. Run them in that
 order.
 
+## To be made again, and cases wanted
+
+What has been decided or found since this data was made, that it does not yet hold.
+Each needs Simple Presenter or a tool changed first, on the Linux machine; nothing here
+is to be put right by editing a file of answers.
+
+**1. The range of a chord on a line of chords alone** is to be one long, its stand-in
+only, as Multitracks writes it ([`spec/01-file-format.md`](../spec/01-file-format.md),
+Chords; decided 2026-10-10). Three chords on such a line are 0 to 1, 2 to 3, 4 to 5,
+not 0 to 2, 2 to 4, 4 to 5.
+
+- Simple Presenter: `chords::ranges`, and what `chords.h` says of it. On a line that
+  `isPlaceholders`, a chord's range ends one after it starts.
+- `tools/make-fixtures.py`: `right_ranges`, which is the same rule in Python and is
+  what mending check 1 writes.
+- Then, made again: `vectors/ranges.json`; the three clean files that have such a line
+  (Amazing Grace, It Is Well, Plain Song) and their damaged twins; `files/expected/`,
+  `repairs.json` with it.
+
+**2. Blank slides** are to be shown, and to take chords
+([`spec/01-file-format.md`](../spec/01-file-format.md), "A blank slide"; decided
+2026-10-10). Simple Presenter leaves them out, and nothing here has one. Wanted, once
+it has them: a test song with a blank slide in it (an intro made as an empty slide,
+and a blank slide in the middle of a group), in `files/` and in
+`as-read-by-simple-presenter.json`; and in `vectors/sheet-model.json`, the rows such a
+song makes, where the spot can stand on its blank row, and what is asked when a chord
+is put there.
+
+**3. Rules that no vector holds.** Found while the Mac app's rules were built: with
+every vector passing, each rule was broken in one small way in turn, and these could
+be got wrong without any file here noticing. The Mac app holds each with a case of its
+own (`mac/Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift`), whose expected
+answer was read from the reference's code and not got from it. Put these inputs into
+`tools/make-vectors` and `tools/keyfit.py`, and the answers will be the reference's
+own, for both apps.
+
+| Where | Input wanted | The rule it holds |
+| --- | --- | --- |
+| `chord-names.json` | `G#b5` | A flat after a sharp is not part of the note |
+| `chord-names.json`, `transposed.json` | `C/Em`, `c/em` | What follows the last slash is a bass only if it is a note and nothing more |
+| `transposed.json` | `g` from C to C; a chord with a music flat in it, from E to E | The same key twice gives the chord back exactly as written |
+| `carried.json` | The same words before and after, two chords in one place | Unchanged words are only tidied, so the later of the two stands |
+| `carried.json` | `abab` to `ab`, a chord at 2 | The shared end is not looked for inside the shared start |
+| `chordpro.json`, `toText` | Three lines, the middle one empty, a chord on it | A chord on an empty line is written on that line |
+| `chordpro.json`, `withoutChords` | A `[` with a line break before its `]`; `[[G]]` | A bracket is not closed on another line, nor round another bracket |
+| `parse-song.json` (a sixth song) | Two `{artist}` lines; an empty line inside `{start_of_chorus}`; a line starting `[G]` and two spaces; the headings `CHORUS:`, `verse 2b`, `pre-chorus 2:`, `[PRE CHORUS]`; and `Verse 2bb` and `Chorus of angels`, which are not headings | The first artist stands; a gap in a marked part; chords move with trimmed words; what a heading is |
+| `rtf-text.json` | A group that sets the count of characters to pass over to nought, and after the group a numbered character with one stand-in after it | That count is a group's own, put back when the group closes |
+| `key-fit.json` | A stated key 0.2, exactly 0.25, and 0.3 below the best; a song whose best score is 0.6; E flat's chords written in sharps, with C minor used as often; a chord with the little circle | "More than a quarter below"; "at least 0.75"; the major before its relative minor; the circle is diminished |
+| `tidy.json`, `ranges.json`, `carried.json`, `chordpro.json` | Words with an emoji in them | Places are UTF-16 units. Only `rtf-text.json` has a character from beyond the first 65,536 |
+
 ## What must not come in here
 
 Anyone's real songs. Not the maintainer's, not a tester's, not one "just for a test":

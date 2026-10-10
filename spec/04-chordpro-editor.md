@@ -22,6 +22,7 @@ and with it the app is already of use.
    | (an empty line) | The gap between one slide and the next | No |
    | `[G]Words and [D]more words` | A line of a slide's words, with its chords | Only its chords |
    | `[C] [G] [Am]` | A line of chords alone | Its chords, freely |
+   | (an empty line, where a blank slide is) | A blank slide: a line of chords alone with none yet | Chords may be typed on it |
 
 2. It is made from the song's text boxes in order
    ([05-song-and-saving.md](05-song-and-saving.md)): an empty line before each new
@@ -31,6 +32,14 @@ and with it the app is already of use.
 3. Beside the text the editor keeps, for every line of it, what that line is: which
    text box and which line of it, where that line starts in the box, its words without
    chords, and whether it is a line of chords alone. Every rule below goes by that.
+
+   A **blank slide** ([01-file-format.md](01-file-format.md)) is one line of the text,
+   and that line is empty. With the empty line that parts it from the slide before,
+   the text has two empty lines running there, and only by what is kept beside the
+   text does the editor know which is the slide. Chords typed on it are saved as a
+   line of chords alone. (**New**, and the part of blank slides least sure to be
+   right: two empty lines look alike. To be tried with M7. The sheet is the better
+   place to put chords on a blank slide.)
 4. Chords are coloured orange, brackets and all. The lines in curly brackets are
    greyed. The colouring never changes the text.
 5. Over the text is one line of help: "Type chords in square brackets among the words:

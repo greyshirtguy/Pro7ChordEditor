@@ -102,6 +102,23 @@ chord editors show are those that
 Nearly every song slide has exactly one such box. Where a slide has two, both are
 shown, one after the other, in the order of `elements`.
 
+**A blank slide.** A slide none of whose boxes is shown by those rules is a blank
+slide if it has a text box (an element with `element.text`) that has no `data_links`.
+The first such box, in the order of `elements`, is shown too: as a
+[line of chords alone](#chords-with-no-words) that has no chords yet and no stand-ins,
+so that chords can be put on it ([chords onto a blank slide](#chords-onto-a-blank-slide)).
+
+- A blank box on a slide that has another box with words is not shown: that slide has
+  somewhere to put a chord already.
+- A slide with no text box at all is left out, as before. The app does not make text
+  boxes.
+
+This is **new**, decided by the maintainer on 2026-10-10. Simple Presenter leaves
+every blank box out: an intro or an instrumental that someone made as an empty slide
+has then nowhere to take its chords. In the one library looked at, 27 slides of 383
+had a blank text box, many of them in groups named Ending, Intro and Bridge, and one
+slide had nothing on it at all. No file of `testdata/` has a blank slide yet.
+
 `testdata/files/expected/as-read-by-simple-presenter.json` has every test file read
 this way: reading a file is right when it gives that.
 
@@ -164,12 +181,30 @@ custom_attributes {
   is unless the person changes it.
 - `range.start` is the place the chord stands at: it is drawn over the character there.
   It can be anywhere, the middle of a word included.
-- `range.end` is where its stretch of the words ends. **Written** it is always the
-  start of the next chord or the end of the chord's own line, whichever comes first,
-  and at least one more than `start`. **Read** it is not believed: files differ, and
-  some are wrong ([08-repair.md](08-repair.md)), so only `start` says where a chord is.
-  A range that runs past the end of its line makes ProPresenter draw the chord again
-  on the next line, which is why what is written matters.
+- `range.end` is where its stretch of the words ends. **Written** it is:
+  - on a [line of chords alone](#chords-with-no-words), one more than `start`: the
+    chord's own stand-in and nothing else, so that three chords on such a line are
+    0 to 1, 2 to 3 and 4 to 5, with the em quads between them in no range;
+  - on any other line, the start of the next chord or the end of the chord's own
+    line, whichever comes first, and at least one more than `start`.
+
+  **Known**: that is what the songs from Multitracks have. In the one library looked
+  at, all 290 chords on lines of chords alone had a range one long, and 949 of the
+  1,009 on lines of words had exactly the other; the 60 left were in two songs the old
+  Windows editor had saved ([08-repair.md](08-repair.md), check 1). So a box written
+  by this rule with its chords unchanged is, in its chord entries, what it was.
+
+  **Read** it is not believed: files differ, and some are wrong, so only `start` says
+  where a chord is. A range that runs past the end of its line makes ProPresenter draw
+  the chord again on the next line, which is why what is written matters.
+
+  (The first half of the rule was decided by the maintainer on 2026-10-10, on that
+  evidence. Simple Presenter runs the range of a chord on a line of chords alone on to
+  the next chord, over the em quad, as on a line of words, and `ranges.json` and the
+  test files were made from it. Until it is changed and they are made again
+  ([testdata/README.md](../testdata/README.md), "To be made again"), the apps'
+  `ranges` answers as that file has it. Whether ProPresenter draws the two any
+  differently is **not known**.)
 - A `start` or `end` of 0 is simply absent from the bytes. That is Protocol Buffers'
   way and needs no care.
 
@@ -222,7 +257,42 @@ the line cannot be found cleanly in the RTF, refuse the change and say so.
 
 This is the riskiest thing the app does to a file, and it comes last in the plan
 ([11-plan.md](11-plan.md), M7). Until then such lines are shown, and their chords can
-be renamed, moved among themselves and copied, but not added to or taken from.
+be renamed, moved among themselves and copied, but not added to or taken from; and a
+blank slide is shown and cannot be given chords.
+
+### Chords onto a blank slide
+
+**New**, with [a blank slide](#from-the-presentation-down-to-a-text-box) being shown at all.
+Putting the first chords on one gives its box words: one stand-in for each chord,
+U+200B with U+2001 between, exactly as a line of chords alone has. The app does it
+without asking. Nothing that shows on the slide is changed: it shows no words before
+and none after.
+
+There is nothing in such a box's RTF to change in place. As Apple's text system writes
+a text box with no text, the RTF is an empty document: its font table is empty, and it
+names no font, no size and no colour, so stand-ins put into it would have none. (29 of
+the 30 blank boxes looked at were so. The other was written by ProPresenter on
+Windows, and did name a font and a format.) So the RTF is made, from the song itself:
+
+1. Take the RTF of the nearest box of the song that is shown and is not blank: on a
+   slide before this one if there is one, else on one after.
+2. Keep its opening, up to where its words begin (its fonts, colours and format), and
+   put the stand-ins after it, as [09-chordpro-files.md](09-chordpro-files.md) does
+   to give a new song's text box its words.
+3. Read it back and check that the plain text is the stand-ins and nothing else,
+   before anything is saved.
+4. Only the box's `rtf_data` and its chord entries change. Where the box is on the
+   slide, its size and its fill, and `text.attributes`, stay as they were.
+
+If the song has no other box to take an opening from, the change is refused, with a
+sentence that says why. Taking the last chord off again leaves the box with that
+opening and no words: blank to look at as it was, and still shown as a blank slide.
+Undo puts the bytes back as they were.
+
+**A guess**, until it has been seen in ProPresenter: that a box so written shows its
+chords on a stage screen as an intro from Multitracks does, its text being the same
+shape; and that `text.attributes` may be left as they were. It is built with M7, and
+tried there before anyone is given it.
 
 ## The key
 

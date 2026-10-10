@@ -32,7 +32,7 @@ machine, each through the same milestones.
 | **M4** | **The copies.** Kept before a first change; listed; looked at; put back; taken back | [07](07-backups.md) | The proofs at the foot of page 07. (There is no editor yet: prove it with the song's own functions) |
 | **M5** | **The ChordPro editor.** | [04](04-chordpro-editor.md) | The maintainer can chord a song of their own, on a **copy** of their library, and see the chords in ProPresenter. This is the first build worth giving anyone |
 | **M6** | **The chord sheet.** First its model, held to the vectors; then drawn; then the pointer and the keys; then the typing bubble; then dragging; then copying a line | [03](03-chord-sheet.md) | Every case of `sheet-model.json` and `layout.json`; the pictures set beside `spec/pictures`; and the maintainer saying it is as quick as Simple Presenter's |
-| **M7** | **Chords with no words.** Adding to and taking from a line of chords alone, in both editors: the one place the app writes RTF | [01](01-file-format.md) (Chords with no words) | The RTF of every other line of a changed box is byte for byte what it was; a song so changed opens in ProPresenter with its chords in place |
+| **M7** | **Chords with no words.** Adding to and taking from a line of chords alone, and putting chords on a blank slide, in both editors: the one place the app writes RTF | [01](01-file-format.md) (Chords with no words) | The RTF of every other line of a changed box is byte for byte what it was; a song so changed opens in ProPresenter with its chords in place, a blank slide that was given chords among them |
 | **M8** | **Mending.** The checks; the marks; mending one song and all; the "(Chords)" copies | [08](08-repair.md) | The proofs at the foot of page 08. Check 2 built and left switched off until the maintainer has seen the fault in a real file |
 | **M9** | **ChordPro files.** Reading one and showing what is in it; making the song; writing one out | [09](09-chordpro-files.md) | `parse-song.json` passes (it may be done in M1). A song made here opens in ProPresenter, on this system, with its chords showing on a stage screen |
 | **M10** | **Giving it out.** The icon, the About text, the README for this app, signing and notarizing (Mac) or the zip and what the person will be told by Windows; a release | [10](10-platforms.md) | Someone else can download it and run it |
@@ -54,6 +54,9 @@ M7 to M9 can change order to suit what the maintainer wants next.
 - **At M5**: a copy of a real library to try on, and ProPresenter to look at the
   result in.
 - **During M6**: the maintainer's hand on the mouse, more than once.
+- **Before M7**: a small song made in ProPresenter that has a blank slide in it (an
+  intro made as an empty slide), of words anyone may use, for `testdata/files`; and
+  ProPresenter to look at what M7 writes.
 - **Before M8's check 2**: the one test with the old editor
   ([08-repair.md](08-repair.md)).
 - **Before M9**: a small presentation made in ProPresenter, of words anyone may use,

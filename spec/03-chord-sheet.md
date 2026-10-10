@@ -44,7 +44,12 @@ The sheet is a list of rows made from the song's text boxes
    including its line break. An empty line is taken as one place wide, so that a chord
    standing on it is not lost.
 4. A line row can take the spot (is *usable*) if its words are not empty. A group row
-   and an empty line cannot.
+   and an empty line cannot. The one exception is the row of a **blank slide**
+   ([01-file-format.md](01-file-format.md)): its box has no words, so it is one empty
+   line, and it is usable. It is a line of chords alone with none yet: rule 13 draws
+   it, rule 22 gives it its one stop, and a chord put there asks the song for "this
+   line of chords alone now has these". (**New.** Simple Presenter leaves blank slides
+   out, so `sheet-model.json` has none; hold this to cases of your own until it has.)
 5. Each slide's line rows know how many they are, which is the first and which the
    last, and the sheet knows the greatest number any slide has. That is what the cards
    are sized by.

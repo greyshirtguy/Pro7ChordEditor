@@ -154,9 +154,15 @@ fourteen.
 - Then sorted by place, keeping order among equals.
 - An empty text has no chords.
 
-`ranges(text, chords)`: how each is written in the file (tidied first): from its place
-to the next chord's place or the end of its line, whichever comes first, and never
-empty. Vectors: `ranges.json`.
+`ranges(text, chords)`: how each is written in the file (tidied first). On a line of
+chords alone (`isPlaceholders`), its own place and no more: one long. On any other
+line, from its place to the next chord's place or the end of its line, whichever comes
+first, and never empty. Vectors: `ranges.json`.
+
+(The first of those is as Multitracks writes it, and was decided on 2026-10-10:
+[01-file-format.md](01-file-format.md), Chords. Simple Presenter has only the second,
+for every line, and `ranges.json` is still what it answers. The apps' `ranges` follows
+the file until it is made again.)
 
 `carried(before, after, chords)`: where chords stand when the words under them are
 changed. Vectors: `carried.json`. Neither app changes words, so this is not needed to
