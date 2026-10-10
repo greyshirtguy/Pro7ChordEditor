@@ -1,0 +1,46 @@
+# Builds the Mac app and runs its tests on one of GitHub's own Macs, at every push.
+#
+# This is half of the referee the two apps share (spec/10-platforms.md, "Getting it to
+# other people"): both are held to the same testdata/, and neither can drift from it
+# without it showing here. The Windows half is set up in the first milestone of the
+# Windows app, as a file of its own beside this one.
+#
+# What it proves is what spec/11-plan.md asks of a fresh clone: that with nothing but
+# the repository and Xcode, the tests pass and the app builds. So it installs nothing.
+# It does not fetch the proto/ submodule either: the reader made from it is kept in the
+# repository (mac/Core/generate-proto.sh says why).
+#
+# The app is built signed "to run locally" (ad hoc), which needs no certificate. A
+# build for other people is signed and notarized by hand, at M10.
+
+name: Mac
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Test and build
+    # The newest macOS, for the newest Xcode: the generated reader needs Swift 6.1.
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Which tools
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+
+      - name: The tests of the rules and the song
+        run: swift test --package-path mac/Core
+
+      - name: The app
+        run: >
+          xcodebuild
+          -project mac/Pro7ChordEditor.xcodeproj
+          -scheme Pro7ChordEditor
+          -configuration Debug
+          -derivedDataPath "$RUNNER_TEMP/DerivedData"
+          build
