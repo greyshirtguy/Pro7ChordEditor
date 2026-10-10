@@ -215,7 +215,7 @@ Simple Presenter does this by reading the RTF into its own model and writing the
 RTF again in its own words. **Do not copy that.** It suits an app that edits text
 anyway; here it would rewrite the RTF of someone's library for the sake of one line.
 Instead change the RTF in place: find the bytes that are that line's text and put the
-new stand-ins there, as `\uc0舃 ` for U+200B and `\uc0膓 ` for U+2001 (a space
+new stand-ins there, as `\uc0\u8203 ` for U+200B and `\uc0\u8193 ` for U+2001 (a space
 ends each control word and is not text), leaving every other byte alone. Then read the
 RTF back and check that the plain text is what was meant, before anything is saved. If
 the line cannot be found cleanly in the RTF, refuse the change and say so.

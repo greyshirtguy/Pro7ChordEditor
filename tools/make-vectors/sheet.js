@@ -33,8 +33,8 @@ if (!source || !outFolder || !fs.existsSync(path.join(source, "qml/ChordSheet.qm
     process.exit(2)
 }
 
-const ZW = "​"
-const QUAD = " "
+const ZW = "\u200b"
+const QUAD = "\u2001"
 
 // ---- The chord rules the sheet asks of, and the ones the stand-in document needs
 
@@ -81,7 +81,7 @@ function tidied(typed) {
 }
 
 function isPlaceholders(line) {
-    return line !== "" && /^[\s​]+$/.test(line)
+    return line !== "" && /^[\s\u200b]+$/.test(line)
 }
 
 function placeholders(count, standIn) {

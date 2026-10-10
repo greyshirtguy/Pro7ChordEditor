@@ -132,9 +132,9 @@ def plain_text(rtf):
                 elif n in (0x0A, 0x0D):
                     new_paragraph()
                 elif n == 0x7E:
-                    put(" ")
+                    put("\u00a0")
                 elif n == 0x5F:
-                    put("‑")
+                    put("\u2011")
                 elif n == 0x2D:
                     pass
                 else:
