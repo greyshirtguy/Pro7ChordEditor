@@ -70,9 +70,10 @@ private func chords(of presentation: RVData_Presentation) -> [Found] {
 struct PresentationsCanBeReadTests {
     static let paths = (try? TestData.presentationPaths()) ?? []
 
-    @Test("The nine test files are there")
+    @Test("The ten test files are there: nine that Simple Presenter made or that were made from those, and one of ProPresenter's own")
     func theFilesAreThere() {
-        #expect(Self.paths.count == 9)
+        #expect(Self.paths.count == 10)
+        #expect(Self.paths.filter { $0.hasPrefix("made-by-propresenter/") } == ["made-by-propresenter/Rock Of Ages (Toplady).pro"])
     }
 
     @Test("Amazing Grace is read, and is what it is said to be")
@@ -102,7 +103,8 @@ struct PresentationsCanBeReadTests {
             .flatMap(\.chords)
             .map { Found(start: $0.start, end: $0.end, name: $0.name) }
             .sorted()
-        #expect(!expectedChords.isEmpty)
+        // (Every test file has chords but the one ProPresenter wrote, which has none yet.)
+        #expect(!expectedChords.isEmpty || path.hasPrefix("made-by-propresenter/"))
         #expect(chords(of: presentation) == expectedChords)
     }
 

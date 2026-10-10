@@ -55,10 +55,10 @@ And after M1, on what its check of real songs found:
 10. **A chord on a line of chords alone is written with a range one long**, as
     Multitracks writes it, and not run on to the next chord as Simple Presenter
     writes it. The maintainer's measure: the proto and the songs from Multitracks are
-    the best source of what is right. `spec/01` and `spec/02` say so now. **The code
-    does not yet**: `Chords.ranges` still answers as `ranges.json` has it, because a
-    vector is not edited and that one has to be made again from a changed Simple
-    Presenter. See "Left rough".
+    the best source of what is right. `spec/01` and `spec/02` say so. At first the
+    code waited for `ranges.json` to be made again from a changed Simple Presenter;
+    then the maintainer said not to wait, and `Chords.ranges` has the rule. The vector
+    is still not edited: see "Left rough" for the one allowance that makes.
 11. **Blank slides are to be shown, and to take chords.** Simple Presenter leaves a
     blank text box out, so an intro made as an empty slide can be given none. The
     design is in `spec/01` ("A blank slide", "Chords onto a blank slide"), with what
@@ -75,6 +75,12 @@ And at M2, by saying go to its plan:
     and M4's. One opened with none can be read and nothing else.
 14. **The key is a step of undo**, as `spec/05` says; in the reference it is not.
 15. **What a refusal says** is a list of sentences in `spec/05`, for both apps.
+
+16. **A file ProPresenter wrote is in the test data**: *Rock of Ages*, from the
+    maintainer's MainHall library. The maintainer said to use any file of it. One was
+    chosen whose words are out of copyright, since `AGENTS.md` and `testdata/README.md`
+    say nothing else may come in, and whose bytes hold nothing of anyone's: it was
+    looked through first. `testdata/README.md` describes it.
 
 ## How it is laid out, and why
 
@@ -288,7 +294,21 @@ changing any of it:
     chords;
   - the 71 that changed are the 51 with a line of chords alone (the range rule that
     is to change: decision 10) and the 20 the old Windows editor had saved.
-  When `Chords.ranges` has changed, the 51 should be none. Run this again then.
+  Run again with the new range rule in: the 51 are none. 287 of 307 boxes are written
+  exactly as they were, and the 20 that are not are the old editor's, in two songs.
+- **On copies of the 309 songs of the maintainer's MainHall library** (the same way):
+  every one opens; every one read and written unchanged is the same bytes; there is
+  no field in any of them that the descriptions have no name for. Two have chords.
+  One is from Multitracks, and all 121 of its chords are written as the rule writes
+  them, the 56 on lines of chords alone among them. The other is not from
+  Multitracks, states no key, and has 8 chords each with a range exactly 4 long, none
+  of them on the start of a word: **who wrote those is not known**. It is not what
+  Multitracks writes nor what the old Windows editor is said to have written
+  (`spec/08`). Ask the maintainer before M8.
+- **The file ProPresenter wrote** (`testdata/files/made-by-propresenter`) has its cues
+  out of the order its groups name them, a colour on every group, and a link on every
+  text box that only says when the box is to be seen. Under "a box with a link is not
+  shown", as the page first had it, the song would have had no words at all.
 - **No chord's name in those songs would be changed by tidying**, and none is empty.
   It matters because setting a box's chords tidies every name in the box, the ones
   nobody touched among them (`spec/05` now says so).
@@ -312,14 +332,19 @@ vectors have them, the cases here that say the same can go.
 
 ## Left rough, and what to ask
 
-- **`Chords.ranges` is to change when `ranges.json` has been made again** (decision
-  10), and not before: the new rule fails the vector as it stands. The change is
-  small. In `ChordsInABox.swift`, where a chord's `end` is worked out: if the chord's
-  own line `isPlaceholders`, the end is `chord.at + 1`; otherwise as now. Then take
-  the sentences that say "until it is made again" out of `spec/01` (Chords) and
-  `spec/02` (`ranges`), and the same from here. **Nothing should write a file for
-  anyone before this is done.** M2 can be built before it: its proofs are on
-  `testdata/files`.
+- **One allowance in the tests, which is to end.** `ranges.json` has one case made
+  before the rule for a chord on a line of chords alone was decided. The test of that
+  file (`ChordsInABoxTests.ranges`) does not leave the case out or call the old answer
+  right: it checks that the vector is exactly the rule as it was, that the rule now
+  differs from it only as decided, and that there is exactly one such case. **When
+  the file has been made again that test fails**, on the count, and so does
+  `ChangingChordsTests.rangesAsTheVectorsSay`. Then take the allowance out of both
+  (the comment in the first says how), and the sentences about it out of `spec/01`
+  (Chords), `spec/02` (`ranges`) and `testdata/README.md`.
+- **`as-read-by-simple-presenter.json` does not have the file ProPresenter wrote.**
+  What it reads as is held by `AFileProPresenterWroteTests`, against the hymn itself.
+  When Simple Presenter has read it into that file, `ReadingASongTests` takes it up
+  without a line changing.
 - **What M7 has to add to the song**: the stand-ins of a line of chords alone written
   into the box's RTF when it gains or loses a chord, and the first chord on a blank
   slide (`spec/01`). Until then `setChordsAlone` refuses both with a sentence. The
@@ -327,9 +352,8 @@ vectors have them, the cases here that say the same can go.
 - **Not proved**, because nothing here can make it happen: that a file which does not
   read back as it was written is noticed (`SongFile.write`), and that 200 steps of
   undo are kept and no more.
-- **Still wanted before anything writes for anyone**: a presentation ProPresenter
-  itself made, of words anyone may use, in `testdata/files`. The real-songs check
-  stands in for it, but it is not a test.
+- **Still wanted before M7**: a song with a blank slide in it that ProPresenter made
+  (an intro made as an empty slide), of words anyone may use.
 - **What the port of the RTF reader does not copy**, each said where it happens in
   `RTFWords.swift`: what Qt's reader of numbers makes of two characters after a
   backslash and an apostrophe that are not two hexadecimal digits. Nothing is known to

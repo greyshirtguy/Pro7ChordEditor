@@ -44,7 +44,7 @@ public enum TestData {
     }
 
     /// The folders of `testdata/files` that hold presentations.
-    public static let presentationFolders = ["made-by-simple-presenter", "as-the-old-windows-app-left-them"]
+    public static let presentationFolders = ["made-by-simple-presenter", "as-the-old-windows-app-left-them", "made-by-propresenter"]
 
     /// Every presentation of `testdata/files`, as "folder/Name.pro", in order.
     public static func presentationPaths() throws -> [String] {

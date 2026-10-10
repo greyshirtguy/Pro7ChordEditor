@@ -98,7 +98,8 @@ chord editors show are those that
 - show words of their own: none of their `data_links` is of a kind that puts something
   else in the box (a clock, a timer, another element's or another slide's words, and
   every other kind the descriptions name). The one kind that leaves a box its own
-  words is a `visibility_link`, which only says when the box is to be seen. And
+  words is a `visibility_link`, which only says when the box is to be seen. (**Known**
+  to matter: in the test file ProPresenter wrote, every text box has one.) And
 - have words: the plain text is not empty or blank. But a box whose text is blank is
   still shown if it has chords, or has a stand-in character in it (U+200B or U+2001):
   it is a [line of chords alone](#chords-with-no-words).
@@ -206,10 +207,10 @@ custom_attributes {
   (The first half of the rule was decided by the maintainer on 2026-10-10, on that
   evidence. Simple Presenter runs the range of a chord on a line of chords alone on to
   the next chord, over the em quad, as on a line of words, and `ranges.json` and the
-  test files were made from it. Until it is changed and they are made again
-  ([testdata/README.md](../testdata/README.md), "To be made again"), the apps'
-  `ranges` answers as that file has it. Whether ProPresenter draws the two any
-  differently is **not known**.)
+  test files were made from it. It is to be changed and they are to be made again
+  ([testdata/README.md](../testdata/README.md), "To be made again"). The Mac app has
+  the rule already, and knows one case of that file as made before it. Whether
+  ProPresenter draws the two any differently is **not known**.)
 - A `start` or `end` of 0 is simply absent from the bytes. That is Protocol Buffers'
   way and needs no care.
 

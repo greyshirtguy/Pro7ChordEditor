@@ -46,6 +46,20 @@ Presentations, as `.pro` files.
   ([`spec/08-repair.md`](../spec/08-repair.md)). They are named as it named its copies,
   "... (Chords).pro". Made by `tools/make-fixtures.py`, which says at its top exactly
   what was done to each.
+- **`made-by-propresenter/`**: one song as ProPresenter itself wrote it, version 7.9 on
+  a Mac: *Rock of Ages*, from the maintainer's own library, copied as it was, byte for
+  byte. It may be here because nothing in it is anyone's: the words are Toplady's of
+  1776 and the tune named with them is Hastings' of 1830, and besides them it holds a
+  CCLI song number, a font's name, and ProPresenter's own ids and settings. It has no
+  chords and states no key. It is the only test file that shows what a real one is
+  like, and it is unlike the others in two ways that matter: its cues are **not** in
+  the order its groups name them, and every one of its text boxes has a link (of the
+  kind that says when the box is to be seen, which leaves a box its own words). Its
+  groups have colours. Its description in `expected/` was made by
+  `tools/look.py --json`, with `"folder"` added as `make-fixtures.py` adds it; that
+  tool does not know this folder yet, and
+  `as-read-by-simple-presenter.json` does not have this file yet ("To be made again",
+  below).
 - **`expected/`**: what is in each file.
   - `<name>.json`: its words and every chord with its range as the file has it, by
     `tools/look.py --json`, which reads the file through `protoc`.
@@ -99,6 +113,12 @@ not 0 to 2, 2 to 4, 4 to 5.
 - Then, made again: `vectors/ranges.json`; the three clean files that have such a line
   (Amazing Grace, It Is Well, Plain Song) and their damaged twins; `files/expected/`,
   `repairs.json` with it.
+- The Mac app has the rule already (the maintainer's word, 2026-10-10: not to wait).
+  One case of `ranges.json` is therefore known to it as made before the decision, and
+  its tests say exactly what they allow of that case and fail when the file has been
+  made again, so that the allowance is taken out
+  (`mac/Core/Tests/ChordRulesTests/ChordsInABoxTests.swift`). The Windows app should
+  not need one: by then the file will be new.
 
 **2. Blank slides** are to be shown, and to take chords
 ([`spec/01-file-format.md`](../spec/01-file-format.md), "A blank slide"; decided
@@ -109,7 +129,16 @@ and a blank slide in the middle of a group), in `files/` and in
 song makes, where the spot can stand on its blank row, and what is asked when a chord
 is put there.
 
-**3. Rules that no vector holds.** Found while the Mac app's rules were built: with
+**3. The file ProPresenter wrote**, `files/made-by-propresenter/Rock Of Ages
+(Toplady).pro`, is to be read by Simple Presenter into
+`as-read-by-simple-presenter.json` like the others: twelve text boxes, in the hymn's
+order, three to each of four verses. (Simple Presenter leaves out a box with a link,
+but for a link that only says when the box is to be seen; if it hands over none of
+these, that is a thing to put right there.) And `tools/make-fixtures.py` is to be
+taught the folder, as a third kind beside the clean and the damaged, so that it
+describes the file in `expected/` and does not take it for a damaged one.
+
+**4. Rules that no vector holds.** Found while the Mac app's rules were built: with
 every vector passing, each rule was broken in one small way in turn, and these could
 be got wrong without any file here noticing. The Mac app holds each with a case of its
 own (`mac/Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift`), whose expected

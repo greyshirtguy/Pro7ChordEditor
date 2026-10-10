@@ -63,6 +63,9 @@ M7 to M9 can change order to suit what the maintainer wants next.
   for the app to carry as its model of a slide. Its file goes in `testdata/files` too:
   it will be the only test file ProPresenter itself wrote, and reading it, changing it
   and writing it back should be added to the proofs of M2 as soon as it exists.
+  (**Given, 2026-10-10**: *Rock of Ages*, from the maintainer's library, is in
+  `testdata/files/made-by-propresenter`, and the Mac app's proofs of M2 have it.
+  Whether it will also do as the model of a slide is M9's to say.)
 - **For M10** on the Mac: the Apple developer account.
 
 ## To start the Mac session
