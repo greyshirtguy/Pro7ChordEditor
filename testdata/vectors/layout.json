@@ -1,0 +1,398 @@
+{
+    "about": "Where the chords of one line stand, by chordlayout.js: place(text, chords, words, bubbles, gap). A chord's left edge is where its character starts, unless that would run into the chord before it, in which case it is pushed right until it clears that one by `gap`. Made with letters of a fixed width (see `metrics`) so that it does not depend on any font: a port is tried with the same widths, and then given its real ones. `characterAt`: which character of a line is at a distance along it.",
+    "madeBy": "tools/make-vectors/sheet.js, by running the functions of Simple Presenter's qml/ChordSheet.qml and qml/chordlayout.js themselves. Do not edit by hand: run it again.",
+    "metrics": {
+        "wordLetter": 10,
+        "chordLetter": 8,
+        "bubblePadEachSide": 7,
+        "gap": 4
+    },
+    "place": [
+        {
+            "text": "Amazing grace how sweet the sound",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                }
+            ],
+            "xs": [
+                0,
+                80,
+                170,
+                270
+            ],
+            "widths": [
+                22,
+                30,
+                22,
+                22
+            ],
+            "width": 330,
+            "wordsWidth": 330
+        },
+        {
+            "text": "Amazing grace",
+            "chords": [],
+            "xs": [],
+            "widths": [],
+            "width": 130,
+            "wordsWidth": 130
+        },
+        {
+            "text": "a b c d",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "Gsus4"
+                },
+                {
+                    "at": 2,
+                    "name": "F#m7b5"
+                },
+                {
+                    "at": 4,
+                    "name": "C"
+                },
+                {
+                    "at": 6,
+                    "name": "Dmaj7/F#"
+                }
+            ],
+            "xs": [
+                0,
+                58,
+                124,
+                150
+            ],
+            "widths": [
+                54,
+                62,
+                22,
+                78
+            ],
+            "width": 228,
+            "wordsWidth": 70
+        },
+        {
+            "text": "I",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "Ebmaj7/G"
+                }
+            ],
+            "xs": [
+                0
+            ],
+            "widths": [
+                78
+            ],
+            "width": 78,
+            "wordsWidth": 10
+        },
+        {
+            "text": "Hallelujah",
+            "chords": [
+                {
+                    "at": 3,
+                    "name": "F"
+                },
+                {
+                    "at": 4,
+                    "name": "C/E"
+                }
+            ],
+            "xs": [
+                30,
+                56
+            ],
+            "widths": [
+                22,
+                38
+            ],
+            "width": 100,
+            "wordsWidth": 100
+        },
+        {
+            "text": "​ ​ ​",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "A"
+                }
+            ],
+            "xs": [
+                0,
+                26,
+                52
+            ],
+            "widths": [
+                22,
+                22,
+                22
+            ],
+            "width": 74,
+            "wordsWidth": 50
+        },
+        {
+            "text": " ",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                }
+            ],
+            "xs": [
+                0
+            ],
+            "widths": [
+                22
+            ],
+            "width": 22,
+            "wordsWidth": 10
+        },
+        {
+            "text": "",
+            "chords": [],
+            "xs": [],
+            "widths": [],
+            "width": 0,
+            "wordsWidth": 0
+        },
+        {
+            "text": "end",
+            "chords": [
+                {
+                    "at": 2,
+                    "name": "Asus4"
+                }
+            ],
+            "xs": [
+                20
+            ],
+            "widths": [
+                54
+            ],
+            "width": 74,
+            "wordsWidth": 30
+        }
+    ],
+    "characterAt": [
+        {
+            "text": "Amazing grace",
+            "x": -5,
+            "out": 0
+        },
+        {
+            "text": "Amazing grace",
+            "x": 0,
+            "out": 0
+        },
+        {
+            "text": "Amazing grace",
+            "x": 4,
+            "out": 0
+        },
+        {
+            "text": "Amazing grace",
+            "x": 9,
+            "out": 0
+        },
+        {
+            "text": "Amazing grace",
+            "x": 10,
+            "out": 1
+        },
+        {
+            "text": "Amazing grace",
+            "x": 11,
+            "out": 1
+        },
+        {
+            "text": "Amazing grace",
+            "x": 25,
+            "out": 2
+        },
+        {
+            "text": "Amazing grace",
+            "x": 64,
+            "out": 6
+        },
+        {
+            "text": "Amazing grace",
+            "x": 125,
+            "out": 12
+        },
+        {
+            "text": "Amazing grace",
+            "x": 129,
+            "out": 12
+        },
+        {
+            "text": "Amazing grace",
+            "x": 130,
+            "out": 12
+        },
+        {
+            "text": "Amazing grace",
+            "x": 131,
+            "out": 12
+        },
+        {
+            "text": "Amazing grace",
+            "x": 500,
+            "out": 12
+        },
+        {
+            "text": "I",
+            "x": -5,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 0,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 4,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 9,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 10,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 11,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 25,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 64,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 125,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 129,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 130,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 131,
+            "out": 0
+        },
+        {
+            "text": "I",
+            "x": 500,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": -5,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 0,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 4,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 9,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 10,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 11,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 25,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 64,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 125,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 129,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 130,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 131,
+            "out": 0
+        },
+        {
+            "text": "",
+            "x": 500,
+            "out": 0
+        }
+    ]
+}

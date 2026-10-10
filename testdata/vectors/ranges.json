@@ -1,0 +1,606 @@
+{
+    "about": "ranges(text, chords): the stretch of the text each chord is written over in the file. It starts at the chord and runs to the next chord or to the end of its line, whichever comes first, and is never empty. This is what is written; on reading only `start` is believed.",
+    "cases": [
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "end": 8,
+                    "name": "G",
+                    "start": 0
+                },
+                {
+                    "end": 17,
+                    "name": "G7",
+                    "start": 8
+                },
+                {
+                    "end": 27,
+                    "name": "C",
+                    "start": 17
+                },
+                {
+                    "end": 33,
+                    "name": "G",
+                    "start": 27
+                },
+                {
+                    "end": 45,
+                    "name": "G",
+                    "start": 34
+                },
+                {
+                    "end": 61,
+                    "name": "D",
+                    "start": 45
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 45,
+                    "name": "D"
+                },
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "end": 17,
+                    "name": "G",
+                    "start": 0
+                },
+                {
+                    "end": 33,
+                    "name": "C",
+                    "start": 17
+                },
+                {
+                    "end": 61,
+                    "name": "D",
+                    "start": 45
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 0,
+                    "name": "Em"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "end": 8,
+                    "name": "Em",
+                    "start": 0
+                },
+                {
+                    "end": 33,
+                    "name": "C",
+                    "start": 8
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 33,
+                    "name": "D"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "end": 33,
+                    "name": "D",
+                    "start": 32
+                },
+                {
+                    "end": 61,
+                    "name": "G",
+                    "start": 34
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 33,
+                    "name": "D"
+                },
+                {
+                    "at": 32,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "end": 33,
+                    "name": "G",
+                    "start": 32
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 500,
+                    "name": "D"
+                },
+                {
+                    "at": -4,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "end": 33,
+                    "name": "G",
+                    "start": 0
+                },
+                {
+                    "end": 61,
+                    "name": "D",
+                    "start": 60
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 3,
+                    "name": ""
+                },
+                {
+                    "at": 5,
+                    "name": "  "
+                },
+                {
+                    "at": 8,
+                    "name": " C "
+                }
+            ],
+            "out": [
+                {
+                    "end": 33,
+                    "name": "C",
+                    "start": 8
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+            ],
+            "out": [
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "out": [
+            ],
+            "text": ""
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "A"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                },
+                {
+                    "at": 9,
+                    "name": "E"
+                },
+                {
+                    "at": 12,
+                    "name": "A"
+                }
+            ],
+            "out": [
+                {
+                    "end": 4,
+                    "name": "A",
+                    "start": 0
+                },
+                {
+                    "end": 9,
+                    "name": "D",
+                    "start": 4
+                },
+                {
+                    "end": 12,
+                    "name": "E",
+                    "start": 9
+                },
+                {
+                    "end": 13,
+                    "name": "A",
+                    "start": 12
+                }
+            ],
+            "text": "One line only"
+        },
+        {
+            "chords": [
+                {
+                    "at": 12,
+                    "name": "A"
+                },
+                {
+                    "at": 13,
+                    "name": "E"
+                }
+            ],
+            "out": [
+                {
+                    "end": 13,
+                    "name": "E",
+                    "start": 12
+                }
+            ],
+            "text": "One line only"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 7,
+                    "name": "F"
+                },
+                {
+                    "at": 16,
+                    "name": "C"
+                },
+                {
+                    "at": 24,
+                    "name": "G"
+                },
+                {
+                    "at": 32,
+                    "name": "Am"
+                },
+                {
+                    "at": 42,
+                    "name": "F"
+                },
+                {
+                    "at": 50,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "end": 7,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 15,
+                    "name": "F",
+                    "start": 7
+                },
+                {
+                    "end": 24,
+                    "name": "C",
+                    "start": 16
+                },
+                {
+                    "end": 31,
+                    "name": "G",
+                    "start": 24
+                },
+                {
+                    "end": 32,
+                    "name": "Am",
+                    "start": 31
+                },
+                {
+                    "end": 50,
+                    "name": "F",
+                    "start": 42
+                },
+                {
+                    "end": 56,
+                    "name": "C",
+                    "start": 50
+                }
+            ],
+            "text": "I once was lost\nbut now am found\nWas blind but now I see"
+        },
+        {
+            "chords": [
+                {
+                    "at": 15,
+                    "name": "X"
+                },
+                {
+                    "at": 16,
+                    "name": "Y"
+                },
+                {
+                    "at": 31,
+                    "name": "Z"
+                }
+            ],
+            "out": [
+                {
+                    "end": 15,
+                    "name": "X",
+                    "start": 14
+                },
+                {
+                    "end": 31,
+                    "name": "Y",
+                    "start": 16
+                },
+                {
+                    "end": 32,
+                    "name": "Z",
+                    "start": 31
+                }
+            ],
+            "text": "I once was lost\nbut now am found\nWas blind but now I see"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 1,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "E"
+                },
+                {
+                    "at": 3,
+                    "name": "F"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "D",
+                    "start": 0
+                },
+                {
+                    "end": 3,
+                    "name": "E",
+                    "start": 2
+                },
+                {
+                    "end": 4,
+                    "name": "F",
+                    "start": 3
+                }
+            ],
+            "text": "a\n\nb"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 1,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 6,
+                    "name": "D",
+                    "start": 1
+                }
+            ],
+            "text": "\nwords"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "C",
+                    "start": 0
+                }
+            ],
+            "text": "x"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "end": 2,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 4,
+                    "name": "G",
+                    "start": 2
+                },
+                {
+                    "end": 5,
+                    "name": "Am",
+                    "start": 4
+                }
+            ],
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 1,
+                    "name": "G"
+                },
+                {
+                    "at": 2,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 2,
+                    "name": "G",
+                    "start": 1
+                },
+                {
+                    "end": 3,
+                    "name": "Am",
+                    "start": 2
+                }
+            ],
+            "text": "​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "E"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "E",
+                    "start": 0
+                }
+            ],
+            "text": " "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C /// | Am ///"
+                },
+                {
+                    "at": 8,
+                    "name": "g"
+                },
+                {
+                    "at": 17,
+                    "name": "f#m/a"
+                }
+            ],
+            "out": [
+                {
+                    "end": 8,
+                    "name": "C /// | Am ///",
+                    "start": 0
+                },
+                {
+                    "end": 17,
+                    "name": "g",
+                    "start": 8
+                },
+                {
+                    "end": 33,
+                    "name": "f#m/a",
+                    "start": 17
+                }
+            ],
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}

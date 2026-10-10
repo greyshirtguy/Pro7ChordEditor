@@ -1,0 +1,956 @@
+{
+    "about": "What a chord's name is taken to be. For each `in`: parts(in) as valid, root, quality and bass; tidied(in), what a typed chord is tidied to; couldBecome(in), whether it could be the start of a chord being typed; and isChord(in), which is valid and couldBecome, what an editor asks before it puts a newly typed chord on. (A chord that is in a file already is kept whatever it is.)",
+    "cases": [
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C",
+            "isChord": true,
+            "quality": "",
+            "root": "C",
+            "tidied": "C",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "c",
+            "isChord": true,
+            "quality": "",
+            "root": "C",
+            "tidied": "C",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Cm",
+            "isChord": true,
+            "quality": "m",
+            "root": "C",
+            "tidied": "Cm",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C#",
+            "isChord": true,
+            "quality": "",
+            "root": "C#",
+            "tidied": "C#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Db",
+            "isChord": true,
+            "quality": "",
+            "root": "Db",
+            "tidied": "Db",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "F#m7",
+            "isChord": true,
+            "quality": "m7",
+            "root": "F#",
+            "tidied": "F#m7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "f#m7",
+            "isChord": true,
+            "quality": "m7",
+            "root": "F#",
+            "tidied": "F#m7",
+            "valid": true
+        },
+        {
+            "bass": "D",
+            "couldBecome": true,
+            "in": "Bb/D",
+            "isChord": true,
+            "quality": "",
+            "root": "Bb",
+            "tidied": "Bb/D",
+            "valid": true
+        },
+        {
+            "bass": "D",
+            "couldBecome": true,
+            "in": "bb/d",
+            "isChord": true,
+            "quality": "",
+            "root": "Bb",
+            "tidied": "Bb/D",
+            "valid": true
+        },
+        {
+            "bass": "F#",
+            "couldBecome": true,
+            "in": "D/F#",
+            "isChord": true,
+            "quality": "",
+            "root": "D",
+            "tidied": "D/F#",
+            "valid": true
+        },
+        {
+            "bass": "F#",
+            "couldBecome": true,
+            "in": "d/f#",
+            "isChord": true,
+            "quality": "",
+            "root": "D",
+            "tidied": "D/F#",
+            "valid": true
+        },
+        {
+            "bass": "G#",
+            "couldBecome": true,
+            "in": "E/G#",
+            "isChord": true,
+            "quality": "",
+            "root": "E",
+            "tidied": "E/G#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C6/9",
+            "isChord": true,
+            "quality": "6/9",
+            "root": "C",
+            "tidied": "C6/9",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G1",
+            "isChord": true,
+            "quality": "1",
+            "root": "G",
+            "tidied": "G1",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Gsus4",
+            "isChord": true,
+            "quality": "sus4",
+            "root": "G",
+            "tidied": "Gsus4",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Asus2",
+            "isChord": true,
+            "quality": "sus2",
+            "root": "A",
+            "tidied": "Asus2",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Am7b5",
+            "isChord": true,
+            "quality": "m7b5",
+            "root": "A",
+            "tidied": "Am7b5",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Cmaj7",
+            "isChord": true,
+            "quality": "maj7",
+            "root": "C",
+            "tidied": "Cmaj7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "CMaj7",
+            "isChord": true,
+            "quality": "Maj7",
+            "root": "C",
+            "tidied": "CMaj7",
+            "valid": true
+        },
+        {
+            "bass": "G",
+            "couldBecome": true,
+            "in": "Ebmaj7/G",
+            "isChord": true,
+            "quality": "maj7",
+            "root": "Eb",
+            "tidied": "Ebmaj7/G",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Bdim",
+            "isChord": true,
+            "quality": "dim",
+            "root": "B",
+            "tidied": "Bdim",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "B°",
+            "isChord": true,
+            "quality": "°",
+            "root": "B",
+            "tidied": "B°",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Caug",
+            "isChord": true,
+            "quality": "aug",
+            "root": "C",
+            "tidied": "Caug",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C+",
+            "isChord": true,
+            "quality": "+",
+            "root": "C",
+            "tidied": "C+",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Cadd9",
+            "isChord": true,
+            "quality": "add9",
+            "root": "C",
+            "tidied": "Cadd9",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C2",
+            "isChord": true,
+            "quality": "2",
+            "root": "C",
+            "tidied": "C2",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "D7#9",
+            "isChord": true,
+            "quality": "7#9",
+            "root": "D",
+            "tidied": "D7#9",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "A7(b9)",
+            "isChord": true,
+            "quality": "7(b9)",
+            "root": "A",
+            "tidied": "A7(b9)",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G13",
+            "isChord": true,
+            "quality": "13",
+            "root": "G",
+            "tidied": "G13",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "N.C.",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "N.C.",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "NC",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "NC",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "H",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "H",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "Hm",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "Hm",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": " ",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": " G ",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "G",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "G ",
+            "isChord": false,
+            "quality": " ",
+            "root": "G",
+            "tidied": "G",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "x",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "x",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "1",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "1",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "#",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "#",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "b",
+            "isChord": true,
+            "quality": "",
+            "root": "B",
+            "tidied": "B",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "B",
+            "isChord": true,
+            "quality": "",
+            "root": "B",
+            "tidied": "B",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Bb",
+            "isChord": true,
+            "quality": "",
+            "root": "Bb",
+            "tidied": "Bb",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Bbb",
+            "isChord": true,
+            "quality": "",
+            "root": "Bbb",
+            "tidied": "Bbb",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "B#",
+            "isChord": true,
+            "quality": "",
+            "root": "B#",
+            "tidied": "B#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "E#",
+            "isChord": true,
+            "quality": "",
+            "root": "E#",
+            "tidied": "E#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Fb",
+            "isChord": true,
+            "quality": "",
+            "root": "Fb",
+            "tidied": "Fb",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Cb",
+            "isChord": true,
+            "quality": "",
+            "root": "Cb",
+            "tidied": "Cb",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C##",
+            "isChord": true,
+            "quality": "",
+            "root": "C##",
+            "tidied": "C##",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "A♭",
+            "isChord": true,
+            "quality": "",
+            "root": "Ab",
+            "tidied": "Ab",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C♯m",
+            "isChord": true,
+            "quality": "m",
+            "root": "C#",
+            "tidied": "C#m",
+            "valid": true
+        },
+        {
+            "bass": "C",
+            "couldBecome": true,
+            "in": "A♭/C",
+            "isChord": true,
+            "quality": "",
+            "root": "Ab",
+            "tidied": "Ab/C",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G/",
+            "isChord": true,
+            "quality": "/",
+            "root": "G",
+            "tidied": "G/",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G//",
+            "isChord": true,
+            "quality": "//",
+            "root": "G",
+            "tidied": "G//",
+            "valid": true
+        },
+        {
+            "bass": "D",
+            "couldBecome": true,
+            "in": "G/B/D",
+            "isChord": true,
+            "quality": "/B",
+            "root": "G",
+            "tidied": "G/B/D",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Am/",
+            "isChord": true,
+            "quality": "m/",
+            "root": "A",
+            "tidied": "Am/",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C/E/",
+            "isChord": true,
+            "quality": "/E/",
+            "root": "C",
+            "tidied": "C/E/",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C/x",
+            "isChord": true,
+            "quality": "/x",
+            "root": "C",
+            "tidied": "C/x",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C/9",
+            "isChord": true,
+            "quality": "/9",
+            "root": "C",
+            "tidied": "C/9",
+            "valid": true
+        },
+        {
+            "bass": "F",
+            "couldBecome": true,
+            "in": "D/F",
+            "isChord": true,
+            "quality": "",
+            "root": "D",
+            "tidied": "D/F",
+            "valid": true
+        },
+        {
+            "bass": "C#",
+            "couldBecome": true,
+            "in": "A/C#",
+            "isChord": true,
+            "quality": "",
+            "root": "A",
+            "tidied": "A/C#",
+            "valid": true
+        },
+        {
+            "bass": "A",
+            "couldBecome": true,
+            "in": "f#M7/a",
+            "isChord": true,
+            "quality": "M7",
+            "root": "F#",
+            "tidied": "F#M7/A",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "C /// | Am ///",
+            "isChord": false,
+            "quality": " /// | Am ///",
+            "root": "C",
+            "tidied": "C /// | Am ///",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "C][G",
+            "isChord": false,
+            "quality": "][G",
+            "root": "C",
+            "tidied": "C][G",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "[C]",
+            "isChord": false,
+            "quality": "",
+            "root": "",
+            "tidied": "[C]",
+            "valid": false
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "C]",
+            "isChord": false,
+            "quality": "]",
+            "root": "C",
+            "tidied": "C]",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G-",
+            "isChord": true,
+            "quality": "-",
+            "root": "G",
+            "tidied": "G-",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G-7",
+            "isChord": true,
+            "quality": "-7",
+            "root": "G",
+            "tidied": "G-7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Cm(maj7)",
+            "isChord": true,
+            "quality": "m(maj7)",
+            "root": "C",
+            "tidied": "Cm(maj7)",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C^7",
+            "isChord": true,
+            "quality": "^7",
+            "root": "C",
+            "tidied": "C^7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "CΔ7",
+            "isChord": true,
+            "quality": "Δ7",
+            "root": "C",
+            "tidied": "CΔ7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Gø7",
+            "isChord": true,
+            "quality": "ø7",
+            "root": "G",
+            "tidied": "Gø7",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G.",
+            "isChord": true,
+            "quality": ".",
+            "root": "G",
+            "tidied": "G.",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G,",
+            "isChord": true,
+            "quality": ",",
+            "root": "G",
+            "tidied": "G,",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "G?",
+            "isChord": false,
+            "quality": "?",
+            "root": "G",
+            "tidied": "G?",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": false,
+            "in": "G!",
+            "isChord": false,
+            "quality": "!",
+            "root": "G",
+            "tidied": "G!",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Do",
+            "isChord": true,
+            "quality": "o",
+            "root": "D",
+            "tidied": "Do",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "do",
+            "isChord": true,
+            "quality": "o",
+            "root": "D",
+            "tidied": "Do",
+            "valid": true
+        },
+        {
+            "bass": "G",
+            "couldBecome": true,
+            "in": "Am7/G",
+            "isChord": true,
+            "quality": "m7",
+            "root": "A",
+            "tidied": "Am7/G",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "E7sus4",
+            "isChord": true,
+            "quality": "7sus4",
+            "root": "E",
+            "tidied": "E7sus4",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "F#",
+            "isChord": true,
+            "quality": "",
+            "root": "F#",
+            "tidied": "F#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "gb",
+            "isChord": true,
+            "quality": "",
+            "root": "Gb",
+            "tidied": "Gb",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Gbm",
+            "isChord": true,
+            "quality": "m",
+            "root": "Gb",
+            "tidied": "Gbm",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "F#m",
+            "isChord": true,
+            "quality": "m",
+            "root": "F#",
+            "tidied": "F#m",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "ebm",
+            "isChord": true,
+            "quality": "m",
+            "root": "Eb",
+            "tidied": "Ebm",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "D#m",
+            "isChord": true,
+            "quality": "m",
+            "root": "D#",
+            "tidied": "D#m",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "A#",
+            "isChord": true,
+            "quality": "",
+            "root": "A#",
+            "tidied": "A#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "a#dim",
+            "isChord": true,
+            "quality": "dim",
+            "root": "A#",
+            "tidied": "A#dim",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "Csus",
+            "isChord": true,
+            "quality": "sus",
+            "root": "C",
+            "tidied": "Csus",
+            "valid": true
+        },
+        {
+            "bass": "E",
+            "couldBecome": true,
+            "in": "c/e",
+            "isChord": true,
+            "quality": "",
+            "root": "C",
+            "tidied": "C/E",
+            "valid": true
+        },
+        {
+            "bass": "Bb",
+            "couldBecome": true,
+            "in": "C/Bb",
+            "isChord": true,
+            "quality": "",
+            "root": "C",
+            "tidied": "C/Bb",
+            "valid": true
+        },
+        {
+            "bass": "Bb",
+            "couldBecome": true,
+            "in": "C/bb",
+            "isChord": true,
+            "quality": "",
+            "root": "C",
+            "tidied": "C/Bb",
+            "valid": true
+        },
+        {
+            "bass": "C",
+            "couldBecome": true,
+            "in": "Dm7/C",
+            "isChord": true,
+            "quality": "m7",
+            "root": "D",
+            "tidied": "Dm7/C",
+            "valid": true
+        },
+        {
+            "bass": "A#",
+            "couldBecome": true,
+            "in": "G/A#",
+            "isChord": true,
+            "quality": "",
+            "root": "G",
+            "tidied": "G/A#",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "abmaj7",
+            "isChord": true,
+            "quality": "maj7",
+            "root": "Ab",
+            "tidied": "Abmaj7",
+            "valid": true
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}

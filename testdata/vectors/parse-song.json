@@ -1,0 +1,1049 @@
+{
+    "about": "parseSong(text) for each ChordPro file in testdata/songs: what the song is, and its parts with their lines and chords (each `at` counted along its line). `linesOnEachSlide` is slidesOf(section, n) for n of 1 to 4: how many lines land on each slide.",
+    "cases": [
+        {
+            "artist": "John Newton",
+            "ccli": "",
+            "copyright": "Public domain",
+            "file": "amazing-grace.cho",
+            "key": "G",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 1,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 8,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 18,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 28,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Amazing grace how sweet the sound"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 25,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "That saved a wretch like me"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 2,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 11,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 20,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 27,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "I once was lost but now am found"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "Em"
+                                },
+                                {
+                                    "at": 14,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 20,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Was blind but now I see"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 1"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 5,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 16,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 26,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 35,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Twas grace that taught my heart to fear"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 21,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "And grace my fears relieved"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 22,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 30,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "How precious did that grace appear"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "Em"
+                                },
+                                {
+                                    "at": 11,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 19,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "The hour I first believed"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 2"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 8,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 21,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 31,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Through many dangers toils and snares"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 15,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "I have already come"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 15,
+                                    "name": "G7"
+                                },
+                                {
+                                    "at": 26,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 36,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Tis grace hath brought me safe thus far"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "Em"
+                                },
+                                {
+                                    "at": 15,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 23,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "And grace will lead me home"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 3"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 2,
+                                    "name": "G/B"
+                                },
+                                {
+                                    "at": 4,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 6,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "​ ​ ​ ​"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Ending"
+                }
+            ],
+            "title": "Amazing Grace"
+        },
+        {
+            "artist": "",
+            "ccli": "",
+            "copyright": "",
+            "file": "holy-holy-holy.txt",
+            "key": "",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 10,
+                                    "name": "Bm"
+                                },
+                                {
+                                    "at": 12,
+                                    "name": "A"
+                                }
+                            ],
+                            "text": "Holy holy holy"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 11,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 15,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Lord God Almighty"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "A"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Early in the morning"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 4,
+                                    "name": "Bm"
+                                },
+                                {
+                                    "at": 15,
+                                    "name": "E7"
+                                },
+                                {
+                                    "at": 23,
+                                    "name": "A"
+                                }
+                            ],
+                            "text": "Our song shall rise to Thee"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 1"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 10,
+                                    "name": "Bm"
+                                },
+                                {
+                                    "at": 12,
+                                    "name": "A"
+                                }
+                            ],
+                            "text": "Holy holy holy"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 17,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Merciful and mighty"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "A"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "God in three persons"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 8,
+                                    "name": "A"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Blessed Trinity"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 2"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                            ],
+                            "text": "Holy holy holy"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "All the saints adore Thee"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Casting down their golden crowns"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Around the glassy sea"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": ""
+                }
+            ],
+            "title": ""
+        },
+        {
+            "artist": "Horatio Spafford",
+            "ccli": "0",
+            "copyright": "",
+            "file": "it-is-well.chordpro",
+            "key": "C",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 5,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 18,
+                                    "name": "F"
+                                },
+                                {
+                                    "at": 26,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 37,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "When peace like a river attendeth my way"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 5,
+                                    "name": "Am"
+                                },
+                                {
+                                    "at": 18,
+                                    "name": "D7"
+                                },
+                                {
+                                    "at": 30,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "When sorrows like sea billows roll"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2
+                        ],
+                        "3": [
+                            2
+                        ],
+                        "4": [
+                            2
+                        ]
+                    },
+                    "name": "Verse 1"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 6,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 9,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "It is well"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 8,
+                                    "name": "F"
+                                },
+                                {
+                                    "at": 11,
+                                    "name": "C"
+                                }
+                            ],
+                            "text": "With my soul"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 6,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 17,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 30,
+                                    "name": "C"
+                                }
+                            ],
+                            "text": "It is well it is well with my soul"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            1
+                        ],
+                        "3": [
+                            3
+                        ],
+                        "4": [
+                            3
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                            ],
+                            "text": "It is well"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "Am"
+                                },
+                                {
+                                    "at": 2,
+                                    "name": "F"
+                                },
+                                {
+                                    "at": 4,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 6,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "​ ​ ​ ​"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "Am"
+                                },
+                                {
+                                    "at": 14,
+                                    "name": "F"
+                                }
+                            ],
+                            "text": "Even so it is well"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2
+                        ],
+                        "3": [
+                            2
+                        ],
+                        "4": [
+                            2
+                        ]
+                    },
+                    "name": "Bridge"
+                }
+            ],
+            "title": "It Is Well"
+        },
+        {
+            "artist": "",
+            "ccli": "",
+            "copyright": "",
+            "file": "minor-key.cho",
+            "key": "F#m",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "F#m"
+                                },
+                                {
+                                    "at": 19,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Leading spaces and trailing ones"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "A"
+                                },
+                                {
+                                    "at": 20,
+                                    "name": "E"
+                                },
+                                {
+                                    "at": 22,
+                                    "name": "F#m"
+                                }
+                            ],
+                            "text": "A chord at the very end"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2
+                        ],
+                        "3": [
+                            2
+                        ],
+                        "4": [
+                            2
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "F#m"
+                                },
+                                {
+                                    "at": 21,
+                                    "name": "C#m"
+                                }
+                            ],
+                            "text": "The second chorus is numbered"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Chorus 2"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "Bm7"
+                                },
+                                {
+                                    "at": 13,
+                                    "name": "C#7sus4"
+                                }
+                            ],
+                            "text": "Named by its label"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "The Middle Eight"
+                }
+            ],
+            "title": "A Song / In A Minor Key"
+        },
+        {
+            "artist": "Nobody At All",
+            "ccli": "",
+            "copyright": "",
+            "file": "plain-song.cho",
+            "key": "G",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 14,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "One two three four"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 9,
+                                    "name": "Em"
+                                }
+                            ],
+                            "text": "Five six seven eight"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 10,
+                                    "name": "G/B"
+                                }
+                            ],
+                            "text": "Nine ten eleven twelve"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Thirteen"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2
+                        ],
+                        "3": [
+                            3,
+                            1
+                        ],
+                        "4": [
+                            4
+                        ]
+                    },
+                    "name": "Verse 1"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 8,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Sing it out"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "Sing it loud"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2
+                        ],
+                        "3": [
+                            2
+                        ],
+                        "4": [
+                            2
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 2,
+                                    "name": "D/F#"
+                                },
+                                {
+                                    "at": 4,
+                                    "name": "Em"
+                                }
+                            ],
+                            "text": "​ ​ ​"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Outro"
+                }
+            ],
+            "title": "Plain Song"
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}

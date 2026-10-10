@@ -61,3 +61,12 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Test data is kept byte for byte. Some of it is binary (presentations are, and
+# git cannot always tell), and some is text whose line ends are part of the test
+# (testdata/songs has a file with Windows line ends on purpose).
+###############################################################################
+testdata/** -text
+*.pro binary
+*.png binary

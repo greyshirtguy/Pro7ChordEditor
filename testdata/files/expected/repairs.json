@@ -1,0 +1,682 @@
+{
+  "about": "What the three checks of spec/08-repair.md find in each test file, and for the damaged ones what their chords are once put right (`start` and `end` as the file then has them, for each text box that has words, in the file's order). `damaged` are the files in as-the-old-windows-app-left-them; `clean` are those in made-by-simple-presenter, in which nothing should be found.",
+  "madeBy": "tools/make-fixtures.py, which is the reference for these checks. Do not edit by hand: run it again.",
+  "damaged": [
+    {
+      "file": "Plain Song (Chords).pro",
+      "madeFrom": "Plain Song.pro",
+      "how": "A: read and saved again by the old editor, no chord touched. Every range runs to the next chord.",
+      "rangesOverLineBreaks": 3,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 2,
+        "atTheStartOfAWord": 2,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "G",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "G",
+          "Em"
+        ]
+      },
+      "putRight": {
+        "movedBack": false,
+        "textBoxes": [
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 14,
+                "name": "G"
+              },
+              {
+                "start": 14,
+                "end": 18,
+                "name": "D"
+              },
+              {
+                "start": 28,
+                "end": 39,
+                "name": "Em"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 10,
+                "name": "C"
+              },
+              {
+                "start": 10,
+                "end": 22,
+                "name": "G/B"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 8,
+                "name": "C"
+              },
+              {
+                "start": 8,
+                "end": 11,
+                "name": "G"
+              },
+              {
+                "start": 12,
+                "end": 24,
+                "name": "D"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 2,
+                "name": "G"
+              },
+              {
+                "start": 2,
+                "end": 4,
+                "name": "D/F#"
+              },
+              {
+                "start": 4,
+                "end": 5,
+                "name": "Em"
+              }
+            ]
+          }
+        ],
+        "isThenTheFileItWasMadeFrom": true
+      }
+    },
+    {
+      "file": "It Is Well (Chords).pro",
+      "madeFrom": "It Is Well.pro",
+      "how": "A: the same, for a song of four lines to a slide, one of them a line of chords with no words.",
+      "rangesOverLineBreaks": 4,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 10,
+        "atTheStartOfAWord": 9,
+        "ifMovedBack": 1,
+        "likely": false
+      },
+      "key": {
+        "stated": "C",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "C",
+          "Am"
+        ]
+      },
+      "putRight": {
+        "movedBack": false,
+        "textBoxes": [
+          {
+            "chords": [
+              {
+                "start": 5,
+                "end": 18,
+                "name": "C"
+              },
+              {
+                "start": 18,
+                "end": 26,
+                "name": "F"
+              },
+              {
+                "start": 26,
+                "end": 37,
+                "name": "C"
+              },
+              {
+                "start": 37,
+                "end": 40,
+                "name": "G"
+              },
+              {
+                "start": 46,
+                "end": 59,
+                "name": "Am"
+              },
+              {
+                "start": 59,
+                "end": 71,
+                "name": "D7"
+              },
+              {
+                "start": 71,
+                "end": 75,
+                "name": "G"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 6,
+                "end": 9,
+                "name": "C"
+              },
+              {
+                "start": 9,
+                "end": 10,
+                "name": "G"
+              },
+              {
+                "start": 19,
+                "end": 22,
+                "name": "F"
+              },
+              {
+                "start": 22,
+                "end": 23,
+                "name": "C"
+              },
+              {
+                "start": 30,
+                "end": 41,
+                "name": "C"
+              },
+              {
+                "start": 41,
+                "end": 54,
+                "name": "G"
+              },
+              {
+                "start": 54,
+                "end": 58,
+                "name": "C"
+              }
+            ]
+          },
+          {
+            "chords": []
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 2,
+                "name": "Am"
+              },
+              {
+                "start": 2,
+                "end": 4,
+                "name": "F"
+              },
+              {
+                "start": 4,
+                "end": 6,
+                "name": "C"
+              },
+              {
+                "start": 6,
+                "end": 7,
+                "name": "G"
+              },
+              {
+                "start": 8,
+                "end": 22,
+                "name": "Am"
+              },
+              {
+                "start": 22,
+                "end": 26,
+                "name": "F"
+              }
+            ]
+          }
+        ],
+        "isThenTheFileItWasMadeFrom": true
+      }
+    },
+    {
+      "file": "Amazing Grace (Chords).pro",
+      "madeFrom": "Amazing Grace.pro",
+      "how": "A and B: every chord put on by hand in the old editor. Those below a first line are short by one for each line break above.",
+      "rangesOverLineBreaks": 6,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 12,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 10,
+        "likely": true
+      },
+      "key": {
+        "stated": "G",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "G",
+          "Em"
+        ]
+      },
+      "putRight": {
+        "movedBack": true,
+        "textBoxes": [
+          {
+            "chords": [
+              {
+                "start": 1,
+                "end": 8,
+                "name": "G"
+              },
+              {
+                "start": 8,
+                "end": 18,
+                "name": "G7"
+              },
+              {
+                "start": 18,
+                "end": 28,
+                "name": "C"
+              },
+              {
+                "start": 28,
+                "end": 33,
+                "name": "G"
+              },
+              {
+                "start": 59,
+                "end": 61,
+                "name": "D"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 2,
+                "end": 11,
+                "name": "G"
+              },
+              {
+                "start": 11,
+                "end": 20,
+                "name": "G7"
+              },
+              {
+                "start": 20,
+                "end": 27,
+                "name": "C"
+              },
+              {
+                "start": 27,
+                "end": 32,
+                "name": "G"
+              },
+              {
+                "start": 37,
+                "end": 47,
+                "name": "Em"
+              },
+              {
+                "start": 47,
+                "end": 53,
+                "name": "D"
+              },
+              {
+                "start": 53,
+                "end": 56,
+                "name": "G"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 5,
+                "end": 16,
+                "name": "G"
+              },
+              {
+                "start": 16,
+                "end": 26,
+                "name": "G7"
+              },
+              {
+                "start": 26,
+                "end": 35,
+                "name": "C"
+              },
+              {
+                "start": 35,
+                "end": 39,
+                "name": "G"
+              },
+              {
+                "start": 61,
+                "end": 67,
+                "name": "D"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 4,
+                "end": 13,
+                "name": "G"
+              },
+              {
+                "start": 13,
+                "end": 22,
+                "name": "G7"
+              },
+              {
+                "start": 22,
+                "end": 30,
+                "name": "C"
+              },
+              {
+                "start": 30,
+                "end": 34,
+                "name": "G"
+              },
+              {
+                "start": 39,
+                "end": 46,
+                "name": "Em"
+              },
+              {
+                "start": 46,
+                "end": 54,
+                "name": "D"
+              },
+              {
+                "start": 54,
+                "end": 60,
+                "name": "G"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 8,
+                "end": 13,
+                "name": "G"
+              },
+              {
+                "start": 13,
+                "end": 21,
+                "name": "G7"
+              },
+              {
+                "start": 21,
+                "end": 31,
+                "name": "C"
+              },
+              {
+                "start": 31,
+                "end": 37,
+                "name": "G"
+              },
+              {
+                "start": 53,
+                "end": 57,
+                "name": "D"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 4,
+                "end": 15,
+                "name": "G"
+              },
+              {
+                "start": 15,
+                "end": 26,
+                "name": "G7"
+              },
+              {
+                "start": 26,
+                "end": 36,
+                "name": "C"
+              },
+              {
+                "start": 36,
+                "end": 39,
+                "name": "G"
+              },
+              {
+                "start": 44,
+                "end": 55,
+                "name": "Em"
+              },
+              {
+                "start": 55,
+                "end": 63,
+                "name": "D"
+              },
+              {
+                "start": 63,
+                "end": 67,
+                "name": "G"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 2,
+                "name": "C"
+              },
+              {
+                "start": 2,
+                "end": 4,
+                "name": "G/B"
+              },
+              {
+                "start": 4,
+                "end": 6,
+                "name": "D"
+              },
+              {
+                "start": 6,
+                "end": 7,
+                "name": "G"
+              }
+            ]
+          }
+        ],
+        "isThenTheFileItWasMadeFrom": true
+      }
+    },
+    {
+      "file": "A Song - In A Minor Key (Chords).pro",
+      "madeFrom": "A Song - In A Minor Key.pro",
+      "how": "A and C: read and saved again, with nothing chosen in the list of keys, the song's own (F sharp minor) being one it could not show.",
+      "rangesOverLineBreaks": 1,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 3,
+        "atTheStartOfAWord": 2,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "Ab",
+        "doubtful": true,
+        "suggested": "F#m",
+        "likeliest": [
+          "F#m",
+          "A"
+        ]
+      },
+      "putRight": {
+        "movedBack": false,
+        "textBoxes": [
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 19,
+                "name": "F#m"
+              },
+              {
+                "start": 19,
+                "end": 32,
+                "name": "D"
+              },
+              {
+                "start": 33,
+                "end": 53,
+                "name": "A"
+              },
+              {
+                "start": 53,
+                "end": 55,
+                "name": "E"
+              },
+              {
+                "start": 55,
+                "end": 56,
+                "name": "F#m"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 21,
+                "name": "F#m"
+              },
+              {
+                "start": 21,
+                "end": 29,
+                "name": "C#m"
+              }
+            ]
+          },
+          {
+            "chords": [
+              {
+                "start": 0,
+                "end": 13,
+                "name": "Bm7"
+              },
+              {
+                "start": 13,
+                "end": 18,
+                "name": "C#7sus4"
+              }
+            ]
+          }
+        ],
+        "isThenTheFileItWasMadeFrom": true
+      }
+    }
+  ],
+  "clean": [
+    {
+      "file": "A Song - In A Minor Key.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 3,
+        "atTheStartOfAWord": 2,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "F#m",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "F#m",
+          "A"
+        ]
+      }
+    },
+    {
+      "file": "Amazing Grace.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 12,
+        "atTheStartOfAWord": 10,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "G",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "G",
+          "Em"
+        ]
+      }
+    },
+    {
+      "file": "Holy Holy Holy.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 12,
+        "atTheStartOfAWord": 8,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "",
+        "doubtful": false,
+        "suggested": "D",
+        "likeliest": [
+          "D",
+          "Bm"
+        ]
+      }
+    },
+    {
+      "file": "It Is Well.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 10,
+        "atTheStartOfAWord": 9,
+        "ifMovedBack": 1,
+        "likely": false
+      },
+      "key": {
+        "stated": "C",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "C",
+          "Am"
+        ]
+      }
+    },
+    {
+      "file": "Plain Song.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 2,
+        "atTheStartOfAWord": 2,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "G",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "G",
+          "Em"
+        ]
+      }
+    }
+  ]
+}

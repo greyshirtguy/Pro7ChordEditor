@@ -1,0 +1,549 @@
+{
+    "about": "diatonic(key): the seven chords that belong to a key, on each note of its scale in turn: what the keys 1 to 7 give in the chord sheet. Empty for what is no key.",
+    "cases": [
+        {
+            "key": "Ab",
+            "out": [
+                "Ab",
+                "Bbm",
+                "Cm",
+                "Db",
+                "Eb",
+                "Fm",
+                "Gdim"
+            ]
+        },
+        {
+            "key": "A",
+            "out": [
+                "A",
+                "Bm",
+                "C#m",
+                "D",
+                "E",
+                "F#m",
+                "G#dim"
+            ]
+        },
+        {
+            "key": "A#",
+            "out": [
+                "A#",
+                "B#m",
+                "C##m",
+                "D#",
+                "E#",
+                "F##m",
+                "G##dim"
+            ]
+        },
+        {
+            "key": "Bb",
+            "out": [
+                "Bb",
+                "Cm",
+                "Dm",
+                "Eb",
+                "F",
+                "Gm",
+                "Adim"
+            ]
+        },
+        {
+            "key": "B",
+            "out": [
+                "B",
+                "C#m",
+                "D#m",
+                "E",
+                "F#",
+                "G#m",
+                "A#dim"
+            ]
+        },
+        {
+            "key": "B#",
+            "out": [
+                "B#",
+                "C##m",
+                "D##m",
+                "E#",
+                "F##",
+                "G##m",
+                "A##dim"
+            ]
+        },
+        {
+            "key": "Cb",
+            "out": [
+                "Cb",
+                "Dbm",
+                "Ebm",
+                "Fb",
+                "Gb",
+                "Abm",
+                "Bbdim"
+            ]
+        },
+        {
+            "key": "C",
+            "out": [
+                "C",
+                "Dm",
+                "Em",
+                "F",
+                "G",
+                "Am",
+                "Bdim"
+            ]
+        },
+        {
+            "key": "C#",
+            "out": [
+                "C#",
+                "D#m",
+                "E#m",
+                "F#",
+                "G#",
+                "A#m",
+                "B#dim"
+            ]
+        },
+        {
+            "key": "Db",
+            "out": [
+                "Db",
+                "Ebm",
+                "Fm",
+                "Gb",
+                "Ab",
+                "Bbm",
+                "Cdim"
+            ]
+        },
+        {
+            "key": "D",
+            "out": [
+                "D",
+                "Em",
+                "F#m",
+                "G",
+                "A",
+                "Bm",
+                "C#dim"
+            ]
+        },
+        {
+            "key": "D#",
+            "out": [
+                "D#",
+                "E#m",
+                "F##m",
+                "G#",
+                "A#",
+                "B#m",
+                "C##dim"
+            ]
+        },
+        {
+            "key": "Eb",
+            "out": [
+                "Eb",
+                "Fm",
+                "Gm",
+                "Ab",
+                "Bb",
+                "Cm",
+                "Ddim"
+            ]
+        },
+        {
+            "key": "E",
+            "out": [
+                "E",
+                "F#m",
+                "G#m",
+                "A",
+                "B",
+                "C#m",
+                "D#dim"
+            ]
+        },
+        {
+            "key": "E#",
+            "out": [
+                "E#",
+                "F##m",
+                "G##m",
+                "A#",
+                "B#",
+                "C##m",
+                "D##dim"
+            ]
+        },
+        {
+            "key": "Fb",
+            "out": [
+                "Fb",
+                "Gbm",
+                "Abm",
+                "Bbb",
+                "Cb",
+                "Dbm",
+                "Ebdim"
+            ]
+        },
+        {
+            "key": "F",
+            "out": [
+                "F",
+                "Gm",
+                "Am",
+                "Bb",
+                "C",
+                "Dm",
+                "Edim"
+            ]
+        },
+        {
+            "key": "F#",
+            "out": [
+                "F#",
+                "G#m",
+                "A#m",
+                "B",
+                "C#",
+                "D#m",
+                "E#dim"
+            ]
+        },
+        {
+            "key": "Gb",
+            "out": [
+                "Gb",
+                "Abm",
+                "Bbm",
+                "Cb",
+                "Db",
+                "Ebm",
+                "Fdim"
+            ]
+        },
+        {
+            "key": "G",
+            "out": [
+                "G",
+                "Am",
+                "Bm",
+                "C",
+                "D",
+                "Em",
+                "F#dim"
+            ]
+        },
+        {
+            "key": "G#",
+            "out": [
+                "G#",
+                "A#m",
+                "B#m",
+                "C#",
+                "D#",
+                "E#m",
+                "F##dim"
+            ]
+        },
+        {
+            "key": "Abm",
+            "out": [
+                "Abm",
+                "Bbdim",
+                "Cb",
+                "Dbm",
+                "Ebm",
+                "Fb",
+                "Gb"
+            ]
+        },
+        {
+            "key": "Am",
+            "out": [
+                "Am",
+                "Bdim",
+                "C",
+                "Dm",
+                "Em",
+                "F",
+                "G"
+            ]
+        },
+        {
+            "key": "A#m",
+            "out": [
+                "A#m",
+                "B#dim",
+                "C#",
+                "D#m",
+                "E#m",
+                "F#",
+                "G#"
+            ]
+        },
+        {
+            "key": "Bbm",
+            "out": [
+                "Bbm",
+                "Cdim",
+                "Db",
+                "Ebm",
+                "Fm",
+                "Gb",
+                "Ab"
+            ]
+        },
+        {
+            "key": "Bm",
+            "out": [
+                "Bm",
+                "C#dim",
+                "D",
+                "Em",
+                "F#m",
+                "G",
+                "A"
+            ]
+        },
+        {
+            "key": "B#m",
+            "out": [
+                "B#m",
+                "C##dim",
+                "D#",
+                "E#m",
+                "F##m",
+                "G#",
+                "A#"
+            ]
+        },
+        {
+            "key": "Cbm",
+            "out": [
+                "Cbm",
+                "Dbdim",
+                "Ebb",
+                "Fbm",
+                "Gbm",
+                "Abb",
+                "Bbb"
+            ]
+        },
+        {
+            "key": "Cm",
+            "out": [
+                "Cm",
+                "Ddim",
+                "Eb",
+                "Fm",
+                "Gm",
+                "Ab",
+                "Bb"
+            ]
+        },
+        {
+            "key": "C#m",
+            "out": [
+                "C#m",
+                "D#dim",
+                "E",
+                "F#m",
+                "G#m",
+                "A",
+                "B"
+            ]
+        },
+        {
+            "key": "Dbm",
+            "out": [
+                "Dbm",
+                "Ebdim",
+                "Fb",
+                "Gbm",
+                "Abm",
+                "Bbb",
+                "Cb"
+            ]
+        },
+        {
+            "key": "Dm",
+            "out": [
+                "Dm",
+                "Edim",
+                "F",
+                "Gm",
+                "Am",
+                "Bb",
+                "C"
+            ]
+        },
+        {
+            "key": "D#m",
+            "out": [
+                "D#m",
+                "E#dim",
+                "F#",
+                "G#m",
+                "A#m",
+                "B",
+                "C#"
+            ]
+        },
+        {
+            "key": "Ebm",
+            "out": [
+                "Ebm",
+                "Fdim",
+                "Gb",
+                "Abm",
+                "Bbm",
+                "Cb",
+                "Db"
+            ]
+        },
+        {
+            "key": "Em",
+            "out": [
+                "Em",
+                "F#dim",
+                "G",
+                "Am",
+                "Bm",
+                "C",
+                "D"
+            ]
+        },
+        {
+            "key": "E#m",
+            "out": [
+                "E#m",
+                "F##dim",
+                "G#",
+                "A#m",
+                "B#m",
+                "C#",
+                "D#"
+            ]
+        },
+        {
+            "key": "Fbm",
+            "out": [
+                "Fbm",
+                "Gbdim",
+                "Abb",
+                "Bbbm",
+                "Cbm",
+                "Dbb",
+                "Ebb"
+            ]
+        },
+        {
+            "key": "Fm",
+            "out": [
+                "Fm",
+                "Gdim",
+                "Ab",
+                "Bbm",
+                "Cm",
+                "Db",
+                "Eb"
+            ]
+        },
+        {
+            "key": "F#m",
+            "out": [
+                "F#m",
+                "G#dim",
+                "A",
+                "Bm",
+                "C#m",
+                "D",
+                "E"
+            ]
+        },
+        {
+            "key": "Gbm",
+            "out": [
+                "Gbm",
+                "Abdim",
+                "Bbb",
+                "Cbm",
+                "Dbm",
+                "Ebb",
+                "Fb"
+            ]
+        },
+        {
+            "key": "Gm",
+            "out": [
+                "Gm",
+                "Adim",
+                "Bb",
+                "Cm",
+                "Dm",
+                "Eb",
+                "F"
+            ]
+        },
+        {
+            "key": "G#m",
+            "out": [
+                "G#m",
+                "A#dim",
+                "B",
+                "C#m",
+                "D#m",
+                "E",
+                "F#"
+            ]
+        },
+        {
+            "key": "",
+            "out": [
+            ]
+        },
+        {
+            "key": "H",
+            "out": [
+            ]
+        },
+        {
+            "key": "x",
+            "out": [
+            ]
+        },
+        {
+            "key": "c",
+            "out": [
+                "C",
+                "Dm",
+                "Em",
+                "F",
+                "G",
+                "Am",
+                "Bdim"
+            ]
+        },
+        {
+            "key": "Cmaj",
+            "out": [
+                "C",
+                "Dm",
+                "Em",
+                "F",
+                "G",
+                "Am",
+                "Bdim"
+            ]
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}

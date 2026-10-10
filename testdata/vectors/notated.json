@@ -1,0 +1,5060 @@
+{
+    "about": "notated(chord, key, notation): a chord, which is in `key`, written in one of ProPresenter's four notations (0 letters, 1 numbers, 2 numerals, 3 do re mi, as its file numbers them). `rows` has every key and notation for each of `chords`; `kinds` has the kinds of chord that numerals write differently. A GUESS in 1 to 3: ProPresenter does not say what it writes (spec/02-chord-rules.md).",
+    "chords": [
+        "C",
+        "Dm",
+        "F#m7",
+        "Bb/D",
+        "E/G#",
+        "Gsus4",
+        "Ab",
+        "B",
+        "C#dim",
+        "G1",
+        "Ebmaj7/G",
+        "A#m",
+        "Cb",
+        "E#"
+    ],
+    "keys": [
+        "Ab",
+        "A",
+        "A#",
+        "Bb",
+        "B",
+        "B#",
+        "Cb",
+        "C",
+        "C#",
+        "Db",
+        "D",
+        "D#",
+        "Eb",
+        "E",
+        "E#",
+        "Fb",
+        "F",
+        "F#",
+        "Gb",
+        "G",
+        "G#",
+        "Abm",
+        "Am",
+        "A#m",
+        "Bbm",
+        "Bm",
+        "B#m",
+        "Cbm",
+        "Cm",
+        "C#m",
+        "Dbm",
+        "Dm",
+        "D#m",
+        "Ebm",
+        "Em",
+        "E#m",
+        "Fbm",
+        "Fm",
+        "F#m",
+        "Gbm",
+        "Gm",
+        "G#m"
+    ],
+    "kinds": [
+        {
+            "chord": "C",
+            "key": "C",
+            "notation": 0,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "C",
+            "notation": 1,
+            "out": "1"
+        },
+        {
+            "chord": "C",
+            "key": "C",
+            "notation": 2,
+            "out": "I"
+        },
+        {
+            "chord": "C",
+            "key": "C",
+            "notation": 3,
+            "out": "Do"
+        },
+        {
+            "chord": "C",
+            "key": "Am",
+            "notation": 0,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "Am",
+            "notation": 1,
+            "out": "1"
+        },
+        {
+            "chord": "C",
+            "key": "Am",
+            "notation": 2,
+            "out": "I"
+        },
+        {
+            "chord": "C",
+            "key": "Am",
+            "notation": 3,
+            "out": "Do"
+        },
+        {
+            "chord": "C",
+            "key": "Eb",
+            "notation": 0,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6"
+        },
+        {
+            "chord": "C",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VI"
+        },
+        {
+            "chord": "C",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Do"
+        },
+        {
+            "chord": "C",
+            "key": "",
+            "notation": 0,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "",
+            "notation": 1,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "",
+            "notation": 2,
+            "out": "C"
+        },
+        {
+            "chord": "C",
+            "key": "",
+            "notation": 3,
+            "out": "Do"
+        },
+        {
+            "chord": "Cm",
+            "key": "C",
+            "notation": 0,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "C",
+            "notation": 1,
+            "out": "1m"
+        },
+        {
+            "chord": "Cm",
+            "key": "C",
+            "notation": 2,
+            "out": "i"
+        },
+        {
+            "chord": "Cm",
+            "key": "C",
+            "notation": 3,
+            "out": "Dom"
+        },
+        {
+            "chord": "Cm",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "Am",
+            "notation": 1,
+            "out": "1m"
+        },
+        {
+            "chord": "Cm",
+            "key": "Am",
+            "notation": 2,
+            "out": "i"
+        },
+        {
+            "chord": "Cm",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dom"
+        },
+        {
+            "chord": "Cm",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6m"
+        },
+        {
+            "chord": "Cm",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi"
+        },
+        {
+            "chord": "Cm",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dom"
+        },
+        {
+            "chord": "Cm",
+            "key": "",
+            "notation": 0,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "",
+            "notation": 1,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "",
+            "notation": 2,
+            "out": "Cm"
+        },
+        {
+            "chord": "Cm",
+            "key": "",
+            "notation": 3,
+            "out": "Dom"
+        },
+        {
+            "chord": "Cm7",
+            "key": "C",
+            "notation": 0,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "C",
+            "notation": 1,
+            "out": "1m7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "C",
+            "notation": 2,
+            "out": "i7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "C",
+            "notation": 3,
+            "out": "Dom7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Am",
+            "notation": 1,
+            "out": "1m7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Am",
+            "notation": 2,
+            "out": "i7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dom7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6m7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dom7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "",
+            "notation": 0,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "",
+            "notation": 1,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "",
+            "notation": 2,
+            "out": "Cm7"
+        },
+        {
+            "chord": "Cm7",
+            "key": "",
+            "notation": 3,
+            "out": "Dom7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "C",
+            "notation": 0,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "C",
+            "notation": 1,
+            "out": "1min7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "C",
+            "notation": 2,
+            "out": "i7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "C",
+            "notation": 3,
+            "out": "Domin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Am",
+            "notation": 1,
+            "out": "1min7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Am",
+            "notation": 2,
+            "out": "i7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Am",
+            "notation": 3,
+            "out": "Domin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6min7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Domin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "",
+            "notation": 0,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "",
+            "notation": 1,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "",
+            "notation": 2,
+            "out": "Cmin7"
+        },
+        {
+            "chord": "Cmin7",
+            "key": "",
+            "notation": 3,
+            "out": "Domin7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "C",
+            "notation": 0,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "C",
+            "notation": 1,
+            "out": "1maj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "C",
+            "notation": 2,
+            "out": "Imaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "C",
+            "notation": 3,
+            "out": "Domaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Am",
+            "notation": 1,
+            "out": "1maj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Am",
+            "notation": 2,
+            "out": "Imaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Am",
+            "notation": 3,
+            "out": "Domaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6maj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VImaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Domaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "",
+            "notation": 0,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "",
+            "notation": 1,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "",
+            "notation": 2,
+            "out": "Cmaj7"
+        },
+        {
+            "chord": "Cmaj7",
+            "key": "",
+            "notation": 3,
+            "out": "Domaj7"
+        },
+        {
+            "chord": "Cdim",
+            "key": "C",
+            "notation": 0,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "C",
+            "notation": 1,
+            "out": "1dim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "C",
+            "notation": 2,
+            "out": "i°"
+        },
+        {
+            "chord": "Cdim",
+            "key": "C",
+            "notation": 3,
+            "out": "Dodim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Am",
+            "notation": 1,
+            "out": "1dim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Am",
+            "notation": 2,
+            "out": "i°"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dodim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6dim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi°"
+        },
+        {
+            "chord": "Cdim",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dodim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "",
+            "notation": 0,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "",
+            "notation": 1,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "",
+            "notation": 2,
+            "out": "Cdim"
+        },
+        {
+            "chord": "Cdim",
+            "key": "",
+            "notation": 3,
+            "out": "Dodim"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "C",
+            "notation": 0,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "C",
+            "notation": 1,
+            "out": "1dim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "C",
+            "notation": 2,
+            "out": "i°7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "C",
+            "notation": 3,
+            "out": "Dodim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Am",
+            "notation": 1,
+            "out": "1dim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Am",
+            "notation": 2,
+            "out": "i°7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dodim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6dim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi°7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dodim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "",
+            "notation": 0,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "",
+            "notation": 1,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "",
+            "notation": 2,
+            "out": "Cdim7"
+        },
+        {
+            "chord": "Cdim7",
+            "key": "",
+            "notation": 3,
+            "out": "Dodim7"
+        },
+        {
+            "chord": "Caug",
+            "key": "C",
+            "notation": 0,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "C",
+            "notation": 1,
+            "out": "1aug"
+        },
+        {
+            "chord": "Caug",
+            "key": "C",
+            "notation": 2,
+            "out": "Iaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "C",
+            "notation": 3,
+            "out": "Doaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Am",
+            "notation": 0,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Am",
+            "notation": 1,
+            "out": "1aug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Am",
+            "notation": 2,
+            "out": "Iaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Am",
+            "notation": 3,
+            "out": "Doaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6aug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VIaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Doaug"
+        },
+        {
+            "chord": "Caug",
+            "key": "",
+            "notation": 0,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "",
+            "notation": 1,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "",
+            "notation": 2,
+            "out": "Caug"
+        },
+        {
+            "chord": "Caug",
+            "key": "",
+            "notation": 3,
+            "out": "Doaug"
+        },
+        {
+            "chord": "Csus4",
+            "key": "C",
+            "notation": 0,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "C",
+            "notation": 1,
+            "out": "1sus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "C",
+            "notation": 2,
+            "out": "Isus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "C",
+            "notation": 3,
+            "out": "Dosus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Am",
+            "notation": 0,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Am",
+            "notation": 1,
+            "out": "1sus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Am",
+            "notation": 2,
+            "out": "Isus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dosus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6sus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VIsus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dosus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "",
+            "notation": 0,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "",
+            "notation": 1,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "",
+            "notation": 2,
+            "out": "Csus4"
+        },
+        {
+            "chord": "Csus4",
+            "key": "",
+            "notation": 3,
+            "out": "Dosus4"
+        },
+        {
+            "chord": "C7",
+            "key": "C",
+            "notation": 0,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "C",
+            "notation": 1,
+            "out": "17"
+        },
+        {
+            "chord": "C7",
+            "key": "C",
+            "notation": 2,
+            "out": "I7"
+        },
+        {
+            "chord": "C7",
+            "key": "C",
+            "notation": 3,
+            "out": "Do7"
+        },
+        {
+            "chord": "C7",
+            "key": "Am",
+            "notation": 0,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "Am",
+            "notation": 1,
+            "out": "17"
+        },
+        {
+            "chord": "C7",
+            "key": "Am",
+            "notation": 2,
+            "out": "I7"
+        },
+        {
+            "chord": "C7",
+            "key": "Am",
+            "notation": 3,
+            "out": "Do7"
+        },
+        {
+            "chord": "C7",
+            "key": "Eb",
+            "notation": 0,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "Eb",
+            "notation": 1,
+            "out": "67"
+        },
+        {
+            "chord": "C7",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VI7"
+        },
+        {
+            "chord": "C7",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Do7"
+        },
+        {
+            "chord": "C7",
+            "key": "",
+            "notation": 0,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "",
+            "notation": 1,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "",
+            "notation": 2,
+            "out": "C7"
+        },
+        {
+            "chord": "C7",
+            "key": "",
+            "notation": 3,
+            "out": "Do7"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "C",
+            "notation": 0,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "C",
+            "notation": 1,
+            "out": "1m/b3"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "C",
+            "notation": 2,
+            "out": "i/bIII"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "C",
+            "notation": 3,
+            "out": "Dom/Mib"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Am",
+            "notation": 1,
+            "out": "1m/b3"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Am",
+            "notation": 2,
+            "out": "i/bIII"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dom/Mib"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6m/1"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi/I"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dom/Mib"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "",
+            "notation": 0,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "",
+            "notation": 1,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "",
+            "notation": 2,
+            "out": "Cm/Eb"
+        },
+        {
+            "chord": "Cm/Eb",
+            "key": "",
+            "notation": 3,
+            "out": "Dom/Mib"
+        },
+        {
+            "chord": "C/E",
+            "key": "C",
+            "notation": 0,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "C",
+            "notation": 1,
+            "out": "1/3"
+        },
+        {
+            "chord": "C/E",
+            "key": "C",
+            "notation": 2,
+            "out": "I/III"
+        },
+        {
+            "chord": "C/E",
+            "key": "C",
+            "notation": 3,
+            "out": "Do/Mi"
+        },
+        {
+            "chord": "C/E",
+            "key": "Am",
+            "notation": 0,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "Am",
+            "notation": 1,
+            "out": "1/3"
+        },
+        {
+            "chord": "C/E",
+            "key": "Am",
+            "notation": 2,
+            "out": "I/III"
+        },
+        {
+            "chord": "C/E",
+            "key": "Am",
+            "notation": 3,
+            "out": "Do/Mi"
+        },
+        {
+            "chord": "C/E",
+            "key": "Eb",
+            "notation": 0,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6/#1"
+        },
+        {
+            "chord": "C/E",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VI/#I"
+        },
+        {
+            "chord": "C/E",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Do/Mi"
+        },
+        {
+            "chord": "C/E",
+            "key": "",
+            "notation": 0,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "",
+            "notation": 1,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "",
+            "notation": 2,
+            "out": "C/E"
+        },
+        {
+            "chord": "C/E",
+            "key": "",
+            "notation": 3,
+            "out": "Do/Mi"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "C",
+            "notation": 0,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "C",
+            "notation": 1,
+            "out": "1add9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "C",
+            "notation": 2,
+            "out": "Iadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "C",
+            "notation": 3,
+            "out": "Doadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Am",
+            "notation": 1,
+            "out": "1add9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Am",
+            "notation": 2,
+            "out": "Iadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Am",
+            "notation": 3,
+            "out": "Doadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6add9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Eb",
+            "notation": 2,
+            "out": "VIadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Doadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "",
+            "notation": 0,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "",
+            "notation": 1,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "",
+            "notation": 2,
+            "out": "Cadd9"
+        },
+        {
+            "chord": "Cadd9",
+            "key": "",
+            "notation": 3,
+            "out": "Doadd9"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "C",
+            "notation": 0,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "C",
+            "notation": 1,
+            "out": "1m7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "C",
+            "notation": 2,
+            "out": "i7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "C",
+            "notation": 3,
+            "out": "Dom7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Am",
+            "notation": 0,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Am",
+            "notation": 1,
+            "out": "1m7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Am",
+            "notation": 2,
+            "out": "i7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Am",
+            "notation": 3,
+            "out": "Dom7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Eb",
+            "notation": 0,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Eb",
+            "notation": 1,
+            "out": "6m7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Eb",
+            "notation": 2,
+            "out": "vi7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "Eb",
+            "notation": 3,
+            "out": "Dom7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "",
+            "notation": 0,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "",
+            "notation": 1,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "",
+            "notation": 2,
+            "out": "Cm7b5"
+        },
+        {
+            "chord": "Cm7b5",
+            "key": "",
+            "notation": 3,
+            "out": "Dom7b5"
+        },
+        {
+            "chord": "x",
+            "key": "C",
+            "notation": 0,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "C",
+            "notation": 1,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "C",
+            "notation": 2,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "C",
+            "notation": 3,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Am",
+            "notation": 0,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Am",
+            "notation": 1,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Am",
+            "notation": 2,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Am",
+            "notation": 3,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Eb",
+            "notation": 0,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Eb",
+            "notation": 1,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Eb",
+            "notation": 2,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "Eb",
+            "notation": 3,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "",
+            "notation": 0,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "",
+            "notation": 1,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "",
+            "notation": 2,
+            "out": "x"
+        },
+        {
+            "chord": "x",
+            "key": "",
+            "notation": 3,
+            "out": "x"
+        },
+        {
+            "chord": "",
+            "key": "C",
+            "notation": 0,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "C",
+            "notation": 1,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "C",
+            "notation": 2,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "C",
+            "notation": 3,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Am",
+            "notation": 0,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Am",
+            "notation": 1,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Am",
+            "notation": 2,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Am",
+            "notation": 3,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Eb",
+            "notation": 0,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Eb",
+            "notation": 1,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Eb",
+            "notation": 2,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "Eb",
+            "notation": 3,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "",
+            "notation": 0,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "",
+            "notation": 1,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "",
+            "notation": 2,
+            "out": ""
+        },
+        {
+            "chord": "",
+            "key": "",
+            "notation": 3,
+            "out": ""
+        },
+        {
+            "chord": "N.C.",
+            "key": "C",
+            "notation": 0,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "C",
+            "notation": 1,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "C",
+            "notation": 2,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "C",
+            "notation": 3,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Am",
+            "notation": 0,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Am",
+            "notation": 1,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Am",
+            "notation": 2,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Am",
+            "notation": 3,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Eb",
+            "notation": 0,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Eb",
+            "notation": 1,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Eb",
+            "notation": 2,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "Eb",
+            "notation": 3,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "",
+            "notation": 0,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "",
+            "notation": 1,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "",
+            "notation": 2,
+            "out": "N.C."
+        },
+        {
+            "chord": "N.C.",
+            "key": "",
+            "notation": 3,
+            "out": "N.C."
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again.",
+    "rows": [
+        {
+            "key": "Ab",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Ab",
+            "notation": 1,
+            "out": [
+                "3",
+                "#4m",
+                "#6m7",
+                "2/#4",
+                "#5/#7",
+                "7sus4",
+                "1",
+                "#2",
+                "#3dim",
+                "71",
+                "5maj7/7",
+                "##1m",
+                "b3",
+                "##5"
+            ]
+        },
+        {
+            "key": "Ab",
+            "notation": 2,
+            "out": [
+                "III",
+                "#iv",
+                "#vi7",
+                "II/#IV",
+                "#V/#VII",
+                "VIIsus4",
+                "I",
+                "#II",
+                "#iii°",
+                "VII1",
+                "Vmaj7/VII",
+                "##i",
+                "bIII",
+                "##V"
+            ]
+        },
+        {
+            "key": "Ab",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "A",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "A",
+            "notation": 1,
+            "out": [
+                "b3",
+                "4m",
+                "6m7",
+                "b2/4",
+                "5/7",
+                "b7sus4",
+                "b1",
+                "2",
+                "3dim",
+                "b71",
+                "b5maj7/b7",
+                "#1m",
+                "bb3",
+                "#5"
+            ]
+        },
+        {
+            "key": "A",
+            "notation": 2,
+            "out": [
+                "bIII",
+                "iv",
+                "vi7",
+                "bII/IV",
+                "V/VII",
+                "bVIIsus4",
+                "bI",
+                "II",
+                "iii°",
+                "bVII1",
+                "bVmaj7/bVII",
+                "#i",
+                "bbIII",
+                "#V"
+            ]
+        },
+        {
+            "key": "A",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "A#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "A#",
+            "notation": 1,
+            "out": [
+                "bb3",
+                "b4m",
+                "b6m7",
+                "bb2/b4",
+                "b5/b7",
+                "bb7sus4",
+                "bb1",
+                "b2",
+                "b3dim",
+                "bb71",
+                "bb5maj7/bb7",
+                "1m",
+                "bbb3",
+                "5"
+            ]
+        },
+        {
+            "key": "A#",
+            "notation": 2,
+            "out": [
+                "bbIII",
+                "biv",
+                "bvi7",
+                "bbII/bIV",
+                "bV/bVII",
+                "bbVIIsus4",
+                "bbI",
+                "bII",
+                "biii°",
+                "bbVII1",
+                "bbVmaj7/bbVII",
+                "i",
+                "bbbIII",
+                "V"
+            ]
+        },
+        {
+            "key": "A#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Bb",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Bb",
+            "notation": 1,
+            "out": [
+                "2",
+                "3m",
+                "#5m7",
+                "1/3",
+                "#4/#6",
+                "6sus4",
+                "b7",
+                "#1",
+                "#2dim",
+                "61",
+                "4maj7/6",
+                "#7m",
+                "b2",
+                "##4"
+            ]
+        },
+        {
+            "key": "Bb",
+            "notation": 2,
+            "out": [
+                "II",
+                "iii",
+                "#v7",
+                "I/III",
+                "#IV/#VI",
+                "VIsus4",
+                "bVII",
+                "#I",
+                "#ii°",
+                "VI1",
+                "IVmaj7/VI",
+                "#vii",
+                "bII",
+                "##IV"
+            ]
+        },
+        {
+            "key": "Bb",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "B",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "B",
+            "notation": 1,
+            "out": [
+                "b2",
+                "b3m",
+                "5m7",
+                "b1/b3",
+                "4/6",
+                "b6sus4",
+                "bb7",
+                "1",
+                "2dim",
+                "b61",
+                "b4maj7/b6",
+                "7m",
+                "bb2",
+                "#4"
+            ]
+        },
+        {
+            "key": "B",
+            "notation": 2,
+            "out": [
+                "bII",
+                "biii",
+                "v7",
+                "bI/bIII",
+                "IV/VI",
+                "bVIsus4",
+                "bbVII",
+                "I",
+                "ii°",
+                "bVI1",
+                "bIVmaj7/bVI",
+                "vii",
+                "bbII",
+                "#IV"
+            ]
+        },
+        {
+            "key": "B",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "B#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "B#",
+            "notation": 1,
+            "out": [
+                "bb2",
+                "bb3m",
+                "b5m7",
+                "bb1/bb3",
+                "b4/b6",
+                "bb6sus4",
+                "bbb7",
+                "b1",
+                "b2dim",
+                "bb61",
+                "bb4maj7/bb6",
+                "b7m",
+                "bbb2",
+                "4"
+            ]
+        },
+        {
+            "key": "B#",
+            "notation": 2,
+            "out": [
+                "bbII",
+                "bbiii",
+                "bv7",
+                "bbI/bbIII",
+                "bIV/bVI",
+                "bbVIsus4",
+                "bbbVII",
+                "bI",
+                "bii°",
+                "bbVI1",
+                "bbIVmaj7/bbVI",
+                "bvii",
+                "bbbII",
+                "IV"
+            ]
+        },
+        {
+            "key": "B#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Cb",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Cb",
+            "notation": 1,
+            "out": [
+                "#1",
+                "#2m",
+                "##4m7",
+                "7/#2",
+                "#3/##5",
+                "#5sus4",
+                "6",
+                "#7",
+                "##1dim",
+                "#51",
+                "3maj7/#5",
+                "##6m",
+                "1",
+                "##3"
+            ]
+        },
+        {
+            "key": "Cb",
+            "notation": 2,
+            "out": [
+                "#I",
+                "#ii",
+                "##iv7",
+                "VII/#II",
+                "#III/##V",
+                "#Vsus4",
+                "VI",
+                "#VII",
+                "##i°",
+                "#V1",
+                "IIImaj7/#V",
+                "##vi",
+                "I",
+                "##III"
+            ]
+        },
+        {
+            "key": "Cb",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "C",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "C",
+            "notation": 1,
+            "out": [
+                "1",
+                "2m",
+                "#4m7",
+                "b7/2",
+                "3/#5",
+                "5sus4",
+                "b6",
+                "7",
+                "#1dim",
+                "51",
+                "b3maj7/5",
+                "#6m",
+                "b1",
+                "#3"
+            ]
+        },
+        {
+            "key": "C",
+            "notation": 2,
+            "out": [
+                "I",
+                "ii",
+                "#iv7",
+                "bVII/II",
+                "III/#V",
+                "Vsus4",
+                "bVI",
+                "VII",
+                "#i°",
+                "V1",
+                "bIIImaj7/V",
+                "#vi",
+                "bI",
+                "#III"
+            ]
+        },
+        {
+            "key": "C",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "C#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "C#",
+            "notation": 1,
+            "out": [
+                "b1",
+                "b2m",
+                "4m7",
+                "bb7/b2",
+                "b3/5",
+                "b5sus4",
+                "bb6",
+                "b7",
+                "1dim",
+                "b51",
+                "bb3maj7/b5",
+                "6m",
+                "bb1",
+                "3"
+            ]
+        },
+        {
+            "key": "C#",
+            "notation": 2,
+            "out": [
+                "bI",
+                "bii",
+                "iv7",
+                "bbVII/bII",
+                "bIII/V",
+                "bVsus4",
+                "bbVI",
+                "bVII",
+                "i°",
+                "bV1",
+                "bbIIImaj7/bV",
+                "vi",
+                "bbI",
+                "III"
+            ]
+        },
+        {
+            "key": "C#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Db",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Db",
+            "notation": 1,
+            "out": [
+                "7",
+                "#1m",
+                "#3m7",
+                "6/#1",
+                "#2/##4",
+                "#4sus4",
+                "5",
+                "#6",
+                "#7dim",
+                "#41",
+                "2maj7/#4",
+                "##5m",
+                "b7",
+                "##2"
+            ]
+        },
+        {
+            "key": "Db",
+            "notation": 2,
+            "out": [
+                "VII",
+                "#i",
+                "#iii7",
+                "VI/#I",
+                "#II/##IV",
+                "#IVsus4",
+                "V",
+                "#VI",
+                "#vii°",
+                "#IV1",
+                "IImaj7/#IV",
+                "##v",
+                "bVII",
+                "##II"
+            ]
+        },
+        {
+            "key": "Db",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "D",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "D",
+            "notation": 1,
+            "out": [
+                "b7",
+                "1m",
+                "3m7",
+                "b6/1",
+                "2/#4",
+                "4sus4",
+                "b5",
+                "6",
+                "7dim",
+                "41",
+                "b2maj7/4",
+                "#5m",
+                "bb7",
+                "#2"
+            ]
+        },
+        {
+            "key": "D",
+            "notation": 2,
+            "out": [
+                "bVII",
+                "i",
+                "iii7",
+                "bVI/I",
+                "II/#IV",
+                "IVsus4",
+                "bV",
+                "VI",
+                "vii°",
+                "IV1",
+                "bIImaj7/IV",
+                "#v",
+                "bbVII",
+                "#II"
+            ]
+        },
+        {
+            "key": "D",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "D#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "D#",
+            "notation": 1,
+            "out": [
+                "bb7",
+                "b1m",
+                "b3m7",
+                "bb6/b1",
+                "b2/4",
+                "b4sus4",
+                "bb5",
+                "b6",
+                "b7dim",
+                "b41",
+                "bb2maj7/b4",
+                "5m",
+                "bbb7",
+                "2"
+            ]
+        },
+        {
+            "key": "D#",
+            "notation": 2,
+            "out": [
+                "bbVII",
+                "bi",
+                "biii7",
+                "bbVI/bI",
+                "bII/IV",
+                "bIVsus4",
+                "bbV",
+                "bVI",
+                "bvii°",
+                "bIV1",
+                "bbIImaj7/bIV",
+                "v",
+                "bbbVII",
+                "II"
+            ]
+        },
+        {
+            "key": "D#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Eb",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Eb",
+            "notation": 1,
+            "out": [
+                "6",
+                "7m",
+                "#2m7",
+                "5/7",
+                "#1/#3",
+                "3sus4",
+                "4",
+                "#5",
+                "#6dim",
+                "31",
+                "1maj7/3",
+                "##4m",
+                "b6",
+                "##1"
+            ]
+        },
+        {
+            "key": "Eb",
+            "notation": 2,
+            "out": [
+                "VI",
+                "vii",
+                "#ii7",
+                "V/VII",
+                "#I/#III",
+                "IIIsus4",
+                "IV",
+                "#V",
+                "#vi°",
+                "III1",
+                "Imaj7/III",
+                "##iv",
+                "bVI",
+                "##I"
+            ]
+        },
+        {
+            "key": "Eb",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "E",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "E",
+            "notation": 1,
+            "out": [
+                "b6",
+                "b7m",
+                "2m7",
+                "b5/b7",
+                "1/3",
+                "b3sus4",
+                "b4",
+                "5",
+                "6dim",
+                "b31",
+                "b1maj7/b3",
+                "#4m",
+                "bb6",
+                "#1"
+            ]
+        },
+        {
+            "key": "E",
+            "notation": 2,
+            "out": [
+                "bVI",
+                "bvii",
+                "ii7",
+                "bV/bVII",
+                "I/III",
+                "bIIIsus4",
+                "bIV",
+                "V",
+                "vi°",
+                "bIII1",
+                "bImaj7/bIII",
+                "#iv",
+                "bbVI",
+                "#I"
+            ]
+        },
+        {
+            "key": "E",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "E#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "E#",
+            "notation": 1,
+            "out": [
+                "bb6",
+                "bb7m",
+                "b2m7",
+                "bb5/bb7",
+                "b1/b3",
+                "bb3sus4",
+                "bb4",
+                "b5",
+                "b6dim",
+                "bb31",
+                "bb1maj7/bb3",
+                "4m",
+                "bbb6",
+                "1"
+            ]
+        },
+        {
+            "key": "E#",
+            "notation": 2,
+            "out": [
+                "bbVI",
+                "bbvii",
+                "bii7",
+                "bbV/bbVII",
+                "bI/bIII",
+                "bbIIIsus4",
+                "bbIV",
+                "bV",
+                "bvi°",
+                "bbIII1",
+                "bbImaj7/bbIII",
+                "iv",
+                "bbbVI",
+                "I"
+            ]
+        },
+        {
+            "key": "E#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Fb",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Fb",
+            "notation": 1,
+            "out": [
+                "#5",
+                "#6m",
+                "##1m7",
+                "#4/#6",
+                "#7/##2",
+                "#2sus4",
+                "3",
+                "##4",
+                "##5dim",
+                "#21",
+                "7maj7/#2",
+                "##3m",
+                "5",
+                "##7"
+            ]
+        },
+        {
+            "key": "Fb",
+            "notation": 2,
+            "out": [
+                "#V",
+                "#vi",
+                "##i7",
+                "#IV/#VI",
+                "#VII/##II",
+                "#IIsus4",
+                "III",
+                "##IV",
+                "##v°",
+                "#II1",
+                "VIImaj7/#II",
+                "##iii",
+                "V",
+                "##VII"
+            ]
+        },
+        {
+            "key": "Fb",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "F",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "F",
+            "notation": 1,
+            "out": [
+                "5",
+                "6m",
+                "#1m7",
+                "4/6",
+                "7/#2",
+                "2sus4",
+                "b3",
+                "#4",
+                "#5dim",
+                "21",
+                "b7maj7/2",
+                "#3m",
+                "b5",
+                "#7"
+            ]
+        },
+        {
+            "key": "F",
+            "notation": 2,
+            "out": [
+                "V",
+                "vi",
+                "#i7",
+                "IV/VI",
+                "VII/#II",
+                "IIsus4",
+                "bIII",
+                "#IV",
+                "#v°",
+                "II1",
+                "bVIImaj7/II",
+                "#iii",
+                "bV",
+                "#VII"
+            ]
+        },
+        {
+            "key": "F",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "F#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "F#",
+            "notation": 1,
+            "out": [
+                "b5",
+                "b6m",
+                "1m7",
+                "b4/b6",
+                "b7/2",
+                "b2sus4",
+                "bb3",
+                "4",
+                "5dim",
+                "b21",
+                "bb7maj7/b2",
+                "3m",
+                "bb5",
+                "7"
+            ]
+        },
+        {
+            "key": "F#",
+            "notation": 2,
+            "out": [
+                "bV",
+                "bvi",
+                "i7",
+                "bIV/bVI",
+                "bVII/II",
+                "bIIsus4",
+                "bbIII",
+                "IV",
+                "v°",
+                "bII1",
+                "bbVIImaj7/bII",
+                "iii",
+                "bbV",
+                "VII"
+            ]
+        },
+        {
+            "key": "F#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Gb",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Gb",
+            "notation": 1,
+            "out": [
+                "#4",
+                "#5m",
+                "#7m7",
+                "3/#5",
+                "#6/##1",
+                "#1sus4",
+                "2",
+                "#3",
+                "##4dim",
+                "#11",
+                "6maj7/#1",
+                "##2m",
+                "4",
+                "##6"
+            ]
+        },
+        {
+            "key": "Gb",
+            "notation": 2,
+            "out": [
+                "#IV",
+                "#v",
+                "#vii7",
+                "III/#V",
+                "#VI/##I",
+                "#Isus4",
+                "II",
+                "#III",
+                "##iv°",
+                "#I1",
+                "VImaj7/#I",
+                "##ii",
+                "IV",
+                "##VI"
+            ]
+        },
+        {
+            "key": "Gb",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "G",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "G",
+            "notation": 1,
+            "out": [
+                "4",
+                "5m",
+                "7m7",
+                "b3/5",
+                "6/#1",
+                "1sus4",
+                "b2",
+                "3",
+                "#4dim",
+                "11",
+                "b6maj7/1",
+                "#2m",
+                "b4",
+                "#6"
+            ]
+        },
+        {
+            "key": "G",
+            "notation": 2,
+            "out": [
+                "IV",
+                "v",
+                "vii7",
+                "bIII/V",
+                "VI/#I",
+                "Isus4",
+                "bII",
+                "III",
+                "#iv°",
+                "I1",
+                "bVImaj7/I",
+                "#ii",
+                "bIV",
+                "#VI"
+            ]
+        },
+        {
+            "key": "G",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "G#",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "G#",
+            "notation": 1,
+            "out": [
+                "b4",
+                "b5m",
+                "b7m7",
+                "bb3/b5",
+                "b6/1",
+                "b1sus4",
+                "bb2",
+                "b3",
+                "4dim",
+                "b11",
+                "bb6maj7/b1",
+                "2m",
+                "bb4",
+                "6"
+            ]
+        },
+        {
+            "key": "G#",
+            "notation": 2,
+            "out": [
+                "bIV",
+                "bv",
+                "bvii7",
+                "bbIII/bV",
+                "bVI/I",
+                "bIsus4",
+                "bbII",
+                "bIII",
+                "iv°",
+                "bI1",
+                "bbVImaj7/bI",
+                "ii",
+                "bbIV",
+                "VI"
+            ]
+        },
+        {
+            "key": "G#",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Abm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Abm",
+            "notation": 1,
+            "out": [
+                "#1",
+                "#2m",
+                "##4m7",
+                "7/#2",
+                "#3/##5",
+                "#5sus4",
+                "6",
+                "#7",
+                "##1dim",
+                "#51",
+                "3maj7/#5",
+                "##6m",
+                "1",
+                "##3"
+            ]
+        },
+        {
+            "key": "Abm",
+            "notation": 2,
+            "out": [
+                "#I",
+                "#ii",
+                "##iv7",
+                "VII/#II",
+                "#III/##V",
+                "#Vsus4",
+                "VI",
+                "#VII",
+                "##i°",
+                "#V1",
+                "IIImaj7/#V",
+                "##vi",
+                "I",
+                "##III"
+            ]
+        },
+        {
+            "key": "Abm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Am",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Am",
+            "notation": 1,
+            "out": [
+                "1",
+                "2m",
+                "#4m7",
+                "b7/2",
+                "3/#5",
+                "5sus4",
+                "b6",
+                "7",
+                "#1dim",
+                "51",
+                "b3maj7/5",
+                "#6m",
+                "b1",
+                "#3"
+            ]
+        },
+        {
+            "key": "Am",
+            "notation": 2,
+            "out": [
+                "I",
+                "ii",
+                "#iv7",
+                "bVII/II",
+                "III/#V",
+                "Vsus4",
+                "bVI",
+                "VII",
+                "#i°",
+                "V1",
+                "bIIImaj7/V",
+                "#vi",
+                "bI",
+                "#III"
+            ]
+        },
+        {
+            "key": "Am",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "A#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "A#m",
+            "notation": 1,
+            "out": [
+                "b1",
+                "b2m",
+                "4m7",
+                "bb7/b2",
+                "b3/5",
+                "b5sus4",
+                "bb6",
+                "b7",
+                "1dim",
+                "b51",
+                "bb3maj7/b5",
+                "6m",
+                "bb1",
+                "3"
+            ]
+        },
+        {
+            "key": "A#m",
+            "notation": 2,
+            "out": [
+                "bI",
+                "bii",
+                "iv7",
+                "bbVII/bII",
+                "bIII/V",
+                "bVsus4",
+                "bbVI",
+                "bVII",
+                "i°",
+                "bV1",
+                "bbIIImaj7/bV",
+                "vi",
+                "bbI",
+                "III"
+            ]
+        },
+        {
+            "key": "A#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Bbm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Bbm",
+            "notation": 1,
+            "out": [
+                "7",
+                "#1m",
+                "#3m7",
+                "6/#1",
+                "#2/##4",
+                "#4sus4",
+                "5",
+                "#6",
+                "#7dim",
+                "#41",
+                "2maj7/#4",
+                "##5m",
+                "b7",
+                "##2"
+            ]
+        },
+        {
+            "key": "Bbm",
+            "notation": 2,
+            "out": [
+                "VII",
+                "#i",
+                "#iii7",
+                "VI/#I",
+                "#II/##IV",
+                "#IVsus4",
+                "V",
+                "#VI",
+                "#vii°",
+                "#IV1",
+                "IImaj7/#IV",
+                "##v",
+                "bVII",
+                "##II"
+            ]
+        },
+        {
+            "key": "Bbm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Bm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Bm",
+            "notation": 1,
+            "out": [
+                "b7",
+                "1m",
+                "3m7",
+                "b6/1",
+                "2/#4",
+                "4sus4",
+                "b5",
+                "6",
+                "7dim",
+                "41",
+                "b2maj7/4",
+                "#5m",
+                "bb7",
+                "#2"
+            ]
+        },
+        {
+            "key": "Bm",
+            "notation": 2,
+            "out": [
+                "bVII",
+                "i",
+                "iii7",
+                "bVI/I",
+                "II/#IV",
+                "IVsus4",
+                "bV",
+                "VI",
+                "vii°",
+                "IV1",
+                "bIImaj7/IV",
+                "#v",
+                "bbVII",
+                "#II"
+            ]
+        },
+        {
+            "key": "Bm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "B#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "B#m",
+            "notation": 1,
+            "out": [
+                "bb7",
+                "b1m",
+                "b3m7",
+                "bb6/b1",
+                "b2/4",
+                "b4sus4",
+                "bb5",
+                "b6",
+                "b7dim",
+                "b41",
+                "bb2maj7/b4",
+                "5m",
+                "bbb7",
+                "2"
+            ]
+        },
+        {
+            "key": "B#m",
+            "notation": 2,
+            "out": [
+                "bbVII",
+                "bi",
+                "biii7",
+                "bbVI/bI",
+                "bII/IV",
+                "bIVsus4",
+                "bbV",
+                "bVI",
+                "bvii°",
+                "bIV1",
+                "bbIImaj7/bIV",
+                "v",
+                "bbbVII",
+                "II"
+            ]
+        },
+        {
+            "key": "B#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Cbm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Cbm",
+            "notation": 1,
+            "out": [
+                "#6",
+                "#7m",
+                "##2m7",
+                "#5/#7",
+                "##1/##3",
+                "#3sus4",
+                "#4",
+                "##5",
+                "##6dim",
+                "#31",
+                "#1maj7/#3",
+                "###4m",
+                "6",
+                "###1"
+            ]
+        },
+        {
+            "key": "Cbm",
+            "notation": 2,
+            "out": [
+                "#VI",
+                "#vii",
+                "##ii7",
+                "#V/#VII",
+                "##I/##III",
+                "#IIIsus4",
+                "#IV",
+                "##V",
+                "##vi°",
+                "#III1",
+                "#Imaj7/#III",
+                "###iv",
+                "VI",
+                "###I"
+            ]
+        },
+        {
+            "key": "Cbm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Cm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Cm",
+            "notation": 1,
+            "out": [
+                "6",
+                "7m",
+                "#2m7",
+                "5/7",
+                "#1/#3",
+                "3sus4",
+                "4",
+                "#5",
+                "#6dim",
+                "31",
+                "1maj7/3",
+                "##4m",
+                "b6",
+                "##1"
+            ]
+        },
+        {
+            "key": "Cm",
+            "notation": 2,
+            "out": [
+                "VI",
+                "vii",
+                "#ii7",
+                "V/VII",
+                "#I/#III",
+                "IIIsus4",
+                "IV",
+                "#V",
+                "#vi°",
+                "III1",
+                "Imaj7/III",
+                "##iv",
+                "bVI",
+                "##I"
+            ]
+        },
+        {
+            "key": "Cm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "C#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "C#m",
+            "notation": 1,
+            "out": [
+                "b6",
+                "b7m",
+                "2m7",
+                "b5/b7",
+                "1/3",
+                "b3sus4",
+                "b4",
+                "5",
+                "6dim",
+                "b31",
+                "b1maj7/b3",
+                "#4m",
+                "bb6",
+                "#1"
+            ]
+        },
+        {
+            "key": "C#m",
+            "notation": 2,
+            "out": [
+                "bVI",
+                "bvii",
+                "ii7",
+                "bV/bVII",
+                "I/III",
+                "bIIIsus4",
+                "bIV",
+                "V",
+                "vi°",
+                "bIII1",
+                "bImaj7/bIII",
+                "#iv",
+                "bbVI",
+                "#I"
+            ]
+        },
+        {
+            "key": "C#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Dbm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Dbm",
+            "notation": 1,
+            "out": [
+                "#5",
+                "#6m",
+                "##1m7",
+                "#4/#6",
+                "#7/##2",
+                "#2sus4",
+                "3",
+                "##4",
+                "##5dim",
+                "#21",
+                "7maj7/#2",
+                "##3m",
+                "5",
+                "##7"
+            ]
+        },
+        {
+            "key": "Dbm",
+            "notation": 2,
+            "out": [
+                "#V",
+                "#vi",
+                "##i7",
+                "#IV/#VI",
+                "#VII/##II",
+                "#IIsus4",
+                "III",
+                "##IV",
+                "##v°",
+                "#II1",
+                "VIImaj7/#II",
+                "##iii",
+                "V",
+                "##VII"
+            ]
+        },
+        {
+            "key": "Dbm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Dm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Dm",
+            "notation": 1,
+            "out": [
+                "5",
+                "6m",
+                "#1m7",
+                "4/6",
+                "7/#2",
+                "2sus4",
+                "b3",
+                "#4",
+                "#5dim",
+                "21",
+                "b7maj7/2",
+                "#3m",
+                "b5",
+                "#7"
+            ]
+        },
+        {
+            "key": "Dm",
+            "notation": 2,
+            "out": [
+                "V",
+                "vi",
+                "#i7",
+                "IV/VI",
+                "VII/#II",
+                "IIsus4",
+                "bIII",
+                "#IV",
+                "#v°",
+                "II1",
+                "bVIImaj7/II",
+                "#iii",
+                "bV",
+                "#VII"
+            ]
+        },
+        {
+            "key": "Dm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "D#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "D#m",
+            "notation": 1,
+            "out": [
+                "b5",
+                "b6m",
+                "1m7",
+                "b4/b6",
+                "b7/2",
+                "b2sus4",
+                "bb3",
+                "4",
+                "5dim",
+                "b21",
+                "bb7maj7/b2",
+                "3m",
+                "bb5",
+                "7"
+            ]
+        },
+        {
+            "key": "D#m",
+            "notation": 2,
+            "out": [
+                "bV",
+                "bvi",
+                "i7",
+                "bIV/bVI",
+                "bVII/II",
+                "bIIsus4",
+                "bbIII",
+                "IV",
+                "v°",
+                "bII1",
+                "bbVIImaj7/bII",
+                "iii",
+                "bbV",
+                "VII"
+            ]
+        },
+        {
+            "key": "D#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Ebm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Ebm",
+            "notation": 1,
+            "out": [
+                "#4",
+                "#5m",
+                "#7m7",
+                "3/#5",
+                "#6/##1",
+                "#1sus4",
+                "2",
+                "#3",
+                "##4dim",
+                "#11",
+                "6maj7/#1",
+                "##2m",
+                "4",
+                "##6"
+            ]
+        },
+        {
+            "key": "Ebm",
+            "notation": 2,
+            "out": [
+                "#IV",
+                "#v",
+                "#vii7",
+                "III/#V",
+                "#VI/##I",
+                "#Isus4",
+                "II",
+                "#III",
+                "##iv°",
+                "#I1",
+                "VImaj7/#I",
+                "##ii",
+                "IV",
+                "##VI"
+            ]
+        },
+        {
+            "key": "Ebm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Em",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Em",
+            "notation": 1,
+            "out": [
+                "4",
+                "5m",
+                "7m7",
+                "b3/5",
+                "6/#1",
+                "1sus4",
+                "b2",
+                "3",
+                "#4dim",
+                "11",
+                "b6maj7/1",
+                "#2m",
+                "b4",
+                "#6"
+            ]
+        },
+        {
+            "key": "Em",
+            "notation": 2,
+            "out": [
+                "IV",
+                "v",
+                "vii7",
+                "bIII/V",
+                "VI/#I",
+                "Isus4",
+                "bII",
+                "III",
+                "#iv°",
+                "I1",
+                "bVImaj7/I",
+                "#ii",
+                "bIV",
+                "#VI"
+            ]
+        },
+        {
+            "key": "Em",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "E#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "E#m",
+            "notation": 1,
+            "out": [
+                "b4",
+                "b5m",
+                "b7m7",
+                "bb3/b5",
+                "b6/1",
+                "b1sus4",
+                "bb2",
+                "b3",
+                "4dim",
+                "b11",
+                "bb6maj7/b1",
+                "2m",
+                "bb4",
+                "6"
+            ]
+        },
+        {
+            "key": "E#m",
+            "notation": 2,
+            "out": [
+                "bIV",
+                "bv",
+                "bvii7",
+                "bbIII/bV",
+                "bVI/I",
+                "bIsus4",
+                "bbII",
+                "bIII",
+                "iv°",
+                "bI1",
+                "bbVImaj7/bI",
+                "ii",
+                "bbIV",
+                "VI"
+            ]
+        },
+        {
+            "key": "E#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Fbm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Fbm",
+            "notation": 1,
+            "out": [
+                "#3",
+                "##4m",
+                "##6m7",
+                "#2/##4",
+                "##5/##7",
+                "#7sus4",
+                "#1",
+                "##2",
+                "##3dim",
+                "#71",
+                "#5maj7/#7",
+                "###1m",
+                "3",
+                "###5"
+            ]
+        },
+        {
+            "key": "Fbm",
+            "notation": 2,
+            "out": [
+                "#III",
+                "##iv",
+                "##vi7",
+                "#II/##IV",
+                "##V/##VII",
+                "#VIIsus4",
+                "#I",
+                "##II",
+                "##iii°",
+                "#VII1",
+                "#Vmaj7/#VII",
+                "###i",
+                "III",
+                "###V"
+            ]
+        },
+        {
+            "key": "Fbm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Fm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Fm",
+            "notation": 1,
+            "out": [
+                "3",
+                "#4m",
+                "#6m7",
+                "2/#4",
+                "#5/#7",
+                "7sus4",
+                "1",
+                "#2",
+                "#3dim",
+                "71",
+                "5maj7/7",
+                "##1m",
+                "b3",
+                "##5"
+            ]
+        },
+        {
+            "key": "Fm",
+            "notation": 2,
+            "out": [
+                "III",
+                "#iv",
+                "#vi7",
+                "II/#IV",
+                "#V/#VII",
+                "VIIsus4",
+                "I",
+                "#II",
+                "#iii°",
+                "VII1",
+                "Vmaj7/VII",
+                "##i",
+                "bIII",
+                "##V"
+            ]
+        },
+        {
+            "key": "Fm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "F#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "F#m",
+            "notation": 1,
+            "out": [
+                "b3",
+                "4m",
+                "6m7",
+                "b2/4",
+                "5/7",
+                "b7sus4",
+                "b1",
+                "2",
+                "3dim",
+                "b71",
+                "b5maj7/b7",
+                "#1m",
+                "bb3",
+                "#5"
+            ]
+        },
+        {
+            "key": "F#m",
+            "notation": 2,
+            "out": [
+                "bIII",
+                "iv",
+                "vi7",
+                "bII/IV",
+                "V/VII",
+                "bVIIsus4",
+                "bI",
+                "II",
+                "iii°",
+                "bVII1",
+                "bVmaj7/bVII",
+                "#i",
+                "bbIII",
+                "#V"
+            ]
+        },
+        {
+            "key": "F#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Gbm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Gbm",
+            "notation": 1,
+            "out": [
+                "#2",
+                "#3m",
+                "##5m7",
+                "#1/#3",
+                "##4/##6",
+                "#6sus4",
+                "7",
+                "##1",
+                "##2dim",
+                "#61",
+                "#4maj7/#6",
+                "##7m",
+                "2",
+                "###4"
+            ]
+        },
+        {
+            "key": "Gbm",
+            "notation": 2,
+            "out": [
+                "#II",
+                "#iii",
+                "##v7",
+                "#I/#III",
+                "##IV/##VI",
+                "#VIsus4",
+                "VII",
+                "##I",
+                "##ii°",
+                "#VI1",
+                "#IVmaj7/#VI",
+                "##vii",
+                "II",
+                "###IV"
+            ]
+        },
+        {
+            "key": "Gbm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "Gm",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "Gm",
+            "notation": 1,
+            "out": [
+                "2",
+                "3m",
+                "#5m7",
+                "1/3",
+                "#4/#6",
+                "6sus4",
+                "b7",
+                "#1",
+                "#2dim",
+                "61",
+                "4maj7/6",
+                "#7m",
+                "b2",
+                "##4"
+            ]
+        },
+        {
+            "key": "Gm",
+            "notation": 2,
+            "out": [
+                "II",
+                "iii",
+                "#v7",
+                "I/III",
+                "#IV/#VI",
+                "VIsus4",
+                "bVII",
+                "#I",
+                "#ii°",
+                "VI1",
+                "IVmaj7/VI",
+                "#vii",
+                "bII",
+                "##IV"
+            ]
+        },
+        {
+            "key": "Gm",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        },
+        {
+            "key": "G#m",
+            "notation": 0,
+            "out": [
+                "C",
+                "Dm",
+                "F#m7",
+                "Bb/D",
+                "E/G#",
+                "Gsus4",
+                "Ab",
+                "B",
+                "C#dim",
+                "G1",
+                "Ebmaj7/G",
+                "A#m",
+                "Cb",
+                "E#"
+            ]
+        },
+        {
+            "key": "G#m",
+            "notation": 1,
+            "out": [
+                "b2",
+                "b3m",
+                "5m7",
+                "b1/b3",
+                "4/6",
+                "b6sus4",
+                "bb7",
+                "1",
+                "2dim",
+                "b61",
+                "b4maj7/b6",
+                "7m",
+                "bb2",
+                "#4"
+            ]
+        },
+        {
+            "key": "G#m",
+            "notation": 2,
+            "out": [
+                "bII",
+                "biii",
+                "v7",
+                "bI/bIII",
+                "IV/VI",
+                "bVIsus4",
+                "bbVII",
+                "I",
+                "ii°",
+                "bVI1",
+                "bIVmaj7/bVI",
+                "vii",
+                "bbII",
+                "#IV"
+            ]
+        },
+        {
+            "key": "G#m",
+            "notation": 3,
+            "out": [
+                "Do",
+                "Rem",
+                "Fa#m7",
+                "Sib/Re",
+                "Mi/Sol#",
+                "Solsus4",
+                "Lab",
+                "Si",
+                "Do#dim",
+                "Sol1",
+                "Mibmaj7/Sol",
+                "La#m",
+                "Dob",
+                "Mi#"
+            ]
+        }
+    ]
+}

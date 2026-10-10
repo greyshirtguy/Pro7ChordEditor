@@ -1,0 +1,195 @@
+{
+  "file": "It Is Well (Chords).pro",
+  "nameInside": "It Is Well",
+  "uuid": "7878A197-D6F8-47D2-A6C2-A528207BF994",
+  "hasMusic": true,
+  "originalKey": "C",
+  "userKey": "C",
+  "multitracks": false,
+  "textBoxes": [
+    {
+      "words": "When peace like a river attendeth my way\nWhen sorrows like sea billows roll",
+      "length": 75,
+      "chords": [
+        {
+          "start": 5,
+          "end": 18,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 18,
+          "end": 26,
+          "name": "F",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 26,
+          "end": 37,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 37,
+          "end": 46,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": true,
+          "pastTheEnd": false
+        },
+        {
+          "start": 46,
+          "end": 59,
+          "name": "Am",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 59,
+          "end": 71,
+          "name": "D7",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 71,
+          "end": 74,
+          "name": "G",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "It is well\nWith my soul\nIt is well it is well with my soul",
+      "length": 58,
+      "chords": [
+        {
+          "start": 6,
+          "end": 9,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 9,
+          "end": 19,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": true,
+          "pastTheEnd": false
+        },
+        {
+          "start": 19,
+          "end": 22,
+          "name": "F",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 22,
+          "end": 30,
+          "name": "C",
+          "line": 1,
+          "overLineBreak": true,
+          "pastTheEnd": false
+        },
+        {
+          "start": 30,
+          "end": 41,
+          "name": "C",
+          "line": 2,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 41,
+          "end": 54,
+          "name": "G",
+          "line": 2,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 54,
+          "end": 56,
+          "name": "C",
+          "line": 2,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "It is well",
+      "length": 10,
+      "chords": []
+    },
+    {
+      "words": "​ ​ ​ ​\nEven so it is well",
+      "length": 26,
+      "chords": [
+        {
+          "start": 0,
+          "end": 2,
+          "name": "Am",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 4,
+          "name": "F",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 6,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 6,
+          "end": 8,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": true,
+          "pastTheEnd": false
+        },
+        {
+          "start": 8,
+          "end": 22,
+          "name": "Am",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 22,
+          "end": 25,
+          "name": "F",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    }
+  ],
+  "folder": "as-the-old-windows-app-left-them"
+}

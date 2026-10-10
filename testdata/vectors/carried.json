@@ -1,0 +1,602 @@
+{
+    "about": "carried(before, after, chords): the chords of a text box whose words have been changed, where they stand in the new words. What the old and new words share at their start and at their end is taken to be the same words; a chord in the part that changed goes to the start of what replaced it. (Neither new app lets words be changed yet; this is for when one does, or meets a file whose words were changed elsewhere.)",
+    "cases": [
+        {
+            "after": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace how sweet the sound\nThat saved a wretch like you",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace, how sweet the sound\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 18,
+                    "name": "C"
+                },
+                {
+                    "at": 28,
+                    "name": "G"
+                },
+                {
+                    "at": 35,
+                    "name": "G"
+                },
+                {
+                    "at": 46,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing Grace how sweet the sound\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace how sweet the sound\nThat saved a wretch like me\nI once was lost",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "O Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 10,
+                    "name": "G7"
+                },
+                {
+                    "at": 19,
+                    "name": "C"
+                },
+                {
+                    "at": 29,
+                    "name": "G"
+                },
+                {
+                    "at": 36,
+                    "name": "G"
+                },
+                {
+                    "at": 47,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 12,
+                    "name": "C"
+                },
+                {
+                    "at": 14,
+                    "name": "G"
+                },
+                {
+                    "at": 25,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace how sweet the sound",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 32,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "after": "",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+            ]
+        },
+        {
+            "after": "Something else entirely",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "after": "abc xyz def",
+            "before": "abc def",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 8,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "after": "abc ghi",
+            "before": "abc def ghi",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "after": "abc X ghi",
+            "before": "abc def ghi",
+            "chords": [
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 5,
+                    "name": "D"
+                },
+                {
+                    "at": 8,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 6,
+                    "name": "Am"
+                }
+            ]
+        },
+        {
+            "after": "Amazing grace how sweet the sound\nThat saved a wretch like you",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+            ],
+            "out": [
+            ]
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}

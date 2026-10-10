@@ -1,0 +1,804 @@
+{
+    "about": "Chords as ChordPro text and back. `toLine`: toChordPro(line), each chord in square brackets before the character it stands at. `fromLine`: fromChordPro(text), used when a ChordPro FILE is read: brackets holding what could not be a chord are dropped, and a line of chords alone gets a stand-in character for each. `toText`: a whole text box of several lines. `chordsOf` and `withoutChords`: what the ChordPro EDITOR reads back from what was typed (places along the words as they are, no stand-ins made). `placeholders` and `isPlaceholders`: the stand-ins a chord with no words hangs on. NOTE that some strings here hold characters that cannot be seen: U+200B (zero-width space) and U+2001 (em quad).",
+    "chordsOf": [
+        {
+            "in": "[G]Amazing [G7]grace how [C]sweet the [G]sound\n[G]That saved a [D]wretch like me",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 18,
+                    "name": "C"
+                },
+                {
+                    "at": 28,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 47,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "in": "Amazing grace\nhow sweet",
+            "out": [
+            ]
+        },
+        {
+            "in": "[C] [G] [Am]\n[G]Amazing grace",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 1,
+                    "name": "G"
+                },
+                {
+                    "at": 2,
+                    "name": "Am"
+                },
+                {
+                    "at": 3,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "in": "[]Amazing [ ]grace",
+            "out": [
+            ]
+        },
+        {
+            "in": "[g]Amazing [xyz]grace [C /// | Am ///]",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "xyz"
+                },
+                {
+                    "at": 14,
+                    "name": "C /// | Am ///"
+                }
+            ]
+        },
+        {
+            "in": "Ama[G]zing",
+            "out": [
+                {
+                    "at": 3,
+                    "name": "G"
+                }
+            ]
+        },
+        {
+            "in": "[G",
+            "out": [
+            ]
+        },
+        {
+            "in": "G]",
+            "out": [
+            ]
+        },
+        {
+            "in": "",
+            "out": [
+            ]
+        },
+        {
+            "in": "[G]\n[D]",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 1,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "in": "{c: Verse 1}\n[G]Amazing",
+            "out": [
+                {
+                    "at": 13,
+                    "name": "G"
+                }
+            ]
+        }
+    ],
+    "fromLine": [
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 18,
+                    "name": "C"
+                },
+                {
+                    "at": 28,
+                    "name": "G"
+                }
+            ],
+            "in": "[G]Amazing [G7]grace how [C]sweet the [G]sound",
+            "text": "Amazing grace how sweet the sound"
+        },
+        {
+            "chords": [
+            ],
+            "in": "Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "in": "[G]",
+            "text": "​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "in": "[C] [G] [Am]",
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "in": "[C][G][Am]",
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                }
+            ],
+            "in": "  [C]  [G]  ",
+            "text": "​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 3,
+                    "name": "G"
+                },
+                {
+                    "at": 12,
+                    "name": "D"
+                }
+            ],
+            "in": "Ama[G]zing grace[D]",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 13,
+                    "name": "D"
+                }
+            ],
+            "in": "Amazing grace [D]",
+            "text": "Amazing grace "
+        },
+        {
+            "chords": [
+            ],
+            "in": "[*Coda]Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+            ],
+            "in": "[Verse 1]",
+            "text": ""
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "D/F#"
+                }
+            ],
+            "in": "[g]amazing [d/f#]grace",
+            "text": "amazing grace"
+        },
+        {
+            "chords": [
+            ],
+            "in": "Amazing [grace",
+            "text": "Amazing [grace"
+        },
+        {
+            "chords": [
+            ],
+            "in": "Amazing ]grace[",
+            "text": "Amazing ]grace["
+        },
+        {
+            "chords": [
+            ],
+            "in": "[]Amazing",
+            "text": "Amazing"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "in": "[ G ]Amazing",
+            "text": "Amazing"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "in": "[G]  Amazing",
+            "text": "  Amazing"
+        },
+        {
+            "chords": [
+            ],
+            "in": "",
+            "text": ""
+        },
+        {
+            "chords": [
+            ],
+            "in": "   ",
+            "text": "   "
+        },
+        {
+            "chords": [
+            ],
+            "in": "[N.C.]Amazing",
+            "text": "Amazing"
+        },
+        {
+            "chords": [
+            ],
+            "in": "[x]Amazing",
+            "text": "Amazing"
+        },
+        {
+            "chords": [
+            ],
+            "in": "[C /// | Am ///]",
+            "text": ""
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 0,
+                    "name": "D"
+                }
+            ],
+            "in": "[G][D]Amazing",
+            "text": "Amazing"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "in": "A[G]",
+            "text": "A"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "in": "[G]A",
+            "text": "A"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "Gsus4"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 14,
+                    "name": "D7"
+                },
+                {
+                    "at": 20,
+                    "name": "G"
+                }
+            ],
+            "in": "[Gsus4]Was [G]blind but [D7]now I [G]see",
+            "text": "Was blind but now I see"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "Ab"
+                }
+            ],
+            "in": "[A♭]Amen",
+            "text": "Amen"
+        }
+    ],
+    "isPlaceholders": [
+        {
+            "in": "",
+            "out": false
+        },
+        {
+            "in": " ",
+            "out": true
+        },
+        {
+            "in": "   ",
+            "out": true
+        },
+        {
+            "in": "​",
+            "out": true
+        },
+        {
+            "in": "​ ​ ​",
+            "out": true
+        },
+        {
+            "in": "  ",
+            "out": true
+        },
+        {
+            "in": "a",
+            "out": false
+        },
+        {
+            "in": " a ",
+            "out": false
+        },
+        {
+            "in": "​a",
+            "out": false
+        },
+        {
+            "in": "\t",
+            "out": true
+        },
+        {
+            "in": " ",
+            "out": true
+        },
+        {
+            "in": "-",
+            "out": false
+        },
+        {
+            "in": "   ",
+            "out": true
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again.",
+    "placeholders": [
+        {
+            "count": 0,
+            "out": "",
+            "standIn": "​"
+        },
+        {
+            "count": 1,
+            "out": "​",
+            "standIn": "​"
+        },
+        {
+            "count": 2,
+            "out": "​ ​",
+            "standIn": "​"
+        },
+        {
+            "count": 3,
+            "out": "​ ​ ​",
+            "standIn": "​"
+        },
+        {
+            "count": 5,
+            "out": "​ ​ ​ ​ ​",
+            "standIn": "​"
+        },
+        {
+            "count": 1,
+            "out": " ",
+            "standIn": " "
+        },
+        {
+            "count": 3,
+            "out": "     ",
+            "standIn": " "
+        }
+    ],
+    "toLine": [
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                }
+            ],
+            "out": "[G]Amazing [G7]grace how[C] sweet the[G] sound",
+            "text": "Amazing grace how sweet the sound"
+        },
+        {
+            "chords": [
+                {
+                    "at": 8,
+                    "name": "D"
+                },
+                {
+                    "at": 0,
+                    "name": "G"
+                }
+            ],
+            "out": "[G]Amazing [D]grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 3,
+                    "name": "G"
+                },
+                {
+                    "at": 12,
+                    "name": "D"
+                }
+            ],
+            "out": "Ama[G]zing grac[D]e",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+            ],
+            "out": "Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 0,
+                    "name": "Em"
+                }
+            ],
+            "out": "[G][Em]Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 40,
+                    "name": "G"
+                }
+            ],
+            "out": "Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+            ],
+            "out": "",
+            "text": ""
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "out": "[C] [G] [Am]",
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                }
+            ],
+            "out": "[C]",
+            "text": "​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "E"
+                }
+            ],
+            "out": "[E]",
+            "text": " "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                }
+            ],
+            "out": "[C] [G] [D]",
+            "text": "     "
+        },
+        {
+            "chords": [
+            ],
+            "out": "",
+            "text": "  "
+        }
+    ],
+    "toText": [
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 8,
+                    "name": "G7"
+                },
+                {
+                    "at": 17,
+                    "name": "C"
+                },
+                {
+                    "at": 27,
+                    "name": "G"
+                },
+                {
+                    "at": 34,
+                    "name": "G"
+                },
+                {
+                    "at": 45,
+                    "name": "D"
+                }
+            ],
+            "out": "[G]Amazing [G7]grace how[C] sweet the[G] sound\n[G]That saved [D]a wretch like me",
+            "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 7,
+                    "name": "F"
+                },
+                {
+                    "at": 16,
+                    "name": "C"
+                },
+                {
+                    "at": 24,
+                    "name": "G"
+                },
+                {
+                    "at": 32,
+                    "name": "Am"
+                },
+                {
+                    "at": 42,
+                    "name": "F"
+                },
+                {
+                    "at": 50,
+                    "name": "C"
+                }
+            ],
+            "out": "[C]I once [F]was lost\n[C]but now [G]am found\nWas blind[F] but now[C] I see",
+            "text": "I once was lost\nbut now am found\nWas blind but now I see"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                },
+                {
+                    "at": 6,
+                    "name": "G"
+                }
+            ],
+            "out": "[C] [G] [Am]\n[G]Amazing grace",
+            "text": "​ ​ ​\nAmazing grace"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 15,
+                    "name": "C"
+                }
+            ],
+            "out": "[G]Amazing grace\n\n[C]how sweet",
+            "text": "Amazing grace\n\nhow sweet"
+        },
+        {
+            "chords": [
+            ],
+            "out": "Amazing grace",
+            "text": "Amazing grace"
+        },
+        {
+            "chords": [
+            ],
+            "out": "",
+            "text": ""
+        }
+    ],
+    "withoutChords": [
+        {
+            "in": "[G]Amazing [G7]grace how [C]sweet the [G]sound\n[G]That saved a [D]wretch like me",
+            "out": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "in": "Amazing grace\nhow sweet",
+            "out": "Amazing grace\nhow sweet"
+        },
+        {
+            "in": "[C] [G] [Am]\n[G]Amazing grace",
+            "out": "  \nAmazing grace"
+        },
+        {
+            "in": "[]Amazing [ ]grace",
+            "out": "Amazing grace"
+        },
+        {
+            "in": "[g]Amazing [xyz]grace [C /// | Am ///]",
+            "out": "Amazing grace "
+        },
+        {
+            "in": "Ama[G]zing",
+            "out": "Amazing"
+        },
+        {
+            "in": "[G",
+            "out": "[G"
+        },
+        {
+            "in": "G]",
+            "out": "G]"
+        },
+        {
+            "in": "",
+            "out": ""
+        },
+        {
+            "in": "[G]\n[D]",
+            "out": "\n"
+        },
+        {
+            "in": "{c: Verse 1}\n[G]Amazing",
+            "out": "{c: Verse 1}\nAmazing"
+        }
+    ]
+}

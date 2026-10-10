@@ -1,0 +1,1162 @@
+{
+  "about": "Each test file as Simple Presenter's own editor reads it: what its chord editors are handed (PresentationEditor::song). One entry for each text box that has words of its own, in the order of the slides: `slide` counted from 0, the name of its group and whether it is the first slide of that group, the id of the text box, its words, and its chords, each `at` a place along those words (a line break being one). `key` is the key the chords are written in, as a musician writes it, or nothing. This is the reference for reading a file: a port that reads these files should find the same. Some strings hold characters that cannot be seen: U+200B and U+2001.",
+  "madeBy": "tools/simple-presenter-scripts/dump.qml, run in Simple Presenter (testdata/README.md says how). Do not edit by hand.",
+  "files": [
+    {
+      "file": "A Song - In A Minor Key (Chords).pro",
+      "key": "Ab",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "2027C946-2A5A-4007-95BC-9F19D23BAC39",
+          "words": "Leading spaces and trailing ones\nA chord at the very end",
+          "chords": [
+            {
+              "at": 0,
+              "name": "F#m"
+            },
+            {
+              "at": 19,
+              "name": "D"
+            },
+            {
+              "at": 33,
+              "name": "A"
+            },
+            {
+              "at": 53,
+              "name": "E"
+            },
+            {
+              "at": 55,
+              "name": "F#m"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Chorus 2",
+          "startsItsGroup": true,
+          "element": "F110F1FF-5674-4C98-89FE-8A388B5E7B82",
+          "words": "The second chorus is numbered",
+          "chords": [
+            {
+              "at": 0,
+              "name": "F#m"
+            },
+            {
+              "at": 21,
+              "name": "C#m"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "The Middle Eight",
+          "startsItsGroup": true,
+          "element": "0127E59A-3E69-474A-A3F0-392A3E0070F2",
+          "words": "Named by its label",
+          "chords": [
+            {
+              "at": 0,
+              "name": "Bm7"
+            },
+            {
+              "at": 13,
+              "name": "C#7sus4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "A Song - In A Minor Key.pro",
+      "key": "F#m",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "2027C946-2A5A-4007-95BC-9F19D23BAC39",
+          "words": "Leading spaces and trailing ones\nA chord at the very end",
+          "chords": [
+            {
+              "at": 0,
+              "name": "F#m"
+            },
+            {
+              "at": 19,
+              "name": "D"
+            },
+            {
+              "at": 33,
+              "name": "A"
+            },
+            {
+              "at": 53,
+              "name": "E"
+            },
+            {
+              "at": 55,
+              "name": "F#m"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Chorus 2",
+          "startsItsGroup": true,
+          "element": "F110F1FF-5674-4C98-89FE-8A388B5E7B82",
+          "words": "The second chorus is numbered",
+          "chords": [
+            {
+              "at": 0,
+              "name": "F#m"
+            },
+            {
+              "at": 21,
+              "name": "C#m"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "The Middle Eight",
+          "startsItsGroup": true,
+          "element": "0127E59A-3E69-474A-A3F0-392A3E0070F2",
+          "words": "Named by its label",
+          "chords": [
+            {
+              "at": 0,
+              "name": "Bm7"
+            },
+            {
+              "at": 13,
+              "name": "C#7sus4"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Amazing Grace (Chords).pro",
+      "key": "G",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "BB92B2CD-0AA7-4F46-88CB-4B9AB6F5E81E",
+          "words": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+          "chords": [
+            {
+              "at": 1,
+              "name": "G"
+            },
+            {
+              "at": 8,
+              "name": "G7"
+            },
+            {
+              "at": 18,
+              "name": "C"
+            },
+            {
+              "at": 28,
+              "name": "G"
+            },
+            {
+              "at": 58,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "27424D21-85AF-4FD1-B02B-E49C72BE8721",
+          "words": "I once was lost but now am found\nWas blind but now I see",
+          "chords": [
+            {
+              "at": 2,
+              "name": "G"
+            },
+            {
+              "at": 11,
+              "name": "G7"
+            },
+            {
+              "at": 20,
+              "name": "C"
+            },
+            {
+              "at": 27,
+              "name": "G"
+            },
+            {
+              "at": 36,
+              "name": "Em"
+            },
+            {
+              "at": 46,
+              "name": "D"
+            },
+            {
+              "at": 52,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Verse 2",
+          "startsItsGroup": true,
+          "element": "5311132A-CA88-471F-9CDA-79693D197128",
+          "words": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+          "chords": [
+            {
+              "at": 5,
+              "name": "G"
+            },
+            {
+              "at": 16,
+              "name": "G7"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 35,
+              "name": "G"
+            },
+            {
+              "at": 60,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 3,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "859FCA44-171A-4122-98C8-C8604ED50066",
+          "words": "How precious did that grace appear\nThe hour I first believed",
+          "chords": [
+            {
+              "at": 4,
+              "name": "G"
+            },
+            {
+              "at": 13,
+              "name": "G7"
+            },
+            {
+              "at": 22,
+              "name": "C"
+            },
+            {
+              "at": 30,
+              "name": "G"
+            },
+            {
+              "at": 38,
+              "name": "Em"
+            },
+            {
+              "at": 45,
+              "name": "D"
+            },
+            {
+              "at": 53,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 4,
+          "group": "Verse 3",
+          "startsItsGroup": true,
+          "element": "55B06329-DA0C-4F50-BB45-5AEF9B887279",
+          "words": "Through many dangers toils and snares\nI have already come",
+          "chords": [
+            {
+              "at": 8,
+              "name": "G"
+            },
+            {
+              "at": 13,
+              "name": "G7"
+            },
+            {
+              "at": 21,
+              "name": "C"
+            },
+            {
+              "at": 31,
+              "name": "G"
+            },
+            {
+              "at": 52,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 5,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "3117FE1D-A57D-4406-95E2-6695297AFD0C",
+          "words": "Tis grace hath brought me safe thus far\nAnd grace will lead me home",
+          "chords": [
+            {
+              "at": 4,
+              "name": "G"
+            },
+            {
+              "at": 15,
+              "name": "G7"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 36,
+              "name": "G"
+            },
+            {
+              "at": 43,
+              "name": "Em"
+            },
+            {
+              "at": 54,
+              "name": "D"
+            },
+            {
+              "at": 62,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 6,
+          "group": "Ending",
+          "startsItsGroup": true,
+          "element": "631134C7-0DF8-4695-85CB-552A52C94C6D",
+          "words": "​ ​ ​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 2,
+              "name": "G/B"
+            },
+            {
+              "at": 4,
+              "name": "D"
+            },
+            {
+              "at": 6,
+              "name": "G"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Amazing Grace.pro",
+      "key": "G",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "BB92B2CD-0AA7-4F46-88CB-4B9AB6F5E81E",
+          "words": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+          "chords": [
+            {
+              "at": 1,
+              "name": "G"
+            },
+            {
+              "at": 8,
+              "name": "G7"
+            },
+            {
+              "at": 18,
+              "name": "C"
+            },
+            {
+              "at": 28,
+              "name": "G"
+            },
+            {
+              "at": 59,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "27424D21-85AF-4FD1-B02B-E49C72BE8721",
+          "words": "I once was lost but now am found\nWas blind but now I see",
+          "chords": [
+            {
+              "at": 2,
+              "name": "G"
+            },
+            {
+              "at": 11,
+              "name": "G7"
+            },
+            {
+              "at": 20,
+              "name": "C"
+            },
+            {
+              "at": 27,
+              "name": "G"
+            },
+            {
+              "at": 37,
+              "name": "Em"
+            },
+            {
+              "at": 47,
+              "name": "D"
+            },
+            {
+              "at": 53,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Verse 2",
+          "startsItsGroup": true,
+          "element": "5311132A-CA88-471F-9CDA-79693D197128",
+          "words": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+          "chords": [
+            {
+              "at": 5,
+              "name": "G"
+            },
+            {
+              "at": 16,
+              "name": "G7"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 35,
+              "name": "G"
+            },
+            {
+              "at": 61,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 3,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "859FCA44-171A-4122-98C8-C8604ED50066",
+          "words": "How precious did that grace appear\nThe hour I first believed",
+          "chords": [
+            {
+              "at": 4,
+              "name": "G"
+            },
+            {
+              "at": 13,
+              "name": "G7"
+            },
+            {
+              "at": 22,
+              "name": "C"
+            },
+            {
+              "at": 30,
+              "name": "G"
+            },
+            {
+              "at": 39,
+              "name": "Em"
+            },
+            {
+              "at": 46,
+              "name": "D"
+            },
+            {
+              "at": 54,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 4,
+          "group": "Verse 3",
+          "startsItsGroup": true,
+          "element": "55B06329-DA0C-4F50-BB45-5AEF9B887279",
+          "words": "Through many dangers toils and snares\nI have already come",
+          "chords": [
+            {
+              "at": 8,
+              "name": "G"
+            },
+            {
+              "at": 13,
+              "name": "G7"
+            },
+            {
+              "at": 21,
+              "name": "C"
+            },
+            {
+              "at": 31,
+              "name": "G"
+            },
+            {
+              "at": 53,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 5,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "3117FE1D-A57D-4406-95E2-6695297AFD0C",
+          "words": "Tis grace hath brought me safe thus far\nAnd grace will lead me home",
+          "chords": [
+            {
+              "at": 4,
+              "name": "G"
+            },
+            {
+              "at": 15,
+              "name": "G7"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 36,
+              "name": "G"
+            },
+            {
+              "at": 44,
+              "name": "Em"
+            },
+            {
+              "at": 55,
+              "name": "D"
+            },
+            {
+              "at": 63,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 6,
+          "group": "Ending",
+          "startsItsGroup": true,
+          "element": "631134C7-0DF8-4695-85CB-552A52C94C6D",
+          "words": "​ ​ ​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 2,
+              "name": "G/B"
+            },
+            {
+              "at": 4,
+              "name": "D"
+            },
+            {
+              "at": 6,
+              "name": "G"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Holy Holy Holy.pro",
+      "key": "",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "7200AB48-4867-4155-AB90-758F74E9EC53",
+          "words": "Holy holy holy\nLord God Almighty",
+          "chords": [
+            {
+              "at": 0,
+              "name": "D"
+            },
+            {
+              "at": 10,
+              "name": "Bm"
+            },
+            {
+              "at": 12,
+              "name": "A"
+            },
+            {
+              "at": 15,
+              "name": "D"
+            },
+            {
+              "at": 26,
+              "name": "G"
+            },
+            {
+              "at": 30,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "323661A5-4E14-4ECA-9E76-D926D6EB94EC",
+          "words": "Early in the morning\nOur song shall rise to Thee",
+          "chords": [
+            {
+              "at": 0,
+              "name": "A"
+            },
+            {
+              "at": 13,
+              "name": "D"
+            },
+            {
+              "at": 25,
+              "name": "Bm"
+            },
+            {
+              "at": 36,
+              "name": "E7"
+            },
+            {
+              "at": 44,
+              "name": "A"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Verse 2",
+          "startsItsGroup": true,
+          "element": "32318E3C-438A-42F9-83CF-46EF55B882F0",
+          "words": "Holy holy holy\nMerciful and mighty",
+          "chords": [
+            {
+              "at": 0,
+              "name": "D"
+            },
+            {
+              "at": 10,
+              "name": "Bm"
+            },
+            {
+              "at": 12,
+              "name": "A"
+            },
+            {
+              "at": 15,
+              "name": "D"
+            },
+            {
+              "at": 28,
+              "name": "G"
+            },
+            {
+              "at": 32,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 3,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "2A5D4BE1-0FDD-4452-89A6-0BB77F9BA5DF",
+          "words": "God in three persons\nBlessed Trinity",
+          "chords": [
+            {
+              "at": 0,
+              "name": "A"
+            },
+            {
+              "at": 13,
+              "name": "D"
+            },
+            {
+              "at": 21,
+              "name": "G"
+            },
+            {
+              "at": 29,
+              "name": "A"
+            },
+            {
+              "at": 34,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 4,
+          "group": "",
+          "startsItsGroup": true,
+          "element": "D8FD3298-2CDB-4ECD-A30C-228C4D40EB4A",
+          "words": "Holy holy holy\nAll the saints adore Thee",
+          "chords": []
+        },
+        {
+          "slide": 5,
+          "group": "",
+          "startsItsGroup": false,
+          "element": "14CD8E53-8E75-44FF-BC96-1086133AA97D",
+          "words": "Casting down their golden crowns\nAround the glassy sea",
+          "chords": []
+        }
+      ]
+    },
+    {
+      "file": "It Is Well (Chords).pro",
+      "key": "C",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "C3C8C388-DAD7-4EF6-80DF-3C392DDE6996",
+          "words": "When peace like a river attendeth my way\nWhen sorrows like sea billows roll",
+          "chords": [
+            {
+              "at": 5,
+              "name": "C"
+            },
+            {
+              "at": 18,
+              "name": "F"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 37,
+              "name": "G"
+            },
+            {
+              "at": 46,
+              "name": "Am"
+            },
+            {
+              "at": 59,
+              "name": "D7"
+            },
+            {
+              "at": 71,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "A6D608E2-A01D-483C-88FC-13CDE1105AAA",
+          "words": "It is well\nWith my soul\nIt is well it is well with my soul",
+          "chords": [
+            {
+              "at": 6,
+              "name": "C"
+            },
+            {
+              "at": 9,
+              "name": "G"
+            },
+            {
+              "at": 19,
+              "name": "F"
+            },
+            {
+              "at": 22,
+              "name": "C"
+            },
+            {
+              "at": 30,
+              "name": "C"
+            },
+            {
+              "at": 41,
+              "name": "G"
+            },
+            {
+              "at": 54,
+              "name": "C"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "37E65732-4DA6-462B-B496-55B00B9E537A",
+          "words": "It is well",
+          "chords": []
+        },
+        {
+          "slide": 3,
+          "group": "Bridge",
+          "startsItsGroup": true,
+          "element": "451AC878-123A-42D0-A42B-6E5B56F6C6A8",
+          "words": "​ ​ ​ ​\nEven so it is well",
+          "chords": [
+            {
+              "at": 0,
+              "name": "Am"
+            },
+            {
+              "at": 2,
+              "name": "F"
+            },
+            {
+              "at": 4,
+              "name": "C"
+            },
+            {
+              "at": 6,
+              "name": "G"
+            },
+            {
+              "at": 8,
+              "name": "Am"
+            },
+            {
+              "at": 22,
+              "name": "F"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "It Is Well.pro",
+      "key": "C",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "C3C8C388-DAD7-4EF6-80DF-3C392DDE6996",
+          "words": "When peace like a river attendeth my way\nWhen sorrows like sea billows roll",
+          "chords": [
+            {
+              "at": 5,
+              "name": "C"
+            },
+            {
+              "at": 18,
+              "name": "F"
+            },
+            {
+              "at": 26,
+              "name": "C"
+            },
+            {
+              "at": 37,
+              "name": "G"
+            },
+            {
+              "at": 46,
+              "name": "Am"
+            },
+            {
+              "at": 59,
+              "name": "D7"
+            },
+            {
+              "at": 71,
+              "name": "G"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "A6D608E2-A01D-483C-88FC-13CDE1105AAA",
+          "words": "It is well\nWith my soul\nIt is well it is well with my soul",
+          "chords": [
+            {
+              "at": 6,
+              "name": "C"
+            },
+            {
+              "at": 9,
+              "name": "G"
+            },
+            {
+              "at": 19,
+              "name": "F"
+            },
+            {
+              "at": 22,
+              "name": "C"
+            },
+            {
+              "at": 30,
+              "name": "C"
+            },
+            {
+              "at": 41,
+              "name": "G"
+            },
+            {
+              "at": 54,
+              "name": "C"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "37E65732-4DA6-462B-B496-55B00B9E537A",
+          "words": "It is well",
+          "chords": []
+        },
+        {
+          "slide": 3,
+          "group": "Bridge",
+          "startsItsGroup": true,
+          "element": "451AC878-123A-42D0-A42B-6E5B56F6C6A8",
+          "words": "​ ​ ​ ​\nEven so it is well",
+          "chords": [
+            {
+              "at": 0,
+              "name": "Am"
+            },
+            {
+              "at": 2,
+              "name": "F"
+            },
+            {
+              "at": 4,
+              "name": "C"
+            },
+            {
+              "at": 6,
+              "name": "G"
+            },
+            {
+              "at": 8,
+              "name": "Am"
+            },
+            {
+              "at": 22,
+              "name": "F"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Plain Song (Chords).pro",
+      "key": "G",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "49BB8D98-2612-4A3F-9987-29B722376F1A",
+          "words": "One two three four\nFive six seven eight",
+          "chords": [
+            {
+              "at": 0,
+              "name": "G"
+            },
+            {
+              "at": 14,
+              "name": "D"
+            },
+            {
+              "at": 28,
+              "name": "Em"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "157B6864-71B8-4E44-8BCD-26001C76B2F8",
+          "words": "Nine ten eleven twelve\nThirteen",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 10,
+              "name": "G/B"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "3CE75358-D570-4DE1-8E47-39CE42D0354F",
+          "words": "Sing it out\nSing it loud",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 8,
+              "name": "G"
+            },
+            {
+              "at": 12,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 3,
+          "group": "Outro",
+          "startsItsGroup": true,
+          "element": "11304099-256D-4D31-9951-A3831F012E69",
+          "words": "​ ​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "G"
+            },
+            {
+              "at": 2,
+              "name": "D/F#"
+            },
+            {
+              "at": 4,
+              "name": "Em"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Plain Song.pro",
+      "key": "G",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "49BB8D98-2612-4A3F-9987-29B722376F1A",
+          "words": "One two three four\nFive six seven eight",
+          "chords": [
+            {
+              "at": 0,
+              "name": "G"
+            },
+            {
+              "at": 14,
+              "name": "D"
+            },
+            {
+              "at": 28,
+              "name": "Em"
+            }
+          ]
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "157B6864-71B8-4E44-8BCD-26001C76B2F8",
+          "words": "Nine ten eleven twelve\nThirteen",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 10,
+              "name": "G/B"
+            }
+          ]
+        },
+        {
+          "slide": 2,
+          "group": "Chorus",
+          "startsItsGroup": true,
+          "element": "3CE75358-D570-4DE1-8E47-39CE42D0354F",
+          "words": "Sing it out\nSing it loud",
+          "chords": [
+            {
+              "at": 0,
+              "name": "C"
+            },
+            {
+              "at": 8,
+              "name": "G"
+            },
+            {
+              "at": 12,
+              "name": "D"
+            }
+          ]
+        },
+        {
+          "slide": 3,
+          "group": "Outro",
+          "startsItsGroup": true,
+          "element": "11304099-256D-4D31-9951-A3831F012E69",
+          "words": "​ ​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "G"
+            },
+            {
+              "at": 2,
+              "name": "D/F#"
+            },
+            {
+              "at": 4,
+              "name": "Em"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

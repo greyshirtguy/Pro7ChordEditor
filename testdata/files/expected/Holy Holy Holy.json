@@ -1,0 +1,222 @@
+{
+  "file": "Holy Holy Holy.pro",
+  "nameInside": "holy-holy-holy",
+  "uuid": "38820627-80DE-461F-AAE2-88CC98FA56F4",
+  "hasMusic": false,
+  "originalKey": "",
+  "userKey": "",
+  "multitracks": false,
+  "textBoxes": [
+    {
+      "words": "Holy holy holy\nLord God Almighty",
+      "length": 32,
+      "chords": [
+        {
+          "start": 0,
+          "end": 10,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 10,
+          "end": 12,
+          "name": "Bm",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 12,
+          "end": 14,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 15,
+          "end": 26,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 26,
+          "end": 30,
+          "name": "G",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 30,
+          "end": 32,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Early in the morning\nOur song shall rise to Thee",
+      "length": 48,
+      "chords": [
+        {
+          "start": 0,
+          "end": 13,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 13,
+          "end": 20,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 25,
+          "end": 36,
+          "name": "Bm",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 36,
+          "end": 44,
+          "name": "E7",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 44,
+          "end": 48,
+          "name": "A",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Holy holy holy\nMerciful and mighty",
+      "length": 34,
+      "chords": [
+        {
+          "start": 0,
+          "end": 10,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 10,
+          "end": 12,
+          "name": "Bm",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 12,
+          "end": 14,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 15,
+          "end": 28,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 28,
+          "end": 32,
+          "name": "G",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 32,
+          "end": 34,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "God in three persons\nBlessed Trinity",
+      "length": 36,
+      "chords": [
+        {
+          "start": 0,
+          "end": 13,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 13,
+          "end": 20,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 21,
+          "end": 29,
+          "name": "G",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 29,
+          "end": 34,
+          "name": "A",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 34,
+          "end": 36,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Holy holy holy\nAll the saints adore Thee",
+      "length": 40,
+      "chords": []
+    },
+    {
+      "words": "Casting down their golden crowns\nAround the glassy sea",
+      "length": 54,
+      "chords": []
+    }
+  ],
+  "folder": "made-by-simple-presenter"
+}

@@ -1,0 +1,124 @@
+{
+  "file": "Plain Song.pro",
+  "nameInside": "Plain Song",
+  "uuid": "5FDDEA7C-EB22-4E7C-8BEA-A97A3246C38C",
+  "hasMusic": true,
+  "originalKey": "G",
+  "userKey": "G",
+  "multitracks": false,
+  "textBoxes": [
+    {
+      "words": "One two three four\nFive six seven eight",
+      "length": 39,
+      "chords": [
+        {
+          "start": 0,
+          "end": 14,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 14,
+          "end": 18,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 28,
+          "end": 39,
+          "name": "Em",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Nine ten eleven twelve\nThirteen",
+      "length": 31,
+      "chords": [
+        {
+          "start": 0,
+          "end": 10,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 10,
+          "end": 22,
+          "name": "G/B",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Sing it out\nSing it loud",
+      "length": 24,
+      "chords": [
+        {
+          "start": 0,
+          "end": 8,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 8,
+          "end": 11,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 12,
+          "end": 24,
+          "name": "D",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "​ ​ ​",
+      "length": 5,
+      "chords": [
+        {
+          "start": 0,
+          "end": 2,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 4,
+          "name": "D/F#",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 5,
+          "name": "Em",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    }
+  ],
+  "folder": "made-by-simple-presenter"
+}

@@ -1,0 +1,763 @@
+{
+  "about": "Check 2 of spec/08-repair.md. `unshifted`: where a chord was meant for if the old Windows editor saved it at `savedAt` (a place counted along the words with their line breaks left out). `songs`: whether a song's chords look as if they were put on by hand in that editor, by line_break_shift() of tools/make-fixtures.py.",
+  "madeBy": "tools/make-fixtures.py, which is the reference for this check. Do not edit by hand: run it again.",
+  "unshifted": [
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 0,
+      "meantFor": 0
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 1,
+      "meantFor": 1
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 2,
+      "meantFor": 2
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 3,
+      "meantFor": 3
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 4,
+      "meantFor": 4
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 5,
+      "meantFor": 5
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 6,
+      "meantFor": 6
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 7,
+      "meantFor": 7
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 8,
+      "meantFor": 8
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 9,
+      "meantFor": 9
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 10,
+      "meantFor": 10
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 11,
+      "meantFor": 11
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 12,
+      "meantFor": 12
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 13,
+      "meantFor": 13
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 14,
+      "meantFor": 14
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 15,
+      "meantFor": 15
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 16,
+      "meantFor": 16
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 17,
+      "meantFor": 17
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 18,
+      "meantFor": 19
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 19,
+      "meantFor": 20
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 20,
+      "meantFor": 21
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 21,
+      "meantFor": 22
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 22,
+      "meantFor": 23
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 23,
+      "meantFor": 24
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 24,
+      "meantFor": 25
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 25,
+      "meantFor": 26
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 26,
+      "meantFor": 27
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 27,
+      "meantFor": 28
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 28,
+      "meantFor": 29
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 29,
+      "meantFor": 30
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 30,
+      "meantFor": 31
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 31,
+      "meantFor": 32
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 32,
+      "meantFor": 33
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 33,
+      "meantFor": 34
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 34,
+      "meantFor": 35
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 35,
+      "meantFor": 36
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 36,
+      "meantFor": 37
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 37,
+      "meantFor": 38
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 38,
+      "meantFor": 40
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 39,
+      "meantFor": 41
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 40,
+      "meantFor": 42
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 41,
+      "meantFor": 43
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 42,
+      "meantFor": 44
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 43,
+      "meantFor": 45
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 44,
+      "meantFor": 46
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 45,
+      "meantFor": 47
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 46,
+      "meantFor": 48
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 47,
+      "meantFor": 49
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 48,
+      "meantFor": 50
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 49,
+      "meantFor": 51
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 50,
+      "meantFor": 52
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 51,
+      "meantFor": 53
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 52,
+      "meantFor": 54
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 53,
+      "meantFor": 55
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 54,
+      "meantFor": 56
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 55,
+      "meantFor": 57
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 56,
+      "meantFor": 58
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 57,
+      "meantFor": 59
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 58,
+      "meantFor": 60
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 59,
+      "meantFor": 61
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 60,
+      "meantFor": 61
+    },
+    {
+      "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+      "savedAt": 61,
+      "meantFor": 61
+    },
+    {
+      "words": "One line only",
+      "savedAt": 0,
+      "meantFor": 0
+    },
+    {
+      "words": "One line only",
+      "savedAt": 1,
+      "meantFor": 1
+    },
+    {
+      "words": "One line only",
+      "savedAt": 2,
+      "meantFor": 2
+    },
+    {
+      "words": "One line only",
+      "savedAt": 3,
+      "meantFor": 3
+    },
+    {
+      "words": "One line only",
+      "savedAt": 4,
+      "meantFor": 4
+    },
+    {
+      "words": "One line only",
+      "savedAt": 5,
+      "meantFor": 5
+    },
+    {
+      "words": "One line only",
+      "savedAt": 6,
+      "meantFor": 6
+    },
+    {
+      "words": "One line only",
+      "savedAt": 7,
+      "meantFor": 7
+    },
+    {
+      "words": "One line only",
+      "savedAt": 8,
+      "meantFor": 8
+    },
+    {
+      "words": "One line only",
+      "savedAt": 9,
+      "meantFor": 9
+    },
+    {
+      "words": "One line only",
+      "savedAt": 10,
+      "meantFor": 10
+    },
+    {
+      "words": "One line only",
+      "savedAt": 11,
+      "meantFor": 11
+    },
+    {
+      "words": "One line only",
+      "savedAt": 12,
+      "meantFor": 12
+    },
+    {
+      "words": "One line only",
+      "savedAt": 13,
+      "meantFor": 12
+    },
+    {
+      "words": "One line only",
+      "savedAt": 14,
+      "meantFor": 12
+    },
+    {
+      "words": "",
+      "savedAt": 0,
+      "meantFor": 0
+    },
+    {
+      "words": "",
+      "savedAt": 1,
+      "meantFor": 0
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 0,
+      "meantFor": 0
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 1,
+      "meantFor": 3
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 2,
+      "meantFor": 4
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 3,
+      "meantFor": 5
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 4,
+      "meantFor": 5
+    },
+    {
+      "words": "a\n\nb c",
+      "savedAt": 5,
+      "meantFor": 5
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 0,
+      "meantFor": 0
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 1,
+      "meantFor": 1
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 2,
+      "meantFor": 3
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 3,
+      "meantFor": 4
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 4,
+      "meantFor": 4
+    },
+    {
+      "words": "ab\ncd",
+      "savedAt": 5,
+      "meantFor": 4
+    }
+  ],
+  "songs": [
+    {
+      "about": "every chord on the start of a word, as ProPresenter counts",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": [
+            {
+              "start": 0,
+              "end": 1,
+              "name": "G"
+            },
+            {
+              "start": 4,
+              "end": 5,
+              "name": "G"
+            },
+            {
+              "start": 8,
+              "end": 9,
+              "name": "G"
+            },
+            {
+              "start": 14,
+              "end": 15,
+              "name": "G"
+            },
+            {
+              "start": 19,
+              "end": 20,
+              "name": "G"
+            },
+            {
+              "start": 24,
+              "end": 25,
+              "name": "G"
+            },
+            {
+              "start": 28,
+              "end": 29,
+              "name": "G"
+            },
+            {
+              "start": 34,
+              "end": 35,
+              "name": "G"
+            },
+            {
+              "start": 40,
+              "end": 41,
+              "name": "G"
+            },
+            {
+              "start": 45,
+              "end": 46,
+              "name": "G"
+            },
+            {
+              "start": 49,
+              "end": 50,
+              "name": "G"
+            },
+            {
+              "start": 56,
+              "end": 57,
+              "name": "G"
+            }
+          ]
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 8,
+        "atTheStartOfAWord": 8,
+        "ifMovedBack": 0,
+        "likely": false
+      }
+    },
+    {
+      "about": "every chord put on the start of a word in the old editor",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": [
+            {
+              "start": 0,
+              "end": 1,
+              "name": "G"
+            },
+            {
+              "start": 4,
+              "end": 5,
+              "name": "G"
+            },
+            {
+              "start": 8,
+              "end": 9,
+              "name": "G"
+            },
+            {
+              "start": 14,
+              "end": 15,
+              "name": "G"
+            },
+            {
+              "start": 18,
+              "end": 19,
+              "name": "G"
+            },
+            {
+              "start": 23,
+              "end": 24,
+              "name": "G"
+            },
+            {
+              "start": 27,
+              "end": 28,
+              "name": "G"
+            },
+            {
+              "start": 33,
+              "end": 34,
+              "name": "G"
+            },
+            {
+              "start": 38,
+              "end": 39,
+              "name": "G"
+            },
+            {
+              "start": 43,
+              "end": 44,
+              "name": "G"
+            },
+            {
+              "start": 47,
+              "end": 48,
+              "name": "G"
+            },
+            {
+              "start": 54,
+              "end": 55,
+              "name": "G"
+            }
+          ]
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 8,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 8,
+        "likely": true
+      }
+    },
+    {
+      "about": "chords in the middle of words, as ProPresenter counts",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": [
+            {
+              "start": 1,
+              "end": 2,
+              "name": "G"
+            },
+            {
+              "start": 5,
+              "end": 6,
+              "name": "G"
+            },
+            {
+              "start": 10,
+              "end": 11,
+              "name": "G"
+            },
+            {
+              "start": 21,
+              "end": 22,
+              "name": "G"
+            },
+            {
+              "start": 26,
+              "end": 27,
+              "name": "G"
+            },
+            {
+              "start": 30,
+              "end": 31,
+              "name": "G"
+            },
+            {
+              "start": 42,
+              "end": 43,
+              "name": "G"
+            },
+            {
+              "start": 47,
+              "end": 48,
+              "name": "G"
+            },
+            {
+              "start": 51,
+              "end": 52,
+              "name": "G"
+            }
+          ]
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 6,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 1,
+        "likely": false
+      }
+    },
+    {
+      "about": "only the first line has chords",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": [
+            {
+              "start": 0,
+              "end": 1,
+              "name": "G"
+            },
+            {
+              "start": 4,
+              "end": 5,
+              "name": "G"
+            },
+            {
+              "start": 8,
+              "end": 9,
+              "name": "G"
+            },
+            {
+              "start": 14,
+              "end": 15,
+              "name": "G"
+            }
+          ]
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 0,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 0,
+        "likely": false
+      }
+    },
+    {
+      "about": "too few below the first line to say",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": [
+            {
+              "start": 0,
+              "end": 1,
+              "name": "G"
+            },
+            {
+              "start": 4,
+              "end": 5,
+              "name": "G"
+            },
+            {
+              "start": 18,
+              "end": 19,
+              "name": "G"
+            },
+            {
+              "start": 38,
+              "end": 39,
+              "name": "G"
+            }
+          ]
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 2,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 2,
+        "likely": false
+      }
+    },
+    {
+      "about": "one line",
+      "textBoxes": [
+        {
+          "words": "One two three four\nFive six seven eight\nNine ten eleven twelve",
+          "chords": []
+        }
+      ],
+      "out": {
+        "chordsBelowTheFirstLine": 0,
+        "atTheStartOfAWord": 0,
+        "ifMovedBack": 0,
+        "likely": false
+      }
+    }
+  ]
+}
