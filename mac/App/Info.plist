@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+	What the app says of itself that Xcode's build settings have no setting for. The rest
+	of the built app's Info.plist (its name, version, identifier and so on) comes from the
+	target's build settings in Pro7ChordEditor.xcodeproj, and Xcode puts the two together.
+
+	NSDocumentsFolderUsageDescription: ProPresenter keeps its library in the Documents
+	folder, and macOS asks the person, the first time, whether this app may read there.
+	These are the words it shows them under its question (spec/10-platforms.md).
+-->
+<plist version="1.0">
+<dict>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>To open the songs in your ProPresenter library.</string>
+</dict>
+</plist>
