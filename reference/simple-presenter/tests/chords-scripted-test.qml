@@ -4,8 +4,11 @@ import "lib.js" as Lib
 
 // Chords: a song's chords read from a file Multitracks wrote, shown on the stage in the
 // key picked and in each notation; the chord editor (the spot, the keys 1 to 7, typing
-// a chord, dragging one, copying a line's, undo); the ChordPro editor (only chords can
-// be typed); importing a ChordPro file; and a new library.
+// a chord, dragging one, copying a line's, undo); a blank slide given chords in both
+// editors, with and without a text box of its own, and left as it was found when they
+// are taken off again; the ChordPro editor (only chords can be typed); importing a
+// ChordPro file; and a new library. What the file then holds is looked at when the
+// test is over, by after_chords in run.py.
 QtObject {
     id: t
 
@@ -42,6 +45,21 @@ QtObject {
         return null
     }
 
+    // A text box as the file has it now, found by its id: its words and its chords.
+    function boxOnDisk(path, element) {
+        for (const slide of catalog.open(path).slides) {
+            const found = slide.elements.find(e => e.id === element)
+            if (found)
+                return { text: testInput.plain(found.text), chords: (found.chords ?? []).map(c => c.at + ":" + c.name).join(" ") }
+        }
+        return { text: "(no such box)", chords: "" }
+    }
+
+    // What a string is made of, for saying so where it cannot be seen.
+    function units(text) {
+        return "[" + Array.from(text).map(c => c.charCodeAt(0).toString(16)).join(" ") + "]"
+    }
+
     function lineNames(lines) {
         return lines.map(line => line.text + " <" + line.chords.map(c => c.at + ":" + c.name).join(" ") + ">").join(" | ")
     }
@@ -50,6 +68,10 @@ QtObject {
         const herald = "Hark the herald angels sing"
         const peace = "Peace on earth and mercy mild"
         const born = "Born to raise the sons of earth"
+        // What a chord with no words hangs on, and what is between two of them. (Made
+        // from their numbers: neither can be seen in a file.)
+        const zeroWidth = String.fromCharCode(0x200b)
+        const emQuad = String.fromCharCode(0x2001)
         steps = [
             () => {
                 openLibrary(catalog.libraries[0].path)
@@ -307,6 +329,128 @@ QtObject {
                 check("one more is put on its end, and the characters it hangs on are made for it", row.chords.length === kept.aloneCount + 1
                       && row.chords[kept.aloneCount].name === "E" && row.text.length === (kept.aloneCount + 1) * 2 - 1 && row.alone,
                       names(kept.alone) + " over " + row.text.length + " characters")
+                // A blank slide: nothing on it but an empty text box, as an intro or an ending is often made.
+                kept.blank = sheet().rows.findIndex(r => r.kind === "line" && r.blank)
+                const blank = sheet().rows[kept.blank]
+                check("a blank slide is on the sheet too, in a card of its own, as a line of chords alone that has none yet",
+                      kept.blank >= 0 && blank.alone && blank.text === "" && blank.chords.length === 0 && blank.first && blank.last === true
+                      && sheet().usable(kept.blank) && sheet().stops(kept.blank).join(" ") === "0", kept.blank + " " + JSON.stringify(blank ?? null))
+                check("and only the one: a blank text box on a slide that has words is not", sheet().rows.filter(r => r.kind === "line" && r.blank).length === 1
+                      && editScreen.editor.song().filter(b => b.blank).length === 1, sheet().rows.filter(r => r.kind === "line" && r.blank).length)
+                kept.blankRow = blank.row
+                kept.blankElement = blank.element
+                kept.blankBox = JSON.stringify(boxOnDisk(kept.path, kept.blankElement))
+                kept.blankHash = testInput.fileHash(kept.path)
+                // Its card is brought into view, for the pointer to go over it.
+                const view = named("chordSheetView")
+                kept.scrolled = view.contentY
+                view.contentY = Math.max(0, Math.min(Math.max(0, view.contentHeight - view.height), lineItem(kept.blank).y - 80))
+                return 400
+            },
+            () => {
+                const p = over(kept.blank, 0)
+                testInput.mouse(1, p.x, p.y)
+                return 300
+            },
+            () => {
+                check("the spot goes to it with the pointer, as to any line", sheet().spotRow === kept.blank && sheet().spotAt === 0 && named("chordSpot").visible,
+                      sheet().spotRow + ":" + sheet().spotAt)
+                testInput.grab("7a-blank-slide")
+                testInput.key(Qt.Key_5, 0, "5")
+                return 400
+            },
+            () => {
+                const row = sheet().rows[kept.blank]
+                const box = boxOnDisk(kept.path, kept.blankElement)
+                check("5 puts the key's fifth chord on it, hung on a character made for it in the slide's empty text box",
+                      names(kept.blank) === "0:B" && row.alone && !row.blank && row.text === zeroWidth && box.text === zeroWidth && box.chords === "0:B",
+                      names(kept.blank) + " over " + units(row.text) + ", in the file " + box.chords + " over " + units(box.text))
+                // A second, typed after it.
+                sheet().setSpot(kept.blank, 2)
+                testInput.key(Qt.Key_C, 0, "c")
+                return 300
+            },
+            () => {
+                testInput.type("#m")
+                testInput.key(Qt.Key_Return)
+                return 400
+            },
+            () => {
+                const box = boxOnDisk(kept.path, kept.blankElement)
+                check("a second is typed after it, with the wide space between the two that Multitracks puts there",
+                      names(kept.blank) === "0:B 2:C#m" && box.text === zeroWidth + emQuad + zeroWidth && box.chords === "0:B 2:C#m",
+                      names(kept.blank) + ", in the file " + box.chords + " over " + units(box.text))
+                testInput.grab("7a2-blank-slide-with-chords")
+                sheet().setSpot(kept.blank, 2)
+                testInput.key(Qt.Key_Delete)
+                return 300
+            },
+            () => {
+                check("Delete takes one off", names(kept.blank) === "0:B", names(kept.blank))
+                sheet().setSpot(kept.blank, 0)
+                testInput.key(Qt.Key_Delete)
+                return 300
+            },
+            () => {
+                const row = sheet().rows[kept.blank]
+                const box = boxOnDisk(kept.path, kept.blankElement)
+                check("and with the last one off the slide is blank as it was, and still on the sheet to be given others",
+                      row.blank && row.alone && row.text === "" && row.chords.length === 0 && sheet().usable(kept.blank) && box.text === "" && box.chords === "",
+                      JSON.stringify(row) + ", in the file " + box.chords + " over " + units(box.text))
+                check("nothing is left behind by the change of mind: the song's file is byte for byte what it was before the first of them",
+                      testInput.fileHash(kept.path) === kept.blankHash, testInput.fileHash(kept.path) + " " + kept.blankHash)
+                // The same slide with no text box at all: its empty one is taken off it, as Slides takes an element off.
+                const off = editScreen.editor.remove(kept.blankRow, kept.blankElement)
+                check("(the slide's empty text box is taken off it, to make a slide with nothing on it)", off === "", off)
+                return 400
+            },
+            () => {
+                const row = sheet().rows[kept.blank]
+                check("a slide with no text box at all is on the sheet as well: a blank line, with no text box behind it yet",
+                      row.blank && row.alone && row.element === "" && sheet().usable(kept.blank) && catalog.open(kept.path).slides[kept.blankRow].elements.length === 0,
+                      JSON.stringify(row))
+                kept.bareHash = testInput.fileHash(kept.path)
+                sheet().setSpot(kept.blank, 0)
+                testInput.key(Qt.Key_4, 0, "4")
+                return 400
+            },
+            () => {
+                const row = sheet().rows[kept.blank]
+                const slide = catalog.open(kept.path).slides[kept.blankRow]
+                const made = slide.elements[0]
+                // What it is made like: the first text box with words or chords on the nearest slide before.
+                const before = editScreen.editor.song().filter(b => b.row < kept.blankRow && !b.blank)
+                const model = before.find(b => b.row === Math.max(...before.map(b => b.row)))
+                const like = catalog.open(kept.path).slides[model.row].elements.find(e => e.id === model.element)
+                check("a chord put there adds the text box it needs, and only now: one, with the chord's stand-in in it",
+                      names(kept.blank) === "0:A" && !row.blank && row.element !== "" && slide.elements.length === 1 && made.id === row.element
+                      && testInput.plain(made.text) === zeroWidth && (made.chords ?? []).length === 1,
+                      names(kept.blank) + ", " + slide.elements.length + " on the slide, over " + units(made ? testInput.plain(made.text) : ""))
+                check("it is a copy of the song's own text box from the slide before: named, placed and sized as that is", made.id !== like.id && made.name === like.name
+                      && made.x === like.x && made.y === like.y && made.width === like.width && made.height === like.height && made.textBox === true,
+                      made.name + " " + [made.x, made.y, made.width, made.height].join(",") + " like " + like.name + " " + [like.x, like.y, like.width, like.height].join(","))
+                testInput.grab("7a3-slide-given-a-text-box")
+                testInput.key(Qt.Key_Delete)
+                return 400
+            },
+            () => {
+                const row = sheet().rows[kept.blank]
+                check("taking the chord off again takes that text box off with it: the slide has nothing on it, and the file is byte for byte what it was",
+                      row.blank && row.element === "" && catalog.open(kept.path).slides[kept.blankRow].elements.length === 0
+                      && testInput.fileHash(kept.path) === kept.bareHash, JSON.stringify(row) + " " + catalog.open(kept.path).slides[kept.blankRow].elements.length)
+                // Back to the slide with its own empty text box, for what follows: the chord's going, its coming, and the box's.
+                const undone = [editScreen.editor.undo(), editScreen.editor.undo(), editScreen.editor.undo()]
+                check("(those three changes are undone)", undone.join("") === "", undone.join(" | "))
+                return 400
+            },
+            () => {
+                check("undone, the slide has its own empty text box again, and the file is what it was before any of it",
+                      sheet().rows[kept.blank].blank && sheet().rows[kept.blank].element === kept.blankElement && testInput.fileHash(kept.path) === kept.blankHash,
+                      JSON.stringify(sheet().rows[kept.blank]))
+                named("chordSheetView").contentY = kept.scrolled
+                return 400
+            },
+            () => {
                 // A run of chords with the mouse and the letters alone: type one, click where the next goes.
                 kept.peace = lineOf(peace)
                 kept.god = lineOf("God and sinners reconciled")
@@ -425,6 +569,38 @@ QtObject {
                 const disk = onDisk(kept.path, born)
                 check("Backspace on its bracket takes the whole chord away", !area.text.includes("[G/B]") && disk !== null && !disk.chords.some(c => c.name === "G/B"),
                       disk ? JSON.stringify(disk.chords) : "")
+                // The blank slide is a line of the text too: an empty one, after the empty line that parts it from the slide before.
+                const pro = named("chordProEditor")
+                const lines = area.text.split("\n")
+                kept.proLine = pro.layout.findIndex(l => l.kind === "line" && l.row === kept.blankRow)
+                check("in ChordPro a blank slide is an empty line of its own, kept as a line of chords alone", kept.proLine > 0 && pro.layout[kept.proLine].alone
+                      && lines[kept.proLine] === "" && pro.layout[kept.proLine - 1].kind !== "line", kept.proLine + " '" + lines[kept.proLine] + "'")
+                kept.proStart = lines.slice(0, kept.proLine).join("\n").length + 1
+                kept.proText = area.text
+                kept.proHash = testInput.fileHash(kept.path)
+                // The line before it is not the slide's, and takes nothing.
+                area.cursorPosition = kept.proStart - 1
+                testInput.type("[")
+                check("the line before it, which is the gap or the group's name, cannot be typed on", area.text === kept.proText, area.text.length + " " + kept.proText.length)
+                area.cursorPosition = kept.proStart
+                testInput.type("[")
+                testInput.type("A")
+                return 1200
+            },
+            () => {
+                const area = named("chordProText")
+                const box = boxOnDisk(kept.path, kept.blankElement)
+                check("a chord typed on the slide's own line is saved as a chord alone, on a character made for it", area.text.split("\n")[kept.proLine] === "[A]"
+                      && box.text === zeroWidth && box.chords === "0:A", "'" + area.text.split("\n")[kept.proLine] + "', in the file " + box.chords + " over " + units(box.text))
+                area.cursorPosition = kept.proStart + 3
+                testInput.key(Qt.Key_Backspace)
+                return 1200
+            },
+            () => {
+                const area = named("chordProText")
+                const box = boxOnDisk(kept.path, kept.blankElement)
+                check("and taken away again leaves the slide blank, and the file what it was", area.text === kept.proText && box.text === "" && box.chords === ""
+                      && testInput.fileHash(kept.path) === kept.proHash, "'" + area.text.split("\n")[kept.proLine] + "', in the file " + box.chords + " over " + units(box.text))
                 click(centre(named("slidesMode")))
                 return 400
             },
@@ -436,6 +612,14 @@ QtObject {
                     ++undone
                 }
                 check("every chord change can be undone, back to the song as it was", JSON.stringify(editScreen.editor.song()) === kept.song, undone + " steps")
+                check("the blank slide's text box among them: in the file it has no words and no chords again", JSON.stringify(boxOnDisk(kept.path, kept.blankElement)) === kept.blankBox,
+                      JSON.stringify(boxOnDisk(kept.path, kept.blankElement)))
+                // Left in the file, to be looked at there once the test is over (after_chords in run.py): the blank slide with two
+                // chords, and one more on the end of the first line of chords alone.
+                const intro = editScreen.editor.song().find(b => b.chords.length > 0 && Chords.isPlaceholders(b.text))
+                const left = [editScreen.editor.setChordsAlone(kept.blankRow, kept.blankElement, 0, ["E", "B/D#"]),
+                              editScreen.editor.setChordsAlone(intro.row, intro.element, 0, intro.chords.map(c => c.name).concat(["A"]))]
+                check("two changes are left in the file for that", left.join("") === "", left.join(" | "))
                 stopEditing()
                 return 500
             },

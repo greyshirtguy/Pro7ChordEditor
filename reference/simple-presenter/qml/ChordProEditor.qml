@@ -19,6 +19,11 @@ import SimplePresenterApp
 //   [G]Words and [D]more words     a line of a slide's words, with its chords
 //   [C] [G] [Am]     a line of chords with no words (an intro's): here chords can be
 //                    added and taken away freely, with spaces between
+//   (an empty line)  a blank slide: a line of chords with no words that has none yet,
+//                    and takes them the same way. It looks like the empty line between
+//                    two slides, which stands before it, and only `layout` tells the
+//                    two apart: with the caret on this one its slide is the one
+//                    picked in the list at the side, and what is typed on it stays.
 //
 // Help with the brackets, since they are all there is to type: "[" brings its "]" with
 // it and leaves the caret between them; "]" typed at a "]" steps over it; Backspace or
@@ -37,7 +42,8 @@ FocusScope {
     readonly property color accentColor: "#ff8a1f"
     property var blocks: []
     // What each line of the text is: { kind: "group" | "gap" | "line", text (what it is
-    // with no chords in it), block, line, start, alone }
+    // with no chords in it), block, line, start, alone (chords with no words: a line
+    // of stand-ins, or a blank slide's line, which has none yet) }
     property var layout: []
     // The text as it last was when it passed check()
     property string good
@@ -71,7 +77,8 @@ FocusScope {
                 const end = start + Math.max(1, text.length)
                 const chords = block.chords.filter(c => c.at >= start && c.at < end).map(c => ({ at: c.at - start, name: c.name }))
                 lines.push(Chords.toChordPro(text, chords))
-                kinds.push({ kind: "line", text: text, block: b, line: l, start: start, alone: Chords.isPlaceholders(text), row: block.row })
+                kinds.push({ kind: "line", text: text, block: b, line: l, start: start,
+                             alone: Chords.isPlaceholders(text) || block.blank === true, row: block.row })
                 start += text.length + 1
             })
         })

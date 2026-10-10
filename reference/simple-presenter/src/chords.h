@@ -128,9 +128,19 @@ QList<Chord> tidy(const QString &text, QList<Chord> chords);
 QList<Chord> carried(const QString &before, const QString &after, const QList<Chord> &chords);
 
 // The stretch of the text each chord is written over in the file. ProPresenter does
-// not keep where a chord stands but a stretch of characters it belongs to, which in
-// every file to hand starts at the chord and runs to the next chord or to the end of
-// its line, whichever comes first, and is never empty.
+// not keep where a chord stands but a stretch of characters it belongs to. What is
+// written here is what Multitracks writes, its songs being the ones ProPresenter is
+// given with chords and so the best measure there is of what it expects:
+//   - on a line of words, from the chord to the next chord or to the end of its line,
+//     whichever comes first, and never empty;
+//   - on a line of chords alone (isPlaceholders), the chord's own stand-in and no
+//     more, one character, so that the wide space between two chords is in neither:
+//     three chords are 0 to 1, 2 to 3 and 4 to 5.
+// (Counted in 22 of its songs: all 290 chords on lines of chords alone are written the
+// second way, and 949 of the 1,009 on lines of words the first; the other 60 are in
+// two songs that another program had saved since. Up to version 0.82 the first was
+// written here for every line. Whether ProPresenter draws a chord any differently for
+// it is not known.)
 struct Range
 {
     int start = 0;

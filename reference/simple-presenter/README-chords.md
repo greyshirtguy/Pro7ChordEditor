@@ -1,4 +1,5 @@
-<!-- The part of Simple Presenter's README (version 0.82) that describes its chord features to the person using it.
+<!-- The part of Simple Presenter's README that describes its chord features to the person using it, as it is
+     after the change that lets a slide with no words take chords (after version 0.82).
      Kept here as it was, for how the editor is explained in plain words. Its links go to that repository. -->
 
 ## Chords
@@ -67,6 +68,18 @@ What makes it quick:
 - **A verse's chords go onto the next verse in one go.** Ctrl+C copies the chords of a
   line, or with Shift of a whole group, and Ctrl+V puts them on other lines word for
   word.
+- **A slide with no words takes chords too.** An intro, an instrumental or an ending
+  is often a slide with nothing on it. It is on the sheet as a card with one empty
+  line: point at it and put chords on, one after another, as anywhere else. They are
+  kept as Multitracks keeps the chords of an intro, on characters that do not show, so
+  the slide shows no more than it did.
+- **And nothing is added to a slide that is not needed.** A slide with no words is not
+  touched until a chord is put on it. The characters its chords hang on go into the
+  text box it has, empty as that is; only a slide with no text box at all is given
+  one, a copy of the song's own, set and placed as the song's words are. A change of
+  mind leaves nothing behind: take the chords off again while the song is still open
+  in the editor, and the slide's file is exactly what it was, an added text box gone
+  with them.
 - **Nothing is lost.** Every change is saved at once, into the song's own file, and
   Ctrl+Z takes it back. The words are never changed here, only the chords.
 
@@ -94,7 +107,11 @@ taken to be in C until one is set.
 `[G]Amazing [C]grace`. Chords are typed, changed and deleted among the words, and the
 words themselves cannot be typed over. `[` brings its `]` with it, and Backspace on a
 bracket takes the whole chord. It is for someone who thinks in ChordPro, or has a chart
-to copy from.
+to copy from. A line of chords with no words is its chords with spaces between,
+`[C] [G] [Am]`, and a slide with no words is an empty line, which chords can be typed
+on: the one after the empty line that parts it from the slide before. (The two look
+alike. With the caret on the slide's own, that slide is the one picked in the list at
+the side, and what is typed on the other does not stay.)
 
 ### Importing a ChordPro file
 
@@ -107,8 +124,25 @@ song's key. The same **+** has **New Library**.
 ### What is a guess, or not done
 
 - How the chords are kept was worked out from songs ProPresenter imported from
-  Multitracks, and what is written here is in the same form. A song with chords put on
-  here has not been opened in ProPresenter yet; nor has a song imported here.
+  Multitracks, and what is written here is in the same form, down to the stretch of
+  characters a chord is written over: up to the next chord or the end of its line
+  where there are words, and its own character and no more where there are none.
+  (Counted in 22 of those songs: all 290 chords with no words are written so, and all
+  but 60 of the 1,009 over words, the 60 being in two songs that another program had
+  saved since.) A song with chords put on here has not been opened in ProPresenter
+  yet; nor has a song imported here.
+- Chords put on a slide with no words are hung on characters written in that text
+  box's own font and size, which the file keeps for an empty text box too. That
+  ProPresenter then shows the slide's chords as it shows a Multitracks intro's is a
+  guess until it has been seen there. Whether anything in ProPresenter that asks if a
+  slide has text counts such characters is not known either: a slide from Multitracks
+  with chords and no words has them just the same.
+- A text box added for the chords of a slide that had none is a copy of the nearest
+  text box of the song that has words, with those words taken out. That ProPresenter
+  is content with it is a guess too. (A song with no text box anywhere gets one as
+  the **T** in Slides makes one.) What was made for a slide's chords is only unmade
+  while the song is open in the editor: chords taken off another day leave an empty
+  text box where one was added.
 - Numbers, numerals and Do Re Mi are written the way musicians write them.
   ProPresenter does not say exactly what it writes, so they may differ in the corners.
 - A song imported or chorded here is not marked as a Multitracks song, which is a mark
@@ -116,4 +150,3 @@ song's key. The same **+** has **New Library**.
 - The chord editors do not change words; the Slides editor does, and the chords of
   the rest of the text box stay on their words when it does.
 - ProPresenter's other chord thing, a chord chart shown as a picture, is not shown.
-

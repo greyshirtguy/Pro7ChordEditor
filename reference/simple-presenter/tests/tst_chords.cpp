@@ -196,6 +196,37 @@ private slots:
         QVERIFY(last.at(0).start == 1 && last.at(0).end == 2);
     }
 
+    void aChordWithNoWordsIsWrittenOverItsOwnStandInAndNoMore()
+    {
+        const auto spans = [](const QList<Range> &written) {
+            QStringList all;
+            for (const Range &range : written)
+                all << QStringLiteral("%1-%2").arg(range.start).arg(range.end);
+            return all.join(u' ');
+        };
+        // As Multitracks writes an intro: the wide space between two chords is in
+        // neither chord's stretch, where on a line of words the first would run up to
+        // the second.
+        const QList<Chord> three {{0, "E"}, {2, "A"}, {4, "B"}};
+        QCOMPARE(spans(ranges(placeholders(3), three)), "0-1 2-3 4-5");
+        QCOMPARE(spans(ranges(placeholders(3, u' '), three)), "0-1 2-3 4-5");
+        // One chord on a slide of its own, hung on one space or one zero-width space
+        QCOMPARE(spans(ranges(" ", {{0, "E"}})), "0-1");
+        QCOMPARE(spans(ranges(placeholders(1), {{0, "E"}})), "0-1");
+        // Fewer chords than the line has stand-ins: each is still its own one only
+        QCOMPARE(spans(ranges(placeholders(3), {{0, "E"}, {4, "B"}})), "0-1 4-5");
+        // A text box with such a line among lines of words (a turnaround after a
+        // verse): each line is written its own way. "One two" is 0 to 6, its line
+        // break 7, the stand-ins 8 to 10, their line break 11, "Three" from 12.
+        const QString mixed = QStringLiteral("One two\n") + placeholders(2) + QStringLiteral("\nThree");
+        QCOMPARE(spans(ranges(mixed, {{0, "G"}, {4, "D"}, {8, "C"}, {10, "G"}, {12, "Em"}})), "0-4 4-7 8-9 10-11 12-17");
+        // A chord on an empty line is one long, as it always was. And a line that is
+        // only spaces is a line of chords alone: there is no telling it from one
+        // (isPlaceholders).
+        QCOMPARE(spans(ranges("One\n\nTwo", {{4, "G"}})), "4-5");
+        QCOMPARE(spans(ranges("   ", {{0, "G"}, {2, "D"}})), "0-1 2-3");
+    }
+
     void chordProThereAndBack()
     {
         const Line line {"Amazing grace how sweet", {{0, "C"}, {8, "F"}, {18, "C/E"}}};

@@ -477,6 +477,9 @@ QVariantMap toElementMap(const rv::data::Slide::Element &slideElement)
     const Text &text = element.text();
     const RichText words = readText(text);
     map.insert("text", QVariant::fromValue(words));
+    // Whether the file gives the element a text at all, with words in it or none. (The
+    // map has "text" either way: an element with none gets an empty one, as if it had.)
+    map.insert("textBox", element.has_text());
     // The start of its own words on one line, for naming an element that has no name
     map.insert("words", words.plainText().simplified().left(60));
     map.insert("verticalAlignment", toQtVerticalAlignment(text.vertical_alignment()));

@@ -30,6 +30,15 @@ rv::data::Slide::Element *findElement(rv::data::Slide *slide, const QString &id)
     return nullptr;
 }
 
+// Whether a text box's words are nothing to a song: none at all, or only a stray space
+// or line break (which files are full of), with none of the characters that chords
+// with no words are hung on (see chords::placeholders). It is what the chord editors
+// leave out, and what a blank slide's text box is.
+bool noWords(const QString &text)
+{
+    return text.trimmed().isEmpty() && !text.contains(QChar(0x200B)) && !text.contains(QChar(0x2001));
+}
+
 int indexOfElement(const rv::data::Slide &slide, const QString &id)
 {
     const std::string wanted = id.toStdString();
@@ -38,6 +47,29 @@ int indexOfElement(const rv::data::Slide &slide, const QString &id)
             return i;
     }
     return -1;
+}
+
+// Takes an element off its slide, and out of the order builds run in, where it has no
+// place either.
+void takeOff(rv::data::Slide *slide, int index)
+{
+    const std::string id = slide->elements(index).element().uuid().string();
+    slide->mutable_elements()->DeleteSubrange(index, 1);
+    for (int i = slide->element_build_order_size() - 1; i >= 0; --i) {
+        if (slide->element_build_order(i).string() == id)
+            slide->mutable_element_build_order()->DeleteSubrange(i, 1);
+    }
+}
+
+// What a text says of itself apart from its words and its chords: all of it but the RTF
+// and the ranges kept beside the RTF. Two states of a text box that differ only in the
+// chords on it and the characters they hang on are the same by this.
+std::string lookOf(const rv::data::Graphics::Text &text)
+{
+    rv::data::Graphics::Text copy = text;
+    copy.clear_rtf_data();
+    copy.mutable_attributes()->clear_custom_attributes();
+    return copy.SerializeAsString();
 }
 
 // The first slide a cue shows, as an index into its actions, or -1: a presentation's
@@ -99,6 +131,7 @@ void PresentationEditor::start(Kind kind, const QString &path, const QString &wo
     m_name = name;
     m_undo.clear();
     m_redo.clear();
+    m_madeForChords.clear();
     m_changed = false;
     m_backupPath.clear();
     m_previewRow = -1;
@@ -249,6 +282,7 @@ void PresentationEditor::close()
     m_slides.clear();
     m_undo.clear();
     m_redo.clear();
+    m_madeForChords.clear();
     m_changed = false;
     m_backupPath.clear();
     m_previewRow = -1;
@@ -616,13 +650,7 @@ QString PresentationEditor::remove(int row, const QString &element)
         const int index = indexOfElement(*slide, element);
         if (index < 0)
             return elementGone;
-        slide->mutable_elements()->DeleteSubrange(index, 1);
-        // It has no place in the order builds run in either.
-        const std::string id = element.toStdString();
-        for (int i = slide->element_build_order_size() - 1; i >= 0; --i) {
-            if (slide->element_build_order(i).string() == id)
-                slide->mutable_element_build_order()->DeleteSubrange(i, 1);
-        }
+        takeOff(slide, index);
         return QString();
     });
 }
@@ -717,33 +745,61 @@ QVariantList PresentationEditor::song() const
     QVariantList blocks;
     if (m_kind != Kind::Presentation)
         return blocks;
-    for (int row = 0; row < m_slides.size(); ++row) {
-        const QVariantMap slide = m_slides.at(row).toMap();
-        const QVariantList elements = slide.value("elements").toList();
-        for (const QVariant &entry : elements) {
-            const QVariantMap element = entry.toMap();
-            // Words of its own: not another element's, a timer's or the live slide's
-            if (element.value("linkKind").toString() != QLatin1String("none"))
-                continue;
-            const QString text = element.value("text").value<RichText>().plainText();
-            // A box with no words is left out, unless it is a line of chords alone: it
-            // has chords, or the characters Multitracks hangs them on. (A box with
-            // only a stray space in it, which files are full of, is neither.)
-            if (text.trimmed().isEmpty() && !element.contains("chords") && !text.contains(QChar(0x200B)) && !text.contains(QChar(0x2001)))
-                continue;
-            blocks.append(QVariantMap {
-                {"row", row},
-                {"slideId", slide.value("id")},
-                {"group", slide.value("group")},
-                {"groupColor", slide.value("groupColor")},
-                {"groupStart", slide.value("groupStart")},
-                {"label", slide.value("label")},
-                {"element", element.value("id")},
-                {"text", text},
-                {"chords", element.value("chords").toList()},
-            });
+    for (int row = 0; row < m_slides.size(); ++row)
+        blocks += songOf(row);
+    return blocks;
+}
+
+QVariantList PresentationEditor::songOf(int row) const
+{
+    QVariantList blocks;
+    const QVariantMap slide = m_slides.at(row).toMap();
+    const QVariantList elements = slide.value("elements").toList();
+    const auto block = [&](const QVariantMap &element, const QString &text, bool blank) {
+        return QVariantMap {
+            {"row", row},
+            {"slideId", slide.value("id")},
+            {"group", slide.value("group")},
+            {"groupColor", slide.value("groupColor")},
+            {"groupStart", slide.value("groupStart")},
+            {"label", slide.value("label")},
+            {"element", element.value("id").toString()},
+            {"text", text},
+            {"chords", element.value("chords").toList()},
+            {"blank", blank},
+        };
+    };
+    // The text box a blank slide is handed over as, should this be one: its first that
+    // has nothing in it.
+    QVariantMap empty;
+    for (const QVariant &entry : elements) {
+        const QVariantMap element = entry.toMap();
+        // Words of its own: not another element's, a timer's or the live slide's
+        if (element.value("linkKind").toString() != QLatin1String("none"))
+            continue;
+        const QString text = element.value("text").value<RichText>().plainText();
+        // A box with no words is left out, unless it is a line of chords alone: it has
+        // chords, or the characters Multitracks hangs them on. (A box with only a stray
+        // space in it, which files are full of, is neither.)
+        if (noWords(text) && !element.contains("chords")) {
+            if (empty.isEmpty() && element.value("textBox").toBool())
+                empty = element;
+            continue;
         }
+        blocks.append(block(element, text, false));
     }
+    // A blank slide: nothing on it has words or chords. It is handed over all the same,
+    // as one text box with no words, which the editors show as a line of chords alone
+    // that has none yet.
+    //   - If it has a text box to put chords in, that is the box: the first element the
+    //     file gives a text that is not linked to anything, whatever stray space it may
+    //     hold, and whatever else the element is. (In the libraries looked at, a slide
+    //     that is one picture has an empty text of its own as often as not, and a
+    //     song's title slide may well be where its intro is played.)
+    //   - If it has none, the box has no id yet. Nothing is made for it here: a text
+    //     box is added to the slide only when a chord is put on it (setChordsAlone).
+    if (blocks.isEmpty())
+        blocks.append(block(empty, QString(), true));
     return blocks;
 }
 
@@ -778,15 +834,102 @@ QString PresentationEditor::setChords(int row, const QString &element, const QVa
     return error;
 }
 
+const rv::data::Slide::Element *PresentationEditor::wordsBoxNear(int row)
+{
+    // The slides before this one, the nearest first; then those after it.
+    QList<int> others;
+    for (int other = row - 1; other >= 0; --other)
+        others << other;
+    for (int other = row + 1; other < m_slides.size(); ++other)
+        others << other;
+    for (const int other : std::as_const(others)) {
+        const QVariantList blocks = songOf(other);
+        for (const QVariant &entry : blocks) {
+            const QVariantMap block = entry.toMap();
+            if (block.value("blank").toBool())
+                continue;
+            if (rv::data::Slide *slide = slideIn(other)) {
+                if (const rv::data::Slide::Element *found = findElement(slide, block.value("element").toString()))
+                    return found;
+            }
+        }
+    }
+    return nullptr;
+}
+
 QString PresentationEditor::setChordsAlone(int row, const QString &element, int line, const QStringList &names, bool joined)
 {
+    // What this change makes for a blank slide's chords, to be remembered once it has
+    // been saved (see m_madeForChords).
+    QString madeId;
+    MadeForChords made;
     m_joinNext = joined;
     const QString error = change(row, [&](rv::data::Slide *slide) {
-        rv::data::Slide::Element *target = findElement(slide, element);
+        rv::data::Slide::Element *target = element.isEmpty() ? nullptr : findElement(slide, element);
+        if (element.isEmpty()) {
+            // A blank slide that has no text box to put chords in (see song()).
+            // Nothing to put: nothing is made.
+            if (names.isEmpty())
+                return QString();
+            const QVariantList now = songOf(row);
+            if (now.size() != 1 || !now.first().toMap().value("element").toString().isEmpty())
+                return QStringLiteral("That slide is no longer blank.");
+            // Its first chords, and so the text box they need. It is a copy of the
+            // song's own: the nearest text box that has words, set and placed as that
+            // is, which is what a song from Multitracks has under an intro's chords.
+            // (A copy of something ProPresenter made, then, and not a text box of this
+            // app's devising, unless the song has none to copy.) Its words and chords
+            // are that slide's and go; so does what tied it to other things there.
+            const rv::data::Slide::Element *model = wordsBoxNear(row);
+            rv::data::Slide::Element added = model ? *model : proconvert::makeTextElement(*slide, nullptr);
+            rv::data::Graphics::Element *graphics = added.mutable_element();
+            graphics->mutable_uuid()->set_string(workspace::newUuid());
+            graphics->set_name(proconvert::uniqueElementName(*slide, QString::fromStdString(graphics->name())).toStdString());
+            added.clear_build_in();
+            added.clear_build_out();
+            added.clear_childbuilds();
+            added.clear_data_links();
+            proconvert::writeChords(graphics->mutable_text(), {});
+            target = slide->add_elements();
+            *target = added;
+            madeId = QString::fromStdString(graphics->uuid().string());
+            made.added = true;
+        }
         if (!target)
             return elementGone;
         rv::data::Graphics::Text *text = target->mutable_element()->mutable_text();
         RichText rich = proconvert::readText(*text);
+        const QList<chords::Chord> had = proconvert::readChords(*text);
+        if (made.added || (had.isEmpty() && noWords(rich.plainText()))) {
+            // A blank slide's text box. Nothing to put and nothing there: it is left
+            // exactly as it is, not written again to say the same.
+            if (names.isEmpty())
+                return QString();
+            // As the file had it, to go back to if the chords are taken off again.
+            if (!made.added && !m_madeForChords.contains(element)) {
+                madeId = element;
+                made.was = text->SerializeAsString();
+            }
+            // Its first chords. All it holds becomes their stand-ins, one paragraph
+            // of them, in the format the box keeps for what is typed into it: its own
+            // font, size and colour, which the file has for a box with no text too
+            // (every blank box looked at, 229 of them, had all three). Nothing that
+            // shows on the slide changes: it showed no words and shows none now.
+            // Zero-width spaces, as an import here writes them.
+            TextParagraph paragraph = rich.paragraphs.isEmpty() ? TextParagraph() : rich.paragraphs.first();
+            TextRun run = rich.firstRun();
+            run.text = chords::placeholders(int(names.size()));
+            paragraph.runs = {run};
+            rich.paragraphs = {paragraph};
+            proconvert::writeText(text, rich);
+            QList<chords::Chord> put;
+            for (int i = 0; i < names.size(); ++i)
+                put.append({i * 2, chords::tidied(names.at(i))});
+            proconvert::writeChords(text, put);
+            if (!madeId.isEmpty() && !made.added)
+                made.look = lookOf(*text);
+            return QString();
+        }
         // The line is a paragraph, or part of one that has line breaks in it. Its
         // words become the stand-ins, in the format the paragraph starts in.
         // In the character the line hangs its chords on now, if it has one.
@@ -823,7 +966,6 @@ QString PresentationEditor::setChordsAlone(int row, const QString &element, int 
         const QStringList beforeLines = proconvert::readText(*text).plainText().split(u'\n');
         const int oldLength = line < beforeLines.size() ? int(beforeLines.at(line).size()) : 0;
         const int shift = int(standIns.size()) - oldLength;
-        const QList<chords::Chord> had = proconvert::readChords(*text);
         for (const chords::Chord &chord : had) {
             if (chord.at < start)
                 kept.append(chord);
@@ -834,9 +976,27 @@ QString PresentationEditor::setChordsAlone(int row, const QString &element, int 
         for (int i = 0; i < names.size(); ++i)
             kept.append({start + i * 2, chords::tidied(names.at(i))});
         proconvert::writeChords(text, kept);
+        // The last chord taken off a blank slide that was given its chords while the
+        // presentation has been open here: what was made for them is unmade, so that
+        // the slide is as it was found and not left with an empty text box it never
+        // had, or with one written afresh to say nothing.
+        const auto known = m_madeForChords.constFind(element);
+        if (known != m_madeForChords.constEnd() && kept.isEmpty() && noWords(rich.plainText())) {
+            if (known->added) {
+                // The text box that was added for them goes with them.
+                takeOff(slide, indexOfElement(*slide, element));
+            } else if (lookOf(*text) == known->look) {
+                // The box's own text goes back as the file had it. (Unless something
+                // else has been done to the box meanwhile, its font changed in Slides
+                // say: then it keeps that, and is simply empty.)
+                text->ParseFromString(known->was);
+            }
+        }
         return QString();
     });
     m_joinNext = false;
+    if (error.isEmpty() && !madeId.isEmpty())
+        m_madeForChords.insert(madeId, made);
     return error;
 }
 

@@ -428,11 +428,18 @@ QList<Range> ranges(const QString &text, const QList<Chord> &chords)
     QList<Range> result;
     for (qsizetype i = 0; i < ordered.size(); ++i) {
         const Chord &chord = ordered.at(i);
+        // The chord's own line: from after the line break before it to the next one.
+        const qsizetype lineStart = chord.at > 0 ? text.lastIndexOf(u'\n', chord.at - 1) + 1 : 0;
         qsizetype end = text.indexOf(u'\n', chord.at);
         if (end < 0)
             end = text.size();
-        if (i + 1 < ordered.size())
+        if (isPlaceholders(text.mid(lineStart, end - lineStart))) {
+            // A line of chords alone: the chord's own stand-in and no more, so that the
+            // wide space between two chords belongs to neither of them.
+            end = chord.at + 1;
+        } else if (i + 1 < ordered.size()) {
             end = qMin(end, qsizetype(ordered.at(i + 1).at));
+        }
         result.append({chord.at, int(qMax(end, qsizetype(chord.at + 1))), chord.name});
     }
     return result;

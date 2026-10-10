@@ -24,6 +24,15 @@ import "chordlayout.js" as ChordLayout
 // intro's, is the exception: its chords hang on stand-in characters that are made and
 // unmade with them. See chords::placeholders.)
 //
+// A blank slide is on the sheet too, as a card with one empty line: a line of chords
+// alone that has none yet. An intro or an instrumental is often a slide with nothing
+// on it, and this is where its chords are put. Nothing is done to the slide until
+// then: the first chord gives its empty text box its stand-ins, or, where the slide
+// has no text box (the row's `element` is then empty), adds one for them; and taking
+// the last chord off again unmakes whichever it was. All of that is the document's
+// doing (PresentationEditor::song and setChordsAlone): here it is a line of chords
+// alone like any other.
+//
 // The spot. There is one place on the sheet that the next chord goes to, shown as a
 // bubble in outline with its tail on a character. It follows the pointer, and the arrow
 // keys move it too, so that the mouse and the keys are two hands on one thing: point
@@ -75,6 +84,7 @@ FocusScope {
     // { kind: "group", name, color } over a group's first slide, and for each line a
     // { kind: "line", block, line, row, element, text, start (where the line starts in
     // its text box), chords (each `at` along the line), alone (chords with no words),
+    // blank (a blank slide's one line: alone, with no chords yet and no stand-ins),
     // first (of its slide) }
     property var blocks: []
     property var rows: []
@@ -141,7 +151,8 @@ FocusScope {
                 flat.push({
                     kind: "line", block: b, line: l, row: block.row, element: block.element, text: text, start: start,
                     chords: block.chords.filter(c => c.at >= start && c.at < end).map(c => ({ at: c.at - start, name: c.name })),
-                    alone: Chords.isPlaceholders(text), first: newSlide && l === 0
+                    alone: Chords.isPlaceholders(text) || block.blank === true, blank: block.blank === true,
+                    first: newSlide && l === 0
                 })
                 start += text.length + 1
             })
@@ -178,8 +189,10 @@ FocusScope {
 
     // ---- Where a chord can go
 
+    // A line with words on it, or a blank slide's, which has none and is there to be
+    // given chords. An empty line among a slide's words is neither.
     function usable(index) {
-        return index >= 0 && index < rows.length && rows[index].kind === "line" && rows[index].text.length > 0
+        return index >= 0 && index < rows.length && rows[index].kind === "line" && (rows[index].text.length > 0 || rows[index].blank)
     }
 
     function wordStarts(text) {
@@ -192,7 +205,8 @@ FocusScope {
     }
 
     // The places on a line the spot stops at: the starts of its words, or on a line of
-    // chords alone each chord and one more for a new one.
+    // chords alone each chord and one more for a new one (which on a blank slide's
+    // line is the only one).
     function stops(index) {
         const line = rows[index]
         if (!line.alone)
@@ -906,7 +920,7 @@ FocusScope {
                     MouseArea {
                         width: Math.min(parent.width, sheet.gutter + sheet.cardWidth - sheet.cardPad)
                         height: parent.height
-                        enabled: line.isLine && line.words.length > 0
+                        enabled: sheet.usable(line.index)
                         hoverEnabled: true
                         onPositionChanged: (mouse) => {
                             if (sheet.pointerMoved(this, mouse.x, mouse.y) && !sheet.dragged)
@@ -1004,7 +1018,7 @@ FocusScope {
                                     // sheet that is, and the place on it
                                     const where = mapToItem(column, mouse.x, mouse.y)
                                     const under = column.childAt(Math.max(1, Math.min(column.width - 1, where.x)), where.y)
-                                    if (under && under.isLine && under.words.length > 0)
+                                    if (under && under.isLine && sheet.usable(under.index))
                                         sheet.setSpot(under.index, under.placeAt(where.x, (mouse.modifiers & Qt.ShiftModifier) === 0))
                                 }
                                 onReleased: (mouse) => {

@@ -57,9 +57,11 @@ void writeText(rv::data::Graphics::Text *text, const RichText &rich);
 // a few it changed afterwards). A chord is one of the "custom attributes" the file
 // keeps beside the RTF, the same list that has the capitalisation and the fonts: a
 // range of characters and the chord's name, in the song's original key. The range
-// starts at the character the chord stands over. Where it ends varies a little from
-// file to file (at the next chord, or the end of the line, and now and then past it),
-// so only its start is read; what is written is chords::ranges(), the commonest form.
+// starts at the character the chord stands over. Where it ends is not the same in
+// every file (a program other than ProPresenter has been at some of them, and left
+// ranges that run past their line), so only its start is read; what is written is
+// chords::ranges(), which is how Multitracks writes them: to the next chord or the end
+// of the line, and on a line of chords alone the chord's own character only.
 // Places are counted along the text as plainText() gives it, a line break being one.
 //
 // Writing touches nothing but the chord ranges: the RTF and every other range are left
@@ -94,7 +96,9 @@ void writeChords(rv::data::Graphics::Text *text, const QList<chords::Chord> &cho
 //     Offset, Radius, and worked out from those OffsetX and OffsetY
 //   words (the start of its own text, on one line: what an element with no name is
 //     called in a list)
-//   text (RichText, as authored), verticalAlignment, marginLeft/Top/Right/Bottom,
+//   text (RichText, as authored), textBox (whether the file gives it a text at all,
+//     with words or with none: what the chord editors go by to find a blank slide's
+//     text box), verticalAlignment, marginLeft/Top/Right/Bottom,
 //   textScale (whether the text's size is changed to suit its box, as the file has it:
 //     0 no, 1 the box's height suits the text instead, which is not done here, 2 made
 //     smaller if it does not fit, 3 made larger if there is room, 4 either; see

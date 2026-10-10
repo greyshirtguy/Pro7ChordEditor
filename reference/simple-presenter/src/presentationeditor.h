@@ -6,6 +6,7 @@
 #include "template.pb.h"
 
 #include <QAbstractListModel>
+#include <QHash>
 #include <QUrl>
 #include <QVariantMap>
 #include <QtQml/qqmlregistration.h>
@@ -112,8 +113,17 @@ public:
 
     // The presentation as one song: every text box that has words of its own, slide
     // after slide, as { row, slideId, group, groupColor, groupStart, label, element,
-    // text, chords: [{ at, name }] }. It is what the two chord editors lay out as one
-    // sheet, there being no such thing in the file, where each slide has its own words.
+    // text, chords: [{ at, name }], blank }. It is what the two chord editors lay out
+    // as one sheet, there being no such thing in the file, where each slide has its
+    // own words.
+    //
+    // A blank slide is in it too, so that it can be given chords: an intro or an
+    // instrumental is often made as a slide with nothing on it. A slide none of whose
+    // text boxes has words or chords is handed over as one text box with no text and
+    // `blank` set: the first of its text boxes that is not linked to anything, or, if
+    // it has none, a box with no id (`element` is empty), which is not in the file and
+    // is made only if a chord is put there. A blank box on a slide that has words
+    // elsewhere is not handed over.
     Q_INVOKABLE QVariantList song() const;
     // Every chord in the presentation, as often as it comes up: what the chord editor
     // offers first.
@@ -125,6 +135,18 @@ public:
     // Replaces one line of a text box, a line of chords with no words, by these chords:
     // the line's stand-in characters are made anew, one for each (see
     // chords::placeholders). It is the one change the chord editors make to the words.
+    //
+    // For a blank slide (see song()) the line is all its box has. Nothing is done to
+    // such a slide until a chord is put on it. Its first chords give the box stand-ins
+    // where it had no text, in the box's own format; and where the slide has no text
+    // box (`element` empty) one is added for them first, a copy of the song's nearest
+    // text box with words, so that it is set and placed as the song's words are.
+    // Taking the last chord off again, while the presentation is still open here,
+    // unmakes all of that: an added box is taken off the slide, and a box that was
+    // there has its text back as the file had it. So a change of mind leaves the slide
+    // as it was found. (Nothing of this is kept once the presentation is closed: a
+    // slide left with chords keeps what was made for them, and taking them off another
+    // day leaves its text box empty.)
     Q_INVOKABLE QString setChordsAlone(int row, const QString &element, int line, const QStringList &names, bool joined = false);
     // Says what key the chords are written in. Not a change to any slide, so not one
     // that undo takes back.
@@ -178,6 +200,12 @@ private:
     google::protobuf::Message *unitAt(int row);
     const google::protobuf::Message *unitAt(int row) const;
     rv::data::Slide *slideIn(int row);
+    // One slide's part of song().
+    QVariantList songOf(int row) const;
+    // The text box a slide with none is given one like, for its chords: the first
+    // that has words (or chords) on the nearest slide before it, or failing that on the
+    // nearest after it. Null if no slide has one.
+    const rv::data::Slide::Element *wordsBoxNear(int row);
     QString write();
     QVariantMap describe(int row) const;
     void refresh(int row);
@@ -202,6 +230,20 @@ private:
     QVariantList m_slides;
     QList<Step> m_undo;
     QList<Step> m_redo;
+    // What the chord editors have made for chords on blank slides since the
+    // presentation was opened, by the id of the text box, so that taking the chords
+    // off again can unmake it (setChordsAlone). `added`: the slide had no text box
+    // and this one was added. Otherwise `was` is the box's text as the file had it,
+    // and `look` is what the text said of itself, apart from its words and chords,
+    // once the chords were on: while it still says the same, nothing else has been
+    // done to the box and `was` can go back.
+    struct MadeForChords
+    {
+        bool added = false;
+        std::string was;
+        std::string look;
+    };
+    QHash<QString, MadeForChords> m_madeForChords;
     bool m_changed = false;
     QString m_backupPath;
     // The row a preview is under way in, or -1, and its cue as it was before.
