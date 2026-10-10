@@ -1,0 +1,68 @@
+{
+  "file": "Blank Slides.pro",
+  "nameInside": "Blank Slides",
+  "uuid": "1A93093B-C0D4-4785-AFDD-F2D7FB25689C",
+  "hasMusic": true,
+  "originalKey": "G",
+  "userKey": "G",
+  "multitracks": false,
+  "textBoxes": [
+    {
+      "words": "",
+      "length": 0,
+      "chords": []
+    },
+    {
+      "words": "Amazing grace how sweet the sound",
+      "length": 33,
+      "chords": [
+        {
+          "start": 0,
+          "end": 18,
+          "name": "G",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 18,
+          "end": 33,
+          "name": "C",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "That saved a wretch like me",
+      "length": 27,
+      "chords": []
+    },
+    {
+      "words": "",
+      "length": 0,
+      "chords": []
+    },
+    {
+      "words": "I once was lost but now am found",
+      "length": 32,
+      "chords": [
+        {
+          "start": 2,
+          "end": 32,
+          "name": "D",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Was blind but now I see",
+      "length": 23,
+      "chords": []
+    }
+  ],
+  "folder": "made-by-simple-presenter"
+}

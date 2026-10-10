@@ -81,12 +81,12 @@
             "chords": [
               {
                 "start": 0,
-                "end": 2,
+                "end": 1,
                 "name": "G"
               },
               {
                 "start": 2,
-                "end": 4,
+                "end": 3,
                 "name": "D/F#"
               },
               {
@@ -208,17 +208,17 @@
             "chords": [
               {
                 "start": 0,
-                "end": 2,
+                "end": 1,
                 "name": "Am"
               },
               {
                 "start": 2,
-                "end": 4,
+                "end": 3,
                 "name": "F"
               },
               {
                 "start": 4,
-                "end": 6,
+                "end": 5,
                 "name": "C"
               },
               {
@@ -473,17 +473,17 @@
             "chords": [
               {
                 "start": 0,
-                "end": 2,
+                "end": 1,
                 "name": "C"
               },
               {
                 "start": 2,
-                "end": 4,
+                "end": 3,
                 "name": "G/B"
               },
               {
                 "start": 4,
-                "end": 6,
+                "end": 5,
                 "name": "D"
               },
               {
@@ -608,6 +608,25 @@
       "lineBreakShift": {
         "chordsBelowTheFirstLine": 12,
         "atTheStartOfAWord": 10,
+        "ifMovedBack": 0,
+        "likely": false
+      },
+      "key": {
+        "stated": "G",
+        "doubtful": false,
+        "suggested": "",
+        "likeliest": [
+          "G",
+          "Em"
+        ]
+      }
+    },
+    {
+      "file": "Blank Slides.pro",
+      "rangesOverLineBreaks": 0,
+      "lineBreakShift": {
+        "chordsBelowTheFirstLine": 0,
+        "atTheStartOfAWord": 0,
         "ifMovedBack": 0,
         "likely": false
       },

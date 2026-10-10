@@ -596,6 +596,150 @@
             ],
             "out": [
             ]
+        },
+        {
+            "after": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "before": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 0,
+                    "name": "Em"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "Em"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                }
+            ]
+        },
+        {
+            "after": "ab",
+            "before": "abab",
+            "chords": [
+                {
+                    "at": 2,
+                    "name": "C"
+                }
+            ],
+            "out": [
+                {
+                    "at": 1,
+                    "name": "C"
+                }
+            ]
+        },
+        {
+            "after": "ab",
+            "before": "abab",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 1,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "C"
+                },
+                {
+                    "at": 3,
+                    "name": "Em"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 1,
+                    "name": "C"
+                }
+            ]
+        },
+        {
+            "after": "Joy to the world",
+            "before": "Joy 🎉 to the world",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 14,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 11,
+                    "name": "D"
+                }
+            ]
+        },
+        {
+            "after": "Joy 🎉 to the world",
+            "before": "Joy to the world",
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "A"
+                },
+                {
+                    "at": 11,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 14,
+                    "name": "D"
+                }
+            ]
         }
     ],
     "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."

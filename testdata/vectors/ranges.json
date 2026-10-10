@@ -1,5 +1,5 @@
 {
-    "about": "ranges(text, chords): the stretch of the text each chord is written over in the file. It starts at the chord and runs to the next chord or to the end of its line, whichever comes first, and is never empty. This is what is written; on reading only `start` is believed.",
+    "about": "ranges(text, chords): the stretch of the text each chord is written over in the file. On a line of chords alone (a line with nothing in it but U+200B and white space) it is the chord's own character and no more: one long. On any other line it starts at the chord and runs to the next chord or to the end of its line, whichever comes first, and is never empty. This is what is written, and it is how Multitracks writes both; on reading only `start` is believed.",
     "cases": [
         {
             "chords": [
@@ -500,12 +500,12 @@
             ],
             "out": [
                 {
-                    "end": 2,
+                    "end": 1,
                     "name": "C",
                     "start": 0
                 },
                 {
-                    "end": 4,
+                    "end": 3,
                     "name": "G",
                     "start": 2
                 },
@@ -600,6 +600,253 @@
                 }
             ],
             "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "F#m"
+                },
+                {
+                    "at": 4,
+                    "name": "E"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "D",
+                    "start": 0
+                },
+                {
+                    "end": 3,
+                    "name": "F#m",
+                    "start": 2
+                },
+                {
+                    "end": 5,
+                    "name": "E",
+                    "start": 4
+                }
+            ],
+            "text": "     "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 5,
+                    "name": "Am",
+                    "start": 4
+                }
+            ],
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "C",
+                    "start": 0
+                },
+                {
+                    "end": 3,
+                    "name": "G",
+                    "start": 2
+                },
+                {
+                    "end": 5,
+                    "name": "D",
+                    "start": 4
+                }
+            ],
+            "text": "​ ​\n​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                },
+                {
+                    "at": 10,
+                    "name": "G"
+                },
+                {
+                    "at": 12,
+                    "name": "Em"
+                }
+            ],
+            "out": [
+                {
+                    "end": 4,
+                    "name": "G",
+                    "start": 0
+                },
+                {
+                    "end": 7,
+                    "name": "D",
+                    "start": 4
+                },
+                {
+                    "end": 9,
+                    "name": "C",
+                    "start": 8
+                },
+                {
+                    "end": 11,
+                    "name": "G",
+                    "start": 10
+                },
+                {
+                    "end": 17,
+                    "name": "Em",
+                    "start": 12
+                }
+            ],
+            "text": "One two\n​ ​\nThree"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 2,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "end": 1,
+                    "name": "G",
+                    "start": 0
+                },
+                {
+                    "end": 3,
+                    "name": "D",
+                    "start": 2
+                }
+            ],
+            "text": "   "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 20,
+                    "name": "D"
+                },
+                {
+                    "at": 24,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "end": 4,
+                    "name": "D",
+                    "start": 0
+                },
+                {
+                    "end": 7,
+                    "name": "G",
+                    "start": 4
+                },
+                {
+                    "end": 19,
+                    "name": "A",
+                    "start": 7
+                },
+                {
+                    "end": 24,
+                    "name": "D",
+                    "start": 20
+                },
+                {
+                    "end": 36,
+                    "name": "G",
+                    "start": 24
+                }
+            ],
+            "text": "Joy 🎉 to the world\nthe Lord is come"
+        },
+        {
+            "chords": [
+                {
+                    "at": 5,
+                    "name": "G"
+                },
+                {
+                    "at": 40,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "end": 18,
+                    "name": "G",
+                    "start": 5
+                },
+                {
+                    "end": 19,
+                    "name": "D",
+                    "start": 18
+                }
+            ],
+            "text": "Joy 🎉 to the world"
         }
     ],
     "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."

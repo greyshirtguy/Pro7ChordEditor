@@ -328,6 +328,317 @@
             "title": "Amazing Grace"
         },
         {
+            "artist": "Nobody At All",
+            "ccli": "",
+            "copyright": "",
+            "file": "blank-slides.cho",
+            "key": "G",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "​"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Intro"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 18,
+                                    "name": "C"
+                                }
+                            ],
+                            "text": "Amazing grace how sweet the sound"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "That saved a wretch like me"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "​"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 2,
+                                    "name": "D"
+                                }
+                            ],
+                            "text": "I once was lost but now am found"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Was blind but now I see"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            2,
+                            1
+                        ],
+                        "3": [
+                            3,
+                            2
+                        ],
+                        "4": [
+                            4,
+                            1
+                        ]
+                    },
+                    "name": "Verse 1"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "​"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Ending"
+                }
+            ],
+            "title": "Blank Slides"
+        },
+        {
+            "artist": "The First Named",
+            "ccli": "",
+            "copyright": "",
+            "file": "headings.cho",
+            "key": "C",
+            "sections": [
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 8,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Sing it out"
+                        },
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "F"
+                                }
+                            ],
+                            "text": "After a gap that is still the chorus"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2
+                        ],
+                        "3": [
+                            2
+                        ],
+                        "4": [
+                            2
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                }
+                            ],
+                            "text": "Two spaces after the chord"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Chorus"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "C"
+                                }
+                            ],
+                            "text": "A verse with a small name"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Verse 2b"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "Am"
+                                }
+                            ],
+                            "text": "Before the chorus"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1
+                        ],
+                        "2": [
+                            1
+                        ],
+                        "3": [
+                            1
+                        ],
+                        "4": [
+                            1
+                        ]
+                    },
+                    "name": "Pre-Chorus 2"
+                },
+                {
+                    "lines": [
+                        {
+                            "chords": [
+                                {
+                                    "at": 0,
+                                    "name": "F"
+                                }
+                            ],
+                            "text": "And once more"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Verse 2bb"
+                        },
+                        {
+                            "chords": [
+                            ],
+                            "text": "Chorus of angels"
+                        }
+                    ],
+                    "linesOnEachSlide": {
+                        "1": [
+                            1,
+                            1,
+                            1
+                        ],
+                        "2": [
+                            2,
+                            1
+                        ],
+                        "3": [
+                            3
+                        ],
+                        "4": [
+                            3
+                        ]
+                    },
+                    "name": "Pre Chorus"
+                }
+            ],
+            "title": "Headings"
+        },
+        {
             "artist": "",
             "ccli": "",
             "copyright": "",

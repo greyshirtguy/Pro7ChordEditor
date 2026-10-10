@@ -139,6 +139,36 @@
             "from": "Ab",
             "out": "A",
             "to": "A"
+        },
+        {
+            "chord": "C/Em",
+            "from": "C",
+            "out": "D/Em",
+            "to": "D"
+        },
+        {
+            "chord": "c/em",
+            "from": "C",
+            "out": "D/em",
+            "to": "D"
+        },
+        {
+            "chord": "g",
+            "from": "C",
+            "out": "g",
+            "to": "C"
+        },
+        {
+            "chord": "A♭m7",
+            "from": "E",
+            "out": "A♭m7",
+            "to": "E"
+        },
+        {
+            "chord": "f#m/a",
+            "from": "A",
+            "out": "f#m/a",
+            "to": "A"
         }
     ],
     "rows": [

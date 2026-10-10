@@ -1,6 +1,6 @@
 {
-  "about": "Each test file as Simple Presenter's own editor reads it: what its chord editors are handed (PresentationEditor::song). One entry for each text box that has words of its own, in the order of the slides: `slide` counted from 0, the name of its group and whether it is the first slide of that group, the id of the text box, its words, and its chords, each `at` a place along those words (a line break being one). `key` is the key the chords are written in, as a musician writes it, or nothing. This is the reference for reading a file: a port that reads these files should find the same. Some strings hold characters that cannot be seen: U+200B and U+2001.",
-  "madeBy": "tools/simple-presenter-scripts/dump.qml, run in Simple Presenter (testdata/README.md says how). Do not edit by hand.",
+  "about": "Each test file as Simple Presenter's own editor reads it: what its chord editors are handed (PresentationEditor::song). One entry for each text box that has words of its own, in the order of the slides: `slide` counted from 0, the name of its group and whether it is the first slide of that group, the id of the text box, its words, and its chords, each `at` a place along those words (a line break being one). A blank slide, one with no words or chords on it anywhere, has one entry too, with no words and `blank` true: its first text box that is not linked to anything. Where a blank slide has no text box at all, `element` is empty: that entry is Simple Presenter's own, which gives such a slide a text box when a chord is put there, and an app that makes no text boxes hands nothing over for it. `key` is the key the chords are written in, as a musician writes it, or nothing. This is the reference for reading a file: a port that reads these files should find the same. Some strings hold characters that cannot be seen: U+200B and U+2001.",
+  "madeBy": "tools/simple-presenter-scripts/dump.qml, run in Simple Presenter, and tools/as-read.py (tools/README.md says how). Do not edit by hand.",
   "files": [
     {
       "file": "A Song - In A Minor Key (Chords).pro",
@@ -10,7 +10,7 @@
           "slide": 0,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "2027C946-2A5A-4007-95BC-9F19D23BAC39",
+          "element": "895D7A07-C102-445E-8006-B1C48C886E30",
           "words": "Leading spaces and trailing ones\nA chord at the very end",
           "chords": [
             {
@@ -33,13 +33,14 @@
               "at": 55,
               "name": "F#m"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Chorus 2",
           "startsItsGroup": true,
-          "element": "F110F1FF-5674-4C98-89FE-8A388B5E7B82",
+          "element": "C261954E-A9E1-4502-8C4A-0F1120D96090",
           "words": "The second chorus is numbered",
           "chords": [
             {
@@ -50,13 +51,14 @@
               "at": 21,
               "name": "C#m"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "The Middle Eight",
           "startsItsGroup": true,
-          "element": "0127E59A-3E69-474A-A3F0-392A3E0070F2",
+          "element": "3ED7763B-0A06-4356-A406-C381AD7FA4CB",
           "words": "Named by its label",
           "chords": [
             {
@@ -67,7 +69,8 @@
               "at": 13,
               "name": "C#7sus4"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -79,7 +82,7 @@
           "slide": 0,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "2027C946-2A5A-4007-95BC-9F19D23BAC39",
+          "element": "895D7A07-C102-445E-8006-B1C48C886E30",
           "words": "Leading spaces and trailing ones\nA chord at the very end",
           "chords": [
             {
@@ -102,13 +105,14 @@
               "at": 55,
               "name": "F#m"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Chorus 2",
           "startsItsGroup": true,
-          "element": "F110F1FF-5674-4C98-89FE-8A388B5E7B82",
+          "element": "C261954E-A9E1-4502-8C4A-0F1120D96090",
           "words": "The second chorus is numbered",
           "chords": [
             {
@@ -119,13 +123,14 @@
               "at": 21,
               "name": "C#m"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "The Middle Eight",
           "startsItsGroup": true,
-          "element": "0127E59A-3E69-474A-A3F0-392A3E0070F2",
+          "element": "3ED7763B-0A06-4356-A406-C381AD7FA4CB",
           "words": "Named by its label",
           "chords": [
             {
@@ -136,7 +141,8 @@
               "at": 13,
               "name": "C#7sus4"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -148,7 +154,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "BB92B2CD-0AA7-4F46-88CB-4B9AB6F5E81E",
+          "element": "20DD81E8-20A8-42FF-BDA5-A97A15D1B384",
           "words": "Amazing grace how sweet the sound\nThat saved a wretch like me",
           "chords": [
             {
@@ -171,13 +177,14 @@
               "at": 58,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Verse 1",
           "startsItsGroup": false,
-          "element": "27424D21-85AF-4FD1-B02B-E49C72BE8721",
+          "element": "0155E65E-2737-44E6-9CB5-0D0F34B80B1F",
           "words": "I once was lost but now am found\nWas blind but now I see",
           "chords": [
             {
@@ -208,13 +215,14 @@
               "at": 52,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Verse 2",
           "startsItsGroup": true,
-          "element": "5311132A-CA88-471F-9CDA-79693D197128",
+          "element": "47F1D0AF-D108-4F9E-9E9B-4559C5B46DFC",
           "words": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
           "chords": [
             {
@@ -237,13 +245,14 @@
               "at": 60,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Verse 2",
           "startsItsGroup": false,
-          "element": "859FCA44-171A-4122-98C8-C8604ED50066",
+          "element": "6E6BCB5D-1780-491C-8A6C-01051C642B2A",
           "words": "How precious did that grace appear\nThe hour I first believed",
           "chords": [
             {
@@ -274,13 +283,14 @@
               "at": 53,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 4,
           "group": "Verse 3",
           "startsItsGroup": true,
-          "element": "55B06329-DA0C-4F50-BB45-5AEF9B887279",
+          "element": "C9C665C6-C426-4C1D-9F3D-40BCF127339D",
           "words": "Through many dangers toils and snares\nI have already come",
           "chords": [
             {
@@ -303,13 +313,14 @@
               "at": 52,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 5,
           "group": "Verse 3",
           "startsItsGroup": false,
-          "element": "3117FE1D-A57D-4406-95E2-6695297AFD0C",
+          "element": "79566A39-5C91-44C6-BFF8-DD5332053026",
           "words": "Tis grace hath brought me safe thus far\nAnd grace will lead me home",
           "chords": [
             {
@@ -340,13 +351,14 @@
               "at": 62,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 6,
           "group": "Ending",
           "startsItsGroup": true,
-          "element": "631134C7-0DF8-4695-85CB-552A52C94C6D",
+          "element": "4E0D5CC2-93A6-47EA-A65E-870E59B83AB3",
           "words": "​ ​ ​ ​",
           "chords": [
             {
@@ -365,7 +377,8 @@
               "at": 6,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -377,7 +390,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "BB92B2CD-0AA7-4F46-88CB-4B9AB6F5E81E",
+          "element": "20DD81E8-20A8-42FF-BDA5-A97A15D1B384",
           "words": "Amazing grace how sweet the sound\nThat saved a wretch like me",
           "chords": [
             {
@@ -400,13 +413,14 @@
               "at": 59,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Verse 1",
           "startsItsGroup": false,
-          "element": "27424D21-85AF-4FD1-B02B-E49C72BE8721",
+          "element": "0155E65E-2737-44E6-9CB5-0D0F34B80B1F",
           "words": "I once was lost but now am found\nWas blind but now I see",
           "chords": [
             {
@@ -437,13 +451,14 @@
               "at": 53,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Verse 2",
           "startsItsGroup": true,
-          "element": "5311132A-CA88-471F-9CDA-79693D197128",
+          "element": "47F1D0AF-D108-4F9E-9E9B-4559C5B46DFC",
           "words": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
           "chords": [
             {
@@ -466,13 +481,14 @@
               "at": 61,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Verse 2",
           "startsItsGroup": false,
-          "element": "859FCA44-171A-4122-98C8-C8604ED50066",
+          "element": "6E6BCB5D-1780-491C-8A6C-01051C642B2A",
           "words": "How precious did that grace appear\nThe hour I first believed",
           "chords": [
             {
@@ -503,13 +519,14 @@
               "at": 54,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 4,
           "group": "Verse 3",
           "startsItsGroup": true,
-          "element": "55B06329-DA0C-4F50-BB45-5AEF9B887279",
+          "element": "C9C665C6-C426-4C1D-9F3D-40BCF127339D",
           "words": "Through many dangers toils and snares\nI have already come",
           "chords": [
             {
@@ -532,13 +549,14 @@
               "at": 53,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 5,
           "group": "Verse 3",
           "startsItsGroup": false,
-          "element": "3117FE1D-A57D-4406-95E2-6695297AFD0C",
+          "element": "79566A39-5C91-44C6-BFF8-DD5332053026",
           "words": "Tis grace hath brought me safe thus far\nAnd grace will lead me home",
           "chords": [
             {
@@ -569,13 +587,14 @@
               "at": 63,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 6,
           "group": "Ending",
           "startsItsGroup": true,
-          "element": "631134C7-0DF8-4695-85CB-552A52C94C6D",
+          "element": "4E0D5CC2-93A6-47EA-A65E-870E59B83AB3",
           "words": "​ ​ ​ ​",
           "chords": [
             {
@@ -594,7 +613,91 @@
               "at": 6,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
+        }
+      ]
+    },
+    {
+      "file": "Blank Slides.pro",
+      "key": "G",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Intro",
+          "startsItsGroup": true,
+          "element": "0AB25897-0679-405C-AB1C-AF792E2D5228",
+          "words": "",
+          "chords": [],
+          "blank": true
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "807B35A7-3320-4487-97B7-6895F6E906E7",
+          "words": "Amazing grace how sweet the sound",
+          "chords": [
+            {
+              "at": 0,
+              "name": "G"
+            },
+            {
+              "at": 18,
+              "name": "C"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 2,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "01AD0782-8237-4705-AE55-4ADC5380C9F4",
+          "words": "That saved a wretch like me",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 3,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "C607EE41-CFDD-4B4C-B960-C45E1D10DA8F",
+          "words": "",
+          "chords": [],
+          "blank": true
+        },
+        {
+          "slide": 4,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "111E9F42-2FA9-4742-BDEF-93171C36F51F",
+          "words": "I once was lost but now am found",
+          "chords": [
+            {
+              "at": 2,
+              "name": "D"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 5,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "792742A4-A87C-49C8-907F-9FFEEDFAC846",
+          "words": "Was blind but now I see",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 6,
+          "group": "Ending",
+          "startsItsGroup": true,
+          "element": "",
+          "words": "",
+          "chords": [],
+          "blank": true
         }
       ]
     },
@@ -606,7 +709,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "7200AB48-4867-4155-AB90-758F74E9EC53",
+          "element": "1215F7A2-1B3F-48D5-8B36-680A220AAC62",
           "words": "Holy holy holy\nLord God Almighty",
           "chords": [
             {
@@ -633,13 +736,14 @@
               "at": 30,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Verse 1",
           "startsItsGroup": false,
-          "element": "323661A5-4E14-4ECA-9E76-D926D6EB94EC",
+          "element": "52F49B73-CAE3-4D73-873A-7ED52D71E528",
           "words": "Early in the morning\nOur song shall rise to Thee",
           "chords": [
             {
@@ -662,13 +766,14 @@
               "at": 44,
               "name": "A"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Verse 2",
           "startsItsGroup": true,
-          "element": "32318E3C-438A-42F9-83CF-46EF55B882F0",
+          "element": "6C02572E-1475-4336-8FAF-11E800B75ECB",
           "words": "Holy holy holy\nMerciful and mighty",
           "chords": [
             {
@@ -695,13 +800,14 @@
               "at": 32,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Verse 2",
           "startsItsGroup": false,
-          "element": "2A5D4BE1-0FDD-4452-89A6-0BB77F9BA5DF",
+          "element": "32D96A4E-019E-48C4-A551-F6A74024EAC0",
           "words": "God in three persons\nBlessed Trinity",
           "chords": [
             {
@@ -724,23 +830,26 @@
               "at": 34,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 4,
           "group": "",
           "startsItsGroup": true,
-          "element": "D8FD3298-2CDB-4ECD-A30C-228C4D40EB4A",
+          "element": "2B163CEC-7A01-448F-BEB9-3F4599D23F05",
           "words": "Holy holy holy\nAll the saints adore Thee",
-          "chords": []
+          "chords": [],
+          "blank": false
         },
         {
           "slide": 5,
           "group": "",
           "startsItsGroup": false,
-          "element": "14CD8E53-8E75-44FF-BC96-1086133AA97D",
+          "element": "A640547E-2A22-4D13-A290-E5633CA3EFCF",
           "words": "Casting down their golden crowns\nAround the glassy sea",
-          "chords": []
+          "chords": [],
+          "blank": false
         }
       ]
     },
@@ -752,7 +861,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "C3C8C388-DAD7-4EF6-80DF-3C392DDE6996",
+          "element": "4A2373D5-B95A-4465-BA2E-B946783DE02D",
           "words": "When peace like a river attendeth my way\nWhen sorrows like sea billows roll",
           "chords": [
             {
@@ -783,13 +892,14 @@
               "at": 71,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "A6D608E2-A01D-483C-88FC-13CDE1105AAA",
+          "element": "A63D9715-D31E-4CD7-81FD-F245BDA14E99",
           "words": "It is well\nWith my soul\nIt is well it is well with my soul",
           "chords": [
             {
@@ -820,21 +930,23 @@
               "at": 54,
               "name": "C"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "37E65732-4DA6-462B-B496-55B00B9E537A",
+          "element": "B2DD6BEA-F088-488D-918F-8C5E165B31C7",
           "words": "It is well",
-          "chords": []
+          "chords": [],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Bridge",
           "startsItsGroup": true,
-          "element": "451AC878-123A-42D0-A42B-6E5B56F6C6A8",
+          "element": "F496B0EC-E723-4484-8BE3-97670A9C5749",
           "words": "​ ​ ​ ​\nEven so it is well",
           "chords": [
             {
@@ -861,7 +973,8 @@
               "at": 22,
               "name": "F"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -873,7 +986,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "C3C8C388-DAD7-4EF6-80DF-3C392DDE6996",
+          "element": "4A2373D5-B95A-4465-BA2E-B946783DE02D",
           "words": "When peace like a river attendeth my way\nWhen sorrows like sea billows roll",
           "chords": [
             {
@@ -904,13 +1017,14 @@
               "at": 71,
               "name": "G"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "A6D608E2-A01D-483C-88FC-13CDE1105AAA",
+          "element": "A63D9715-D31E-4CD7-81FD-F245BDA14E99",
           "words": "It is well\nWith my soul\nIt is well it is well with my soul",
           "chords": [
             {
@@ -941,21 +1055,23 @@
               "at": 54,
               "name": "C"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "37E65732-4DA6-462B-B496-55B00B9E537A",
+          "element": "B2DD6BEA-F088-488D-918F-8C5E165B31C7",
           "words": "It is well",
-          "chords": []
+          "chords": [],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Bridge",
           "startsItsGroup": true,
-          "element": "451AC878-123A-42D0-A42B-6E5B56F6C6A8",
+          "element": "F496B0EC-E723-4484-8BE3-97670A9C5749",
           "words": "​ ​ ​ ​\nEven so it is well",
           "chords": [
             {
@@ -982,7 +1098,8 @@
               "at": 22,
               "name": "F"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -994,7 +1111,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "49BB8D98-2612-4A3F-9987-29B722376F1A",
+          "element": "C15F101B-AE36-4925-B015-7495875D2161",
           "words": "One two three four\nFive six seven eight",
           "chords": [
             {
@@ -1009,13 +1126,14 @@
               "at": 28,
               "name": "Em"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Verse 1",
           "startsItsGroup": false,
-          "element": "157B6864-71B8-4E44-8BCD-26001C76B2F8",
+          "element": "3EA4D8F8-0064-446A-8101-C188D88F56D4",
           "words": "Nine ten eleven twelve\nThirteen",
           "chords": [
             {
@@ -1026,13 +1144,14 @@
               "at": 10,
               "name": "G/B"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "3CE75358-D570-4DE1-8E47-39CE42D0354F",
+          "element": "7100B9D0-4053-4808-8ED8-87C2F5E42706",
           "words": "Sing it out\nSing it loud",
           "chords": [
             {
@@ -1047,13 +1166,14 @@
               "at": 12,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Outro",
           "startsItsGroup": true,
-          "element": "11304099-256D-4D31-9951-A3831F012E69",
+          "element": "AAFBA8BE-AD4D-43C0-933D-BB9BB84364F6",
           "words": "​ ​ ​",
           "chords": [
             {
@@ -1068,7 +1188,8 @@
               "at": 4,
               "name": "Em"
             }
-          ]
+          ],
+          "blank": false
         }
       ]
     },
@@ -1080,7 +1201,7 @@
           "slide": 0,
           "group": "Verse 1",
           "startsItsGroup": true,
-          "element": "49BB8D98-2612-4A3F-9987-29B722376F1A",
+          "element": "C15F101B-AE36-4925-B015-7495875D2161",
           "words": "One two three four\nFive six seven eight",
           "chords": [
             {
@@ -1095,13 +1216,14 @@
               "at": 28,
               "name": "Em"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 1,
           "group": "Verse 1",
           "startsItsGroup": false,
-          "element": "157B6864-71B8-4E44-8BCD-26001C76B2F8",
+          "element": "3EA4D8F8-0064-446A-8101-C188D88F56D4",
           "words": "Nine ten eleven twelve\nThirteen",
           "chords": [
             {
@@ -1112,13 +1234,14 @@
               "at": 10,
               "name": "G/B"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 2,
           "group": "Chorus",
           "startsItsGroup": true,
-          "element": "3CE75358-D570-4DE1-8E47-39CE42D0354F",
+          "element": "7100B9D0-4053-4808-8ED8-87C2F5E42706",
           "words": "Sing it out\nSing it loud",
           "chords": [
             {
@@ -1133,13 +1256,14 @@
               "at": 12,
               "name": "D"
             }
-          ]
+          ],
+          "blank": false
         },
         {
           "slide": 3,
           "group": "Outro",
           "startsItsGroup": true,
-          "element": "11304099-256D-4D31-9951-A3831F012E69",
+          "element": "AAFBA8BE-AD4D-43C0-933D-BB9BB84364F6",
           "words": "​ ​ ​",
           "chords": [
             {
@@ -1154,7 +1278,122 @@
               "at": 4,
               "name": "Em"
             }
-          ]
+          ],
+          "blank": false
+        }
+      ]
+    },
+    {
+      "file": "Rock Of Ages (Toplady).pro",
+      "key": "",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "A23BA4B4-2BD0-4A87-97F4-386FC010BEED",
+          "words": "Rock of Ages cleft for me\nLet me hide myself in thee",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "FC6106D8-CF8A-491E-80B6-ACBDD936C229",
+          "words": "Let the water and the blood\nFrom thy wounded side which flowed",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 2,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "DCA104E7-FC2C-4B25-9E76-7FB687906001",
+          "words": "Be of sin the double cure\nSave from wrath and make me pure",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 3,
+          "group": "Verse 2",
+          "startsItsGroup": true,
+          "element": "E9A8E1B1-7214-40A6-93C1-A0C915CC1422",
+          "words": "Not the labors of my hands\nCan fulfill thy law's demands",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 4,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "3597DE0D-D492-4FB2-98A1-1AD663333344",
+          "words": "Could my zeal no respite know\nCould my tears forever flow",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 5,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "EB8540F0-9E4E-4246-A17D-FC82831F605A",
+          "words": "All for sin could not atone\nThou must save and thou alone",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 6,
+          "group": "Verse 3",
+          "startsItsGroup": true,
+          "element": "51C0AF50-4E4D-43EF-B6E0-87B3A2BC1DA6",
+          "words": "Nothing in my hand I bring\nSimply to the cross I cling",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 7,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "97B59C9D-2073-4ECC-BCB1-C59DEC08A0B1",
+          "words": "Naked come to thee for dress\nHelpless look to thee for grace",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 8,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "2634E065-393A-4158-AA42-3CB4AC7611CB",
+          "words": "Foul I to the fountain fly\nWash me Savior or I die",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 9,
+          "group": "Verse 4",
+          "startsItsGroup": true,
+          "element": "C37CCC58-5B04-4A95-84A8-9DE2B4E8EE0B",
+          "words": "While I draw this fleeting breath\nWhen mine eyes shall close in death",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 10,
+          "group": "Verse 4",
+          "startsItsGroup": false,
+          "element": "4B191138-2B4B-4CF2-B3F1-F5714599A0CB",
+          "words": "When I soar to worlds unknown\nSee thee on thy judgment throne",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 11,
+          "group": "Verse 4",
+          "startsItsGroup": false,
+          "element": "B2BBE404-16B3-42C1-AB39-65D7D65C71F8",
+          "words": "Rock of Ages cleft for me\nLet me hide myself in thee",
+          "chords": [],
+          "blank": false
         }
       ]
     }

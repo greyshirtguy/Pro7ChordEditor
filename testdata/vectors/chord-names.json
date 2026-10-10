@@ -950,6 +950,36 @@
             "root": "Ab",
             "tidied": "Abmaj7",
             "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "G#b5",
+            "isChord": true,
+            "quality": "b5",
+            "root": "G#",
+            "tidied": "G#b5",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "C/Em",
+            "isChord": true,
+            "quality": "/Em",
+            "root": "C",
+            "tidied": "C/Em",
+            "valid": true
+        },
+        {
+            "bass": "",
+            "couldBecome": true,
+            "in": "c/em",
+            "isChord": true,
+            "quality": "/em",
+            "root": "C",
+            "tidied": "C/em",
+            "valid": true
         }
     ],
     "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."

@@ -123,6 +123,46 @@
                     "name": "G"
                 }
             ]
+        },
+        {
+            "in": "Ama[zing\ngr]ace",
+            "out": [
+                {
+                    "at": 3,
+                    "name": "zing\ngr"
+                }
+            ]
+        },
+        {
+            "in": "[[G]]Amazing",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "[G"
+                }
+            ]
+        },
+        {
+            "in": "[G[D]]grace",
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G[D"
+                }
+            ]
+        },
+        {
+            "in": "Joy [G]🎉 [A]to the world",
+            "out": [
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                }
+            ]
         }
     ],
     "fromLine": [
@@ -753,6 +793,42 @@
             ],
             "out": "",
             "text": ""
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 5,
+                    "name": "D"
+                }
+            ],
+            "out": "[C]One\n[G]\n[D]Two",
+            "text": "One\n\nTwo"
+        },
+        {
+            "chords": [
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 20,
+                    "name": "D"
+                }
+            ],
+            "out": "Joy [G]🎉 [A]to the world\n[D]the Lord",
+            "text": "Joy 🎉 to the world\nthe Lord"
         }
     ],
     "withoutChords": [
@@ -799,6 +875,22 @@
         {
             "in": "{c: Verse 1}\n[G]Amazing",
             "out": "{c: Verse 1}\nAmazing"
+        },
+        {
+            "in": "Ama[zing\ngr]ace",
+            "out": "Ama[zing\ngr]ace"
+        },
+        {
+            "in": "[[G]]Amazing",
+            "out": "[]Amazing"
+        },
+        {
+            "in": "[G[D]]grace",
+            "out": "[G]grace"
+        },
+        {
+            "in": "Joy [G]🎉 [A]to the world",
+            "out": "Joy 🎉 to the world"
         }
     ]
 }

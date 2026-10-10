@@ -1,7 +1,7 @@
 {
   "file": "Plain Song.pro",
   "nameInside": "Plain Song",
-  "uuid": "5FDDEA7C-EB22-4E7C-8BEA-A97A3246C38C",
+  "uuid": "73BA17E9-D74F-495D-ABF0-A8101F40DE71",
   "hasMusic": true,
   "originalKey": "G",
   "userKey": "G",
@@ -95,7 +95,7 @@
       "chords": [
         {
           "start": 0,
-          "end": 2,
+          "end": 1,
           "name": "G",
           "line": 0,
           "overLineBreak": false,
@@ -103,7 +103,7 @@
         },
         {
           "start": 2,
-          "end": 4,
+          "end": 3,
           "name": "D/F#",
           "line": 0,
           "overLineBreak": false,

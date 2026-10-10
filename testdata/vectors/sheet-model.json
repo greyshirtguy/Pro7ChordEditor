@@ -1,5 +1,5 @@
 {
-    "about": "What the chord sheet does with a song. `songs` are the songs these are made on, as the document hands them over: one entry for each text box that has words, with `row` the slide it is on (counted from 0), its words and its chords (each `at` counted along the whole text box, a line break being one). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. `edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step of undo with the change before it) and the song afterwards. In all of them `row` in a spot is the sheet's row, and `row` in what is asked is the slide. Some strings hold characters that cannot be seen: U+200B and U+2001.",
+    "about": "What the chord sheet does with a song. `songs` are the songs these are made on, as the document hands them over: one entry for each text box that has words, with `row` the slide it is on (counted from 0), its words and its chords (each `at` counted along the whole text box, a line break being one), and for a blank slide one entry with no words and `blank` set (in the song `bare`, with no `element` either: a slide that has no text box, which Simple Presenter gives one when a chord is put there and an app that makes no text boxes leaves out; the id of the box it adds is its own to make, and stands here as a sentence in brackets). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. `edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step of undo with the change before it) and the song afterwards. In all of them `row` in a spot is the sheet's row, and `row` in what is asked is the slide. Some strings hold characters that cannot be seen: U+200B and U+2001.",
     "madeBy": "tools/make-vectors/sheet.js, by running the functions of Simple Presenter's qml/ChordSheet.qml and qml/chordlayout.js themselves. Do not edit by hand: run it again.",
     "songs": {
         "grace": {
@@ -35,7 +35,8 @@
                             "at": 45,
                             "name": "D"
                         }
-                    ]
+                    ],
+                    "blank": false
                 },
                 {
                     "row": 1,
@@ -59,7 +60,8 @@
                             "at": 16,
                             "name": "C"
                         }
-                    ]
+                    ],
+                    "blank": false
                 },
                 {
                     "row": 2,
@@ -70,7 +72,8 @@
                     "label": "",
                     "element": "C",
                     "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
-                    "chords": []
+                    "chords": [],
+                    "blank": false
                 },
                 {
                     "row": 3,
@@ -81,7 +84,8 @@
                     "label": "",
                     "element": "D",
                     "text": "Amen\nAmen and amen",
-                    "chords": []
+                    "chords": [],
+                    "blank": false
                 }
             ]
         },
@@ -110,7 +114,8 @@
                             "at": 4,
                             "name": "A"
                         }
-                    ]
+                    ],
+                    "blank": false
                 },
                 {
                     "row": 1,
@@ -130,7 +135,8 @@
                             "at": 15,
                             "name": "G"
                         }
-                    ]
+                    ],
+                    "blank": false
                 },
                 {
                     "row": 2,
@@ -146,7 +152,8 @@
                             "at": 0,
                             "name": "D"
                         }
-                    ]
+                    ],
+                    "blank": false
                 }
             ]
         },
@@ -171,7 +178,8 @@
                             "at": 9,
                             "name": "C/E"
                         }
-                    ]
+                    ],
+                    "blank": false
                 },
                 {
                     "row": 1,
@@ -182,7 +190,8 @@
                     "label": "",
                     "element": "B",
                     "text": "First box",
-                    "chords": []
+                    "chords": [],
+                    "blank": false
                 },
                 {
                     "row": 1,
@@ -198,7 +207,109 @@
                             "at": 7,
                             "name": "Am"
                         }
-                    ]
+                    ],
+                    "blank": false
+                }
+            ]
+        },
+        "blank": {
+            "key": "G",
+            "textBoxes": [
+                {
+                    "row": 0,
+                    "slideId": "slide-0",
+                    "group": "Intro",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "A",
+                    "text": "",
+                    "chords": [],
+                    "blank": true
+                },
+                {
+                    "row": 1,
+                    "slideId": "slide-1",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ],
+                    "blank": false
+                },
+                {
+                    "row": 2,
+                    "slideId": "slide-2",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": false,
+                    "label": "",
+                    "element": "C",
+                    "text": "",
+                    "chords": [],
+                    "blank": true
+                },
+                {
+                    "row": 3,
+                    "slideId": "slide-3",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": false,
+                    "label": "",
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ],
+                    "blank": false
+                }
+            ]
+        },
+        "bare": {
+            "key": "G",
+            "textBoxes": [
+                {
+                    "row": 0,
+                    "slideId": "slide-0",
+                    "group": "",
+                    "groupColor": "",
+                    "groupStart": false,
+                    "label": "",
+                    "element": "A",
+                    "text": "Amazing grace",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ],
+                    "blank": false
+                },
+                {
+                    "row": 1,
+                    "slideId": "slide-1",
+                    "group": "Ending",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "",
+                    "text": "",
+                    "chords": [],
+                    "blank": true
                 }
             ]
         }
@@ -251,6 +362,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 2
                 },
@@ -269,6 +381,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 2,
                     "last": true
@@ -296,6 +409,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 2
                 },
@@ -309,6 +423,7 @@
                     "start": 33,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 2,
                     "last": true
@@ -329,6 +444,7 @@
                     "start": 0,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 2
                 },
@@ -342,6 +458,7 @@
                     "start": 40,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 2,
                     "last": true
@@ -356,6 +473,7 @@
                     "start": 0,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 2
                 },
@@ -369,6 +487,7 @@
                     "start": 5,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 2,
                     "last": true
@@ -416,6 +535,7 @@
                         }
                     ],
                     "alone": true,
+                    "blank": false,
                     "first": true,
                     "count": 1,
                     "last": true
@@ -441,6 +561,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 2
                 },
@@ -459,6 +580,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 2,
                     "last": true
@@ -484,6 +606,7 @@
                         }
                     ],
                     "alone": true,
+                    "blank": false,
                     "first": true,
                     "count": 1,
                     "last": true
@@ -518,6 +641,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 3
                 },
@@ -531,6 +655,7 @@
                     "start": 13,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 3
                 },
@@ -544,6 +669,7 @@
                     "start": 14,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 3,
                     "last": true
@@ -564,6 +690,7 @@
                     "start": 0,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": true,
                     "count": 3
                 },
@@ -582,6 +709,7 @@
                         }
                     ],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 3
                 },
@@ -595,8 +723,170 @@
                     "start": 11,
                     "chords": [],
                     "alone": false,
+                    "blank": false,
                     "first": false,
                     "count": 3,
+                    "last": true
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "mostLines": 2,
+            "used": [
+                "G",
+                "C",
+                "D"
+            ],
+            "rows": [
+                {
+                    "kind": "group",
+                    "name": "Intro",
+                    "color": "",
+                    "row": 0
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 0,
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "start": 0,
+                    "chords": [],
+                    "alone": true,
+                    "blank": true,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                },
+                {
+                    "kind": "group",
+                    "name": "Verse 1",
+                    "color": "",
+                    "row": 1
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 0,
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 2
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 1,
+                    "row": 1,
+                    "element": "B",
+                    "text": "That saved a wretch like me",
+                    "start": 34,
+                    "chords": [],
+                    "alone": false,
+                    "blank": false,
+                    "first": false,
+                    "count": 2,
+                    "last": true
+                },
+                {
+                    "kind": "line",
+                    "block": 2,
+                    "line": 0,
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "start": 0,
+                    "chords": [],
+                    "alone": true,
+                    "blank": true,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                },
+                {
+                    "kind": "line",
+                    "block": 3,
+                    "line": 0,
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                }
+            ]
+        },
+        {
+            "song": "bare",
+            "mostLines": 1,
+            "used": [
+                "G"
+            ],
+            "rows": [
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 0,
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                },
+                {
+                    "kind": "group",
+                    "name": "Ending",
+                    "color": "",
+                    "row": 1
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 0,
+                    "row": 1,
+                    "element": "",
+                    "text": "",
+                    "start": 0,
+                    "chords": [],
+                    "alone": true,
+                    "blank": true,
+                    "first": true,
+                    "count": 1,
                     "last": true
                 }
             ]
@@ -891,6 +1181,94 @@
             "out": [
                 0,
                 3
+            ]
+        },
+        {
+            "song": "blank",
+            "row": 0,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "blank",
+            "row": 1,
+            "usable": true,
+            "out": [
+                0
+            ]
+        },
+        {
+            "song": "blank",
+            "row": 2,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "blank",
+            "row": 3,
+            "usable": true,
+            "out": [
+                0,
+                8,
+                14,
+                18,
+                24,
+                28
+            ]
+        },
+        {
+            "song": "blank",
+            "row": 4,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                11,
+                13,
+                20,
+                25
+            ]
+        },
+        {
+            "song": "blank",
+            "row": 5,
+            "usable": true,
+            "out": [
+                0
+            ]
+        },
+        {
+            "song": "blank",
+            "row": 6,
+            "usable": true,
+            "out": [
+                0,
+                2,
+                7,
+                11
+            ]
+        },
+        {
+            "song": "bare",
+            "row": 0,
+            "usable": true,
+            "out": [
+                0,
+                8
+            ]
+        },
+        {
+            "song": "bare",
+            "row": 1,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "bare",
+            "row": 2,
+            "usable": true,
+            "out": [
+                0
             ]
         }
     ],
@@ -1618,6 +1996,174 @@
                 {
                     "row": 2,
                     "at": 3
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "start": null,
+            "keys": [
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right"
+            ],
+            "spots": [
+                {
+                    "row": 1,
+                    "at": 0
+                },
+                {
+                    "row": 3,
+                    "at": 0
+                },
+                {
+                    "row": 3,
+                    "at": 8
+                },
+                {
+                    "row": 3,
+                    "at": 14
+                },
+                {
+                    "row": 3,
+                    "at": 18
+                },
+                {
+                    "row": 3,
+                    "at": 24
+                },
+                {
+                    "row": 3,
+                    "at": 28
+                },
+                {
+                    "row": 4,
+                    "at": 0
+                },
+                {
+                    "row": 4,
+                    "at": 5
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "start": {
+                "row": 6,
+                "at": 0
+            },
+            "keys": [
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left"
+            ],
+            "spots": [
+                {
+                    "row": 5,
+                    "at": 0
+                },
+                {
+                    "row": 4,
+                    "at": 25
+                },
+                {
+                    "row": 4,
+                    "at": 20
+                },
+                {
+                    "row": 4,
+                    "at": 13
+                },
+                {
+                    "row": 4,
+                    "at": 11
+                },
+                {
+                    "row": 4,
+                    "at": 5
+                },
+                {
+                    "row": 4,
+                    "at": 0
+                },
+                {
+                    "row": 3,
+                    "at": 28
+                },
+                {
+                    "row": 3,
+                    "at": 24
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "start": {
+                "row": 4,
+                "at": 20
+            },
+            "keys": [
+                "Shift+Right",
+                "Shift+Right",
+                "Shift+Right",
+                "Shift+Right"
+            ],
+            "spots": [
+                {
+                    "row": 4,
+                    "at": 21
+                },
+                {
+                    "row": 4,
+                    "at": 22
+                },
+                {
+                    "row": 4,
+                    "at": 23
+                },
+                {
+                    "row": 4,
+                    "at": 25
+                }
+            ]
+        },
+        {
+            "song": "bare",
+            "start": null,
+            "keys": [
+                "Right",
+                "Right",
+                "Right",
+                "Right"
+            ],
+            "spots": [
+                {
+                    "row": 0,
+                    "at": 0
+                },
+                {
+                    "row": 0,
+                    "at": 8
+                },
+                {
+                    "row": 2,
+                    "at": 0
+                },
+                {
+                    "row": 2,
+                    "at": 0
                 }
             ]
         }
@@ -4160,6 +4706,707 @@
                 }
             ],
             "answer": true
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "put": "G",
+                "note": "a blank slide: its first chord. Its line is a line of chords alone with none yet"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 5,
+                "at": 0
+            },
+            "do": {
+                "key": 4,
+                "note": "the key 4, on a blank slide in the middle of a group"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 2,
+                    "element": "C",
+                    "line": 0,
+                    "names": [
+                        "C"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 5,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "put": "hello",
+                "note": "not a chord: refused, and nothing asked"
+            },
+            "asked": [],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": false
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "note": "a blank slide has nothing to take: nothing asked"
+            },
+            "asked": [],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": false
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "put": "G",
+                "then": {
+                    "put": "D",
+                    "at": 2
+                },
+                "note": "a second chord after the first: the line is asked for both"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G",
+                        "D"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 2,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "put": "G",
+                "then": {
+                    "take": true
+                },
+                "note": "put, and taken off again: asked for none, and the slide is blank as it was"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 3,
+                "at": 0
+            },
+            "do": {
+                "move": {
+                    "row": 1,
+                    "at": 0
+                },
+                "note": "from a word to a blank slide: put there, then taken from here, joined"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChords",
+                    "row": 1,
+                    "element": "B",
+                    "chords": [
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ],
+                    "joined": true
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": null
+        },
+        {
+            "song": "blank",
+            "spot": {
+                "row": 3,
+                "at": 17
+            },
+            "do": {
+                "copy": {
+                    "row": 5,
+                    "at": 0
+                },
+                "note": "with Ctrl held, onto a blank slide: put there, and left here"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 2,
+                    "element": "C",
+                    "line": 0,
+                    "names": [
+                        "C"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 5,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": null
+        },
+        {
+            "song": "bare",
+            "spot": {
+                "row": 2,
+                "at": 0
+            },
+            "do": {
+                "put": "D",
+                "note": "a slide with no text box: the line is asked for, with no id. Simple Presenter then adds a text box for it"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 1,
+                    "element": "",
+                    "line": 0,
+                    "names": [
+                        "D"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "(a text box added for the chords)",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "bare",
+            "spot": {
+                "row": 2,
+                "at": 0
+            },
+            "do": {
+                "put": "D",
+                "then": {
+                    "take": true
+                },
+                "note": "and taken off again: the text box that was added goes with it"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 1,
+                    "element": "",
+                    "line": 0,
+                    "names": [
+                        "D"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 1,
+                    "element": "(a text box added for the chords)",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "",
+                    "text": "",
+                    "chords": []
+                }
+            ],
+            "answer": true
         }
     ],
     "typing": [
@@ -5735,6 +6982,296 @@
                     ]
                 }
             ]
+        },
+        {
+            "song": "blank",
+            "title": "on a blank slide: a click opens the bubble, and a click on the same place while typing keeps the chord and opens on the next",
+            "steps": [
+                {
+                    "step": {
+                        "click": {
+                            "row": 1,
+                            "at": 0
+                        }
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 0
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 0
+                    }
+                },
+                {
+                    "step": {
+                        "typed": "G"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 0
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 0
+                    }
+                },
+                {
+                    "step": {
+                        "click": {
+                            "row": 1,
+                            "at": 0
+                        }
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChordsAlone",
+                            "row": 0,
+                            "element": "A",
+                            "line": 0,
+                            "names": [
+                                "G"
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 2
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                },
+                {
+                    "step": {
+                        "typed": "D"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 2
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Enter"
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChordsAlone",
+                            "row": 0,
+                            "element": "A",
+                            "line": 0,
+                            "names": [
+                                "G",
+                                "D"
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 2,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "title": "Tab on a blank slide keeps the chord and moves the spot on, to the new place after it",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 5,
+                            "at": 0
+                        },
+                        "press": "C"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 5,
+                        "at": 0
+                    },
+                    "boxHolds": {
+                        "text": "C",
+                        "selected": false
+                    },
+                    "spot": {
+                        "row": 5,
+                        "at": 0
+                    }
+                },
+                {
+                    "step": {
+                        "typed": "C"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 5,
+                        "at": 0
+                    },
+                    "boxHolds": {
+                        "text": "C",
+                        "selected": false
+                    },
+                    "spot": {
+                        "row": 5,
+                        "at": 0
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Tab"
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChordsAlone",
+                            "row": 2,
+                            "element": "C",
+                            "line": 0,
+                            "names": [
+                                "C"
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 5,
+                        "at": 2
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "copyPaste": [
@@ -7035,6 +8572,231 @@
                         {
                             "at": 7,
                             "name": "Am"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "title": "words onto a blank slide: nothing",
+            "copyAt": {
+                "row": 3,
+                "at": 0
+            },
+            "wholeGroup": false,
+            "copied": {
+                "lines": [
+                    [
+                        {
+                            "word": 0,
+                            "offset": 0,
+                            "name": "G"
+                        },
+                        {
+                            "word": 2,
+                            "offset": 3,
+                            "name": "C"
+                        }
+                    ]
+                ]
+            },
+            "said": [
+                "2 chords copied from the line: Ctrl+V puts them on the lines from the spot's on, word for word"
+            ],
+            "pasteAt": {
+                "row": 1,
+                "at": 0
+            },
+            "asked": [],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "song": "blank",
+            "title": "a blank slide's none, onto words: nothing",
+            "copyAt": {
+                "row": 1,
+                "at": 0
+            },
+            "wholeGroup": false,
+            "copied": {
+                "lines": [
+                    {
+                        "alone": []
+                    }
+                ]
+            },
+            "said": [
+                "0 chords copied from the line: Ctrl+V puts them on the lines from the spot's on, word for word"
+            ],
+            "pasteAt": {
+                "row": 3,
+                "at": 0
+            },
+            "asked": [],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "I once was lost",
+                    "chords": [
+                        {
+                            "at": 7,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "song": "intro",
+            "title": "a line of chords alone onto a line it empties and fills again: the same chords",
+            "copyAt": {
+                "row": 1,
+                "at": 0
+            },
+            "wholeGroup": false,
+            "copied": {
+                "lines": [
+                    {
+                        "alone": [
+                            "D",
+                            "G",
+                            "A"
+                        ]
+                    }
+                ]
+            },
+            "said": [
+                "3 chords copied from the line: Ctrl+V puts them on the lines from the spot's on, word for word"
+            ],
+            "pasteAt": {
+                "row": 1,
+                "at": 0
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "D",
+                        "G",
+                        "A"
+                    ],
+                    "joined": false
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        },
+                        {
+                            "at": 4,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": " ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
                         }
                     ]
                 }

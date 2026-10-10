@@ -552,6 +552,231 @@
                 }
             ],
             "text": "Amazing grace how sweet the sound\nThat saved a wretch like me"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "F#m"
+                },
+                {
+                    "at": 4,
+                    "name": "E"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 2,
+                    "name": "F#m"
+                },
+                {
+                    "at": 4,
+                    "name": "E"
+                }
+            ],
+            "text": "     "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 4,
+                    "name": "Am"
+                }
+            ],
+            "text": "​ ​ ​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "C"
+                },
+                {
+                    "at": 2,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                }
+            ],
+            "text": "​ ​\n​"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                },
+                {
+                    "at": 10,
+                    "name": "G"
+                },
+                {
+                    "at": 12,
+                    "name": "Em"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 4,
+                    "name": "D"
+                },
+                {
+                    "at": 8,
+                    "name": "C"
+                },
+                {
+                    "at": 10,
+                    "name": "G"
+                },
+                {
+                    "at": 12,
+                    "name": "Em"
+                }
+            ],
+            "text": "One two\n​ ​\nThree"
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 2,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "G"
+                },
+                {
+                    "at": 2,
+                    "name": "D"
+                }
+            ],
+            "text": "   "
+        },
+        {
+            "chords": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 20,
+                    "name": "D"
+                },
+                {
+                    "at": 24,
+                    "name": "G"
+                }
+            ],
+            "out": [
+                {
+                    "at": 0,
+                    "name": "D"
+                },
+                {
+                    "at": 4,
+                    "name": "G"
+                },
+                {
+                    "at": 7,
+                    "name": "A"
+                },
+                {
+                    "at": 20,
+                    "name": "D"
+                },
+                {
+                    "at": 24,
+                    "name": "G"
+                }
+            ],
+            "text": "Joy 🎉 to the world\nthe Lord is come"
+        },
+        {
+            "chords": [
+                {
+                    "at": 5,
+                    "name": "G"
+                },
+                {
+                    "at": 40,
+                    "name": "D"
+                }
+            ],
+            "out": [
+                {
+                    "at": 5,
+                    "name": "G"
+                },
+                {
+                    "at": 18,
+                    "name": "D"
+                }
+            ],
+            "text": "Joy 🎉 to the world"
         }
     ],
     "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
