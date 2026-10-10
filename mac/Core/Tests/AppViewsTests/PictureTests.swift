@@ -16,7 +16,7 @@
 // only a person can.
 
 import AppKit
-import AppViews
+@testable import AppViews
 import Song
 import SwiftUI
 import Testing
@@ -116,5 +116,48 @@ struct PictureTests {
         let model = mac.model()
         await model.start()
         try draw(LibraryWindow(model: model), named: "6 nothing found")
+    }
+
+    // ---- Earlier versions (spec/07-backups.md)
+
+    /// A made-up Mac on which Plain Song was changed nine days ago and two days ago.
+    private func macWithHistory() throws -> MadeUpMac {
+        let mac = try MadeUpMac()
+        try mac.change("Plain Song", daysAgo: 9) { try $0.setKey("E") }
+        try mac.change("Plain Song", daysAgo: 2) { song in
+            let box = song.textBoxes[0]
+            try song.setChords(slide: box.slide, element: box.element, [])
+        }
+        try mac.change("Holy Holy Holy", daysAgo: 30) { try $0.setKey("D") }
+        return mac
+    }
+
+    @Test("Earlier versions of a song, the first picked")
+    func earlierVersions() async throws {
+        let mac = try macWithHistory()
+        let model = await modelWithASongOpen(mac, song: "Plain Song")
+        model.showEarlierVersions()
+        model.pick(copy: model.earlier?.copies.last?.id)
+        try draw(EarlierVersionsPanel(model: model), named: "7 earlier versions", size: NSSize(width: 860, height: 520))
+    }
+
+    @Test("A song put back as it was: the mark, the button, and the offer to undo")
+    func justPutBack() async throws {
+        let mac = try macWithHistory()
+        let model = await modelWithASongOpen(mac, song: "Plain Song")
+        model.showEarlierVersions()
+        model.pick(copy: model.earlier?.copies.last?.id)
+        model.putBackPicked()
+        try draw(LibraryWindow(model: model), named: "8 just put back")
+    }
+
+    @Test("All Copies, in the settings")
+    func allCopies() async throws {
+        let mac = try macWithHistory()
+        try FileManager.default.removeItem(at: mac.place.appendingPathComponent("Libraries/Songs/Holy Holy Holy.pro"))
+        let model = AllCopiesModel(copies: mac.appData.copies())
+        model.read()
+        model.pick(song: "Sunday/Songs/Plain Song")
+        try draw(AllCopiesView(model: model), named: "9 all copies", size: NSSize(width: 940, height: 520))
     }
 }

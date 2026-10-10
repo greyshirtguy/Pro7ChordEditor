@@ -8,7 +8,7 @@
 //   marks.json      the marks worked out for each song (Marks.swift)
 //   log.txt         a line for each thing the app did
 //
-// The copies of files kept before a change are to go here too (milestone M4).
+//   Backups/        the copies of files kept before a change (Copies.swift)
 //
 // The log is for working out what happened when something has gone wrong. It has the
 // names of files in it and NEVER the words of songs, nor the names of chords.
@@ -59,6 +59,11 @@ public struct AppData: Sendable {
     public var settings: Settings {
         get { read(Settings.self, from: "settings.json") ?? Settings() }
         nonmutating set { write(newValue, to: "settings.json") }
+    }
+
+    /// The copies kept, which are in `Backups` here. `appVersion` is for their index.
+    public func copies(appVersion: String = "") -> Copies {
+        Copies(folder: folder.appendingPathComponent("Backups", isDirectory: true), appVersion: appVersion)
     }
 
     public var marks: KeptMarks {

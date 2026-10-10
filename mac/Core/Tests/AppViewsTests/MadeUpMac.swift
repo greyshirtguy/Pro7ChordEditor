@@ -57,6 +57,22 @@ final class MadeUpMac {
             proPresenterIsRunning: { [unowned self] in proPresenterIsRunning })
     }
 
+    /// Changes a song of the library as the app would, some days ago: with a copy kept
+    /// first, among the app's own things, dated then.
+    func change(_ name: String, in library: String = "Songs", daysAgo: Double, _ body: (OpenSong) throws -> Void) throws {
+        let copies = appData.copies(appVersion: "test")
+        let kept = KeptSong(place: "Sunday", library: library, name: name)
+        let then = Date().addingTimeInterval(-daysAgo * 86_400)
+        let song = try OpenSong(opening: place.appendingPathComponent("Libraries/\(library)/\(name).pro"), safeguards: Safeguards(
+            proPresenterIsRunning: { false },
+            keepCopy: { file, why in try copies.keep(file, of: kept, why: why, at: then) }))
+        try body(song)
+    }
+
+    func bytes(of name: String, in library: String = "Songs") throws -> Data {
+        try Data(contentsOf: place.appendingPathComponent("Libraries/\(library)/\(name).pro"))
+    }
+
     func library(_ name: String) -> Library.ID {
         Library(name: name, folder: place.appendingPathComponent("Libraries/\(name)", isDirectory: true)).id
     }

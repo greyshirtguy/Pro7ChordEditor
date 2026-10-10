@@ -38,6 +38,9 @@ public struct LibraryWindow: View {
                 .frame(minWidth: 380, maxWidth: .infinity)
         }
         .frame(minWidth: 860, minHeight: 440)
+        .sheet(isPresented: Binding(get: { model.earlier != nil }, set: { if !$0 { model.closeEarlierVersions() } })) {
+            EarlierVersionsPanel(model: model)
+        }
         .task { await model.start() }
         // When the app comes to the front the lists are read again: ProPresenter may
         // have added songs meanwhile, or been started or quit.
@@ -157,7 +160,7 @@ struct SongsPane: View {
             Divider()
             List(selection: Binding(get: { model.songID }, set: { model.open(song: $0) })) {
                 ForEach(model.listedSongs) { song in
-                    SongRow(name: song.name, marks: model.marks[song.id])
+                    SongRow(name: song.name, marks: model.marks[song.id], hasCopies: model.songsWithCopies.contains(song.name))
                         .tag(Optional(song.id))
                 }
             }
@@ -172,6 +175,7 @@ struct SongsPane: View {
 struct SongRow: View {
     var name: String
     var marks: Marks?
+    var hasCopies = false
 
     var body: some View {
         HStack(spacing: 6) {
@@ -179,6 +183,10 @@ struct SongRow: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer(minLength: 4)
+            if hasCopies {
+                Image(systemName: "clock.arrow.circlepath")
+                    .help("Earlier versions of this song are kept.")
+            }
             if let marks {
                 if marks.cannotBeRead {
                     Image(systemName: "exclamationmark.triangle")

@@ -17,8 +17,9 @@ final class Workbench {
     /// What the safeguards answer. A test sets these to try a refusal.
     var proPresenterIsRunning = false
     var copyCannotBeKept = false
-    /// Every copy the song asked to have kept: the file's bytes at that moment.
+    /// Every copy the song asked to have kept: the file's bytes at that moment, and why.
     private(set) var copiesKept: [Data] = []
+    private(set) var reasons: [CopyReason] = []
 
     init() throws {
         folder = FileManager.default.temporaryDirectory.appendingPathComponent(Self.prefix + UUID().uuidString, isDirectory: true)
@@ -39,9 +40,10 @@ final class Workbench {
     var safeguards: Safeguards {
         Safeguards(
             proPresenterIsRunning: { [unowned self] in proPresenterIsRunning },
-            keepCopy: { [unowned self] url in
+            keepCopy: { [unowned self] url, why in
                 if copyCannotBeKept { throw NoCopy() }
                 copiesKept.append(try Data(contentsOf: url))
+                reasons.append(why)
             })
     }
 

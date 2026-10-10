@@ -38,9 +38,9 @@ public final class OpenSong {
     /// file system said of it then. A save is refused if the disk no longer agrees.
     private var bytesOnDisk: Data
     private var stamp: SongFile.Stamp
-    /// The slides. They do not change while the song is open: nothing here adds a
-    /// slide, takes one away or moves one.
-    private let rows: [SlideRow]
+    /// The slides. They do not change while the song is open, but when a copy is put
+    /// back: nothing else here adds a slide, takes one away or moves one.
+    private var rows: [SlideRow]
     private let safeguards: Safeguards?
     /// Whether the copy that is kept before a first change has been kept.
     private var copyKept = false
@@ -86,8 +86,9 @@ public final class OpenSong {
 
     // ---- What the editors are handed
 
-    /// The song's name, as it is inside the file.
+    /// The song's name, and its id, as they are inside the file.
     public var name: String { presentation.name }
+    public var id: String { presentation.uuid.string }
 
     /// One entry for each text box that holds the song's words, in the order of the
     /// slides and, on a slide, of its boxes.
@@ -206,6 +207,46 @@ public final class OpenSong {
         try restore(forwards: true)
     }
 
+    /// "Put This One Back" (spec/07-backups.md, rules 19 to 22): makes the song's file
+    /// these bytes again, which are a copy of it kept earlier.
+    ///
+    /// It is a save, and so is refused while ProPresenter is running and unless the
+    /// file on disk is the one last read. First the file as it is now is copied, so that
+    /// putting back can itself be taken back: undoing it is only putting back that
+    /// copy, and there is no second mechanism. Then the bytes are written beside the
+    /// file and swapped in, exactly as they are and not as a song read and written
+    /// again, and read back. The song then starts afresh from the file: its history of
+    /// undo is empty, and what was put back is where it starts from.
+    ///
+    /// Bytes that are what the file is already are nothing to do.
+    public func putBack(_ bytes: Data) throws {
+        guard bytes != bytesOnDisk else { return }
+        let safeguards = try maySave()
+        // What is put back must be a song: a copy that cannot be read is not swapped in.
+        guard let copy = try? RVData_Presentation(serializedBytes: bytes) else {
+            throw Refusal.cannotBeRead("That copy", "it is not a presentation, or it is damaged.")
+        }
+        do {
+            try safeguards.keepCopy(url, .beforePuttingBack)
+        } catch {
+            throw Refusal.copyNotKept("\(error.localizedDescription)")
+        }
+        do {
+            try SongFile.write(bytes, over: url)
+        } catch {
+            throw Refusal.notSaved("\(error)")
+        }
+        presentation = copy
+        bytesOnDisk = bytes
+        stamp = (try? SongFile.stamp(of: url)) ?? stamp
+        rows = slideRows(of: copy)
+        undoSteps.removeAll()
+        redoSteps.removeAll()
+        // (A new sitting with the song: its next change asks for a copy again, and none
+        // is made if the newest kept is already what the file is.)
+        copyKept = false
+    }
+
     // ---- How a change is made
 
     private static func set(_ key: inout RVData_MusicKeyScale, to number: Int, minor: Bool) {
@@ -282,6 +323,18 @@ public final class OpenSong {
         }
     }
 
+    /// The first three things asked before anything is saved, in the order below (1 to
+    /// 3). Answers with the safeguards, or throws the refusal.
+    private func maySave() throws -> Safeguards {
+        guard let safeguards else { throw Refusal.onlyForReading }
+        if safeguards.proPresenterIsRunning() { throw Refusal.proPresenterIsRunning }
+        guard let now = try? SongFile.stamp(of: url), now == stamp,
+              let onDisk = try? Data(contentsOf: url), onDisk == bytesOnDisk else {
+            throw Refusal.changedByAnother
+        }
+        return safeguards
+    }
+
     /// Saves a new state of the song, and only then makes it the song. In order:
     ///
     ///   1. A song with no safeguards saves nothing.
@@ -296,15 +349,10 @@ public final class OpenSong {
     ///   5. The whole message is written beside the file and put in its place, and read
     ///      back.
     private func save(_ changed: RVData_Presentation) throws {
-        guard let safeguards else { throw Refusal.onlyForReading }
-        if safeguards.proPresenterIsRunning() { throw Refusal.proPresenterIsRunning }
-        guard let now = try? SongFile.stamp(of: url), now == stamp,
-              let onDisk = try? Data(contentsOf: url), onDisk == bytesOnDisk else {
-            throw Refusal.changedByAnother
-        }
+        let safeguards = try maySave()
         if !copyKept {
             do {
-                try safeguards.keepCopy(url)
+                try safeguards.keepCopy(url, .beforeAChange)
             } catch {
                 throw Refusal.copyNotKept("\(error.localizedDescription)")
             }

@@ -52,12 +52,29 @@ struct SongPane: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Divider()
-            Text(model.notice.isEmpty ? " " : model.notice)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+            HStack(spacing: 10) {
+                Text(model.notice.isEmpty ? " " : model.notice)
+                    .font(.callout)
+                    .foregroundStyle(model.refusal == nil ? .secondary : .primary)
+                    .lineLimit(model.refusal == nil ? 1 : 3)
+                    .fixedSize(horizontal: false, vertical: true)
+                if model.justPutBack != nil && model.refusal == nil {
+                    // Undoing a putting-back is only putting back the copy that was
+                    // made just before it. The offer goes after a few seconds; the copy
+                    // stays at the top of the earlier versions.
+                    Button("Undo") { model.takeBack() }
+                        .controlSize(.small)
+                        .help("Put the song back as it was a moment ago.")
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .task(id: model.justPutBack) {
+                guard model.justPutBack != nil else { return }
+                try? await Task.sleep(for: .seconds(8))
+                if !Task.isCancelled { model.forgetWhatWasPutBack() }
+            }
         }
         .background(Color(nsColor: .textBackgroundColor))
     }
@@ -69,6 +86,10 @@ struct SongPane: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer(minLength: 8)
+            if model.hasEarlierVersions {
+                Button("Earlier Versions") { model.showEarlierVersions() }
+                    .help("See this song as it was before it was changed here, and put a version back.")
+            }
             if shown.problem == nil {
                 if shown.key.isEmpty {
                     Text("No key")
