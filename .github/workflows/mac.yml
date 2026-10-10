@@ -24,6 +24,9 @@ jobs:
     name: Test and build
     # The newest macOS, for the newest Xcode: the generated reader needs Swift 6.1.
     runs-on: macos-26
+    # (It takes a few minutes. A test that hung would otherwise hold one of GitHub's
+    # Macs for six hours before anyone was told.)
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
 
