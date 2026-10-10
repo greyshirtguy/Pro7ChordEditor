@@ -4,8 +4,9 @@ The Mac app, being built first of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it finds ProPresenter's libraries on
 the Mac, lists their songs, and shows a song with its chords to be looked at. Under
 that, and with no window yet, are the rules of chords and the song itself: setting its
-chords and its key, saving safely, undo. **Nothing can be changed from the window
-yet**, and there is nothing to download.
+chords and its key, saving safely, undo. The copies it keeps of a file before changing
+it can be seen and put back. **No chord can be changed from the window yet**, and
+there is nothing to download.
 
 For macOS 15 and 26, built with Xcode 26.
 

@@ -13,7 +13,8 @@ milestone; put right what has become untrue.
 | **M1** The rules | Done, 2026-10-10 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the key fit and the old editor's shift. Every case of the fifteen vector files M1 is held to passes (some thirty thousand answers), with cases of our own for what no vector holds |
 | **M2** The song | Done, 2026-10-10 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files |
 | **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
-| **M4** The copies | Next | |
+| **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
+| **M5** The ChordPro editor | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -92,6 +93,16 @@ And at M3:
     read. Nothing is written in any folder of ProPresenter's.
 19. **The places the app finds are those whose songs are `.pro` files**: workspaces
     kept as folders, `ProPresenter` in Documents, and folders chosen by hand.
+
+And at M4:
+
+20. **A copy's folder has the place in it**: `Backups/<place>/<library>/<song>/`. The
+    page had none, from before there could be several places. `spec/07` says so now.
+21. **A copy is shown as its lines**, as a song is in the window, until the chord
+    sheet is built (M6).
+22. **The song is opened with its real safeguards now** (`LibraryModel.open`): whether
+    ProPresenter is running, and `Copies.keep`. M5 has nothing to add for a change to
+    be safe; it only has to ask for one.
 
 ## How it is laid out, and why
 
@@ -201,6 +212,19 @@ changing any of it:
   `Pro7ChordEditorPictures` in the system's temporary folder.
 - **A song is opened with no safeguards at M3**, so it cannot be changed. M5 hands it
   real ones: `ProPresenterApp.isRunning`, and the copies of M4.
+
+### The copies (M4)
+
+- **In `Song`**: `Copies.swift` is all of it: keeping, listing, thinning, saying when.
+  `OpenSong.putBack` is the putting back, and is a save like any other: it goes
+  through the same three questions (`maySave`) and writes with the same `SongFile.write`.
+- **In `AppViews`**: `LibraryModel` has the panel's state (`earlier`), `putBackPicked`
+  and `takeBack`; `EarlierVersionsPanel` shows it. `AllCopiesModel` and `AllCopiesView`
+  are the settings (Command+comma), wired in `App/Pro7ChordEditorApp.swift`.
+- **Only `Copies.thin` deletes anything**, only files in a song's folder of copies that
+  are named as copies, and never the oldest. If that is ever changed, look hard.
+- **Tests make history** with `MadeUpMac.change(_:daysAgo:)`, which changes a song as
+  the app would, with a copy kept first, dated then.
 
 ## What was found out
 
@@ -372,6 +396,21 @@ changing any of it:
   for its pane; a raw error code in the sentence for a file that cannot be read; "no
   songs in this library" where there was no library.
 
+### At M4
+
+- **How the proofs were shown to bite**: twenty-six breakages, one at a time. All
+  were caught but one, which was a rule with nothing to show it (after thinning, the
+  index still listed copies that were gone). It has a check now, and is caught.
+- **A put back and its taking back leave two copies more**, each "before putting back
+  a copy": a copy is held only against the NEWEST kept (rule 4), so the second is
+  made though an older copy has the same bytes. I had expected one; the rule is the
+  rule, and the page now says why.
+- **`Data.write` will not take "never write over a file" together with "atomically"**:
+  it stops the program. A copy is written with the first alone, then read back, and
+  cleared away if it did not come out whole.
+- **Three pictures were looked at** (the panel, the window just after a putting back,
+  All Copies) and nothing in them wanted changing.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -404,14 +443,19 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Putting a copy back is the first thing in the window that writes to a song's
+  file**, and it cannot be reached on a real Mac yet: there are no copies until
+  something changes a song, which is M5. So it has been tried only by the tests, on
+  made-up Macs. At M5, try it by hand on a COPY of a library first.
+- **All Copies reads every copy's folder each time the settings open.** Fine for
+  hundreds of songs; if it is ever slow, read it off the thread that draws.
 - **What only a hand on a mouse can tell, and nobody has yet** (M3): that the app
   opens and finds the library; what macOS asks the first time it reads Documents;
   that the lists keep up with typing in the search box and with clicks; that the
   band comes and goes as ProPresenter is started and quit; that the window's size is
   remembered; that Choose Folder does what it says. The pictures show the window as
   drawn, not as used.
-- **Not in M3, on purpose**: the marks "copies are kept" (M4) and "wants mending"
-  (M8); keeping a chord being typed when another song is clicked (rule 13: there is
+- **Not in M3, on purpose**: the mark "wants mending" (M8); keeping a chord being typed when another song is clicked (rule 13: there is
   no typing yet); playlists, search by a song's words, dropping a file on the window
   (the page's "later").
 - **The window's looks are a first go** at the page's proposal, to be tried and
