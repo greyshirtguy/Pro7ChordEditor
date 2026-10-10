@@ -119,11 +119,21 @@ so that chords can be put on it ([chords onto a blank slide](#chords-onto-a-blan
 - A slide with no text box at all is left out, as before. The app does not make text
   boxes.
 
-This is **new**, decided by the maintainer on 2026-10-10. Simple Presenter leaves
-every blank box out: an intro or an instrumental that someone made as an empty slide
-has then nowhere to take its chords. In the one library looked at, 27 slides of 383
-had a blank text box, many of them in groups named Ending, Intro and Bridge, and one
-slide had nothing on it at all. No file of `testdata/` has a blank slide yet.
+This is **new**, decided by the maintainer on 2026-10-10: an intro or an instrumental
+that someone made as an empty slide had nowhere to take its chords. In the one library
+looked at, 27 slides of 383 had a blank text box, many of them in groups named Ending,
+Intro and Bridge, and one slide had nothing on it at all. Simple Presenter shows blank
+slides since the change that followed (`reference/`), and `testdata/files` has a song
+made for them, Blank Slides.
+
+**Where Simple Presenter goes further.** It is an editor of slides and makes text
+boxes anyway, and a new slide made in it has nothing on it at all. So a slide with
+**no text box** is on its sheet as well: handed over as a blank box with no id, and
+given a text box when a chord is put there (a copy of the song's nearest text box
+with words, emptied). `as-read-by-simple-presenter.json` has such a slide with an
+empty `element`; the last slide of Blank Slides is one. As these pages stand, the
+apps here leave such a slide out and make no text boxes. Whether they are to do as
+Simple Presenter does is the maintainer's to say.
 
 `testdata/files/expected/as-read-by-simple-presenter.json` has every test file read
 this way: reading a file is right when it gives that.
@@ -205,12 +215,11 @@ custom_attributes {
   the chord again on the next line, which is why what is written matters.
 
   (The first half of the rule was decided by the maintainer on 2026-10-10, on that
-  evidence. Simple Presenter runs the range of a chord on a line of chords alone on to
-  the next chord, over the em quad, as on a line of words, and `ranges.json` and the
-  test files were made from it. It is to be changed and they are to be made again
-  ([testdata/README.md](../testdata/README.md), "To be made again"). The Mac app has
-  the rule already, and knows one case of that file as made before it. Whether
-  ProPresenter draws the two any differently is **not known**.)
+  evidence. Up to its version 0.82 Simple Presenter ran the range of a chord on a line
+  of chords alone on to the next chord, over the em quad, as on a line of words. It
+  writes it one long now, as the Mac app has done since the day of the decision, and
+  `ranges.json` and the test files were made again from it. Whether ProPresenter draws
+  the two any differently is **not known**.)
 - A `start` or `end` of 0 is simply absent from the bytes. That is Protocol Buffers'
   way and needs no care.
 
@@ -294,6 +303,19 @@ If the song has no other box to take an opening from, the change is refused, wit
 sentence that says why. Taking the last chord off again leaves the box with that
 opening and no words: blank to look at as it was, and still shown as a blank slide.
 Undo puts the bytes back as they were.
+
+**A change of mind, as the maintainer asked it of Simple Presenter** (2026-10-10):
+"only add when needed - when user adds a chord to a blank slide - and leaves the
+chord(s) there! (if a textbox was automatically added - but the user changes mind and
+removes the chords - during that edit session - dont leave the added textbox behind -
+no need to track that particular state after a save". Simple Presenter does this:
+while a song is open in its editor it remembers each blank box's text as the file had
+it before the first chord, and taking the last chord off again puts that back, so the
+file is byte for byte what it was (a text box it had to add is taken off the slide).
+Once the song is closed it remembers nothing: chords taken off another day leave the
+box empty, as the paragraph above has it. That goes one step past "leaves the box
+with that opening": whether the apps here are to do the same is the maintainer's to
+say, and it is cheap to do, the bytes being in hand for undo already.
 
 **A guess**, until it has been seen in ProPresenter: that a box so written shows its
 chords on a stage screen as an intro from Multitracks does, its text being the same

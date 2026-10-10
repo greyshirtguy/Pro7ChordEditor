@@ -25,22 +25,41 @@ U+2001 (an em quad). Compare strings unit by unit.
 
 ## `songs/`
 
-Five small ChordPro files, written to try the rules for reading one
+Seven small ChordPro files, written to try the rules for reading one
 ([`spec/09-chordpro-files.md`](../spec/09-chordpro-files.md)): directives and none, parts
 named every way, a line of chords alone, chords in the middle of words, a section of
 tablature to pass over, and one with Windows line ends. Their words are hymns long
 out of copyright (Amazing Grace, 1779; Holy, Holy, Holy, 1826; It Is Well, 1873) and
 made-up lines; the chords are plain ones put on for the purpose.
 
+Two of them are for one thing each. `headings.cho` is the corners of what a heading
+is, what a gap does inside a marked part, and which artist stands; it is read
+(`parse-song.json`) and not made into a presentation. `blank-slides.cho` is what
+Blank Slides is made from: where a blank slide is to be it has a line of one chord
+alone, which is taken off again once the song is made (below).
+
 ## `files/`
 
 Presentations, as `.pro` files.
 
-- **`made-by-simple-presenter/`**: the five songs, each brought in by Simple
-  Presenter's ChordPro import (two lines to a slide; four for It Is Well). They are
-  what a clean song with chords looks like, as far as that app knows how to write one.
-  **None of them was written by ProPresenter**, and none has been opened in it. The
-  first real one is asked of the maintainer in [`spec/11-plan.md`](../spec/11-plan.md).
+- **`made-by-simple-presenter/`**: six songs, each brought in by Simple
+  Presenter's ChordPro import (two lines to a slide; four for It Is Well; one for
+  Blank Slides). They are what a clean song with chords looks like, as far as that
+  app knows how to write one. **None of them was written by ProPresenter**, and none
+  has been opened in it. The first real one is asked of the maintainer in
+  [`spec/11-plan.md`](../spec/11-plan.md).
+
+  **Blank Slides** has seven slides, three of them blank
+  ([`spec/01-file-format.md`](../spec/01-file-format.md), "A blank slide"): its
+  intro, and the third of its verse's five slides, each have a text box with no text
+  in it;
+  and its ending has nothing on it at all, no text box either, which only Simple
+  Presenter hands over (with an empty `element`). They were made in Simple
+  Presenter's editor after the import (`tools/simple-presenter-scripts/import.qml`
+  says how), so the two empty text boxes were written by it: their RTF still names a
+  font, where a blank text box left by ProPresenter is an RTF with no font in it at
+  all. A song with a blank slide that ProPresenter made is still wanted
+  ([`spec/11-plan.md`](../spec/11-plan.md), before M7).
 - **`as-the-old-windows-app-left-them/`**: four of them as the first Windows editor
   would have saved them, each with a different fault
   ([`spec/08-repair.md`](../spec/08-repair.md)). They are named as it named its copies,
@@ -55,11 +74,8 @@ Presentations, as `.pro` files.
   like, and it is unlike the others in two ways that matter: its cues are **not** in
   the order its groups name them, and every one of its text boxes has a link (of the
   kind that says when the box is to be seen, which leaves a box its own words). Its
-  groups have colours. Its description in `expected/` was made by
-  `tools/look.py --json`, with `"folder"` added as `make-fixtures.py` adds it; that
-  tool does not know this folder yet, and
-  `as-read-by-simple-presenter.json` does not have this file yet ("To be made again",
-  below).
+  groups have colours. `make-fixtures.py` describes it in `expected/` with the others,
+  and `as-read-by-simple-presenter.json` has it as Simple Presenter reads it.
 - **`expected/`**: what is in each file.
   - `<name>.json`: its words and every chord with its range as the file has it, by
     `tools/look.py --json`, which reads the file through `protoc`.
@@ -95,70 +111,67 @@ python3 tools/make-fixtures.py
 disagree; `make-fixtures.py` checks its reader of RTF the same way. Run them in that
 order.
 
-## To be made again, and cases wanted
+## Made again on 2026-10-10, and what is still wanted
 
-What has been decided or found since this data was made, that it does not yet hold.
-Each needs Simple Presenter or a tool changed first, on the Linux machine; nothing here
-is to be put right by editing a file of answers.
+What stood under this heading as "to be made again, and cases wanted" was asked for by
+the session that builds the Mac app. It was done the same day on the Linux machine,
+from Simple Presenter as it was changed for it
+([`reference/README.md`](../reference/README.md)). Nothing was edited by hand.
 
-**1. The range of a chord on a line of chords alone** is to be one long, its stand-in
-only, as Multitracks writes it ([`spec/01-file-format.md`](../spec/01-file-format.md),
-Chords; decided 2026-10-10). Three chords on such a line are 0 to 1, 2 to 3, 4 to 5,
-not 0 to 2, 2 to 4, 4 to 5.
+**1. The range of a chord on a line of chords alone** is one long, its stand-in only,
+as Multitracks writes it. Changed: `chords::ranges` in Simple Presenter, and
+`right_ranges` in `tools/make-fixtures.py`, which is the same rule in Python and now
+holds itself to `ranges.json` each time it runs. Made again: `vectors/ranges.json`,
+with more cases of it (stand-ins that are spaces, fewer chords than stand-ins, two
+such lines in one box, one between lines of words, a line that is only spaces); every
+clean file and its damaged twin; `files/expected/` and `repairs.json`.
 
-- Simple Presenter: `chords::ranges`, and what `chords.h` says of it. On a line that
-  `isPlaceholders`, a chord's range ends one after it starts.
-- `tools/make-fixtures.py`: `right_ranges`, which is the same rule in Python and is
-  what mending check 1 writes.
-- Then, made again: `vectors/ranges.json`; the three clean files that have such a line
-  (Amazing Grace, It Is Well, Plain Song) and their damaged twins; `files/expected/`,
-  `repairs.json` with it.
-- The Mac app has the rule already (the maintainer's word, 2026-10-10: not to wait).
-  One case of `ranges.json` is therefore known to it as made before the decision, and
-  its tests say exactly what they allow of that case and fail when the file has been
-  made again, so that the allowance is taken out
-  (`mac/Core/Tests/ChordRulesTests/ChordsInABoxTests.swift`). The Windows app should
-  not need one: by then the file will be new.
+The Mac app had the rule first, and its test of `ranges.json` allowed for the one
+case that was made the old way, so as to fail when the file was made again
+(`mac/Core/Tests/ChordRulesTests/ChordsInABoxTests.swift`). It fails now: the
+allowance is to be taken out, and there is more than one such case to hold to.
 
-**2. Blank slides** are to be shown, and to take chords
-([`spec/01-file-format.md`](../spec/01-file-format.md), "A blank slide"; decided
-2026-10-10). Simple Presenter leaves them out, and nothing here has one. Wanted, once
-it has them: a test song with a blank slide in it (an intro made as an empty slide,
-and a blank slide in the middle of a group), in `files/` and in
-`as-read-by-simple-presenter.json`; and in `vectors/sheet-model.json`, the rows such a
-song makes, where the spot can stand on its blank row, and what is asked when a chord
-is put there.
+**2. Blank slides.** Simple Presenter shows them and puts chords on them. New:
+`songs/blank-slides.cho` and `files/made-by-simple-presenter/Blank Slides.pro` (above),
+in `as-read-by-simple-presenter.json`, where every text box now says whether it is
+`blank`; and in `vectors/sheet-model.json` the songs `blank` (its rows, where the spot
+stands and walks, and what is asked when a chord is put on a blank line, typed there,
+moved there and taken off again) and `bare` (a slide with no text box, which is
+Simple Presenter's own: [`spec/01-file-format.md`](../spec/01-file-format.md), "Where
+Simple Presenter goes further").
 
 **3. The file ProPresenter wrote**, `files/made-by-propresenter/Rock Of Ages
-(Toplady).pro`, is to be read by Simple Presenter into
-`as-read-by-simple-presenter.json` like the others: twelve text boxes, in the hymn's
-order, three to each of four verses. (Simple Presenter leaves out a box with a link,
-but for a link that only says when the box is to be seen; if it hands over none of
-these, that is a thing to put right there.) And `tools/make-fixtures.py` is to be
-taught the folder, as a third kind beside the clean and the damaged, so that it
-describes the file in `expected/` and does not take it for a damaged one.
+(Toplady).pro`, is read by Simple Presenter into `as-read-by-simple-presenter.json`
+like the others. `tools/make-fixtures.py` knows the folder as a third kind beside the
+clean and the damaged: it describes the file in `expected/`, makes no damaged twin of
+it, and leaves it out of `repairs.json`.
 
-**4. Rules that no vector holds.** Found while the Mac app's rules were built: with
-every vector passing, each rule was broken in one small way in turn, and these could
-be got wrong without any file here noticing. The Mac app holds each with a case of its
-own (`mac/Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift`), whose expected
-answer was read from the reference's code and not got from it. Put these inputs into
-`tools/make-vectors` and `tools/keyfit.py`, and the answers will be the reference's
-own, for both apps.
+**4. The rules that no vector held.** Every input of the list that stood here is in
+`tools/make-vectors/main.cpp` or `tools/keyfit.py` now, and its answer is the
+reference's own:
 
-| Where | Input wanted | The rule it holds |
-| --- | --- | --- |
-| `chord-names.json` | `G#b5` | A flat after a sharp is not part of the note |
-| `chord-names.json`, `transposed.json` | `C/Em`, `c/em` | What follows the last slash is a bass only if it is a note and nothing more |
-| `transposed.json` | `g` from C to C; a chord with a music flat in it, from E to E | The same key twice gives the chord back exactly as written |
-| `carried.json` | The same words before and after, two chords in one place | Unchanged words are only tidied, so the later of the two stands |
-| `carried.json` | `abab` to `ab`, a chord at 2 | The shared end is not looked for inside the shared start |
-| `chordpro.json`, `toText` | Three lines, the middle one empty, a chord on it | A chord on an empty line is written on that line |
-| `chordpro.json`, `withoutChords` | A `[` with a line break before its `]`; `[[G]]` | A bracket is not closed on another line, nor round another bracket |
-| `parse-song.json` (a sixth song) | Two `{artist}` lines; an empty line inside `{start_of_chorus}`; a line starting `[G]` and two spaces; the headings `CHORUS:`, `verse 2b`, `pre-chorus 2:`, `[PRE CHORUS]`; and `Verse 2bb` and `Chorus of angels`, which are not headings | The first artist stands; a gap in a marked part; chords move with trimmed words; what a heading is |
-| `rtf-text.json` | A group that sets the count of characters to pass over to nought, and after the group a numbered character with one stand-in after it | That count is a group's own, put back when the group closes |
-| `key-fit.json` | A stated key 0.2, exactly 0.25, and 0.3 below the best; a song whose best score is 0.6; E flat's chords written in sharps, with C minor used as often; a chord with the little circle | "More than a quarter below"; "at least 0.75"; the major before its relative minor; the circle is diminished |
-| `tidy.json`, `ranges.json`, `carried.json`, `chordpro.json` | Words with an emoji in them | Places are UTF-16 units. Only `rtf-text.json` has a character from beyond the first 65,536 |
+| In | What was added |
+| --- | --- |
+| `chord-names.json` | `G#b5`, `C/Em`, `c/em` |
+| `transposed.json`, `odd` | `C/Em` and `c/em` moved a tone; `g`, a chord with a music flat in it, and `f#m/a`, each from a key to the same key |
+| `carried.json` | The same words before and after with two chords in one place; `abab` to `ab` with a chord at 2, and with a chord on every letter; words with a character of two places put in, and taken out |
+| `chordpro.json` | `toText`: three lines, the middle one empty, with a chord on it. `ofText` and `withoutChords`: a `[` with a line break before its `]`, `[[G]]`, `[G[D]]` |
+| `parse-song.json` | A sixth song, `headings.cho` (and a seventh, `blank-slides.cho`, which is plain) |
+| `rtf-text.json` | A group that sets the count of characters to pass over to nought, and after it a numbered character with one stand-in |
+| `key-fit.json` | A stated key 0.2, exactly 0.25 and 0.3 below the best; a song whose best key has three chords of five; E flat's chords written with sharps and C minor as often; a diminished chord written with the little circle |
+| `tidy.json`, `ranges.json`, `carried.json`, `chordpro.json` | Words with a character from beyond the first 65,536 in them |
+
+Where a case of `mac/Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift` and a
+vector now say the same, the case can go, as that file's notes have it. Where they do
+not say the same, the vector is what the reference answers.
+
+**Still wanted**
+
+- A song with a blank slide in it that ProPresenter itself made, of words anyone may
+  use: the blank text boxes of Blank Slides were written by Simple Presenter
+  ([`spec/11-plan.md`](../spec/11-plan.md), before M7).
+- A test file whose chords are not in order of place in the file: the Mac app's notes
+  say no file here would notice that rule being left out.
 
 ## What must not come in here
 

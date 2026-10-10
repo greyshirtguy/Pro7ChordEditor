@@ -2,8 +2,11 @@
 
 The source of the chord editor of
 [Simple Presenter](https://github.com/greyshirtguy/Simple-Presenter), as it was at
-version 0.82 (commit `ff9219f`). It is here to be **read**: not built, not changed,
-not copied line for line into another language where that language has a better way.
+commit `1311d80` (2026-10-10, after version 0.82): with the two changes of that day,
+which write a chord with no words over its own stand-in only and let a blank slide
+take chords. The vectors in `testdata/` were made from the same commit. It is here to
+be **read**: not built, not changed, not copied line for line into another language
+where that language has a better way.
 It is the same person's work, under the same licence (`simple-presenter/LICENSE`).
 
 It is C++ and QML, for Qt. Neither new app uses Qt. But the rules are plain functions
@@ -50,11 +53,16 @@ it does not, each time under a heading or a rule that says so. The main ones:
   (`spec/09-chordpro-files.md`).
 - There is a second key, the one ProPresenter shows the song in
   (`spec/05-song-and-saving.md`).
-- A chord on a line of chords alone is written with a range one character long, its
-  stand-in only, as Multitracks writes it. This code runs it on to the next chord
-  (`chords::ranges`). Simple Presenter is to be changed to match, and the vectors made
-  again (`spec/01-file-format.md`, Chords; `testdata/README.md`, "To be made again").
-- A blank slide is shown, and chords can be put on it. This code leaves a blank text
-  box out (`PresentationEditor::song`), so an intro made as an empty slide can take no
-  chords (`spec/01-file-format.md`, "A blank slide" and "Chords onto a blank slide").
+- A blank slide's first chords are written into its text box here with the box's own
+  font, size and colour, which the file keeps in `text.attributes` for an empty box
+  too (all 229 blank boxes looked at on the Linux machine had them), and the RTF is
+  written whole from that. `spec/01-file-format.md` has the apps take the opening of a
+  neighbouring box's RTF instead, since they write no RTF of their own.
+- A slide with no text box at all is on this code's sheet, and is given a text box
+  when a chord is put there (`PresentationEditor::song` and `setChordsAlone`). The
+  apps leave such a slide out (`spec/01-file-format.md`, "Where Simple Presenter goes
+  further").
+- Taking the last chord off a blank slide again, while the song is open, leaves the
+  file byte for byte as it was (`m_madeForChords`). The pages have the box left empty
+  (`spec/01-file-format.md`, "A change of mind").
 - Everything about the library, the copies and the mending is new.

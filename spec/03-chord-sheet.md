@@ -48,8 +48,10 @@ The sheet is a list of rows made from the song's text boxes
    ([01-file-format.md](01-file-format.md)): its box has no words, so it is one empty
    line, and it is usable. It is a line of chords alone with none yet: rule 13 draws
    it, rule 22 gives it its one stop, and a chord put there asks the song for "this
-   line of chords alone now has these". (**New.** Simple Presenter leaves blank slides
-   out, so `sheet-model.json` has none; hold this to cases of your own until it has.)
+   line of chords alone now has these". (**New**, and in Simple Presenter
+   since 2026-10-10: `sheet-model.json` has it in the song `blank`. Its song `bare` is
+   a slide with no text box, which is Simple Presenter's own:
+   [01-file-format.md](01-file-format.md), "Where Simple Presenter goes further".)
 5. Each slide's line rows know how many they are, which is the first and which the
    last, and the sheet knows the greatest number any slide has. That is what the cards
    are sized by.

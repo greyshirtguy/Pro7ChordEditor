@@ -34,8 +34,10 @@ the slides and, on a slide, of its boxes:
 typing bubble's offers go by.
 
 `testdata/files/expected/as-read-by-simple-presenter.json` has this for every test
-file. (But for blank slides: Simple Presenter hands none over, and no test file has
-one yet.)
+file, the blank slides of Blank Slides among them. (Its last slide has no text box at
+all, and is there with an empty `element`: that one is Simple Presenter's own, and an
+app that makes no text boxes hands nothing over for it.
+[01-file-format.md](01-file-format.md), "Where Simple Presenter goes further".)
 
 A group's colour: the file's cue group has one if someone set it in ProPresenter.
 Most have none, and ProPresenter then colours the group by its *name*, from a list it

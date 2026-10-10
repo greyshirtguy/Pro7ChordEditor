@@ -38,6 +38,15 @@ attributes it took out only the chords that had a name, leaving the others as th
 were and in their order, with the new chords after them. (Read from the code. Not
 tried.)
 
+**And one thing that is not its doing.** Simple Presenter, from its version 0.8 to
+0.82, ran the range of a chord on a line of chords alone on to the next chord (0 to 2,
+2 to 4, 4 to 5), where Multitracks has each one long
+([01-file-format.md](01-file-format.md), Chords). A song chorded or brought in there
+has such ranges on its lines of chords alone. They do not run over a line break, so
+check 1 does not find them, and nothing is known to go wrong by them. They are not
+marked and not mended: they are written right whenever that box's chords are next
+changed.
+
 ## Check 0: chords that are not on a character
 
 A chord whose place is past the end of its box's words, or on a line break.
