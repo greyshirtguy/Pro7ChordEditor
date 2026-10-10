@@ -12,7 +12,8 @@ milestone; put right what has become untrue.
 | **M0** Setting up | Done, 2026-10-10 | The package and its three layers, empty; the generated reader; nine tests; the Xcode project and an app with one window; the workflow |
 | **M1** The rules | Done, 2026-10-10 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the key fit and the old editor's shift. Every case of the fifteen vector files M1 is held to passes (some thirty thousand answers), with cases of our own for what no vector holds |
 | **M2** The song | Done, 2026-10-10 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files |
-| **M3** The library | Next | |
+| **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
+| **M4** The copies | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -82,6 +83,16 @@ And at M2, by saying go to its plan:
     say nothing else may come in, and whose bytes hold nothing of anyone's: it was
     looked through first. `testdata/README.md` describes it.
 
+And at M3:
+
+17. **The window is a library of the package**, `AppViews`, with no `@main` in it,
+    so that `swift test` draws it into pictures. The Xcode target is the few lines
+    that show it.
+18. **ProPresenter's settings are read at run time**, to find workspaces, and only
+    read. Nothing is written in any folder of ProPresenter's.
+19. **The places the app finds are those whose songs are `.pro` files**: workspaces
+    kept as folders, `ProPresenter` in Documents, and folders chosen by hand.
+
 ## How it is laid out, and why
 
 ```
@@ -91,10 +102,12 @@ mac/
   Core/                       one Swift package: everything with no window in it
     Sources/ChordRules/         the rules (M1)                  no protobuf, no AppKit
     Sources/ProFormat/          the generated reader of a .pro  nothing by hand
-    Sources/Song/               the song, the copies, the checks (M2 on)
+    Sources/Song/               the song, the library; the copies, the checks (M2 on)
+    Sources/AppViews/           the window: its model and its views (M3 on)
     Tests/TestData/             how tests find testdata/
     Tests/ChordRulesTests/      held to testdata/vectors
     Tests/SongTests/            held to testdata/files
+    Tests/AppViewsTests/        the window's model, and pictures of the window
     generate-proto.sh           what made Sources/ProFormat/Generated
 ```
 
@@ -171,6 +184,23 @@ changing any of it:
 - **Tests** work in `Workbench`: a folder of its own under the system's temporary
   folder, with copies of the test files and safeguards a test can set. Nothing is ever
   saved into `testdata/`.
+
+### The library and the window (M3)
+
+- **In `Song`, with no window**: `Places.swift` (finding), `Listing.swift` (libraries,
+  songs, search), `Marks.swift`, `AppData.swift` (the app's own folder), `SongText.swift`
+  (a song as lines of text: what is shown now, and what the ChordPro editor will work
+  on at M5).
+- **In `AppViews`**: `LibraryModel` is everything the window shows and does, with no
+  drawing in it, and is tested so. The views only show it. `LibraryModel`, the finder
+  and the song are each handed what they would otherwise ask the Mac for, so that
+  tests hand them a made-up Mac (`Tests/AppViewsTests/MadeUpMac.swift`).
+- **To see the window**: `PRO7_PICTURES=/some/folder swift test --package-path mac/Core
+  --filter PictureTests`, then open the PNGs. Do this after any change to how
+  something is drawn, and say what was seen. Without the variable they go to
+  `Pro7ChordEditorPictures` in the system's temporary folder.
+- **A song is opened with no safeguards at M3**, so it cannot be changed. M5 hands it
+  real ones: `ProPresenterApp.isRunning`, and the copies of M4.
 
 ## What was found out
 
@@ -316,6 +346,32 @@ changing any of it:
   on a file that may not be changed (the new file is then cleared away). Both are
   tests.
 
+### At M3
+
+- **How ProPresenter 21 records its workspaces** is in `spec/06`, rule 3: a list in
+  its own settings, under `userWorkspaces`. Read with `CFPreferencesCopyAppValue`,
+  which an app that is not sandboxed may do for another's settings.
+- **On this Mac the finder finds two places**: the workspace in use (1 library, 2
+  songs) and `ProPresenter` in Documents (10 libraries, 422 songs, 19 of them with
+  chords, 3 the old editor's copies, none that cannot be read). The folder the
+  settings name is the workspace, so it is shown once.
+- **The marks of all 422 songs are worked out in a quarter of a second** (an
+  optimised build). They are still done in the background and kept, as the page
+  asks: a library on a slow disk is another matter.
+- **ProPresenter's helper programs go on running after it has quit.** They have
+  bundle identifiers of their own, and asking for the app's own does not count them:
+  checked with ProPresenter quit and two helpers running.
+- **Drawing the window off the screen** (`spec/10`): `cacheDisplay` of an
+  `NSHostingView` in a window never shown draws lists, fields and buttons. A
+  sidebar's see-through material comes out blank, which is why the three panes are
+  plain `HSplitView` panes with grounds of their own and not a `NavigationSplitView`.
+- **A view that scrolls both ways centres what is smaller than itself.** The song is
+  given the pane's size as its least size to sit at the top left. Seen in a picture,
+  and put right.
+- **The four things the first pictures showed wrong**: that; a quiet line too long
+  for its pane; a raw error code in the sentence for a file that cannot be read; "no
+  songs in this library" where there was no library.
+
 ### Rules the vectors do not hold
 
 Found by breaking the rules (above). Each has a case in
@@ -353,14 +409,18 @@ vectors have them, the cases here that say the same can go.
   `RTFWords.swift`: what Qt's reader of numbers makes of two characters after a
   backslash and an apostrophe that are not two hexadecimal digits. Nothing is known to
   write such a thing.
-- **`mac/Core` is built and tested without Xcode; the app has not been touched at
-  M1.** It still shows its one window.
-- **No test draws a picture yet.** There is nothing to draw but a line of text. Where
-  the views and their picture tests are to live is to be settled at M3, when there is
-  a first real view. My proposal: a fourth library in `Core` for the views (SwiftUI
-  and AppKit, no `@main`), so that `swift test` draws them and the Xcode target stays
-  an `App` struct and an `Info.plist`. It bends "the app is a thin third thing" only
-  by making it thinner. The maintainer's to say.
+- **What only a hand on a mouse can tell, and nobody has yet** (M3): that the app
+  opens and finds the library; what macOS asks the first time it reads Documents;
+  that the lists keep up with typing in the search box and with clicks; that the
+  band comes and goes as ProPresenter is started and quit; that the window's size is
+  remembered; that Choose Folder does what it says. The pictures show the window as
+  drawn, not as used.
+- **Not in M3, on purpose**: the marks "copies are kept" (M4) and "wants mending"
+  (M8); keeping a chord being typed when another song is clicked (rule 13: there is
+  no typing yet); playlists, search by a song's words, dropping a file on the window
+  (the page's "later").
+- **The window's looks are a first go** at the page's proposal, to be tried and
+  changed with the maintainer.
 - **Nothing checks that `Generated/` matches the submodule.** The workflow could
   generate again and compare, but GitHub's Mac would then need the same `protoc` and
   `protoc-gen-swift` as made it, to the version. Not worth it yet.
