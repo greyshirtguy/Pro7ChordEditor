@@ -5,7 +5,7 @@
 //
 //     swift test --package-path mac/Core
 //
-// Three libraries, each knowing only of those above it in this list
+// Four libraries, each knowing only of those above it in this list
 // (spec/10-platforms.md, "The Mac app"):
 //
 //   ChordRules   What a chord is, keys, moving to another key, where a chord stands
@@ -15,14 +15,20 @@
 //                of ProPresenter's format. Nothing in it is written by hand except the
 //                file that says so.
 //   Song         A song as the editors see it: opening a file, its text boxes, setting
-//                chords and the key, saving safely, undo, and later the copies and the
-//                checks. On top of the other two. Held to testdata/files.
+//                chords and the key, saving safely, undo; finding ProPresenter's
+//                libraries and listing them; and later the copies and the checks. On
+//                top of the other two. No window in it. Held to testdata/files.
+//   AppViews     The window: what it shows and what a click does, in SwiftUI and
+//                AppKit, with no `@main` in it. It is a library so that `swift test`
+//                can draw its views into pictures to be looked at
+//                (spec/10-platforms.md, "Seeing what you have drawn").
 //
-// The app (../App, built by ../Pro7ChordEditor.xcodeproj) is a thin fourth thing on
-// top of Song. It is not in this package, because an app with an Info.plist and a
-// signature is Xcode's to build, not the package manager's.
+// The app (../App, built by ../Pro7ChordEditor.xcodeproj) is a thin fifth thing: the
+// few lines that start it and show AppViews' window. It is not in this package,
+// because an app with an Info.plist and a signature is Xcode's to build, not the
+// package manager's.
 //
-// One package and not three: one `swift test`, one Package.resolved, and the layers
+// One package and not several: one `swift test`, one Package.resolved, and the layers
 // are still kept apart, because a target can only import what it names below.
 //
 // swift-protobuf is the one dependency, named by the spec. Add no other without the
@@ -38,6 +44,7 @@ let package = Package(
         .library(name: "ChordRules", targets: ["ChordRules"]),
         .library(name: "ProFormat", targets: ["ProFormat"]),
         .library(name: "Song", targets: ["Song"]),
+        .library(name: "AppViews", targets: ["AppViews"]),
     ],
     dependencies: [
         // Not older than the protoc-gen-swift that made Sources/ProFormat/Generated
@@ -59,6 +66,8 @@ let package = Package(
             ]
         ),
 
+        .target(name: "AppViews", dependencies: ["ChordRules", "Song"]),
+
         // How the tests find testdata/ at the top of the repository. Not a test target
         // itself: both of those use it.
         .target(name: "TestData", path: "Tests/TestData"),
@@ -73,5 +82,6 @@ let package = Package(
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ]
         ),
+        .testTarget(name: "AppViewsTests", dependencies: ["AppViews", "ChordRules", "Song", "TestData"]),
     ]
 )

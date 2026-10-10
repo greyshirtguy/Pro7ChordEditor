@@ -68,9 +68,15 @@ public final class OpenSong {
         do {
             bytes = try Data(contentsOf: url)
             self.stamp = try SongFile.stamp(of: url)
+        } catch {
+            // (The system says why in its own words: there is no such file, or it may
+            // not be read.)
+            throw Refusal.cannotBeRead(url.lastPathComponent, error.localizedDescription)
+        }
+        do {
             self.presentation = try RVData_Presentation(serializedBytes: bytes)
         } catch {
-            throw Refusal.cannotBeRead(url.lastPathComponent, "\(error.localizedDescription)")
+            throw Refusal.cannotBeRead(url.lastPathComponent, "it is not a presentation, or it is damaged.")
         }
         self.url = url
         self.bytesOnDisk = bytes

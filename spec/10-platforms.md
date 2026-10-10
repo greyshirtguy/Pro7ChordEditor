@@ -48,6 +48,9 @@ A place in a song's words is a number of **UTF-16 units**
   ([05-song-and-saving.md](05-song-and-saving.md)), the copies and the checks are a
   second package or target on top of it, also without a window. The app is a thin
   third thing. An agent can build and prove the first two without ever opening Xcode.
+  (As built: the window itself is a library of the same package too, with no `@main`
+  in it, so that the command-line tests can draw it into pictures; and the app is a
+  few lines that show it.)
 - Files are read with [swift-protobuf](https://github.com/apple/swift-protobuf), the
   Swift code generated from `proto/autogen-proto` by its plug-in at build time, or
   generated once and kept in the repository with the command that made it written
@@ -106,7 +109,11 @@ tests that **draw into pictures**:
 
 - **Mac**: render the view off screen (`ImageRenderer` for a SwiftUI view, or
   `NSView.bitmapImageRepForCachingDisplay` and `cacheDisplay`) at a fixed size and
-  scale, and write a PNG into a folder the test names.
+  scale, and write a PNG into a folder the test names. (**Found**: the second, on an
+  `NSHostingView` in a window that is never shown, draws the system's lists, fields
+  and buttons from a command-line test. It does not draw the see-through material of
+  a sidebar, which comes out blank, so a pane is given a plain ground. `ImageRenderer`
+  does not draw the system's lists at all.)
 - **Windows**: `RenderTargetBitmap` of the element after `Measure` and `Arrange`, to
   a PNG. WPF needs a thread in single-threaded apartment for this; give the test one.
 
@@ -137,11 +144,9 @@ seen in a picture and ask the maintainer to try them.
 
 ## One thing only the maintainer can find out, on each
 
-- **Mac**: how ProPresenter records its workspaces and where each one's library is.
-  There is no `PathSettings.proPaths` on the Mac. It is found by reading
-  ProPresenter's own settings on the maintainer's Mac, at M3
-  ([06-library.md](06-library.md), rule 3). (ProPresenter's bundle identifier, the
-  other thing once asked here, is found: rule 17.)
+- **Mac**: nothing now. How ProPresenter 21 records its workspaces was found by
+  reading its settings on the maintainer's Mac ([06-library.md](06-library.md),
+  rule 3), and its bundle identifier is rule 17 of the same page.
 - **Windows**: what the RTF of a song made in ProPresenter for Windows looks like
   ([01-file-format.md](01-file-format.md), Not known), and whether the old editor
   really did save hand-placed chords short ([08-repair.md](08-repair.md), B).

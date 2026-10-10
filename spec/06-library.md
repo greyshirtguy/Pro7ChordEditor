@@ -20,16 +20,30 @@ what it learnt is kept here.
    the folder was moved: no file means Documents. (**Known**: the old editor reads it
    so, and its issue 1 was a computer without the file.)
 3. On the **Mac** there is no such file (**known**: the maintainer's word, and
-   their Mac, 2026-10-10). Newer versions of ProPresenter have **workspaces** instead, each
-   with a folder of its own, and how they are recorded may differ a little from one
-   version to another. So the Mac app shows the workspaces it finds and lets one be
-   picked, and a library of an older ProPresenter, or one kept anywhere else, is
-   opened with **Choose Folder…** (rule 6). How ProPresenter records its workspaces
-   and where each one's `Libraries` folder is, is **not known yet**: it is to be
-   found out at M3 by reading, and only reading, ProPresenter's own settings, and
-   written here. Whether ProPresenter on Windows has workspaces too is for the
-   Windows session to find out; if it has, they are shown and picked there the same
-   way.
+   their Mac, 2026-10-10). ProPresenter 21 has **workspaces** instead, each a folder
+   of its own laid out as rule 5 says, and it lists them in its own settings (the
+   settings kept for `com.renewedvision.propresenter`, read with the system's way of
+   reading another program's settings) under `userWorkspaces`: a list, each entry
+   with a `name`, a `url` (the folder, as a file URL) and `isActive` (whether it is
+   the one in use). **Known** of version 21 on the maintainer's Mac, where the list
+   is JSON kept as data and the workspace's folder is under
+   `~/Library/Application Support/RenewedVision/ProPresenter/UserWorkspaces`. That
+   other versions keep it the same way is **a guess**; the same JSON as text, and a
+   list ready made, are taken too. Version 18 has no such list.
+
+   So the Mac app finds **places**, and shows them all for one to be picked:
+   - each workspace so listed, the one in use first;
+   - the folder those same settings name under `applicationShowDirectory`, if it has
+     a `Libraries` in it and is not one of the workspaces (**a guess** that this is
+     how a ProPresenter from before workspaces says its folder was moved; on the
+     maintainer's Mac it names the workspace);
+   - `ProPresenter` in Documents (rule 1);
+   - each folder chosen by hand (rule 6).
+
+   A place whose folder is not there is left out, and one found twice is shown once.
+   ProPresenter's settings are only read. Whether ProPresenter on Windows has
+   workspaces too is for the Windows session to find out; if it has, they are found
+   and picked there the same way.
 4. Ask the system for Documents; do not build its path. On Windows it is often inside
    OneDrive, and on a Mac it may be kept in iCloud.
 5. Inside ProPresenter's folder, `Libraries` has one folder for each library, named as
@@ -38,7 +52,10 @@ what it learnt is kept here.
 6. If no such folder is found, or it has no `Libraries`, the app says so plainly and
    offers **Choose Folder…**, for any folder of `.pro` files. It is not an error:
    someone may keep a copy of a library elsewhere, or have no ProPresenter on this
-   computer at all. What was chosen is remembered.
+   computer at all. What was chosen is remembered. A folder chosen is taken for what
+   it has: if it has `Libraries` in it, it is a ProPresenter folder; if it has `.pro`
+   files directly in it, it is one library, by its own name; otherwise its libraries
+   are those of its folders that have `.pro` files in them.
 
 ## The window
 
@@ -58,15 +75,20 @@ maintainer; the old editor's two lists beside an editing area are its bones.
 +----------------+---------------------------+----------------------------------------+
 ```
 
-7. **Libraries** at the left: each folder under `Libraries`, by name. The one last used
-   is opened at the start.
-8. **Songs** in the middle: the library's `.pro` files by name, sorted as the system
-   sorts names, with a search box over them that narrows the list as it is typed in.
+7. **Libraries** at the left: each folder under `Libraries`, by name, whether or not it
+   has songs in it yet. The one last used is opened at the start. Over them, where
+   there is more than one place (rule 3), a choice of place, and **Choose Folder…**.
+   What is not a folder, or is hidden, is no library.
+8. **Songs** in the middle: the library's `.pro` files by name (those directly in it,
+   not hidden, and not folders), sorted as the system sorts names, with a search box
+   over them that narrows the list as it is typed in: to the names that have what is
+   typed in them, capitals and accents apart.
 9. Beside a song's name, small **marks**:
-   - it has chords;
+   - it has chords: any, on the slides and boxes the editors would show;
    - copies of it are kept ([07-backups.md](07-backups.md));
    - something in it wants mending ([08-repair.md](08-repair.md));
-   - it is one of the old editor's "(Chords)" copies.
+   - it is one of the old editor's "(Chords)" copies: its name ends ` (Chords)`;
+   - it cannot be read as a presentation.
 
    A mark has a tip that says what it means in words.
 10. The marks need each file to be read, which for a big library takes a few seconds.
@@ -74,7 +96,8 @@ maintainer; the old editor's two lists beside an editing area are its bones.
     that draws, and kept in the app's own data by the file's path, size and time of
     last change so that the next start has them at once.
 11. A choice over the list narrows it by mark: all, with chords, without, wanting
-    mending.
+    mending. A song whose marks are not worked out yet, or that cannot be read, is
+    shown only under "all": nobody knows whether it has chords.
 12. **The song** at the right: its name, its two keys
     ([05-song-and-saving.md](05-song-and-saving.md)), and a switch between the chord
     sheet and ChordPro. Under the editor, one quiet line says what the keys do, or for
@@ -116,10 +139,16 @@ words; dropping a `.pro` file on the window to open it.
 On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in
 `%LOCALAPPDATA%\Pro7ChordEditor`:
 
-- its settings: the folder chosen, the library last open, the window's size;
-- the marks it has worked out (rule 10);
+- its settings: the folders chosen, the place and library last open (`settings.json`),
+  and the window's size, which the system keeps for it;
+- the marks it has worked out (rule 10; `marks.json`);
 - the copies of files ([07-backups.md](07-backups.md));
 - a log of what it did, a line for each thing, with the names of files and never the
-  words of songs: for working out what happened when something has gone wrong.
+  words of songs or the names of chords: for working out what happened when something
+  has gone wrong (`log.txt`; begun again when it passes a megabyte, the one before
+  kept beside it).
+
+None of these is anyone's work. One that cannot be read is taken as not there, and the
+settings are chosen, or the marks worked out, again.
 
 Nothing of the app's is ever put in ProPresenter's folder.

@@ -10,6 +10,7 @@
 		A70000000000000000000015 /* Song in Frameworks */ = {isa = PBXBuildFile; productRef = A70000000000000000000012 /* Song */; };
 		A70000000000000000000016 /* ProFormat in Frameworks */ = {isa = PBXBuildFile; productRef = A70000000000000000000013 /* ProFormat */; };
 		A70000000000000000000017 /* ChordRules in Frameworks */ = {isa = PBXBuildFile; productRef = A70000000000000000000014 /* ChordRules */; };
+		A70000000000000000000019 /* AppViews in Frameworks */ = {isa = PBXBuildFile; productRef = A7000000000000000000001A /* AppViews */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 				A70000000000000000000015 /* Song in Frameworks */,
 				A70000000000000000000016 /* ProFormat in Frameworks */,
 				A70000000000000000000017 /* ChordRules in Frameworks */,
+				A70000000000000000000019 /* AppViews in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +94,7 @@
 				A70000000000000000000012 /* Song */,
 				A70000000000000000000013 /* ProFormat */,
 				A70000000000000000000014 /* ChordRules */,
+				A7000000000000000000001A /* AppViews */,
 			);
 			productName = Pro7ChordEditor;
 			productReference = A70000000000000000000004 /* Pro7 Chord Editor.app */;
@@ -284,6 +287,10 @@
 		A70000000000000000000014 /* ChordRules */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = ChordRules;
+		};
+		A7000000000000000000001A /* AppViews */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppViews;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -128,7 +128,8 @@ and answers with one of these, to be shown as it is. Both apps say the same.
 
 | When | The sentence |
 | --- | --- |
-| The file is no presentation, or cannot be read | *name* could not be read as a ProPresenter presentation: *why* |
+| The file cannot be read at all | *name* could not be read as a ProPresenter presentation: *what the system says of it* |
+| The file is read and is no presentation | *name* could not be read as a ProPresenter presentation: it is not a presentation, or it is damaged. |
 | The song was opened only to be looked at | This song was opened only to be looked at. Nothing was changed. |
 | No slide of that number | That slide is no longer in the song. Nothing was changed. |
 | No text box of that id on the slide | That text box is no longer on the slide. Nothing was changed. |

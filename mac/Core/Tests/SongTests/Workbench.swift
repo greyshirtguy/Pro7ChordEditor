@@ -81,26 +81,26 @@ func isChord(_ entry: Entry) -> Bool {
 }
 
 /// Where a text box is in a message, by its id.
-struct Place {
+struct BoxPlace {
     var cue: Int, action: Int, element: Int
 }
 
-func place(of element: String, in presentation: RVData_Presentation) -> Place? {
+func place(of element: String, in presentation: RVData_Presentation) -> BoxPlace? {
     for (c, cue) in presentation.cues.enumerated() {
         for (a, action) in cue.actions.enumerated() {
             for (e, candidate) in action.slide.presentation.baseSlide.elements.enumerated() where candidate.element.uuid.string == element {
-                return Place(cue: c, action: a, element: e)
+                return BoxPlace(cue: c, action: a, element: e)
             }
         }
     }
     return nil
 }
 
-func entries(at place: Place, in presentation: RVData_Presentation) -> [Entry] {
+func entries(at place: BoxPlace, in presentation: RVData_Presentation) -> [Entry] {
     presentation.cues[place.cue].actions[place.action].slide.presentation.baseSlide.elements[place.element].element.text.attributes.customAttributes
 }
 
-func setEntries(_ entries: [Entry], at place: Place, in presentation: inout RVData_Presentation) {
+func setEntries(_ entries: [Entry], at place: BoxPlace, in presentation: inout RVData_Presentation) {
     presentation.cues[place.cue].actions[place.action].slide.presentation.baseSlide.elements[place.element].element.text.attributes.customAttributes = entries
 }
 
