@@ -1,0 +1,107 @@
+# The plan
+
+How the work is cut up, in what order, and what to say to an AI coding agent to start
+it. The Mac app is built first, then the Windows app, each by a session on its own
+machine, each through the same milestones.
+
+## How a milestone goes
+
+- One milestone at a time. Each ends with **tests that pass** and, from M3 on,
+  **something the maintainer can try**.
+- Start it in plan mode: read the pages it names, say what you will build and how you
+  will prove it, and wait for a yes.
+- Build the plain code and its tests first, the window after.
+- End it with a short report: what was built; what was checked and how (which
+  vectors, which files, which pictures you looked at); what was **not** checked and
+  needs a person; what in `spec/` turned out wrong or silent. Then stop, and let the
+  maintainer try it before the next.
+- Keep `mac/NOTES.md` (or `windows/NOTES.md`): decisions made on the way and why,
+  what was found out about ProPresenter on this platform, what is left rough. The
+  next session, which will remember nothing of this one, starts by reading it.
+- Commit at the end of each milestone, and oftener if the maintainer likes: small
+  commits that each say what they do in plain words. Push only when asked.
+
+## The milestones
+
+| | What is built | Pages | It is done when |
+| --- | --- | --- | --- |
+| **M0** | **Setting up.** The project and its three layers (rules, song, app), empty. The reader of the file format generated from `proto/proto`. A test that reads one vector file and one `.pro`. The workflow that builds and tests on every push | [10](10-platforms.md) | `swift test` / `dotnet test` runs and passes from a fresh clone; the same on GitHub's machine |
+| **M1** | **The rules.** Chord names, keys, moving to another key, notations, what is offered, a box's chords in order and as ranges, ChordPro text, the words of an RTF, which key is likely | [02](02-chord-rules.md), [01](01-file-format.md) (the words) | Every case of every file in `testdata/vectors` passes, bar `sheet-model.json` and `layout.json` |
+| **M2** | **The song.** Open a `.pro`; hand over its text boxes; set a box's chords; set the key; save safely; undo and redo | [01](01-file-format.md), [05](05-song-and-saving.md) | The proofs listed at the foot of page 05, on copies of `testdata/files` |
+| **M3** | **The library.** Find ProPresenter's folder; the lists; search; open a song and show it, read only, as plain lines with chords in brackets; know when ProPresenter is running | [06](06-library.md) | The maintainer can browse his own library and read any song. Nothing can be changed yet |
+| **M4** | **The copies.** Kept before a first change; listed; looked at; put back; taken back | [07](07-backups.md) | The proofs at the foot of page 07. (There is no editor yet: prove it with the song's own functions) |
+| **M5** | **The ChordPro editor.** | [04](04-chordpro-editor.md) | The maintainer can chord a song of his own, on a **copy** of his library, and see the chords in ProPresenter. This is the first build worth giving anyone |
+| **M6** | **The chord sheet.** First its model, held to the vectors; then drawn; then the pointer and the keys; then the typing bubble; then dragging; then copying a line | [03](03-chord-sheet.md) | Every case of `sheet-model.json` and `layout.json`; the pictures set beside `spec/pictures`; and the maintainer saying it is as quick as Simple Presenter's |
+| **M7** | **Chords with no words.** Adding to and taking from a line of chords alone, in both editors: the one place the app writes RTF | [01](01-file-format.md) (Chords with no words) | The RTF of every other line of a changed box is byte for byte what it was; a song so changed opens in ProPresenter with its chords in place |
+| **M8** | **Mending.** The checks; the marks; mending one song and all; the "(Chords)" copies | [08](08-repair.md) | The proofs at the foot of page 08. Check 2 built and left switched off until the maintainer has seen the fault in a real file |
+| **M9** | **ChordPro files.** Reading one and showing what is in it; making the song; writing one out | [09](09-chordpro-files.md) | `parse-song.json` passes (it may be done in M1). A song made here opens in ProPresenter, on this system, with its chords showing on a stage screen |
+| **M10** | **Giving it out.** The icon, the About text, the README for this app, signing and notarizing (Mac) or the zip and what the person will be told by Windows; a release | [10](10-platforms.md) | Someone else can download it and run it |
+
+M5 comes before M6 on purpose: the ChordPro editor is a fifth of the work of the
+sheet, and with it and the copies the app is already better and safer than the one it
+replaces. M6 is the heart, and the largest by far: expect it to take as long as all
+that came before. Do it in the order given, model first, and resist drawing anything
+until `sheet-model.json` passes.
+
+M7 to M9 can change order to suit what the maintainer wants next.
+
+## What the maintainer is asked for along the way
+
+- **Before M3**, on the Mac: where ProPresenter's `PathSettings.proPaths` is and what
+  its bundle identifier is; on Windows: a look at the RTF of a song made there.
+  ([10-platforms.md](10-platforms.md), the last section.)
+- **At M5**: a copy of a real library to try on, and ProPresenter to look at the
+  result in.
+- **During M6**: his hand on the mouse, more than once.
+- **Before M8's check 2**: the one test with the old editor
+  ([08-repair.md](08-repair.md)).
+- **Before M9**: a small presentation made in ProPresenter, of words anyone may use,
+  for the app to carry as its model of a slide. Its file goes in `testdata/files` too:
+  it will be the only test file ProPresenter itself wrote, and reading it, changing it
+  and writing it back should be added to the proofs of M2 as soon as it exists.
+- **For M10** on the Mac: the Apple developer account.
+
+## To start the Mac session
+
+In a clone of this repository on the Mac (`git clone --recurse-submodules`), start the
+agent in the repository's root and say:
+
+> We are building the Mac app of Pro7 Chord Editor, in `mac/`. Read `AGENTS.md`, then
+> `spec/00-overview.md`, `spec/10-platforms.md` and `spec/11-plan.md`. Do not write
+> any code yet. Tell me what you understand the app to be, what you would set up for
+> milestone M0 and how you would lay the project out, and anything in those pages that
+> is unclear or that you think is wrong. Then wait for me.
+
+Then, for each milestone in turn:
+
+> Milestone M1. Read the pages the plan names for it and the reference source they
+> point to. Plan first: tell me what you will build, in what order, and how you will
+> prove it. When I say go, build it, run the tests, and report as the plan asks.
+
+And at the start of any later session:
+
+> We are part way through the Mac app of Pro7 Chord Editor. Read `AGENTS.md`,
+> `spec/11-plan.md` and `mac/NOTES.md`, look at the last few commits, and tell me
+> where things stand and what comes next.
+
+## To start the Windows session
+
+The same three, with "Windows" for "Mac" and `windows/` for `mac/`, and one thing
+more in the first:
+
+> ... The old app in `windows/` is to be replaced, not mended: read
+> `spec/08-repair.md` for what was wrong with it and `spec/06-library.md` for what it
+> knew that is worth keeping. Before anything else, read `mac/NOTES.md`: the Mac app
+> was built first, and what it found out is there.
+
+## When the Mac app has shown the pages to be wrong
+
+It will. The pages were written from an editor on Linux by someone who could not run
+either new app. When the Mac session finds a rule that is wrong, missing or cannot be
+built as written, the page is changed, with the maintainer's yes, in the same commit
+as the code that goes with it, and `mac/NOTES.md` says what was changed and why. The
+Windows session then builds from pages that are already true for one app.
+
+If a vector is wrong, it is not edited: the thing that made it is put right
+(`tools/`, or Simple Presenter itself) and it is made again. That needs the Linux
+machine and is the maintainer's to arrange.
