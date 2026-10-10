@@ -2,8 +2,9 @@
 
 The Mac app, being built first of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far the rules of chords are built and
-held to the shared test data, and nothing else is: the app builds and opens one window
-that says there is nothing to open yet. There is nothing to download.
+held to the shared test data, and so is the song: opening a file, setting its chords
+and its key, saving safely, undo. There is no window for any of it yet: the app builds
+and opens one that says there is nothing to open. There is nothing to download.
 
 For macOS 15 and 26, built with Xcode 26.
 

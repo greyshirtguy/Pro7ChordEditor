@@ -11,7 +11,8 @@ milestone; put right what has become untrue.
 | --- | --- | --- |
 | **M0** Setting up | Done, 2026-10-10 | The package and its three layers, empty; the generated reader; nine tests; the Xcode project and an app with one window; the workflow |
 | **M1** The rules | Done, 2026-10-10 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the key fit and the old editor's shift. Every case of the fifteen vector files M1 is held to passes (some thirty thousand answers), with cases of our own for what no vector holds |
-| **M2** The song | Next | |
+| **M2** The song | Done, 2026-10-10 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files |
+| **M3** The library | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -64,6 +65,16 @@ And after M1, on what its check of real songs found:
     it asks of the sheet, the ChordPro editor and the song in `spec/03`, `04` and
     `05`. Showing them is M2's (`blank`, in what the song hands over); giving them
     chords is M7's.
+
+And at M2, by saying go to its plan:
+
+12. **The type is `OpenSong`**, in the layer still called `Song`: "the song that is
+    open", as `spec/05` has it. A type named as its module is makes trouble in Swift.
+13. **A song cannot save unless it is handed its safeguards**: a way to ask whether
+    ProPresenter is running, and a way to keep a copy first. The real ones are M3's
+    and M4's. One opened with none can be read and nothing else.
+14. **The key is a step of undo**, as `spec/05` says; in the reference it is not.
+15. **What a refusal says** is a list of sentences in `spec/05`, for both apps.
 
 ## How it is laid out, and why
 
@@ -131,6 +142,29 @@ before changing any of it:
 - **Tests**: one file of tests for each vector file, reading every case
   (`Tests/ChordRulesTests/Vectors.swift` says how they compare and report). Tests
   marked "Mine, not a vector" are just that.
+
+### The song (M2)
+
+`Core/Sources/Song/Song.swift` is the way in and lists the files. What to know before
+changing any of it:
+
+- **Everything that may be asked ends in `OpenSong.save`.** A new state of the whole
+  message is made beside the one in memory; the safeguards are asked; the file is
+  written beside itself, pushed onto the disk, swapped in and read back; and only then
+  does the new state become the song. So a refusal or a failure anywhere leaves the
+  song in memory as it was, with nothing to put back. Keep it so: do not change
+  `presentation` anywhere else.
+- **The order in `save`** is the order in `spec/05`, rule 10: no safeguards; ProPresenter
+  running; the file changed by something else (size, time AND bytes); the copy; the
+  write. A refusal before the copy leaves no copy.
+- **A step of undo** holds the part that changed, before and after: one cue, or
+  `music` (which a song may not have at all). 200 steps are kept, as the reference keeps.
+- **Slides do not change while a song is open**, so they are worked out once. The text
+  boxes are read from the message each time they are asked for. If that is ever slow
+  (it parses every box's RTF), keep them and throw them away in `save`.
+- **Tests** work in `Workbench`: a folder of its own under the system's temporary
+  folder, with copies of the test files and safeguards a test can set. Nothing is ever
+  saved into `testdata/`.
 
 ## What was found out
 
@@ -232,6 +266,41 @@ before changing any of it:
   - Two songs are shown in another key than their own (`user` is not `original`), one
     of them in C#, which is not among the twenty-six keys a picker offers.
 
+### At M2
+
+- **How the proofs were shown to bite**, as at M1: each rule of the song layer was
+  broken in one small way in turn, forty-five ways, and its tests run each time.
+  Forty-four were caught. The other no input can tell from the rule (a box that is
+  only a zero-width space is not blank whether or not it is asked for by name, since
+  a zero-width space is not white space).
+- **Where the test files could not hold a rule**, cases were made from Plain Song in a
+  temporary folder, and say they are mine: slides whose cues are not in the order
+  their groups name them, a cue named twice, a cue in no group, an action switched
+  off, chords out of order in the file, an entry that is not a chord among the chords,
+  a blank slide, a box with a link. In every test file the cues are already in group
+  order and the chords already in order of place, so `as-read-by-simple-presenter.json`
+  would pass without either rule.
+- **On copies of the 22 real songs** (once, outside the repository, numbers only):
+  383 slides; 387 text boxes handed over, 17 of them blank slides; 1,299 chords. Each
+  box was then given the chords it already has, and everything undone:
+  - **all 22 files came back byte for byte what they were**;
+  - for 236 boxes of 307 the file did not change at all when the box was given its own
+    chords;
+  - the 71 that changed are the 51 with a line of chords alone (the range rule that
+    is to change: decision 10) and the 20 the old Windows editor had saved.
+  When `Chords.ranges` has changed, the 51 should be none. Run this again then.
+- **No chord's name in those songs would be changed by tidying**, and none is empty.
+  It matters because setting a box's chords tidies every name in the box, the ones
+  nobody touched among them (`spec/05` now says so).
+- **Every `music` in those songs has both its keys**; seven songs have none; two are
+  shown in another key than their own.
+- **A box with a link.** The page said "no data_links". The reference is finer: a box
+  whose only link says when it is to be seen keeps its own words. Followed, and
+  `spec/01` now says it.
+- **`FileManager.replaceItemAt` keeps the old file's permissions**, and fails cleanly
+  on a file that may not be changed (the new file is then cleared away). Both are
+  tests.
+
 ### Rules the vectors do not hold
 
 Found by breaking the rules (above). Each has a case in
@@ -251,9 +320,16 @@ vectors have them, the cases here that say the same can go.
   `spec/02` (`ranges`), and the same from here. **Nothing should write a file for
   anyone before this is done.** M2 can be built before it: its proofs are on
   `testdata/files`.
-- **A type named `Song` cannot live comfortably in a module named `Song`** (Swift
-  then cannot tell the two apart in code that imports it). The layer was named at M0.
-  Settle at the start of M2: call the layer something else (`SongFile`?), or the type.
+- **What M7 has to add to the song**: the stand-ins of a line of chords alone written
+  into the box's RTF when it gains or loses a chord, and the first chord on a blank
+  slide (`spec/01`). Until then `setChordsAlone` refuses both with a sentence. The
+  place is marked in `OpenSong.setChordsAlone`.
+- **Not proved**, because nothing here can make it happen: that a file which does not
+  read back as it was written is noticed (`SongFile.write`), and that 200 steps of
+  undo are kept and no more.
+- **Still wanted before anything writes for anyone**: a presentation ProPresenter
+  itself made, of words anyone may use, in `testdata/files`. The real-songs check
+  stands in for it, but it is not a test.
 - **What the port of the RTF reader does not copy**, each said where it happens in
   `RTFWords.swift`: what Qt's reader of numbers makes of two characters after a
   backslash and an apostrophe that are not two hexadecimal digits. Nothing is known to
