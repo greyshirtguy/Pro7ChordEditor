@@ -76,22 +76,6 @@ struct ChordProTests {
         tally.settle()
     }
 
-    // Not a vector: the file has no character from beyond the first 65,536, so it does
-    // not hold the places to UTF-16 units. Worked out by hand, the party popper being two:
-    //
-    //   J o y _ 🎉 🎉 _ t o \n t  h  e ...
-    //   0 1 2 3 4  5  6 7 8 9  10 11 12
-    @Test("Mine, not a vector: an emoji is two places")
-    func anEmojiIsTwoPlaces() {
-        let typed = "Joy \u{1F389} [G]to\n[D]the world"
-        #expect(Chords.chordsOf(typed) == [Chord(at: 7, name: "G"), Chord(at: 10, name: "D")])
-        #expect(spell(Chords.withoutChords(typed)) == spell("Joy \u{1F389} to\nthe world"))
-        #expect(spell(Chords.toChordPro("Joy \u{1F389} to\nthe world", [Chord(at: 7, name: "G"), Chord(at: 10, name: "D")])) == spell(typed))
-
-        let line = Chords.fromChordPro("Joy \u{1F389} [G]to")
-        #expect(line == Chords.Line(text: "Joy \u{1F389} to", chords: [Chord(at: 7, name: "G")]))
-    }
-
     // Not a vector. Foundation calls U+200B white space, and its trimming would empty a
     // line of stand-ins; Qt, which made the vectors, does not. This is what would break
     // first if anything here were ever done with Foundation's sets.

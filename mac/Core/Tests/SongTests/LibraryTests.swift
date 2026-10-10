@@ -97,7 +97,7 @@ struct LibraryTests {
         #expect(libraries.map(\.name) == ["Empty", "Old copies", "Songs"])
 
         let songs = Listing.songs(of: libraries[2])
-        #expect(songs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Holy Holy Holy", "It Is Well", "Nonsense", "Plain Song", "Rock Of Ages (Toplady)"])
+        #expect(songs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Blank Slides", "Holy Holy Holy", "It Is Well", "Nonsense", "Plain Song", "Rock Of Ages (Toplady)"])
         #expect(songs.allSatisfy { $0.size > 0 && $0.modified > .distantPast })
         #expect(Listing.songs(of: libraries[0]).isEmpty)
         #expect(Listing.songs(of: libraries[1]).count == 4)
@@ -124,7 +124,7 @@ struct LibraryTests {
         #expect(Listing.libraries(of: Place(kind: .chosen, name: "", folder: whole.appendingPathComponent("Libraries"))).map(\.name) == ["Old copies", "Songs"])
         let one = Listing.libraries(of: Place(kind: .chosen, name: "", folder: whole.appendingPathComponent("Libraries/Songs")))
         #expect(one.map(\.name) == ["Songs"])
-        #expect(Listing.songs(of: one[0]).count == 7)
+        #expect(Listing.songs(of: one[0]).count == 8)
         #expect(Listing.libraries(of: Place(kind: .chosen, name: "", folder: whole.appendingPathComponent("Media"))).isEmpty)
     }
 
@@ -168,18 +168,19 @@ struct LibraryTests {
                 #expect(marks.isOldEditorsCopy == song.name.hasSuffix(" (Chords)"))
                 if song.name == "Nonsense" {
                     #expect(marks.cannotBeRead && !marks.hasChords)
-                } else if let expected = asRead.files.first(where: { $0.file == song.name + ".pro" }) {
-                    // As many chords as Simple Presenter's editor is handed for that file.
-                    seen += 1
-                    #expect(marks.chords == expected.textBoxes.reduce(0) { $0 + $1.chords.count }, "\(song.name)")
-                    #expect(marks.hasChords && !marks.cannotBeRead)
                 } else {
-                    #expect(song.name == "Rock Of Ages (Toplady)")
-                    #expect(marks == Marks())
+                    // As many chords as Simple Presenter's editor is handed for that file.
+                    let expected = try #require(asRead.files.first { $0.file == song.name + ".pro" }, "\(song.name) is not in as-read-by-simple-presenter.json")
+                    seen += 1
+                    let chords = expected.textBoxes.reduce(0) { $0 + $1.chords.count }
+                    #expect(marks.chords == chords, "\(song.name)")
+                    #expect(marks.hasChords == (chords > 0) && !marks.cannotBeRead)
                 }
             }
         }
-        #expect(seen == 9)
+        #expect(seen == 11)
+        // (The song ProPresenter wrote is the one with none.)
+        #expect(Marks.read(Listing.songs(of: libraries[2]).first { $0.name == "Rock Of Ages (Toplady)" }!) == Marks())
     }
 
     @Test("Marks worked out before are known again only while the file is as it was")
@@ -276,6 +277,12 @@ struct LibraryTests {
         // Each box's lines, put together again, are the box as `toChordPro` writes it
         // (which chordpro.json holds), and each line knows where it is in its box.
         for box in boxes {
+            // A blank slide is one line, and that line is empty.
+            if box.blank {
+                let own = lines.filter { $0.element == box.element }
+                #expect(own.map(\.kind) == [.blankSlide] && own.first?.text == "" && own.first?.slide == box.slide)
+                continue
+            }
             let own = lines.filter { $0.element == box.element && ($0.kind == .words || $0.kind == .chordsAlone) }
             #expect(own.map(\.text).joined(separator: "\n") == Chords.toChordPro(box.words, box.chords))
             #expect(own.map(\.words) == box.words.lines)

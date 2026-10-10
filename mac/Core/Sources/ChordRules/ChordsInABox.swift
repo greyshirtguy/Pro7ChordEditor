@@ -4,9 +4,8 @@
 //
 // Every place here is a place in the WHOLE text box's words, a line break being one.
 //
-// None of the three vector files has a character from beyond the first 65,536 in it, so
-// the vectors do not hold these to counting in UTF-16 units. ChordsInABoxTests has cases
-// of its own for that, which say they are not vectors.
+// (Each of the three vector files has cases with an emoji in the words, which hold these
+// to counting in UTF-16 units.)
 
 /// The stretch of the text a chord is written over in the file. ProPresenter does not
 /// keep where a chord stands but a stretch of characters it belongs to, which in every

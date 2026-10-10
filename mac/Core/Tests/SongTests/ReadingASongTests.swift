@@ -26,6 +26,7 @@ struct ReadingASongTests {
                 let element: String
                 let words: String
                 let chords: [Chord]
+                let blank: Bool
             }
             let file: String
             let key: String
@@ -38,15 +39,15 @@ struct ReadingASongTests {
     static let fileNames = asRead?.files.map(\.file) ?? []
 
     /// A box as one line of text, every unit of its words and names written out.
-    private func spell(slide: Int, group: String, starts: Bool, element: String, words: [UInt16], chords: [(Int, String)]) -> String {
+    private func spell(slide: Int, group: String, starts: Bool, element: String, words: [UInt16], chords: [(Int, String)], blank: Bool) -> String {
         let units = words.map { String($0, radix: 16) }.joined(separator: " ")
         let named = chords.map { "\($0.0):" + $0.1.utf16.map { String($0, radix: 16) }.joined(separator: " ") }.joined(separator: ", ")
-        return "slide \(slide) | group \(group) | starts \(starts) | \(element) | \(units) | \(named)"
+        return "slide \(slide) | group \(group) | starts \(starts) | \(element) | \(blank ? "blank" : "words") | \(units) | \(named)"
     }
 
-    @Test("It says what all nine test files read as")
+    @Test("It says what all eleven test files read as")
     func theFileIsWhole() {
-        #expect(Self.fileNames.count == 9)
+        #expect(Self.fileNames.count == 11)
     }
 
     @Test("Each test file reads as Simple Presenter reads it", arguments: fileNames)
@@ -59,15 +60,19 @@ struct ReadingASongTests {
         #expect(song.key == expected.key)
         let got = song.textBoxes.map {
             spell(slide: $0.slide, group: $0.group, starts: $0.startsItsGroup, element: $0.element, words: $0.words.units,
-                  chords: $0.chords.map { ($0.at, $0.name) })
+                  chords: $0.chords.map { ($0.at, $0.name) }, blank: $0.blank)
         }
-        let want = expected.textBoxes.map {
+        // A slide with no text box at all is in the file with an empty `element`: that
+        // entry is Simple Presenter's own, which gives such a slide a text box when a
+        // chord is put there. This app makes no text boxes and hands nothing over for it
+        // (spec/01-file-format.md, "Where Simple Presenter goes further"). The slides
+        // are numbered with it all the same.
+        let want = expected.textBoxes.filter { !$0.element.isEmpty }.map {
             spell(slide: $0.slide, group: $0.group, starts: $0.startsItsGroup, element: $0.element, words: Array($0.words.utf16),
-                  chords: $0.chords.map { ($0.at, $0.name) })
+                  chords: $0.chords.map { ($0.at, $0.name) }, blank: $0.blank)
         }
         #expect(got == want)
-        // None of the test files has a blank slide, and none gives a group a colour.
-        #expect(song.textBoxes.allSatisfy { !$0.blank && $0.groupColour == nil })
+        #expect(song.slideCount > (expected.textBoxes.map(\.slide).max() ?? 0))
         #expect(song.usedChords == expected.textBoxes.flatMap { $0.chords.map(\.name) })
     }
 

@@ -372,43 +372,38 @@ changing any of it:
   for its pane; a raw error code in the sentence for a file that cannot be read; "no
   songs in this library" where there was no library.
 
-### Rules the vectors do not hold
+### Rules the vectors did not hold, and what became of them
 
-Found by breaking the rules (above). Each has a case in
-`Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift`, whose expected answer was
-READ from the reference's code, not got from it. The list of inputs to add to the
-tools that make the vectors is in `testdata/README.md`, "To be made again, and cases
-wanted", where the session that looks after Simple Presenter will find it. When the
-vectors have them, the cases here that say the same can go.
+At M1, breaking the rules one at a time found nineteen that no vector held. Each was
+given a case of the Mac app's own, its answer READ from the reference's code, and the
+inputs were listed for the tools that make the vectors.
+
+**On 2026-10-10 the vectors and test files were made again** from a Simple Presenter
+that has the new range rule and shows blank slides, with nearly all of those inputs
+in, a song for headings, a song with blank slides, and the file ProPresenter wrote
+read into `as-read-by-simple-presenter.json`. What that showed:
+
+- **The Mac app's rules passed every new case with not a line of them changed.** The
+  reference answered as its code had been read.
+- The allowance the range tests made for one stale case tripped, as it was built to,
+  and is taken out.
+- Of twenty breakages that only the Mac app's own cases caught before, the vectors
+  now catch nineteen. The own cases that a vector now holds are gone from
+  `NotHeldByVectorsTests`; one is left, and `testdata/README.md` ("Still wanted")
+  says what would hold it.
+- `as-read-by-simple-presenter.json` now has `blank` on each entry, and an entry with
+  an empty `element` for a slide that has no text box at all. That last is Simple
+  Presenter's own (it gives such a slide a text box when a chord is put there); this
+  app hands nothing over for it, and `ReadingASongTests` leaves those entries out.
+
+**Two things the reference now does that these apps do not, for the maintainer to
+decide** (both in `spec/01`, both M7's): giving a slide with no text box one when a
+chord is put there; and, while a song is open, putting a blank slide's file back byte
+for byte as it was when its last chord is taken off again. The maintainer asked the
+second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
-- **One allowance in the tests, which is to end.** `ranges.json` has one case made
-  before the rule for a chord on a line of chords alone was decided. The test of that
-  file (`ChordsInABoxTests.ranges`) does not leave the case out or call the old answer
-  right: it checks that the vector is exactly the rule as it was, that the rule now
-  differs from it only as decided, and that there is exactly one such case. **When
-  the file has been made again that test fails**, on the count, and so does
-  `ChangingChordsTests.rangesAsTheVectorsSay`. Then take the allowance out of both
-  (the comment in the first says how), and the sentences about it out of `spec/01`
-  (Chords), `spec/02` (`ranges`) and `testdata/README.md`.
-- **`as-read-by-simple-presenter.json` does not have the file ProPresenter wrote.**
-  What it reads as is held by `AFileProPresenterWroteTests`, against the hymn itself.
-  When Simple Presenter has read it into that file, `ReadingASongTests` takes it up
-  without a line changing.
-- **What M7 has to add to the song**: the stand-ins of a line of chords alone written
-  into the box's RTF when it gains or loses a chord, and the first chord on a blank
-  slide (`spec/01`). Until then `setChordsAlone` refuses both with a sentence. The
-  place is marked in `OpenSong.setChordsAlone`.
-- **Not proved**, because nothing here can make it happen: that a file which does not
-  read back as it was written is noticed (`SongFile.write`), and that 200 steps of
-  undo are kept and no more.
-- **Still wanted before M7**: a song with a blank slide in it that ProPresenter made
-  (an intro made as an empty slide), of words anyone may use.
-- **What the port of the RTF reader does not copy**, each said where it happens in
-  `RTFWords.swift`: what Qt's reader of numbers makes of two characters after a
-  backslash and an apostrophe that are not two hexadecimal digits. Nothing is known to
-  write such a thing.
 - **What only a hand on a mouse can tell, and nobody has yet** (M3): that the app
   opens and finds the library; what macOS asks the first time it reads Documents;
   that the lists keep up with typing in the search box and with clicks; that the

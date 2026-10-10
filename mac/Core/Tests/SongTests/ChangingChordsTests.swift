@@ -21,7 +21,7 @@ struct ChangingChordsTests {
         let boxes = song.textBoxes
         #expect(!boxes.isEmpty)
         // Each box of the song in turn, one change on top of another.
-        for (n, box) in boxes.enumerated() where !box.words.isEmpty {
+        for (n, box) in boxes.enumerated() where !box.blank && !box.words.isEmpty {
             let before = try message(at: song.url)
             // A different list each time: the box's own chords with its last one gone and
             // one put on the first place, or on the second if the first has one.
@@ -53,7 +53,8 @@ struct ChangingChordsTests {
         let bench = try Workbench()
         let song = try bench.open(path)
         let original = try Data(contentsOf: song.url)
-        let box = try #require(song.textBoxes.first)
+        // (The first box that has words: a blank slide's can take no chords yet.)
+        let box = try #require(song.textBoxes.first { !$0.blank && !$0.words.isEmpty })
 
         #expect(!song.canUndo && !song.canRedo)
         try song.setChords(slide: box.slide, element: box.element, [Chord(at: 0, name: "Em")])
@@ -224,31 +225,21 @@ struct ChangingChordsTests {
         let boxes = try boxesByWords(bench)
         let file = try JSONDecoder().decode(Ranges.self, from: TestData.vector("ranges.json"))
         var tried = 0
-        var asTheVectorHasIt = 0
         for c in file.cases {
             // (Only the cases whose text is the words of a box in a test file can be
             // tried on a file: this layer cannot give a box other words.)
             guard let (song, box) = boxes[Array(c.text.utf16)] else { continue }
             tried += 1
-            let chords = c.chords.map { Chord(at: $0.at, name: $0.name) }
-            try song.setChords(slide: box.slide, element: box.element, chords)
+            try song.setChords(slide: box.slide, element: box.element, c.chords.map { Chord(at: $0.at, name: $0.name) })
             let now = try message(at: song.url)
             let here = try #require(place(of: box.element, in: now))
-            // What is in the file is what the rules say is written, with each name
-            // tidied. (`ranges` writes a name as it is given. The song is asked for a
-            // box's chords by an editor, and tidies each name first, as rule 1 of the
-            // page says: so "g" in the vector is "G" in the file.)
-            let written = spell(entries(at: here, in: now))
-            #expect(written == Chords.ranges(box.words, chords).map { "\(Chords.tidied($0.name)) \($0.start)-\($0.end)" },
+            // (`ranges` writes a name as it is given. The song is asked for a box's
+            // chords by an editor, and tidies each name first, as rule 1 of the page
+            // says: so "g" in the vector is "G" in the file, and the rest is the vector's.)
+            #expect(spell(entries(at: here, in: now)) == c.out.map { "\(Chords.tidied($0.name)) \($0.start)-\($0.end)" },
                     "ranges.json: \(c.chords.map { "\($0.name)@\($0.at)" })")
-            if written == c.out.map({ "\(Chords.tidied($0.name)) \($0.start)-\($0.end)" }) { asTheVectorHasIt += 1 }
         }
         #expect(tried >= 10, "only \(tried) cases of ranges.json could be tried on a test file")
-        // And that is what the vector has, but for the one case of it that was made
-        // before the rule for a chord on a line of chords alone was decided. What is
-        // allowed of that case, and how the allowance ends, is in ChordsInABoxTests
-        // (ChordRulesTests), where the rule itself is held to the vector.
-        #expect(asTheVectorHasIt == tried - 1, "\(asTheVectorHasIt) of \(tried) are as ranges.json has them: if it has been made again, this is to be all of them")
     }
 
     struct SheetModel: Decodable {

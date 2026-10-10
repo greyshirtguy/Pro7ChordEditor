@@ -24,20 +24,20 @@ struct LibraryModelTests {
 
         model.choose(library: mac.library("Songs"))
         await model.marksAreWorkedOut()
-        #expect(model.songs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Holy Holy Holy", "It Is Well", "Nonsense", "Plain Song", "Rock Of Ages (Toplady)"])
-        #expect(model.marks.count == 7)
+        #expect(model.songs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Blank Slides", "Holy Holy Holy", "It Is Well", "Nonsense", "Plain Song", "Rock Of Ages (Toplady)"])
+        #expect(model.marks.count == 8)
         #expect(model.marks[mac.song("Amazing Grace")]?.chords == 40)
         #expect(model.marks[mac.song("Rock Of Ages (Toplady)")]?.hasChords == false)
         #expect(model.marks[mac.song("Nonsense")]?.cannotBeRead == true)
-        #expect(model.notice == "7 songs, 5 with chords.")
+        #expect(model.notice == "8 songs, 6 with chords.")
 
         // The library is remembered, and the marks kept: another start has them at once,
         // with no file read again.
         let again = mac.model()
         await again.start()
         #expect(again.library?.name == "Songs")
-        #expect(again.marks.count == 7)
-        #expect(mac.appData.marks.count == 7)
+        #expect(again.marks.count == 8)
+        #expect(mac.appData.marks.count == 8)
         #expect(mac.appData.settings.lastLibrary == mac.library("Songs"))
     }
 
@@ -87,9 +87,9 @@ struct LibraryModelTests {
         #expect(model.listedSongs.map(\.name) == ["Rock Of Ages (Toplady)"])
         model.typed = ""
         model.filter = .withChords
-        #expect(model.listedSongs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Holy Holy Holy", "It Is Well", "Plain Song"])
+        #expect(model.listedSongs.map(\.name) == ["A Song - In A Minor Key", "Amazing Grace", "Blank Slides", "Holy Holy Holy", "It Is Well", "Plain Song"])
         model.filter = .all
-        #expect(model.listedSongs.count == 7)
+        #expect(model.listedSongs.count == 8)
     }
 
     @Test("When the app comes to the front the lists are read again, and ProPresenter is asked after")
@@ -107,7 +107,7 @@ struct LibraryModelTests {
         try TestData.file("made-by-simple-presenter/It Is Well.pro").write(to: mac.place.appendingPathComponent("Libraries/Songs/Another Song.pro"))
         await model.refresh()
         #expect(model.proPresenterIsRunning)
-        #expect(model.songs.count == 8 && model.songs.contains { $0.name == "Another Song" })
+        #expect(model.songs.count == 9 && model.songs.contains { $0.name == "Another Song" })
         #expect(model.marks[mac.song("Another Song")]?.hasChords == true)
         // What was open is open still.
         #expect(model.library?.name == "Songs" && model.shown?.name == "Plain Song")
@@ -129,11 +129,11 @@ struct LibraryModelTests {
         model.add(folder: mac.place.appendingPathComponent("Libraries/Songs", isDirectory: true))
         await model.marksAreWorkedOut()
         #expect(model.places.map(\.kind) == [.chosen])
-        #expect(model.libraries.map(\.name) == ["Songs"] && model.songs.count == 7)
+        #expect(model.libraries.map(\.name) == ["Songs"] && model.songs.count == 8)
 
         let again = mac.model()
         await again.start()
-        #expect(again.places.map(\.name) == ["Songs"] && again.songs.count == 7)
+        #expect(again.places.map(\.name) == ["Songs"] && again.songs.count == 8)
     }
 
     @Test("The log names files and never has a word of a song in it")

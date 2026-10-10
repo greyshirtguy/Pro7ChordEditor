@@ -172,6 +172,12 @@ not say the same, the vector is what the reference answers.
   ([`spec/11-plan.md`](../spec/11-plan.md), before M7).
 - A test file whose chords are not in order of place in the file: the Mac app's notes
   say no file here would notice that rule being left out.
+- In `songs/headings.cho`, a second chord on the line that has two spaces after its
+  first (`[G]  Two spaces after the [C]chord`). As it is, the line's one chord is at
+  the start, which is where it would be whether or not chords moved with the words
+  when the spaces were taken off; so the rule can still be got wrong unnoticed. (Found
+  by breaking it, after the vectors were made again: of the twenty breakages that
+  only the Mac app's own cases caught before, the vectors now catch nineteen.)
 
 ## What must not come in here
 

@@ -70,9 +70,9 @@ private func chords(of presentation: RVData_Presentation) -> [Found] {
 struct PresentationsCanBeReadTests {
     static let paths = (try? TestData.presentationPaths()) ?? []
 
-    @Test("The ten test files are there: nine that Simple Presenter made or that were made from those, and one of ProPresenter's own")
+    @Test("The eleven test files are there: ten that Simple Presenter made or that were made from those, and one of ProPresenter's own")
     func theFilesAreThere() {
-        #expect(Self.paths.count == 10)
+        #expect(Self.paths.count == 11)
         #expect(Self.paths.filter { $0.hasPrefix("made-by-propresenter/") } == ["made-by-propresenter/Rock Of Ages (Toplady).pro"])
     }
 
