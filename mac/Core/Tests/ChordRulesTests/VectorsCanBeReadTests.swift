@@ -1,11 +1,12 @@
-// Milestone M0's test of the rules layer: that the tests can find testdata/vectors
-// and read what is in it. There are no rules yet, so nothing here says a rule is
-// right. It says the ground M1 will stand on is there: every vector file is in the
-// checkout, is JSON, and says of itself what it holds; and one of them, keys.json, has
-// the shape its `about` says.
+// That the tests can find testdata/vectors and read what is in it. Nothing here says a
+// rule is right: each vector file has tests of its own for that, beside this one. This
+// says the ground they stand on is there: every vector file is in the checkout, is
+// JSON, and says of itself what it holds; and one of them, keys.json, has the shape its
+// `about` says. It is the first thing to fail if a checkout is broken, and what tells
+// a broken checkout from a broken rule.
 //
-// When M1 is built, each file gets tests of its own that hold the rules to its cases,
-// and this stays as the first thing to fail if a checkout is broken.
+// sheet-model.json and layout.json are read here and nowhere else yet: the chord sheet
+// they hold is milestone M6.
 
 import Foundation
 import Testing

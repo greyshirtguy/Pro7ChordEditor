@@ -179,8 +179,9 @@ ChordPro writes a chord in square brackets before the character it is played on:
 | `isPlaceholders(line)` | Not empty, and nothing in it but U+200B and white space |
 
 White space here is what Unicode calls a space separator, plus tab and the line ends:
-U+2001 is one. A zero-width space is not white space in any library, which is why it is
-named separately.
+U+2001 is one, and [To the letter](#to-the-letter) has the whole list. A zero-width
+space is not on it, which is why it is named separately. (It is white space to one
+library, Apple's Foundation, and that is why the list is written out.)
 
 Reading a whole ChordPro file is in [09-chordpro-files.md](09-chordpro-files.md).
 
@@ -189,6 +190,51 @@ Reading a whole ChordPro file is in [09-chordpro-files.md](09-chordpro-files.md)
 **New**: not in Simple Presenter. The rule, its reasons and its reference are in
 `tools/keyfit.py`; [08-repair.md](08-repair.md) says what it is for. Vectors:
 `key-fit.json`.
+
+## To the letter
+
+The rules were written with Qt's strings, and the vectors are what those answered. A
+platform's own strings do some of the same things another way, and then the answers
+come out the same for most songs and different for a few. These are the things the Mac
+app, the first not written with Qt, had to pin down. Both apps do them as said here.
+
+- **Everything is done on UTF-16 units**: a length, a place, "starts with", "is the
+  same as", "is already in the list". Two names are the same only if their units are.
+  (Swift compares strings by whole characters, and calls "é" written as one unit the
+  same as "e" with an accent after it. In .NET ask for an *ordinal* comparison.)
+- **White space** is U+0009 to U+000D, U+0020, U+0085, U+00A0, U+1680, U+2000 to
+  U+200A, U+2028, U+2029, U+202F, U+205F and U+3000, and nothing else. It is what is
+  taken off the ends of a name or a line, and what `isPlaceholders` allows beside
+  U+200B. Hold the platform's own list against this one before using it: Apple's
+  Foundation has U+200B in its list, and trimming with it empties a line of stand-ins.
+- **The two rules whose reference is Python** ([which key is
+  likely](#which-key-a-song-is-most-likely-in), and the line-break check of
+  [08-repair.md](08-repair.md)) take U+001C to U+001F as white space too, as Python
+  does. And a key's score is rounded to four places as Python's `round` does it, by
+  the exact value the machine holds: print the number to four places and read it back,
+  rather than multiply, round and divide, which does not always give the same.
+- **A letter or a number**, in `couldBecome`, is a UTF-16 unit whose Unicode category is
+  one of the letters (Lu, Ll, Lt, Lm, Lo) or one of the numbers (Nd, Nl, No). Each
+  unit is asked by itself, so a letter from beyond the first 65,536 characters is
+  neither: it is two units. (In .NET that is `char.IsLetter` or `char.IsNumber`, and
+  not `char.IsLetterOrDigit`, which leaves two kinds of number out.)
+- **A note's letter** is one of A to G or a to g, and no other character.
+- **A line** ends at U+000A and nowhere else.
+- **Sorting keeps those that are equal in the order they came in.** Not every
+  platform's own sort promises that.
+- **A directive in a ChordPro file** is a line that starts `{` and ends `}`, with a
+  name, and perhaps a colon and a value. The name is what comes before a colon, a `}`
+  or a space; space, tab and the line ends around the name and the value do not count.
+- **A line that only names a part** ("Verse 1", "CHORUS:", "[Bridge]") is, once any
+  square brackets round it and one colon after it are off: one of *verse, chorus,
+  pre-chorus, pre chorus, prechorus, bridge, intro, outro, ending, tag, interlude,
+  instrumental, refrain, turnaround, vamp, coda, hook, post-chorus, post chorus,
+  postchorus*, in the letters A to Z of either case; then perhaps a number, of the
+  digits 0 to 9, with perhaps one space before it and perhaps one letter after it;
+  and nothing more. Its name is that in small letters, with a capital to start and
+  after each space or hyphen. (Simple Presenter finds these with a regular expression
+  that would also take a long s for an "s" and the Kelvin sign for a "k". That is not
+  copied.)
 
 ## The vectors
 

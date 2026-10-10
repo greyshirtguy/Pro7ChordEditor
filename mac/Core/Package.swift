@@ -9,8 +9,8 @@
 // (spec/10-platforms.md, "The Mac app"):
 //
 //   ChordRules   What a chord is, keys, moving to another key, where a chord stands
-//                in the words. Plain Swift: no protobuf, no AppKit, no SwiftUI. Held to
-//                testdata/vectors.
+//                in the words, the words of an RTF. Plain Swift and Foundation: no
+//                protobuf, no AppKit, no SwiftUI. Held to testdata/vectors.
 //   ProFormat    The reader and writer of a .pro file, generated from the descriptions
 //                of ProPresenter's format. Nothing in it is written by hand except the
 //                file that says so.
@@ -67,6 +67,7 @@ let package = Package(
             name: "SongTests",
             dependencies: [
                 "Song",
+                "ChordRules",
                 "ProFormat",
                 "TestData",
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),

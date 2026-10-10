@@ -38,6 +38,11 @@ public enum TestData {
             .sorted()
     }
 
+    /// A file of `testdata/songs`, by its name: "amazing-grace.cho".
+    public static func song(_ name: String) throws -> Data {
+        try Data(contentsOf: root.appendingPathComponent("songs").appendingPathComponent(name))
+    }
+
     /// The folders of `testdata/files` that hold presentations.
     public static let presentationFolders = ["made-by-simple-presenter", "as-the-old-windows-app-left-them"]
 
