@@ -1,4 +1,21 @@
-# Pro7ChordEditor
+# Pro7ChordEditor for Windows
+
+> [!NOTE]
+> **This is the first Windows editor, version 0.9.5, as it has been since 2024.** It
+> is to be replaced by a new one, built to the plan in [`spec/`](../spec/00-overview.md)
+> alongside a Mac app. Until then this folder holds it unchanged, and its
+> [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
+> still works as it did.
+>
+> It has faults that are known and will not be mended in this version: a chord can be
+> shown twice by ProPresenter after a save, a song's key can be changed to A flat by a
+> save, and it stops on slides with no words.
+> [`spec/08-repair.md`](../spec/08-repair.md) has the whole list, and the new editor is
+> to find and mend what this one left in files. Keep a backup of your library.
+
+What follows is its own README, as it was.
+
+---
 
 *Yep, it does what is says on the box!*  
 
@@ -17,7 +34,7 @@ You can change the `User Key` to have Pro7 *automatically transpose* the chords 
   
 ⚠️This is an early beta version not for production use.⚠️  
 
-However - feel free to take the [latest release](https://github.com/greyshirtguy/Pro7ChordEditorWin/releases/latest) for a test-drive...   
+However - feel free to take the [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest) for a test-drive...   
 ...after making a 🦺BACKUP OF YOUR LIBRARIES🦺
 
 **TODO:**
