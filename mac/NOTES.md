@@ -10,7 +10,8 @@ milestone; put right what has become untrue.
 | | | |
 | --- | --- | --- |
 | **M0** Setting up | Done, 2026-10-10 | The package and its three layers, empty; the generated reader; nine tests; the Xcode project and an app with one window; the workflow |
-| **M1** The rules | Next | |
+| **M1** The rules | Done, 2026-10-10 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the key fit and the old editor's shift. Every case of the fifteen vector files M1 is held to passes (some thirty thousand answers), with cases of our own for what no vector holds |
+| **M2** The song | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -35,6 +36,18 @@ milestone; put right what has become untrue.
    against as copies outside the repository: some from Multitracks as they came, some
    changed by the old Windows editor. Ask where. Nothing of them comes into the
    repository (`AGENTS.md`, "The person's files").
+
+And at M1, the same day:
+
+7. **The words of an RTF are read by a port of the reference's small reader**, not by
+   AppKit's (`NSAttributedString`). The page allowed either on the Mac. A port keeps
+   AppKit out of the rules and gives both apps the same reader.
+8. **`spec/02-chord-rules.md` has a section "To the letter"** with what the Mac port
+   had to pin down (white space, what a letter is, comparing by units, a heading's
+   words), so that the Windows app does the same.
+9. **Two names are not the reference's**: its `Song` (a ChordPro file as read) is
+   `Chords.ParsedSong`, and its `Range` is `ChordRange`. Swift has a `Range`, and
+   `Song` is the layer above.
 
 ## How it is laid out, and why
 
@@ -84,6 +97,25 @@ mac/
   signature, saying so in the build log; it comes on by itself when the app is signed
   with a Developer ID at M10.
 
+### The rules (M1)
+
+`Core/Sources/ChordRules/Chords.swift` is the way in and lists the files. What to know
+before changing any of it:
+
+- **The rules stand under `Chords`**, as the C++ has them under `chords::`, with the
+  names they have there: `Chords.transposed("C#m", from: "E", to: "Db")`. Three things
+  that are not from `chords.cpp` have names of their own: `RTFWords`, `KeyFit`,
+  `OldEditor`.
+- **Inside, everything is `[UInt16]`**: a String is turned into its UTF-16 units on the
+  way in and back on the way out, and `Units.swift` has the few operations, each named
+  for the QString function it stands in for. Nothing uses String's `count`, `hasPrefix`
+  or `==` on text, nor Foundation's trimming or character sets. Keep it so.
+- **`Words`** is the type for a text box's words, and a place is an `Int` into its
+  `units`. Names of chords and keys, and ChordPro text as typed, are plain Strings.
+- **Tests**: one file of tests for each vector file, reading every case
+  (`Tests/ChordRulesTests/Vectors.swift` says how they compare and report). Tests
+  marked "Mine, not a vector" are just that.
+
 ## What was found out
 
 - **A file read and written back unchanged is the same, byte for byte**, in every
@@ -125,8 +157,87 @@ mac/
   workflow is refused. `gh` is installed and not signed in; it is not needed to push,
   and the runs of a public repository can be read without it.
 
+### At M1
+
+- **Three things about Swift and Foundation that would have made the rules wrong for
+  some songs**, all now in `spec/02`, "To the letter":
+  - Foundation's white space has U+200B in it, and its trimming empties a line of
+    stand-ins. (`spec/02` had said no library counts it so.)
+  - Swift compares strings, and tests a prefix, by whole characters: "é" as one unit
+    is the same to it as "e" and an accent.
+  - Swift does not promise that its sort keeps equals in order.
+- **A backslash, a "u" and four digits, typed into a file by an agent, can arrive as
+  one Chinese character.** It is what RTF's numbered characters look like. It happened
+  in a test sample here, and looked for all the world like a fault in the reader of
+  RTF, which was right. `NotHeldByVectorsTests` builds its sample from pieces for that
+  reason. After writing anything about RTF, look for characters that should not be
+  there: `LC_ALL=C grep -rn -P '[^\x00-\x7F]' mac/Core`.
+- **How the tests were shown to bite.** Every vector passed the first time the tests
+  were run, which proves little. So each rule was broken in one small way in turn,
+  seventy-nine ways in all, and the tests run each time. Fifty-eight were caught by a
+  vector. Twenty-one were not. Two of those cannot be told apart from the rule by any
+  input (worked through by hand). The other nineteen are rules no vector holds: see
+  the next heading. Each now has a case in `NotHeldByVectorsTests`, and the breakages
+  were run again to see those cases catch them.
+- **On copies of the 22 real songs** (a check made once, outside the repository,
+  printing numbers only):
+  - 400 text boxes have RTF. The reader here and AppKit's give the same words, unit
+    for unit, for all 400. None has a byte over 127 in its RTF.
+  - All 1,299 chords stand on a place inside their words; none on a line break.
+  - **Every chord on a line of chords alone has a range one character long** in those
+    files: 290 of 290, its stand-in and no more (171 hang on U+200B, 119 on a space).
+    `ranges()`, and `ranges.json`, run such a range on to the next chord, over the em
+    quad between: (0,2) (2,4) (4,5) where Multitracks has (0,1) (2,3) (4,5). So
+    `spec/01`, which says a range "in every file to hand" runs to the next chord, is
+    not so for these lines. Nothing here writes yet. **It matters at M2 and M7**:
+    setting a box's chords writes every chord of the box again, and would change 194
+    of those ranges. Whether ProPresenter minds is not known. The maintainer's to
+    decide, for both apps; if the rule changes, the vectors are made again.
+  - Away from such lines, every range in these songs is exactly what `ranges()`
+    would write, but for two songs, in which 60 chords have a range that
+    runs past the end of its line: check 1 of `spec/08`, the old Windows editor's
+    mark. The other checks call nothing in any song doubtful.
+  - The one song last written by ProPresenter on Windows has six text boxes and no
+    line break in any of them. So how ProPresenter on Windows writes a line break is
+    still not known (`spec/01`, "Not known"). Its RTF is not Apple's dialect (no
+    `cocoartf`; it has a list table, margins and paper size) and reads the same here
+    as in AppKit.
+  - Two songs are shown in another key than their own (`user` is not `original`), one
+    of them in C#, which is not among the twenty-six keys a picker offers.
+
+### Rules the vectors do not hold
+
+Found by breaking the rules (above). Each has a case in
+`Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift`, whose expected answer was
+READ from the reference's code, not got from it. The cure is to add these inputs to
+the tools that make the vectors, on the Linux machine, so that both apps are held to
+the reference's own answers; the Windows app should carry the same cases until then.
+
+| Where | Input wanted | What the rule is |
+| --- | --- | --- |
+| `chord-names.json` | `G#b5` | A flat after a sharp is not part of the note |
+| `chord-names.json`, `transposed.json` | `C/Em`, `c/em` | What follows the last slash is a bass only if it is a note and nothing more |
+| `transposed.json` | `g` from C to C; a chord with a music flat, from E to E | The same key twice gives the chord back exactly as written |
+| `carried.json` | The same words before and after, two chords in one place | Unchanged words are only tidied, so the later of the two stands |
+| `carried.json` | `abab` to `ab`, a chord at 2 | The shared end is not looked for inside the shared start |
+| `chordpro.json`, `toText` | Three lines, the middle one empty, a chord on it | A chord on an empty line is written on that line |
+| `chordpro.json`, `withoutChords` | A `[` with a line break before its `]`; `[[G]]` | A bracket is not closed on another line, nor round another bracket |
+| `parse-song.json` (a sixth song) | Two `{artist}` lines; an empty line inside `{start_of_chorus}`; a line starting `[G]` and two spaces; the headings `CHORUS:`, `verse 2b`, `pre-chorus 2:`, `[PRE CHORUS]`, and `Verse 2bb` and `Chorus of angels`, which are not headings | The first artist stands; a gap in a marked part; chords move with trimmed words; what a heading is |
+| `rtf-text.json` | A group that sets the count of characters to pass over to nought, and after the group a numbered character with one stand-in after it | That count is a group's own, put back when the group closes |
+| `key-fit.json` | A stated key 0.2, exactly 0.25, and 0.3 below the best; a song whose best score is 0.6; E flat's chords written in sharps, with C minor used as often; a chord with the little circle | "More than a quarter below"; "at least 0.75"; the major before its relative minor; the circle is diminished |
+| `tidy`, `ranges`, `carried`, `chordpro` | Words with an emoji in them | Places are UTF-16 units. Only `rtf-text.json` has a character from beyond the first 65,536 |
+
 ## Left rough, and what to ask
 
+- **A type named `Song` cannot live comfortably in a module named `Song`** (Swift
+  then cannot tell the two apart in code that imports it). The layer was named at M0.
+  Settle at the start of M2: call the layer something else (`SongFile`?), or the type.
+- **What the port of the RTF reader does not copy**, each said where it happens in
+  `RTFWords.swift`: what Qt's reader of numbers makes of two characters after a
+  backslash and an apostrophe that are not two hexadecimal digits. Nothing is known to
+  write such a thing.
+- **`mac/Core` is built and tested without Xcode; the app has not been touched at
+  M1.** It still shows its one window.
 - **No test draws a picture yet.** There is nothing to draw but a line of text. Where
   the views and their picture tests are to live is to be settled at M3, when there is
   a first real view. My proposal: a fourth library in `Core` for the views (SwiftUI

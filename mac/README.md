@@ -1,9 +1,9 @@
 # Pro7 Chord Editor for the Mac
 
 The Mac app, being built first of the two, to the plan in
-[`spec/11-plan.md`](../spec/11-plan.md). So far it is set up and empty: it builds,
-opens one window that says there is nothing to open yet, and has tests that read the
-shared test data. There is nothing to download.
+[`spec/11-plan.md`](../spec/11-plan.md). So far the rules of chords are built and
+held to the shared test data, and nothing else is: the app builds and opens one window
+that says there is nothing to open yet. There is nothing to download.
 
 For macOS 15 and 26, built with Xcode 26.
 
