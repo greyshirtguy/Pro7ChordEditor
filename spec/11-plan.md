@@ -25,7 +25,7 @@ machine, each through the same milestones.
 
 | | What is built | Pages | It is done when |
 | --- | --- | --- | --- |
-| **M0** | **Setting up.** The project and its three layers (rules, song, app), empty. The reader of the file format generated from `proto/proto`. A test that reads one vector file and one `.pro`. The workflow that builds and tests on every push | [10](10-platforms.md) | `swift test` / `dotnet test` runs and passes from a fresh clone; the same on GitHub's machine |
+| **M0** | **Setting up.** The project and its three layers (rules, song, app), empty. The reader of the file format generated from `proto/autogen-proto`. A test that reads one vector file and one `.pro`. The workflow that builds and tests on every push | [10](10-platforms.md) | `swift test` / `dotnet test` runs and passes from a fresh clone; the same on GitHub's machine |
 | **M1** | **The rules.** Chord names, keys, moving to another key, notations, what is offered, a box's chords in order and as ranges, ChordPro text, the words of an RTF, which key is likely | [02](02-chord-rules.md), [01](01-file-format.md) (the words) | Every case of every file in `testdata/vectors` passes, bar `sheet-model.json` and `layout.json` |
 | **M2** | **The song.** Open a `.pro`; hand over its text boxes; set a box's chords; set the key; save safely; undo and redo | [01](01-file-format.md), [05](05-song-and-saving.md) | The proofs listed at the foot of page 05, on copies of `testdata/files` |
 | **M3** | **The library.** Find ProPresenter's folder; the lists; search; open a song and show it, read only, as plain lines with chords in brackets; know when ProPresenter is running | [06](06-library.md) | The maintainer can browse his own library and read any song. Nothing can be changed yet |

@@ -49,9 +49,10 @@ A place in a song's words is a number of **UTF-16 units**
   second package or target on top of it, also without a window. The app is a thin
   third thing. An agent can build and prove the first two without ever opening Xcode.
 - Files are read with [swift-protobuf](https://github.com/apple/swift-protobuf), the
-  Swift code generated from `proto/proto` by its plug-in at build time, or generated
-  once and kept in the repository with the command that made it written beside it.
-  Do not write a reader by hand.
+  Swift code generated from `proto/autogen-proto` by its plug-in at build time, or
+  generated once and kept in the repository with the command that made it written
+  beside it. [01-file-format.md](01-file-format.md) says which files of that folder,
+  and why that folder. Do not write a reader by hand.
 - **The sheet is one custom-drawn view**, not a stack of SwiftUI texts and shapes: it
   has thousands of small things in it, follows the pointer at every move, and must
   know exactly where every character is. Draw it with `Canvas`, or as an `NSView`
@@ -79,13 +80,15 @@ A place in a song's words is a number of **UTF-16 units**
   rules in the window, and its faults are what [08-repair.md](08-repair.md) is about.
   Keep what it knew (where ProPresenter's folder is, the process to look for), which
   is written down in [06-library.md](06-library.md), and start the code afresh. Its
-  generated reader of the file format is in the repository twice and is three years
-  old: generate anew from `proto/proto`.
+  generated reader of the file format is in the repository twice and was made from
+  descriptions older than any now in the submodule: generate anew from
+  `proto/autogen-proto`. The new code is in another namespace than the old one's
+  `Rv.Data` ([01-file-format.md](01-file-format.md)).
 - **The rules as a class library** with no WPF in it (`windows/ChordRules`), tested
   with xUnit by `dotnet test`. The song, the copies and the checks are a second
   library on top. The app is a thin third project.
-- Files are read with `Google.Protobuf`, the C# generated from `proto/proto` by
-  `Grpc.Tools` at build time.
+- Files are read with `Google.Protobuf`, the C# generated from `proto/autogen-proto`
+  by `Grpc.Tools` at build time.
 - **The sheet is one custom-drawn element**: a `FrameworkElement` that overrides
   `OnRender`, measuring with `FormattedText` or `GlyphRun`, and does its own hit
   testing. Not a `RichTextBox`: that is what the old app was, and where its trouble

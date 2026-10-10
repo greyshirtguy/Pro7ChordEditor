@@ -98,7 +98,7 @@ These are not style. A change that breaks one of them is wrong however well it w
 | `testdata/files` | Sample presentations, clean and damaged, and what is in each |
 | `testdata/songs` | The ChordPro files those were made from |
 | `reference/simple-presenter` | The source of the editor being copied. To read, not to build or change |
-| `proto/` | The descriptions of ProPresenter's file formats (a submodule: `git submodule update --init`). The code that reads a `.pro` is generated from `proto/proto` |
+| `proto/` | The descriptions of ProPresenter's file formats (a submodule: `git submodule update --init`). The code that reads a `.pro` is generated from `proto/autogen-proto`, the set taken from ProPresenter itself, and from no other folder of it |
 | `tools/` | What made the test data, and `look.py` for looking inside a `.pro` |
 | `mac/` | The Mac app |
 | `windows/` | The Windows app. Until it is rewritten it holds the old one, whose bugs are the subject of `spec/08-repair.md` |

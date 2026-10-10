@@ -9,17 +9,50 @@ says otherwise.
 
 A presentation is one file ending `.pro`. It is a Protocol Buffers message,
 `rv.data.Presentation`. The descriptions of that message and everything in it are in
-`proto/proto` (a submodule of this repository: `git submodule update --init`), and each
-app reads and writes the file with code generated from those descriptions
-(swift-protobuf on the Mac, Google.Protobuf on Windows). Use the `proto/proto` folder
-and no other in that submodule: it is the set Simple Presenter is built on.
+`proto/autogen-proto` (`proto/` is a submodule of this repository:
+`git submodule update --init`), and each app reads and writes the file with code
+generated from those descriptions (swift-protobuf on the Mac, Google.Protobuf on
+Windows).
 
-To look inside one as text:
+**Use `proto/autogen-proto` and no other folder of that submodule.** It is taken out of
+ProPresenter's own program, by a job that looks each day for a new version of
+ProPresenter and takes the descriptions again when there is one. So it is what
+ProPresenter itself reads and writes with, and `version.txt` in it says which version:
+21.4 at the commit this repository holds. Simple Presenter is built from it.
+
+The folder `proto` beside it is an older set, worked out by hand and not changed since
+2023. No field of a presentation has another name or number there, but twenty-four
+fields have no name in it at all, and in the one real library looked at, three songs
+in four had some of those. The folders with a version in their names are sets taken
+at those versions, each of them before 21.4.
+
+To look inside a file as text:
 
 ```
-protoc -I proto/proto --decode rv.data.Presentation proto/proto/presentation.proto < "Some Song.pro" | less
+protoc -I proto/autogen-proto --decode rv.data.Presentation proto/autogen-proto/presentation.proto < "Some Song.pro" | less
 tools/look.py --chords "Some Song.pro"
 ```
+
+(`protoc` warns that an import is unused. That is nothing.)
+
+**What to generate code from**: `presentation.proto` and every file it imports,
+directly or through another. At 21.4 that is thirty-two of ProPresenter's files, of
+about a hundred and fifty; the rest describe its other documents, its network API and
+what it reports of its own use, and are not wanted. One of the thirty-two,
+`customOptions.proto`, imports `google/protobuf/descriptor.proto`, which is Google's
+own: the folder has a copy for `protoc` to find, and no code is generated from that
+one, because each language's protobuf library has it already.
+
+The files carry ProPresenter's own options for naming what is generated. In Swift the
+types are named `RVData_...` (`swift_prefix`), and the C# is in the namespace
+`Pro.SerializationInterop.RVProtoData` (`csharp_namespace`). In the C++ of the
+reference source the same things are `rv::data::...`.
+
+**When ProPresenter has a new version** the folder follows it by itself, in the
+submodule's own repository. This repository holds the submodule at one commit, so
+nothing changes here until someone moves it on. Doing that is a change like any other:
+generate again, run every test, and say in the commit which version it is now. Nothing
+forces it, because of what comes next.
 
 Both libraries keep what they do not understand: a field that is not in the
 descriptions is carried through a read and a write unchanged. That is what makes

@@ -1,6 +1,8 @@
 """Reading a ProPresenter presentation without any library for its format: through
 `protoc`, which turns the file into text and text back into a file, given the
-descriptions of the format in proto/ (a submodule: `git submodule update --init`).
+descriptions of the format in proto/autogen-proto (proto/ is a submodule:
+`git submodule update --init`). That folder is the set taken from ProPresenter itself; see
+spec/01-file-format.md for why it and no other.
 
 This is for the tools beside it (look.py, make-fixtures.py), which make and describe the
 test files. It is NOT how either app reads a file: they use the code their own language
@@ -19,7 +21,7 @@ import re
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROTO = os.path.join(os.path.dirname(HERE), "proto", "proto")
+PROTO = os.path.join(os.path.dirname(HERE), "proto", "autogen-proto")
 MESSAGE = "rv.data.Presentation"
 
 
