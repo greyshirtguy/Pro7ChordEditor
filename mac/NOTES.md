@@ -188,15 +188,10 @@ changing any of it:
   name, in 4 of the files. That is the difference the maintainer's first decision
   makes: nothing is lost either way, but with the newer set there is nothing in
   those files the app is blind to.
-- **The descriptions are of ProPresenter 21.4; ProPresenter 22 is installed on this
-  Mac.** No file tried was written by 22. When the submodule has 22's, move it on and
-  generate again.
+- **The descriptions are of ProPresenter 21.4.** When the submodule is moved on to a
+  later version's, generate again.
 - **ProPresenter's bundle identifier is `com.renewedvision.propresenter`**, in every
-  version installed here (7.9.2, 7.14.1, 18.3, 21.3, 22). Now in `spec/06`, rule 17.
-- **ProPresenter's own settings** are in
-  `~/Library/Application Support/RenewedVision/ProPresenter/`. Seen there, by name
-  only: `Workspaces/workspace-v1.sqlite3` and a `UserWorkspaces` folder. Not opened
-  yet: that is M3's.
+  version looked at here, from 7.9.2 to 21.3. Now in `spec/06`, rule 17.
 - **The test files say they were written by ProPresenter 7.16.2 on no platform**
   (`application_info`): Simple Presenter wrote them. A file ProPresenter wrote says
   `macos` or `windows`.

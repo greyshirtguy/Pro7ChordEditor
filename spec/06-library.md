@@ -26,11 +26,10 @@ what it learnt is kept here.
    picked, and a library of an older ProPresenter, or one kept anywhere else, is
    opened with **Choose Folder…** (rule 6). How ProPresenter records its workspaces
    and where each one's `Libraries` folder is, is **not known yet**: it is to be
-   found out at M3 by reading, and only reading,
-   `~/Library/Application Support/RenewedVision/ProPresenter/` (it has a
-   `Workspaces/workspace-v1.sqlite3` and a `UserWorkspaces` folder), and written
-   here. Whether ProPresenter on Windows has workspaces too is for the Windows
-   session to find out; if it has, they are shown and picked there the same way.
+   found out at M3 by reading, and only reading, ProPresenter's own settings, and
+   written here. Whether ProPresenter on Windows has workspaces too is for the
+   Windows session to find out; if it has, they are shown and picked there the same
+   way.
 4. Ask the system for Documents; do not build its path. On Windows it is often inside
    OneDrive, and on a Mac it may be kept in iCloud.
 5. Inside ProPresenter's folder, `Libraries` has one folder for each library, named as
@@ -102,8 +101,8 @@ words; dropping a `.pro` file on the window to open it.
 17. It is running if a process is: on Windows one named `ProPresenter`; on the Mac an
     application whose bundle identifier is `com.renewedvision.propresenter`
     (**known**: `osascript -e 'id of app "ProPresenter"'` says so on the maintainer's
-    Mac, and it is the same in each of the versions installed there, 7.9.2, 7.14.1,
-    18.3, 21.3 and 22).
+    Mac, and it is the same in each of the versions looked at there, from 7.9.2 to
+    21.3).
 18. This is asked when the app starts, when it comes to the front, and **before every
     save**. The first two are for telling the person early; only the last is the
     safeguard.
