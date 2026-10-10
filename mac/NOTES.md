@@ -14,7 +14,8 @@ milestone; put right what has become untrue.
 | **M2** The song | Done, 2026-10-10 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files |
 | **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
 | **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
-| **M5** The ChordPro editor | Next | |
+| **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
+| **M6** The chord sheet | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -103,6 +104,31 @@ And at M4:
 22. **The song is opened with its real safeguards now** (`LibraryModel.open`): whether
     ProPresenter is running, and `Copies.keep`. M5 has nothing to add for a change to
     be safe; it only has to ask for one.
+
+And at M5, 2026-10-11:
+
+23. **A slide with no text box at all is a blank slide too**, handed over with no id,
+    and is given a text box when a chord is put there, as Simple Presenter does it;
+    and **chords taken off a blank slide again in the same sitting leave the file byte
+    for byte what it was**. Both the maintainer's ("Let's adopt the ability to add/edit
+    chords on blank slides! and yes do #2 as well (I will typically keep the simple
+    presenter and stand alone editors identical)"). `spec/01` has both now. Reading
+    hands such a slide over already; the writing of both is M7's.
+24. **M5 was built on "and then proceed"**, with no plan shown first. The plan the
+    page asks for was given with the report instead.
+25. **The two keys are pickers in the song's header from M5**, not left for the sheet:
+    without them a song cannot be told what key its chords are in, and ProPresenter
+    is the one that moves them to another.
+26. **Only the boxes that were typed in are saved** (`spec/04`, rule 24). The
+    reference saves every box whose chords the text cannot show exactly, the first
+    time anything is typed anywhere.
+27. **A save that is refused makes the text again from the song** (`spec/04`, rule
+    19a), so that what is seen is what its sentence says: nothing was changed. And
+    if it was the save made on the way to another song, the song is not left, or the
+    sentence would be swept away unread.
+28. **Until M7** a line of chords alone keeps as many chords as it has and a blank
+    slide takes none; what would change that is not let through, and says why
+    (`spec/04`, "Until chords with no words are built").
 
 ## How it is laid out, and why
 
@@ -225,6 +251,36 @@ changing any of it:
   are named as copies, and never the oldest. If that is ever changed, look hard.
 - **Tests make history** with `MadeUpMac.change(_:daysAgo:)`, which changes a song as
   the app would, with a copy kept first, dated then.
+
+### The ChordPro editor (M5)
+
+- **In `Song`, with no window**: `ChordProEditor.swift` is every rule of `spec/04`:
+  what may be typed (`take`, `allows`), the help with brackets (`helpWith…`), what a
+  pause saves (`save`), the colours, which slide a place is on. It works on the lines
+  `SongText` makes, and counts in UTF-16 units throughout.
+- **In `AppViews`**: `ChordProView.swift` has `ChordProText`, the system's text view
+  and what stands between it and the model, made apart from SwiftUI so that a test
+  can type into it; and `ChordProView`, the few lines that put it in the window.
+  `LibraryModel` says when to save (`textMayBecome`, `settle`) and sets the keys.
+- **How a key press goes**: the text view asks before any change
+  (`shouldChangeTextIn`) -> `LibraryModel.textMayBecome` -> `ChordProEditor.take`. Yes,
+  and the change happens and a save is set for 700 ms on; no, and it never happens.
+  The save is `LibraryModel.settle` -> `ChordProEditor.save` -> `OpenSong`.
+- **The text is set from the model only when `ChordProShown.version` goes up**: a
+  song opened, an earlier version put back, a save refused. Never because of what was
+  typed, or the caret would jump from under the person typing.
+- **`settle()` is called before anything else is done to a song or the song is
+  left**, and answers whether what was typed is saved. If a save was refused, the
+  thing asked for is not done, so that the sentence is seen.
+- **Tests type into the real text view**: `insertText`, `doCommand(by:)` for the two
+  delete keys, `readSelection(from:)` with a pasteboard of the test's own (never the
+  person's), and `undo(_:)`.
+- **When M7 is built**: `ChordProEditor.canBeSavedYet` goes, with the one place that
+  asks it and the one line in `save` marked UNTIL M7; and `OpenSong.setChordsAlone`
+  loses its two refusals.
+- **When M6 is built**: the sentence for a song whose words have brackets gets its
+  last words back ("The chord sheet can still be used."), and `slide(at:)` and
+  `start(ofSlide:)`, which nothing shows yet, are what ties the caret to the sheet.
 
 ## What was found out
 
@@ -411,6 +467,82 @@ changing any of it:
 - **Three pictures were looked at** (the panel, the window just after a putting back,
   All Copies) and nothing in them wanted changing.
 
+### At M5
+
+- **A text view does not answer the Edit menu's Undo itself**: it leaves `undo:` to
+  its window, which uses the window's undo. Given an undo of its own by its delegate
+  (which rule 23 wants, so that it can be forgotten when the text is set afresh), it
+  must answer `undo:` and `redo:` itself, and say when each can be done.
+  `ChordProText.View` does.
+- **The help with brackets is given to what arrives as typed text**
+  (`insertText`), not by looking at which keys are down: on the Mac a key pressed
+  with Command or Control never arrives so, and several keyboards type `[` and `]`
+  with Option held. What is pasted or dropped comes by another door
+  (`readSelection`) and gets none.
+- **Everything the system does to text as it is typed is switched off** in the text
+  view (curly quotes, dashes, spelling put right, spaces added round a paste): each
+  is a change to the words, and would be refused one key press after another.
+- **Asked to bring the caret into view before it has a size, a text view scrolls its
+  own margin away.** `ChordProText.show` puts the top left corner in view instead
+  when the caret is at the start.
+- **A window made in code lets go of itself when closed** unless told not to. A test
+  that closes one it still holds brings the tests down a little later, in some other
+  test. `isReleasedWhenClosed = false`.
+- **A save that is waiting for the typing to stop can come after a test is over**,
+  when its made-up Mac is gone. `MadeUpMac` is held weakly by what it hands out, and
+  a test that types either waits (`whatWasTypedIsSaved`) or settles.
+- **Swift calls two Strings equal that only look alike** (an accented letter as one
+  character and as two). What is typed is held against the words as UTF-16 units,
+  never as Strings; `Chords.withoutChords` and `chordsOf` were given forms that take
+  and give `Words` for it.
+- **Thirteen pictures were looked at.** Three things were wrong in the first of the
+  editor and were put right: the song's name was cut to "A...ace" by the two keys
+  beside it (they go under it now where the pane is narrow); the line of help was cut
+  off; and the text's left margin was scrolled out of sight. The dark one, the one
+  with ProPresenter running, a refusal with Open Again, a song whose words have
+  brackets, and blank slides were then as meant.
+- **How the proofs were shown to bite**: eighty-two breakages, one at a time, of the
+  editor's rules, the reading of blank slides and the window. Seventy-seven were
+  caught. Two that were not were holes in the tests and are caught now: text with a
+  line more or a line fewer at its END (every line before it still being what it
+  was), and a paste straight after typing. One was a guard nothing reached (a paste
+  does not come in by `insertText`), and is taken out. The five still not caught are
+  each a second lock on a door another check already holds, and say so where they
+  stand: the reference's test for a stray bracket (the words not matching says it
+  already); rule 16's "on the last character" (`Chords.tidy` does the same when the
+  box is written); which side of a `]` Delete is on (it comes to the same chord);
+  that a barred song saves nothing (nothing is ever taken from one); and asking
+  about a change made from here before making it (it is asked about again after).
+- **The tests hung once, and it could not be made to happen again.** In the first
+  breakage round one run of the tests never came back (half an hour, until it was
+  stopped). The same broken rule was run 43 times more, then the whole round again
+  with a time limit on each, then all the tests but the pictures 80 times: no hang.
+  The cause is NOT known. What was running were the tests that type into the real
+  text view from a program with no window on the screen, and my guess is something
+  in the system that such a program waits on now and then (the tests made the
+  system's "no" sound then; they are silent now). If it comes back: `sample` the
+  process named `swiftpm-testing-helper` before stopping it. The workflow has a time
+  limit now so that a hang there cannot hold a machine for hours.
+- **A check on copies of 331 real songs** (the maintainer's two sample libraries,
+  copied outside the repository under numbers, read and then deleted; numbers only):
+  all opened; one cannot be changed as ChordPro, having brackets in its words; 16,268
+  lines of text, 130 of them lines of chords alone, and **1,173 blank slides**, five
+  with no text box. For each of the other 330, nothing typed saved nothing and kept
+  no copy. In the 281 that have a line of words not starting with a chord, a chord
+  typed at the start of the first such line was taken, saved, and was then in the
+  file at that place with the box's words as they were; the only thing in the whole
+  message that differed was that one text box's chord entries; and undo left the
+  file byte for byte what it was.
+- **A text box's id is not its own in a song.** In one of those songs the boxes of 27
+  slides share one id: slides made by duplicating one. My check tripped on it, not
+  the app, which names a box by its slide and its id and changed the one box. But
+  nothing must ever tell boxes apart by id alone: the editor goes by which box of the
+  list it is (`SongLine.box`), and the sheet must too. `spec/05` says so now.
+- **Blank slides are everywhere**: three and a half to a song in those libraries. In
+  the ChordPro text each is an empty line after the gap's empty line, so most songs
+  have runs of two empty lines in them. It reads well enough in the pictures; whether
+  it does in the hand is for the maintainer to say (`spec/04`, rule 3).
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -443,10 +575,21 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
-- **Putting a copy back is the first thing in the window that writes to a song's
-  file**, and it cannot be reached on a real Mac yet: there are no copies until
-  something changes a song, which is M5. So it has been tried only by the tests, on
-  made-up Macs. At M5, try it by hand on a COPY of a library first.
+- **Nobody has typed a chord into this app with a hand.** Everything of M5 has been
+  proved by tests on made-up Macs and seen in pictures; the app itself has not been
+  run by the session that built it, since on this Mac it would open the maintainer's
+  own library with a build that can write. **To be tried, on a COPY of a library
+  first**: that typing keeps up; that Command+Z and Shift+Command+Z take back and
+  put again; pasting; Find (Command+F); a dead key (Option+E, then E) in a chord and
+  in a word; the sound when a key is not taken, and whether it is welcome; that
+  switching songs, leaving the app and quitting each save what was typed; the two
+  keys; Earlier Versions and Put This One Back, which had no copies to show until
+  now; and that a song so changed shows its chords in ProPresenter.
+- **Two empty lines look alike** where a blank slide is (`spec/04`, rule 3): to be
+  tried with M7, when one of them can take a chord.
+- **A chord the file has on an empty line of a box** is shown on that line and is
+  dropped if the box is saved, as in the reference (`spec/04`, rule 16 has no
+  character to hang it on). Not seen in a real song.
 - **All Copies reads every copy's folder each time the settings open.** Fine for
   hundreds of songs; if it is ever slow, read it off the thread that draws.
 - **What only a hand on a mouse can tell, and nobody has yet** (M3): that the app

@@ -2,11 +2,19 @@
 
 The Mac app, being built first of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it finds ProPresenter's libraries on
-the Mac, lists their songs, and shows a song with its chords to be looked at. Under
-that, and with no window yet, are the rules of chords and the song itself: setting its
-chords and its key, saving safely, undo. The copies it keeps of a file before changing
-it can be seen and put back. **No chord can be changed from the window yet**, and
-there is nothing to download.
+the Mac, lists their songs, and shows a song as ChordPro text, its chords in square
+brackets among its words, in which chords can be typed, changed and taken out. Each
+change is saved a moment after it is typed, with a copy of the file as it was kept
+first, which can be seen and put back. A song's key can be set, and the key
+ProPresenter shows it in. Nothing is saved while ProPresenter is running.
+
+Not yet: the chord sheet, for putting chords on with the mouse; one more or one fewer
+chord on a line that has no words (an intro's), and chords on a blank slide; mending
+songs the old Windows editor damaged; ChordPro files. And there is nothing to
+download: it is built from here.
+
+**It changes the files of a ProPresenter library. Try it on a copy of one first**
+(copy a folder of `Libraries` somewhere, and open the copy with Choose Folder…).
 
 For macOS 15 and 26, built with Xcode 26.
 
