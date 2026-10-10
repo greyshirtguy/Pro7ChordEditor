@@ -30,6 +30,14 @@ One test settles B, and only the maintainer can run it: in the old editor, put a
 on the first word of a slide's second line, save, and look at it in ProPresenter. If
 it is over the last letter of the line above, B is real.
 
+**What it did not do.** Its reader of the file format was generated from descriptions
+older than any now in the submodule ([01-file-format.md](01-file-format.md)), and so
+knew fewer fields than ProPresenter writes. Nothing was lost by that: the generated
+code carries what it does not know through a save. And of a text box's custom
+attributes it took out only the chords that had a name, leaving the others as they
+were and in their order, with the new chords after them. (Read from the code. Not
+tried.)
+
 ## Check 0: chords that are not on a character
 
 A chord whose place is past the end of its box's words, or on a line break.
