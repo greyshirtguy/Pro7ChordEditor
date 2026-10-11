@@ -1,0 +1,14 @@
+<!--
+  How the tests find testdata/, the folder at the top of the repository that both
+  apps' tests are held to. Not tests itself: every project of tests uses it.
+  TestData.cs says the rest.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.TestData</AssemblyName>
+    <!-- Not "...TestData": its one type is TestData, and a type named as its namespace
+         is makes trouble. -->
+    <RootNamespace>Pro7ChordEditor.Tests</RootNamespace>
+  </PropertyGroup>
+</Project>

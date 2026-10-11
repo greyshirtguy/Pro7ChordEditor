@@ -1,0 +1,38 @@
+<!--
+  What every project of the new Windows app has in common. MSBuild reads this file
+  before each project in this folder or below it, so that these are said once.
+
+  What is NOT here: the names. Each project's assembly and namespace is
+  "Pro7ChordEditor." and the project's own name (Pro7ChordEditor.ChordRules,
+  Pro7ChordEditor.Song), and it could be said once, here, as that. It is said in each
+  project instead, because said here it breaks the building of a window. To build one,
+  WPF first builds a copy of the project under a made-up name ("AppViews_x3kq_wpftmp"),
+  so that a window can use a view of its own project. A name worked out here from the
+  project's name comes out otherwise for the copy, and the window then cannot find the
+  view: "The tag 'NotBuiltYet' does not exist in XML namespace ...". (Found, building
+  M0.)
+
+  Nullable. A name that may hold nothing has to say so, and code that would use
+  nothing where that was not said does not build. It is the one group of warnings made
+  into errors here. Not all warnings are: a newer .NET SDK brings new ones, and a build
+  that passed yesterday should not stop today only because the tools were updated.
+  (The rules about comparing text, which also stop a build, are in .editorconfig.)
+
+  Embedded symbols. What a program needs to say which line an error came from is put
+  inside each assembly, so that the app can be given out as one file and still say so
+  in its log.
+
+  (global.json, beside this file, is what the `dotnet` command itself is told: how
+  tests are run.)
+
+  windows/old has a file of this name with nothing in it, which keeps these settings
+  from the first editor's project.
+-->
+<Project>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+</Project>

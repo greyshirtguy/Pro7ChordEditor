@@ -1,0 +1,28 @@
+<!--
+  The tests of the window (../../AppViews): of what it shows and what a click does,
+  and pictures of it.
+
+  THE PICTURES. An agent cannot look at a window; it can look at a picture file. So
+  some of these tests draw a view into a PNG, and whoever changed how something is
+  drawn opens the pictures and looks at them (spec/10-platforms.md, "Seeing what you
+  have drawn"). Pictures.cs says where they go and how they are drawn. They do not go
+  in the repository.
+
+  It is an .exe because xUnit, from its third version, makes every project of tests a
+  program that can run itself. `dotnet test` runs it.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.AppViews.Tests</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.AppViews.Tests</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppViews\AppViews.csproj" />
+  </ItemGroup>
+</Project>

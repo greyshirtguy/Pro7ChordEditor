@@ -1,0 +1,22 @@
+// What the `dotnet` command is told when it is run in this folder or below it. It
+// looks for a file of this name in the folder it is run in and then in each folder
+// above, which is why the Windows app is built and tested from here:
+//
+//     cd windows
+//     dotnet test
+//
+// ONE THING IS SAID: how tests are run. `dotnet test` has two ways. The old one
+// (VSTest) is what it does unless told otherwise. The tests here are xUnit's third
+// version, which from its 4.0 runs on the new one (Microsoft.Testing.Platform), and
+// from the .NET 10 SDK on the old way refuses such tests outright. Without this file,
+// or run from the top of the repository, `dotnet test` stops with "Testing with VSTest
+// target is no longer supported".
+//
+// ONE THING IS NOT SAID, on purpose: which version of the SDK. Any from .NET 10 on
+// builds these projects. Naming .NET 10's alone would stop the build on the day Visual
+// Studio replaced that SDK with the next.
+{
+  "test": {
+    "runner": "Microsoft.Testing.Platform"
+  }
+}

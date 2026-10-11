@@ -1,0 +1,26 @@
+<!--
+  AppViews: the window. What it shows and what a click does, in WPF.
+
+  It is a library, and the app (../App) is the few lines that show it, for one reason:
+  an agent cannot look at a window, but it can look at a picture file. Tests can draw
+  what is in a library into pictures (Tests/AppViews.Tests), and cannot as easily draw
+  what is in an .exe. spec/10-platforms.md, "Seeing what you have drawn".
+
+  It may use the rules and the song. It does not read a file itself, and it holds no
+  rule: what a click does to a song is worked out in Song, with no window in it, and
+  shown here (AGENTS.md, "Keep the rules out of the window's code").
+
+  Until milestone M3 it has one window with a sentence in it.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.AppViews</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.AppViews</RootNamespace>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
+    <ProjectReference Include="..\Song\Song.csproj" />
+  </ItemGroup>
+</Project>

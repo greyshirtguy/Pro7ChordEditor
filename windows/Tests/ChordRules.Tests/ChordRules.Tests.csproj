@@ -1,0 +1,26 @@
+<!--
+  The tests of the rules (../../ChordRules), held to testdata/vectors: the rules are
+  right when they give the answers those files hold, and an expected answer is never
+  changed to make a test pass (AGENTS.md, "The rules are the vectors").
+
+  Until milestone M1 there are no rules to try, and what is here proves only that the
+  vectors are found and arrive whole on Windows.
+
+  It is an .exe because xUnit, from its third version, makes every project of tests a
+  program that can run itself. `dotnet test` runs it.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.ChordRules.Tests</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.ChordRules.Tests</RootNamespace>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ChordRules\ChordRules.csproj" />
+    <ProjectReference Include="..\TestData\TestData.csproj" />
+  </ItemGroup>
+</Project>

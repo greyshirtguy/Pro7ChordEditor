@@ -1,0 +1,29 @@
+<!--
+  Song: a song as the two editors see it, and everything else that has no window in
+  it. Opening a .pro file and handing over its text boxes, setting a box's chords and
+  the song's keys, saving each change at once and safely, undo
+  (spec/05-song-and-saving.md); finding ProPresenter's libraries and listing them
+  (spec/06-library.md); the copies kept before a file is changed
+  (spec/07-backups.md); the checks for what the first editor left in files
+  (spec/08-repair.md).
+
+  It stands on the rules (ChordRules) and on the reader of the file (ProFormat). It is
+  built for plain .NET, where there is no WPF: what a click does to a song is worked
+  out here, and the window only shows it (AGENTS.md, "Keep the rules out of the
+  window's code").
+
+  Its tests are Tests/Song.Tests, on copies of testdata/files in a temporary folder.
+
+  Empty until milestone M2.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.Song</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.Song</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
+    <ProjectReference Include="..\ProFormat\ProFormat.csproj" />
+  </ItemGroup>
+</Project>

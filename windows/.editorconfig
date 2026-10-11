@@ -1,0 +1,43 @@
+# How the code of the new Windows app is laid out on the page, and six rules about
+# text that stop a build if they are broken.
+#
+# The six are here because of one thing this app must get right. A place in a song's
+# words is a number of UTF-16 units, and the rules of chords compare, search and sort
+# text unit by unit (spec/02-chord-rules.md, "To the letter"). .NET's strings count
+# that way already. But many of its everyday calls on a string do something else unless
+# told not to: "starts with", "index of" and "compare" go by the language the computer
+# is set to, in which two strings of different units can be called the same; and
+# turning a number or a date into text gives other digits and another calendar on some
+# computers, which matters wherever that text is a file's name or is read back. Each
+# of these rules makes the code say which it means. Where the computer's own language
+# IS what is meant (the list of songs sorted as the system sorts names, spec/06), the
+# code says so there, in so many words.
+#
+# "root" says to look no higher than this file. windows/old has a file of this name
+# that says the same, so that none of this reaches the first editor's code.
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{cs,xaml,csproj,props,slnx}]
+indent_style = space
+
+[*.cs]
+indent_size = 4
+
+# Say which language's letters, when changing case.
+dotnet_diagnostic.CA1304.severity = error
+dotnet_diagnostic.CA1311.severity = error
+# Say which language's numbers and dates, when making text of one or reading it.
+dotnet_diagnostic.CA1305.severity = error
+# Say how two pieces of text are to be compared, every time: unit by unit, unless the
+# code gives a reason for anything else where it happens.
+dotnet_diagnostic.CA1307.severity = error
+dotnet_diagnostic.CA1309.severity = error
+dotnet_diagnostic.CA1310.severity = error
+
+[*.{xaml,csproj,props,slnx}]
+indent_size = 2

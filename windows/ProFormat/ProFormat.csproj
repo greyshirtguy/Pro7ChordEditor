@@ -1,0 +1,98 @@
+<!--
+  ProFormat: the reader and writer of ProPresenter's .pro files.
+
+  The code is not in this folder and not in the repository. It is made at each build,
+  by the protoc that the Grpc.Tools package carries, from the descriptions of the
+  format in the proto/ submodule: proto/autogen-proto, the set taken from ProPresenter
+  itself, and no other folder of it (spec/01-file-format.md). It is written into this
+  project's obj folder and compiled with the one file here that is written by hand,
+  MadeFrom.cs, which says more.
+
+  Why at each build, where the Mac app keeps its generated code in the repository:
+  here the tools can read .proto files that are outside the project, so nothing made
+  need be kept, and what is built can never be older than the descriptions beside it.
+  The price is that the submodule has to be there, which an ordinary `git clone` leaves
+  empty. ../README.md has the two ways to fill it. A build without it stops and says
+  what to run (the last lines of this file).
+
+  WHICH FILES. presentation.proto and every file it imports, directly or through
+  another: thirty-two of ProPresenter's, of some hundred and fifty. The rest describe
+  its other documents and its network API and are not wanted. (A thirty-third,
+  google/protobuf/descriptor.proto, is Google's own: protoc reads it from the folder,
+  and no code is made of it, because the library has it already.)
+
+  If the build one day says that a name ending "Reflection" does not exist: the
+  submodule has been moved on, and ProPresenter's newer presentation.proto takes in a
+  file it did not before. Add that file's name to the list below. A test
+  (Tests/Song.Tests) fails if the list has a name that is NOT needed.
+
+  protoc warns, once for nearly every file, that an import of customOptions.proto is
+  unused, and once that customOptions.proto's own import is. It is true and does no
+  harm: the descriptions are taken out of ProPresenter by a program, which leaves those
+  lines in. The warnings come only when the code is made, which is when a description
+  has changed or nothing has been built yet; a build after that is quiet.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.ProFormat</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.ProFormat</RootNamespace>
+    <ProtoFolder>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..', 'proto', 'autogen-proto'))</ProtoFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" />
+    <PackageReference Include="Grpc.Tools" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WantedProto Include="
+        action;
+        alignmentGuide;
+        alphaType;
+        applicationInfo;
+        background;
+        collectionElementType;
+        color;
+        cue;
+        customOptions;
+        digitalAudio;
+        effects;
+        fileProperties;
+        font;
+        graphicsData;
+        groups;
+        hotKey;
+        input;
+        intRange;
+        layers;
+        messages;
+        musicKeyScale;
+        presentation;
+        presentationSlide;
+        propSlide;
+        rvtimestamp;
+        slide;
+        stage;
+        templateIdentification;
+        timers;
+        url;
+        uuid;
+        version" />
+    <!-- GrpcServices="None": these describe files, and no service to be called. -->
+    <Protobuf Include="@(WantedProto->'$(ProtoFolder)%(Identity).proto')" ProtoRoot="$(ProtoFolder)" GrpcServices="None" />
+  </ItemGroup>
+
+  <!-- Which version of ProPresenter the descriptions were taken from, written into
+       the assembly as it is built, for MadeFrom.cs to hand on. -->
+  <PropertyGroup Condition="Exists('$(ProtoFolder)version.txt')">
+    <ProPresenterVersion>$([System.IO.File]::ReadAllText('$(ProtoFolder)version.txt').Trim())</ProPresenterVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="ProPresenterVersion" Value="$(ProPresenterVersion)" />
+  </ItemGroup>
+
+  <Target Name="SayIfTheSubmoduleIsEmpty" BeforeTargets="BeforeBuild;Protobuf_Compile" Condition="!Exists('$(ProtoFolder)presentation.proto')">
+    <Error Text="The folder proto/ is empty, so the code that reads ProPresenter's files cannot be made. It is a git submodule, which an ordinary clone leaves empty. Fill it by running this in the repository: git submodule update --init" />
+  </Target>
+</Project>

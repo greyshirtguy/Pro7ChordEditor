@@ -1,0 +1,23 @@
+<!--
+  ChordRules: the rules. What a chord's name is, keys, moving a chord to another key,
+  the four notations, what is offered as a chord is typed, a text box's chords in order
+  and as the file writes them, chords as ChordPro text, the words of an RTF, which key
+  a song is likely in (spec/02-chord-rules.md, and the words of spec/01-file-format.md).
+
+  Plain functions over text and numbers. Nothing here knows of a file or a window, and
+  the project is so made that it cannot come to: it is built for plain .NET, where
+  there is no WPF to reach for, and it names no package, so there is no protobuf
+  either. Keep it so.
+
+  Its tests are Tests/ChordRules.Tests, held to testdata/vectors: the code is right
+  when it gives those answers (AGENTS.md, "The rules are the vectors").
+
+  Empty until milestone M1.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.ChordRules</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.ChordRules</RootNamespace>
+  </PropertyGroup>
+</Project>

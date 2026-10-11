@@ -1,0 +1,32 @@
+<!--
+  The tests of the song (../../Song) and of the reader it stands on (../../ProFormat),
+  held to testdata/files: the presentations there, clean and damaged, and what
+  testdata/files/expected says is in each.
+
+  Nothing here ever writes into testdata/. A test that changes a file works on a copy
+  in a temporary folder (AGENTS.md, "The person's files").
+
+  Until milestone M2 there is no song to try, and what is here proves the reader:
+  that it is made from the descriptions in this clone, that it reads a real file down
+  to its chords, and that a file read and written back loses nothing.
+
+  It is an .exe because xUnit, from its third version, makes every project of tests a
+  program that can run itself. `dotnet test` runs it.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>Pro7ChordEditor.Song.Tests</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.Song.Tests</RootNamespace>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\ChordRules\ChordRules.csproj" />
+    <ProjectReference Include="..\..\ProFormat\ProFormat.csproj" />
+    <ProjectReference Include="..\..\Song\Song.csproj" />
+    <ProjectReference Include="..\TestData\TestData.csproj" />
+  </ItemGroup>
+</Project>

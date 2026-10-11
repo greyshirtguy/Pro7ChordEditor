@@ -1,0 +1,40 @@
+<!--
+  The new Windows app: every project of it, for `dotnet build`, `dotnet test` and
+  Visual Studio to take as one.
+
+      cd windows
+      dotnet test
+
+  Four libraries, each knowing only of those above it in this list
+  (spec/10-platforms.md, "The Windows app"), and the app. They are the Mac app's four
+  under the same names (mac/Core/Package.swift), so that one can be read beside the
+  other:
+
+    ChordRules   What a chord is, keys, moving to another key, where a chord stands in
+                 the words, the words of an RTF. Plain .NET: no protobuf, no WPF. Held
+                 to testdata/vectors.
+    ProFormat    The reader and writer of a .pro file, made at each build from the
+                 descriptions of ProPresenter's format. One file of it is written by
+                 hand.
+    Song         A song as the editors see it, the library, the copies, the checks.
+                 On top of the other two. No window in it. Held to testdata/files.
+    AppViews     The window: what it shows and what a click does. A library, so that
+                 the tests can draw it into pictures to be looked at.
+    App          The app itself: the few lines that start it and show AppViews' window.
+
+  It was written by hand. Visual Studio and `dotnet sln` can add a project to it, and
+  may take this comment out when they do; if so, put it back.
+-->
+<Solution>
+  <Project Path="ChordRules/ChordRules.csproj" />
+  <Project Path="ProFormat/ProFormat.csproj" />
+  <Project Path="Song/Song.csproj" />
+  <Project Path="AppViews/AppViews.csproj" />
+  <Project Path="App/App.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/TestData/TestData.csproj" />
+    <Project Path="Tests/ChordRules.Tests/ChordRules.Tests.csproj" />
+    <Project Path="Tests/Song.Tests/Song.Tests.csproj" />
+    <Project Path="Tests/AppViews.Tests/AppViews.Tests.csproj" />
+  </Folder>
+</Solution>

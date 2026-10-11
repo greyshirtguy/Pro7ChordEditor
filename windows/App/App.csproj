@@ -1,0 +1,42 @@
+<!--
+  App: the app itself, Pro7ChordEditor.exe. The few lines that start it and show
+  AppViews' window (Program.cs), and how it is built to be given out. Everything it
+  does is in the libraries, where tests can reach it.
+
+  HOW IT IS GIVEN OUT (spec/10-platforms.md, "The Windows app"): as one file that needs
+  nothing installed first.
+
+      cd windows
+      dotnet publish App
+
+  leaves Pro7ChordEditor.exe, alone, in App\bin\Release\net10.0-windows\win-x64\publish.
+
+    SelfContained       .NET itself is inside the file, so the person needs none.
+    PublishSingleFile   The app's own libraries are inside it too.
+    IncludeNativeLibrariesForSelfExtract
+                        So are the five files of WPF that are not .NET code. Without
+                        this they would lie beside the .exe and have to go wherever it
+                        goes. With it, they are unpacked into the person's temporary
+                        folder the first time the app starts.
+    RuntimeIdentifier   Which kind of computer the .NET inside is for: Windows on an
+                        Intel or AMD processor, 64-bit. (Windows on Arm runs that too.)
+
+  The file is large for what it does, most of it .NET. Making it smaller, and what
+  Windows says of an .exe that nobody has signed, are milestone M10's.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Pro7ChordEditor</AssemblyName>
+    <RootNamespace>Pro7ChordEditor.App</RootNamespace>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AppViews\AppViews.csproj" />
+  </ItemGroup>
+</Project>

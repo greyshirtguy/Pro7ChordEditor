@@ -1,0 +1,58 @@
+# Builds the Windows app and runs its tests on one of GitHub's own Windows machines, at
+# every push.
+#
+# This is the other half of the referee the two apps share (spec/10-platforms.md,
+# "Getting it to other people"); mac.yml beside it is the first. Both apps are held to
+# the same testdata/, and neither can drift from it without it showing here.
+#
+# What it proves is what spec/11-plan.md asks of a fresh clone: that with nothing but
+# the repository, its proto/ submodule and the .NET SDK, the tests pass and the app
+# builds as the one file it is given out as.
+#
+# Unlike the Mac's, it fetches the submodule. The Windows app makes its reader of
+# ProPresenter's files from it at each build, and keeps none of that code in the
+# repository (windows/ProFormat/ProFormat.csproj says why).
+#
+# Everything is run in windows/: global.json there tells `dotnet test` how these tests
+# are run, and `dotnet` only finds it from that folder or below.
+#
+# The .exe is not signed, and is not kept: a build for other people is milestone M10's.
+
+name: Windows
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Test and build
+    runs-on: windows-latest
+    # (It takes a few minutes. A test that hung would otherwise hold one of GitHub's
+    # machines for six hours before anyone was told.)
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+
+      # The newest .NET with long support, which the app is built for.
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Which tools
+        run: dotnet --info
+
+      - name: The tests of the rules, the song and the window
+        run: dotnet test
+
+      - name: The app, as the one file it is given out as
+        run: |
+          dotnet publish App
+          $made = Get-ChildItem App\bin\Release\net10.0-windows\win-x64\publish
+          $made | Format-Table Name, Length
+          if ($made.Count -ne 1) { throw "The app was to be one file, and $($made.Count) were made." }

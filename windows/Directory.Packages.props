@@ -1,0 +1,36 @@
+<!--
+  Every package the Windows app takes from NuGet, and at which version: all of them,
+  in this one file. A project names the package it wants and nothing more; the version
+  comes from here. So this is the whole list of what the app depends on that is not
+  Microsoft's own .NET, and a line added here is a new dependency, which wants the
+  maintainer's yes first (AGENTS.md).
+
+  They are the ones spec/10-platforms.md names:
+
+    Google.Protobuf   Reads and writes a .pro file. It is in the app.
+    Grpc.Tools        Makes the C# that does so from proto/autogen-proto, at each
+                      build (ProFormat/ProFormat.csproj). It has protoc in it, so none
+                      has to be installed. It is used to build and is not in the app.
+    xunit.v3          The tests, and what runs them: each project of tests is a
+                      program that runs itself, which `dotnet test` starts (global.json
+                      says how). It is in the tests and not in the app.
+
+  Google.Protobuf must not be older than the protoc inside Grpc.Tools: code made by a
+  newer protoc may ask the library for what an older one has not got. (Grpc.Tools
+  2.84.0 has protoc 35.1, which is Google.Protobuf 3.35.1's.)
+
+  Not here, and not needed by `dotnet test`: xunit.runner.visualstudio and
+  Microsoft.NET.Test.Sdk, which are for the older way of running tests. If Visual
+  Studio's own Test Explorer ever fails to list these tests, those two are the first
+  thing to look at, and adding them is a new dependency to ask about.
+-->
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="Google.Protobuf" Version="3.36.2" />
+    <PackageVersion Include="Grpc.Tools" Version="2.84.0" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+</Project>
