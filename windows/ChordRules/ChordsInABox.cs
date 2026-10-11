@@ -54,11 +54,7 @@ public static partial class Chords
             {
                 continue;
             }
-            var at = Math.Clamp(given.At, 0, text.Length - 1);
-            if (text[at] == Text.LineBreak && at > 0 && text[at - 1] != Text.LineBreak)
-            {
-                at--;
-            }
+            var at = OnACharacter(text, given.At);
             var chord = new Chord(at, name);
             var same = result.FindIndex(other => other.At == at);
             if (same >= 0)
@@ -71,6 +67,31 @@ public static partial class Chords
             }
         }
         return result.OrderBy(chord => chord.At).ToList();
+    }
+
+    /// <summary>
+    /// The place <see cref="Tidy"/> brings a chord's place to: onto a character the text
+    /// has (below 0 to 0, past the end to the last character), and off a line break onto
+    /// the character before it, if that is not a line break too. In a text with no
+    /// characters it is 0, where Tidy keeps no chord at all.
+    ///
+    /// It is Tidy's own sum, taken out so that it can be asked for by itself. NEW
+    /// (spec/08-repair.md, check 0): a chord the file has past the end of its words, or
+    /// on a line break, is shown at this place, so that it can be seen and dealt with;
+    /// and that is where it is written the next time its box's chords are.
+    /// </summary>
+    public static int OnACharacter(string text, int at)
+    {
+        if (text.Length == 0)
+        {
+            return 0;
+        }
+        at = Math.Clamp(at, 0, text.Length - 1);
+        if (text[at] == Text.LineBreak && at > 0 && text[at - 1] != Text.LineBreak)
+        {
+            at--;
+        }
+        return at;
     }
 
     /// <summary>

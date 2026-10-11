@@ -53,6 +53,37 @@ public class SuggestionsAndBoxesTests
         held.Done();
     }
 
+    // MINE, NOT A VECTOR. The place Tidy brings a chord to can be asked for by itself
+    // (spec/08-repair.md, check 0: where a chord that is on no character of its words is
+    // shown), and is the same place, for every place in and around a text.
+    [Fact]
+    public void OnACharacterIsWhereTidyPutsAChord()
+    {
+        string[] texts = ["a", "ab\ncd", "ab\n\ncd", "\nab", "ab\n", "\n", "\n\n", "ab\n\n\n", "ab\ncd\nef"];
+        foreach (var text in texts)
+        {
+            for (var at = -2; at <= text.Length + 2; at++)
+            {
+                Assert.Equal([new Chord(Chords.OnACharacter(text, at), "G")], Chords.Tidy(text, [new Chord(at, "G")]));
+            }
+        }
+        // By hand. On the break that ends a line: the character before it.
+        Assert.Equal(1, Chords.OnACharacter("ab\ncd", 2));
+        // Past the end: the last character.
+        Assert.Equal(4, Chords.OnACharacter("ab\ncd", 9));
+        // Past the end, where the last character is a line break: the one before that.
+        Assert.Equal(1, Chords.OnACharacter("ab\n", 7));
+        // On an empty line, which is its line break and nothing else: it stays.
+        Assert.Equal(3, Chords.OnACharacter("ab\n\ncd", 3));
+        // A break at the very start has no character before it.
+        Assert.Equal(0, Chords.OnACharacter("\nab", 0));
+        // Before the start: the first character.
+        Assert.Equal(0, Chords.OnACharacter("ab", -3));
+        // A text with no characters has no place but 0, though Tidy keeps no chord there.
+        Assert.Equal(0, Chords.OnACharacter("", 5));
+        Assert.Empty(Chords.Tidy("", [new Chord(5, "G")]));
+    }
+
     [Fact]
     public void Ranges()
     {

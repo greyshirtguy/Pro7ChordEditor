@@ -150,6 +150,25 @@ internal static class Reading
         return found.OrderBy(chord => chord.At).ToList();
     }
 
+    /// <summary>
+    /// A box's chords as the editors are handed them: as the file has them, but each on
+    /// a character of the box's words.
+    ///
+    /// NEW (spec/08-repair.md, check 0). A chord the file has past the end of its words,
+    /// or on the line break that ends a line, stands on no line of the box. An editor
+    /// goes by lines, and would not show it at all: it could not be seen, and the next
+    /// change to its box would write it where `Chords.Tidy` puts it, as if from
+    /// nowhere. So it is handed over at that place already (`Chords.OnACharacter`: the
+    /// last character; the character before the break), is shown there, and is written
+    /// there when its box's chords next are. Nothing is saved for it until then.
+    ///
+    /// (The page asks this of the sheet. It is done here, for both editors, so that a
+    /// song has the same chords in the one as in the other: NOTES.md has it, for the
+    /// maintainer to say and for the Mac.)
+    /// </summary>
+    internal static List<Chord> ChordsHanded(string words, RV.Graphics.Types.Text? text) =>
+        ChordsOf(text).Select(chord => chord with { At = Chords.OnACharacter(words, chord.At) }).OrderBy(chord => chord.At).ToList();
+
     internal static bool IsAChord(RV.Graphics.Types.Text.Types.Attributes.Types.CustomAttribute attribute) =>
         attribute.AttributeCase == RV.Graphics.Types.Text.Types.Attributes.Types.CustomAttribute.AttributeOneofCase.Chord;
 
@@ -183,7 +202,7 @@ internal static class Reading
                 continue;
             }
             var words = WordsOf(element.Element_?.Text);
-            var chords = ChordsOf(element.Element_?.Text);
+            var chords = ChordsHanded(words, element.Element_?.Text);
             // A box with no words is left out, unless it is a line of chords alone: it
             // has chords, or the characters Multitracks hangs them on. (A box with only
             // a stray space in it, which files are full of, is neither.)

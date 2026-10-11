@@ -174,7 +174,11 @@ public sealed class NotHeldByTheTestFilesTests : IDisposable
         Workbench.TextOf(presentation, box.Element).Attributes.CustomAttributes.Add(
             new CustomAttribute { Range = new IntRange { Start = lineBreak, End = lineBreak + 1 }, Chord = "OnTheBreak" });
         var song = bench.OpenAt(bench.FileOf("on-the-break.pro", presentation.ToByteArray()));
-        Assert.Contains(new Chord(lineBreak, "OnTheBreak"), song.TextBoxes.Single(one => one.Slide == box.Slide).Chords);
+        // (The file has it on the break. The editors are handed it on the character
+        // before, the line's last stand-in, which is where it would be written: check 0
+        // of spec/08-repair.md, and MendingTests.cs.)
+        Assert.Contains(Checks.Written(Workbench.TextOf(Workbench.Read(song.Path), box.Element)), written => written.Start == lineBreak && written.Name == "OnTheBreak");
+        Assert.Contains(new Chord(lineBreak - 1, "OnTheBreak"), song.TextBoxes.Single(one => one.Slide == box.Slide).Chords);
 
         // Every chord taken off the line. (With a chord put on it instead, a chord that
         // had wrongly been kept from the break would land on the same stand-in and give

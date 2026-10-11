@@ -32,6 +32,8 @@
 //   - A line of chords alone with its last chord taken off keeps one stand-in, a
 //     zero-width space, and takes chords again (the maintainer's, 2026-10-12). There
 //     it is left with none.
+//   - What the first Windows editor left in a song can be put right (`Mend`,
+//     `MoveBack`: spec/08-repair.md). There is nothing of the kind there.
 //
 // Not safe to use from two threads at once, and not meant to be: the app keeps a song
 // where its window is.
@@ -113,6 +115,11 @@ public sealed class OpenSong : ISheetSong
 
     private sealed record MusicUnit(RV.Presentation.Types.Music? Before, RV.Presentation.Types.Music? After) : Unit;
 
+    // A mending changes the chords of many cues at once, and is one thing to undo
+    // whatever their number: so it is one unit, and not a run of steps joined, of which
+    // the oldest would be forgotten in a song of more slides than steps are kept.
+    private sealed record CuesUnit(IReadOnlyList<CueUnit> Cues) : Unit;
+
     /// <param name="Joined">One step of undo with the change before it.</param>
     private sealed record Step(Unit Unit, bool Joined);
 
@@ -169,6 +176,12 @@ public sealed class OpenSong : ISheetSong
     /// The editors never draw chords in it: they show what is in the file.
     /// </summary>
     public string ShownKey => presentation.Music is null ? "" : Reading.KeyName(presentation.Music.User);
+
+    /// <summary>
+    /// What the checks of spec/08-repair.md find in the song as it is now, in every
+    /// text box of its file (Checks.cs).
+    /// </summary>
+    public Findings Findings => Checks.Of(presentation);
 
     public bool CanUndo => undoSteps.Count > 0;
 
@@ -346,6 +359,58 @@ public sealed class OpenSong : ISheetSong
         var minor = Chords.KeyIsMinor(key);
         ChangeMusic(joined, (music, _) => music.User = Set(music.User, number, minor));
     }
+
+    /// <summary>
+    /// NEW (spec/08-repair.md, check 1): puts right the chords that are written so that
+    /// ProPresenter shows them twice. Every text box of the song that has chords has
+    /// them written again, exactly where they are; everything written has the right
+    /// ranges (Writing.cs), so a mending is nothing but that. It moves no chord and
+    /// changes no name, but for what any writing of a box does: a chord that is on no
+    /// character of its words is brought onto one (check 0), and a name loses the
+    /// spaces off its ends.
+    ///
+    /// EVERY box, and not only those in which a range runs over a line break. The page
+    /// says "the box's chords"; but that editor wrote every range of a song its own
+    /// way, and on a line of chords alone its way runs a chord on to the next without
+    /// crossing any line break. `repairs.json` has those put right too (the last box
+    /// of Plain Song), and a file mended is to have exactly the chord entries of the
+    /// one it was made from.
+    ///
+    /// A song in which nothing is found is left alone, whatever its ranges are: nothing
+    /// is saved, and no copy is kept. (So are the lines of chords alone that Simple
+    /// Presenter 0.8 to 0.82 wrote that same way: they are no one's damage, and are
+    /// written right when their box is next changed.)
+    ///
+    /// One save and one step of undo, and before it a copy of the file is kept, whatever
+    /// was kept before (spec/07-backups.md, rule 3). Answers how many chords were
+    /// shown twice.
+    /// </summary>
+    /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
+    public int Mend()
+    {
+        var found = Findings.ShownTwice;
+        if (found > 0)
+        {
+            ChangeEveryBox((_, chords) => chords);
+        }
+        return found;
+    }
+
+    /// <summary>
+    /// NEW (spec/08-repair.md, check 2), for when it has been offered and taken: moves
+    /// the chords that were put on by hand in the first Windows editor to where they
+    /// were meant. Every chord goes to `OldEditor.Unshifted` of its place, which moves
+    /// those below the first line of their text box, by one character for each line
+    /// break above, and leaves the others where they are; and every box is written, as
+    /// by `Mend`, which puts the ranges right by the way.
+    ///
+    /// It is never done unasked: the check that offers it can only say that a song
+    /// LOOKS as if it was chorded there (OldEditor.cs). One save and one step of undo,
+    /// with a copy kept first.
+    /// </summary>
+    /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
+    public void MoveBack() =>
+        ChangeEveryBox((words, chords) => chords.Select(chord => chord with { At = OldEditor.Unshifted(words, chord.At) }));
 
     /// <summary>
     /// Puts the last change back as it was before, and saves. A step that was joined to
@@ -702,6 +767,43 @@ public sealed class OpenSong : ISheetSong
         return true;
     }
 
+    // Gives every text box of the file's slides that has chords the chords that
+    // `chordsFor` makes of its own (handed the box's words, and its chords as the file
+    // has them, in order of place). Which boxes those are is Checks.cs's to say: every
+    // one, shown by the editors or not. One save, one step of undo, and before the
+    // save a copy of the file, kept as before a mending. Answers whether anything
+    // changed.
+    private bool ChangeEveryBox(Func<string, IReadOnlyList<Chord>, IEnumerable<Chord>> chordsFor)
+    {
+        var changed = presentation.Clone();
+        var units = new List<CueUnit>();
+        for (var index = 0; index < presentation.Cues.Count; index++)
+        {
+            var before = presentation.Cues[index];
+            var after = before.Clone();
+            foreach (var text in Checks.Texts(after))
+            {
+                var chords = Reading.ChordsOf(text);
+                if (chords.Count > 0)
+                {
+                    Writing.WriteChords(chordsFor(Reading.WordsOf(text), chords), text);
+                }
+            }
+            if (!after.Equals(before))
+            {
+                changed.Cues[index] = after;
+                units.Add(new CueUnit(index, before, after));
+            }
+        }
+        if (units.Count == 0)
+        {
+            return false;
+        }
+        Save(changed, CopyReason.BeforeMending);
+        Record(new CuesUnit(units), joined: false);
+        return true;
+    }
+
     private void ChangeMusic(bool joined, Action<RV.Presentation.Types.Music, bool> apply)
     {
         var before = presentation.Music;
@@ -748,6 +850,12 @@ public sealed class OpenSong : ISheetSong
             case MusicUnit music:
                 changed.Music = (forwards ? music.After : music.Before)?.Clone();
                 break;
+            case CuesUnit cues:
+                foreach (var one in cues.Cues)
+                {
+                    changed.Cues[one.Index] = (forwards ? one.After : one.Before).Clone();
+                }
+                break;
         }
         Save(changed);
         from.RemoveAt(from.Count - 1);
@@ -787,18 +895,19 @@ public sealed class OpenSong : ISheetSong
     //      be, in its size, its time of last change AND its bytes, what was last read
     //      from it or written to it here. (A file brought down by a syncing service can
     //      come with its old time on it; and a song is small.)
-    //   4. Before the first save, a copy of the file is kept. If it cannot be, nothing
-    //      is saved.
+    //   4. Before the first save, a copy of the file is kept; and before a mending,
+    //      whatever was kept before (`always`: spec/07-backups.md, rule 3). If it
+    //      cannot be, nothing is saved.
     //   5. The whole message is written beside the file and put in its place, and read
     //      back.
-    private void Save(RV.Presentation changed)
+    private void Save(RV.Presentation changed, CopyReason? always = null)
     {
         var asked = MaySave();
-        if (!copyKept)
+        if (!copyKept || always is not null)
         {
             try
             {
-                asked.KeepCopy(Path, CopyReason.BeforeAChange);
+                asked.KeepCopy(Path, always ?? CopyReason.BeforeAChange);
             }
             catch (Exception exception)
             {
