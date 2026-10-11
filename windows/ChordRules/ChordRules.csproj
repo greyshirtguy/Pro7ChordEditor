@@ -10,9 +10,12 @@
   either. Keep it so.
 
   Its tests are Tests/ChordRules.Tests, held to testdata/vectors: the code is right
-  when it gives those answers (AGENTS.md, "The rules are the vectors").
+  when it gives those answers (AGENTS.md, "The rules are the vectors"). They may see
+  what is kept inside the project (the last lines of this file), so that the few small
+  things the rules stand on can be tried by themselves: what white space is, how a
+  score is rounded, which bytes of an RTF a line is written with.
 
-  Empty until milestone M1.
+  Chords.cs is the way in, and lists the files.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -20,4 +23,7 @@
     <AssemblyName>Pro7ChordEditor.ChordRules</AssemblyName>
     <RootNamespace>Pro7ChordEditor.ChordRules</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pro7ChordEditor.ChordRules.Tests" />
+  </ItemGroup>
 </Project>

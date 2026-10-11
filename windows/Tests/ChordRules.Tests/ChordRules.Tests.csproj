@@ -3,8 +3,19 @@
   right when they give the answers those files hold, and an expected answer is never
   changed to make a test pass (AGENTS.md, "The rules are the vectors").
 
-  Until milestone M1 there are no rules to try, and what is here proves only that the
-  vectors are found and arrive whole on Windows.
+  Every case of every vector file is run, bar sheet-model.json and layout.json, which
+  are the chord sheet's (milestone M6). Vectors.cs says how the cases are compared and
+  what is said of one that fails. A test marked "Mine, not a vector" is just that: its
+  answer was worked out or read from the reference, and if it ever disagrees with a
+  vector made later, the vector is right.
+
+    VectorFilesTests          the vectors are found, and arrive whole on Windows
+    NamesKeysAndNotesTests    keys, chord-names, transposed, notated, shown
+    SuggestionsAndBoxesTests  diatonic, completions, tidy, ranges, carried, chordpro
+    ChordProSongTests         parse-song
+    RtfWordsTests             rtf-text, stand-ins-in-rtf
+    NewRulesTests             key-fit, line-break-shift
+    TextTests                 what white space and a letter are, against .NET's own
 
   It is an .exe because xUnit, from its third version, makes every project of tests a
   program that can run itself. `dotnet test` runs it.

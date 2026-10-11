@@ -1,8 +1,9 @@
 // That the vectors are found, and arrive whole on this computer.
 //
-// The rules themselves are milestone M1's: each will have a file of tests here that
-// reads every case of its vector file. These tests are milestone M0's, and prove what
-// those will stand on: that testdata/vectors is where TestData says, that every file
+// The rules themselves are held to the vectors by the tests beside this file, each of
+// which reads every case of its vector file. These tests came first, at milestone M0,
+// and prove what those stand on: that testdata/vectors is where TestData says, that
+// every file
 // of it reads as what testdata/README.md says a vector file is, and that the
 // characters in them that cannot be seen (a zero-width space, U+200B, and an em quad,
 // U+2001) are still those characters, unit for unit, after git has checked the files
