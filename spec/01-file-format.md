@@ -365,9 +365,9 @@ one as the words that were meant, with every other line of the box set as it was
 (its font, its size, its colour, its paragraph); and read the stand-ins a blank
 slide was given in the font of the box they were modelled on. On the Mac that is a
 test of its own (`NSAttributedString`); on Windows there is no such second reader
-to ask. **A guess**, still, until it has been seen: that ProPresenter shows the
-chords of a line so changed as it shows any other's. It does more with a text box
-than read its RTF. The maintainer is asked to look ([11-plan.md](11-plan.md), M7).
+to ask. **Seen**, by the maintainer in ProPresenter on 2026-10-12, of chords put on
+with the Mac app: "They showed". (ProPresenter does more with a text box than read
+its RTF, which is why it had to be looked at there.)
 
 ### Chords onto a blank slide
 
@@ -488,9 +488,10 @@ shape; that `text.attributes` may be left as they were; that a copied box's othe
 custom attributes, whose ranges were over words that are no longer in it, do no harm
 left where they are; and that a text box does no harm on a slide that is there to
 start something else (of the 30 slides in the songs looked at that have nothing on
-them at all, 16 start a video, a macro or the like when they are shown). It was built at M7, on the Mac,
-and **has not yet been looked at in ProPresenter**: that is asked of the maintainer
-before anyone is given it.
+them at all, 16 start a video, a macro or the like when they are shown). It was built
+at M7, on the Mac. The maintainer looked in ProPresenter on 2026-10-12 and the chords
+showed. **Which of these that covered was not said** (a blank slide's own box, a box
+that was added, a slide that starts a video), so each stands as a guess until it is.
 
 ## The key
 

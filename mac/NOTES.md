@@ -16,7 +16,7 @@ milestone; put right what has become untrue.
 | **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
 | **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
-| **M7** Chords with no words | Built, 2026-10-11; **not yet seen in ProPresenter, and not done until it has been** | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made; **its third, that ProPresenter shows what was written, is the maintainer's to make** |
+| **M7** Chords with no words | Built, 2026-10-11. **Seen in ProPresenter by the maintainer, 2026-10-12: "They showed"** (which cases were among what was looked at was not said) | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made, and its third, that ProPresenter shows what was written, the maintainer made. Since then, decision 58: a line that loses its last chord takes chords again |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -1161,10 +1161,11 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
-- **Nobody has seen in ProPresenter what M7 writes.** This is the plan's third proof
-  and the only one that matters to a musician. To be tried by the maintainer, on a
-  song made up for it or a COPY of one of their own, with ProPresenter quit while
-  the chords are put on:
+- **What M7 writes has been seen in ProPresenter by the maintainer** (2026-10-12:
+  "They showed"), which was the plan's third proof. Which of the five things below
+  were looked at was not said, and what was not is still to be tried, on a song made
+  up for it or a COPY of one of their own, with ProPresenter quit while the chords
+  are put on:
   1. a chord more on an intro's line of chords, and one taken off: does the stage
      screen show the line's chords as before, each over its place?
   2. a first chord on a slide whose text box is empty: are the chords there, and is
