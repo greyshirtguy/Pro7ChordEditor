@@ -29,6 +29,11 @@
 //
 // (Putting one back is the song's own, `OpenSong.PutBack`: it is a save like any other.)
 //
+// And the first of the two editors, as far as it is rules (spec/04-chordpro-editor.md):
+//
+//   ChordProEditor.cs   the song as one piece of text: what may be typed in it, the help
+//                       with brackets, and what a pause in the typing saves
+//
 // The Mac app's is mac/Core/Sources/Song, file for file under the same names, and this
 // was ported from it with the reference beside
 // (reference/simple-presenter/src/presentationeditor.cpp), so that the two apps do the
@@ -37,7 +42,7 @@
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M5  the song as ChordPro text
+//   M5  the ChordPro editor's window, which is AppViews' and not here
 //   M6  the chord sheet's model
 //   M8  the checks for what the first Windows editor left, and the mending
 //   M9  a song made from a ChordPro file, and written out as one

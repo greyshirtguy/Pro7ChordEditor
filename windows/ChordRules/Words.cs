@@ -39,6 +39,13 @@ public static class Words
     }
 
     /// <summary>
+    /// Without the white space at their ends, as the rules count white space. (What is
+    /// typed between a pair of brackets is held to `CouldBecome` so trimmed:
+    /// spec/04-chordpro-editor.md, rule 6.)
+    /// </summary>
+    public static string Trimmed(string words) => Text.Trimmed(words);
+
+    /// <summary>
     /// The lines, parted at each line break. There is always at least one; words that
     /// end with a line break end with an empty line.
     /// </summary>
