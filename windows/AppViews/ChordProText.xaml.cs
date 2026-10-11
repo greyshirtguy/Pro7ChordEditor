@@ -37,6 +37,7 @@ using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using ChordProEditor = Pro7ChordEditor.Song.ChordProEditor;
 
 namespace Pro7ChordEditor.AppViews;
@@ -66,6 +67,7 @@ public partial class ChordProText : UserControl
     private bool applying;
     private int? shownVersion;
     private int? shownSitting;
+    private Color? chordColour;
 
     public ChordProText()
     {
@@ -215,6 +217,29 @@ public partial class ChordProText : UserControl
         Scale = wanted;
         Box.FontSize = UsualSize * wanted;
         Under.Remake();
+    }
+
+    /// <summary>
+    /// Draws chords in a colour chosen in the settings; or, given none, in the usual one,
+    /// which is the look's (spec/06, "Settings").
+    /// </summary>
+    public void SetChordColour(Color? chosen)
+    {
+        if (chosen == chordColour)
+        {
+            return;
+        }
+        chordColour = chosen;
+        if (chosen is { } colour)
+        {
+            var brush = new SolidColorBrush(colour);
+            brush.Freeze();
+            Under.ChordBrush = brush;
+        }
+        else
+        {
+            Under.SetResourceReference(ChordProUnderlay.ChordBrushProperty, Look.Chord);
+        }
     }
 
     /// <summary>Takes back the last step of what was typed. Answers whether it did.</summary>

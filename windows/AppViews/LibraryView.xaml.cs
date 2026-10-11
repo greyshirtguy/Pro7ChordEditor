@@ -4,8 +4,9 @@
 // passes on what is chosen in the menu.
 //
 // Two things in the menu open something of the system's or a window of their own, and
-// so are here and not in the model: choosing a folder, and the settings. And two keys
-// are the whole view's, whatever in it has the keyboard: Esc and Ctrl+S.
+// so are here and not in the model: choosing a folder, and the settings. And a few keys
+// are the whole view's, whatever in it has the keyboard: Esc, Ctrl+S, and Ctrl with 1
+// and with 2, which show the song's two editors (spec/06, rule 12).
 
 using System.Windows;
 using System.Windows.Controls;
@@ -82,9 +83,19 @@ public partial class LibraryView : UserControl
         }
     }
 
-    /// <summary>A key was pressed, with these others held. Answers whether it was one of the view's two.</summary>
+    /// <summary>A key was pressed, with these others held. Answers whether it was one of the view's own.</summary>
     internal bool KeyPressed(Key key, ModifierKeys held)
     {
+        // Ctrl with 1 shows the chord sheet and with 2 the ChordPro text, and the
+        // keyboard goes to the one shown. Not while something is asked over the window.
+        if (held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2)
+        {
+            if (Model.RevertQuestion is null && Model.Earlier is null && Model.Shown is { Problem: null })
+            {
+                Show(key is Key.D1 or Key.NumPad1 ? LibraryModel.Editor.Sheet : LibraryModel.Editor.ChordPro);
+            }
+            return true;
+        }
         if (key == Key.Escape && held == ModifierKeys.None && Model.RevertQuestion is not null)
         {
             Model.DontRevert();
@@ -131,6 +142,48 @@ public partial class LibraryView : UserControl
     }
 
     private void TheSongMenuWasOpened(object sender, RoutedEventArgs e) => EarlierVersions.IsEnabled = Model.HasEarlierVersions;
+
+    private void TheViewMenuWasOpened(object sender, RoutedEventArgs e)
+    {
+        var read = Model.Shown is { Problem: null };
+        var sheet = Model.EditorShown == LibraryModel.Editor.Sheet;
+        ShowChords.IsEnabled = ShowChordPro.IsEnabled = UsualWords.IsEnabled = read;
+        ShowChords.IsChecked = read && sheet;
+        ShowChordPro.IsChecked = read && !sheet;
+        LargerWords.IsEnabled = read && (sheet ? Model.CanZoomSheetIn : Model.CanZoomTextIn);
+        SmallerWords.IsEnabled = read && (sheet ? Model.CanZoomSheetOut : Model.CanZoomTextOut);
+    }
+
+    // Shows the song in one of its two editors, and gives that one the keyboard.
+    private void Show(LibraryModel.Editor editor)
+    {
+        Model.Show(editor);
+        Song.GiveTheEditorTheKeyboard();
+    }
+
+    private void ShowTheSheet(object sender, RoutedEventArgs e) => Show(LibraryModel.Editor.Sheet);
+
+    private void ShowTheText(object sender, RoutedEventArgs e) => Show(LibraryModel.Editor.ChordPro);
+
+    // The words of the editor that is shown, a step larger or smaller, or their usual
+    // size: the sheet's and the text's are each remembered by themselves.
+    private void Zoom(int direction)
+    {
+        if (Model.EditorShown == LibraryModel.Editor.Sheet)
+        {
+            Model.ZoomSheet(direction);
+        }
+        else
+        {
+            Model.ZoomText(direction);
+        }
+    }
+
+    private void MakeTheWordsLarger(object sender, RoutedEventArgs e) => Zoom(1);
+
+    private void MakeTheWordsSmaller(object sender, RoutedEventArgs e) => Zoom(-1);
+
+    private void MakeTheWordsTheirUsualSize(object sender, RoutedEventArgs e) => Zoom(0);
 
     private void ShowEarlierVersions(object sender, RoutedEventArgs e) => Model.ShowEarlierVersions();
 }

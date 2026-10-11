@@ -1,0 +1,121 @@
+<!--
+  The switch between a song's two editors, in the middle of the song's header: the chord
+  sheet, for the mouse and the keys, and the song as ChordPro text, to be typed in
+  (spec/06-library.md, rule 12).
+
+  It is two large buttons side by side and not a small switch of the system's: that the
+  song can be worked on in two ways is the first thing to know about this window, and
+  the maintainer found a small one too easy to miss. The one that is shown is filled
+  with the sheet's own orange, its words dark. Ctrl with 1 and with 2 choose them from
+  the keys, which is the window's to hear (LibraryView.xaml.cs).
+
+  Each has a small picture, drawn here and nowhere else:
+
+    the sheet   a chord's bubble in outline with a plus in it, its tail coming down to a
+                line of words: the sheet's own spot, which is what one looks at and
+                points with there;
+    the text    a chord as it is typed there: a C in square brackets.
+
+  To the system they are the two of a choice of one (radio buttons), so that a screen
+  reader says which is chosen, and the arrow keys go from one to the other. How they
+  look is this file's: the system's own look for such a choice is a small ring.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.EditorSwitch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="False"
+             AutomationProperties.Name="How the song is shown">
+  <UserControl.Resources>
+    <Style x:Key="Choice" TargetType="RadioButton">
+      <Setter Property="Height" Value="30" />
+      <Setter Property="Padding" Value="14,0" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+      <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Grid Background="Transparent">
+              <!-- (The shadow is on the fill alone: on the words it would blur them.) -->
+              <Border x:Name="Fill" CornerRadius="8" Background="#FF8A1F" Visibility="Hidden">
+                <Border.Effect>
+                  <DropShadowEffect BlurRadius="3" ShadowDepth="0.5" Direction="270" Opacity="0.22" Color="Black" />
+                </Border.Effect>
+              </Border>
+              <Border x:Name="Over" CornerRadius="8" Background="{DynamicResource TextFillColorPrimaryBrush}" Opacity="0" />
+              <ContentPresenter x:Name="Words"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Opacity="0.78"
+                                RecognizesAccessKey="False" />
+            </Grid>
+            <ControlTemplate.Triggers>
+              <!-- (Dark on the orange, whatever the system is: it is the sheet's orange, and reads the same in the light and in the dark.) -->
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Fill" Property="Visibility" Value="Visible" />
+                <Setter TargetName="Words" Property="Opacity" Value="0.86" />
+                <Setter Property="Foreground" Value="Black" />
+              </Trigger>
+              <MultiTrigger>
+                <MultiTrigger.Conditions>
+                  <Condition Property="IsMouseOver" Value="True" />
+                  <Condition Property="IsChecked" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Over" Property="Opacity" Value="0.07" />
+              </MultiTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </UserControl.Resources>
+  <Grid>
+    <Border CornerRadius="11" Background="{DynamicResource TextFillColorPrimaryBrush}" Opacity="0.09" />
+    <StackPanel Orientation="Horizontal" Margin="3" KeyboardNavigation.TabNavigation="Once" KeyboardNavigation.DirectionalNavigation="Cycle">
+      <RadioButton x:Name="Chords"
+                   Style="{StaticResource Choice}"
+                   Checked="OneWasChosen"
+                   Click="OneWasClicked"
+                   ToolTip="The chord sheet: point at a word and press a key, or click and type. Ctrl+1"
+                   AutomationProperties.Name="Chords">
+        <StackPanel Orientation="Horizontal">
+          <!-- The sheet's picture, in a box of 22 by 18: the spot over a line of words, and a shorter line, fainter, under it. -->
+          <Canvas Width="22" Height="18" VerticalAlignment="Center">
+            <Rectangle Canvas.Left="2.2" Canvas.Top="0.9" Width="10.6" Height="7.6" RadiusX="2.6" RadiusY="2.6"
+                       StrokeThickness="1.5"
+                       Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+            <Path Data="M5.5,4.7 L9.5,4.7 M7.5,2.7 L7.5,6.7"
+                  StrokeThickness="1.3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+            <Path Data="M4.8,8.5 L4.8,11.4"
+                  StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+            <Rectangle Canvas.Left="1.6" Canvas.Top="11.9" Width="18.8" Height="2.3" RadiusX="1.15" RadiusY="1.15"
+                       Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+            <Rectangle Canvas.Left="1.6" Canvas.Top="15.6" Width="12.4" Height="2.3" RadiusX="1.15" RadiusY="1.15"
+                       Opacity="0.5"
+                       Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" />
+          </Canvas>
+          <TextBlock Text="Chords" Margin="7,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+      <RadioButton x:Name="ChordPro"
+                   Style="{StaticResource Choice}"
+                   Margin="2,0,0,0"
+                   Checked="OneWasChosen"
+                   Click="OneWasClicked"
+                   ToolTip="The song as ChordPro text: type chords in square brackets among the words. Ctrl+2"
+                   AutomationProperties.Name="ChordPro">
+        <StackPanel Orientation="Horizontal">
+          <!-- The text's picture: a chord as it is typed there. -->
+          <TextBlock FontFamily="Cascadia Mono, Consolas, Courier New" FontSize="13.5" VerticalAlignment="Center">
+            <Run Text="[" FontWeight="Medium" /><Run Text="C" FontWeight="Black" /><Run Text="]" FontWeight="Medium" />
+          </TextBlock>
+          <TextBlock Text="ChordPro" Margin="7,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+      </RadioButton>
+    </StackPanel>
+  </Grid>
+</UserControl>

@@ -40,6 +40,8 @@ public class ChordProModelTests
         model.ChooseLibrary(pc.Library("Songs"));
         await model.MarksAreWorkedOutAsync();
         model.Open(pc.Song(name));
+        // (A song opens on the chord sheet. These are the ChordPro editor's.)
+        model.Show(LibraryModel.Editor.ChordPro);
         return model;
     }
 

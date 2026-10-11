@@ -7,12 +7,13 @@
 // otherwise be a blank one that nobody happened to open.
 //
 // Each is a whole view, on a made-up PC (MadeUpPC.cs), in the dark look or the light
-// one as the test says, whatever this PC is set to. So far: the lists, a song open as
-// ChordPro text and typed in, its two keys, Revert and its question, its earlier
-// versions, and All Copies. From M6 on, the chord sheet, and the cases spec/10 lists.
+// one as the test says, whatever this PC is set to: the lists, a song open on the chord
+// sheet (the cases spec/10 lists, and more) and as ChordPro text and typed in, its two
+// keys, Revert and its question, its earlier versions, the settings, and All Copies.
 
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using Pro7ChordEditor.Song;
 using Xunit;
 
@@ -294,6 +295,8 @@ public class PictureTests
                 var view = new LibraryView(model);
                 await ASongOpen(pc, model, song);
                 await model.MarksAreWorkedOutAsync();
+                // (A song opens on the chord sheet.)
+                model.Show(LibraryModel.Editor.ChordPro);
                 var typist = new Typist(view.SongPane.ChordPro, model);
                 view.SongPane.ChordPro.SaysNo = () => { };
                 await bring(pc, model, typist);
@@ -435,4 +438,167 @@ public class PictureTests
         },
         width: 1000,
         height: 620);
+
+    // ---- The chord sheet (M6)
+
+    // The window's view with a song open on its chord sheet, and someone at it with a
+    // mouse and a keyboard.
+    private static void DrawSheet(string name, bool dark, string song, Func<MadeUpPC, LibraryModel, Hand, Task> bring, double width = 1280, double height = 800, Action<MadeUpPC>? first = null) =>
+        DrawView(
+            name,
+            dark,
+            async pc =>
+            {
+                first?.Invoke(pc);
+                var model = pc.Model();
+                var view = new LibraryView(model);
+                await ASongOpen(pc, model, song);
+                await model.MarksAreWorkedOutAsync();
+                // Laid out as it will be drawn, so that there are places to point at.
+                Look.Wear(view, dark);
+                Pictures.LayOut(view, width, height);
+                await bring(pc, model, new Hand(view.SongPane.ChordSheet.Canvas));
+                return view;
+            },
+            width,
+            height);
+
+    private static readonly Func<MadeUpPC, LibraryModel, Hand, Task> AsItIs = (_, _, _) => Task.CompletedTask;
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheChordSheetAsASongOpens(bool dark) => DrawSheet("30 the chord sheet as a song opens, " + In(dark), dark, "Amazing Grace", AsItIs);
+
+    [Fact]
+    public void TheChordSheetInAWideWindow() => DrawSheet("31 the chord sheet in a wide window", true, "Amazing Grace", AsItIs, width: 1900, height: 1000);
+
+    [Theory]
+    [InlineData(-9, "smallest")]
+    [InlineData(9, "largest")]
+    public void TheChordSheetWithItsWordsSmallAndLarge(int steps, string said) => DrawSheet(
+        "32 the chord sheet with its words at their " + said,
+        true,
+        "Amazing Grace",
+        (_, model, _) =>
+        {
+            for (var step = 0; step < Math.Abs(steps); step++)
+            {
+                model.ZoomSheet(Math.Sign(steps));
+            }
+            return Task.CompletedTask;
+        },
+        width: 1900,
+        height: 1000);
+
+    [Fact]
+    public void TheSpotOnAWord() => DrawSheet(
+        "33 the spot on a word",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt("wretch");
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void TheSpotOnAChord() => DrawSheet(
+        "34 the spot on a chord",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt(hand.PlaceOf("sweet"), onItsChord: true);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void TheBubbleAChordIsTypedIn() => DrawSheet(
+        "35 a chord being typed on the sheet",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.Click("saved");
+            hand.Type("D/");
+            // (And the pointer has gone on to somewhere else, where the spot follows it.)
+            hand.PointAt("lost");
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void TheBubbleOpenedOnAChordThatIsThere() => DrawSheet(
+        "36 the bubble opened on a chord that is there",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.Click(hand.PlaceOf("blind"), onItsChord: true);
+            hand.Press(Key.Down);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void AChordBeingDragged() => DrawSheet(
+        "37 a chord being dragged",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.Drag(hand.PlaceOf("me"), hand.PlaceOf("wretch"), letGo: false);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void ASongWithALineOfChordsAlone() => DrawSheet(
+        "38 a line of chords alone, and the spot after its last",
+        true,
+        "Plain Song",
+        (_, _, hand) =>
+        {
+            var alone = Enumerable.Range(0, hand.Sheet.Rows.Count).Last(row => hand.Sheet.Rows[row].Alone);
+            hand.PointAt(new Spot(alone, hand.Sheet.Stops(alone)[^1]));
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void BlankSlidesOnTheSheet() => DrawSheet("39 blank slides on the sheet", true, "Blank Slides", AsItIs);
+
+    [Fact]
+    public void TheChordSheetAtTheWindowsSmallest() => DrawSheet("40 the chord sheet at the window" + (char)0x2019 + "s smallest", true, "Amazing Grace", AsItIs, width: 640, height: 480);
+
+    [Fact]
+    public void ASongThatStatesNoKeyOnTheSheet() => DrawSheet("41 a song that states no key, on the sheet", false, "Holy Holy Holy", AsItIs);
+
+    [Fact]
+    public void AChordRefusedOnTheSheetWhileProPresenterIsRunning() => DrawSheet(
+        "42 a chord refused on the sheet while ProPresenter is running",
+        true,
+        "Amazing Grace",
+        (pc, _, hand) =>
+        {
+            // (Started since the app last looked: the song itself finds it running.)
+            pc.ProPresenterIsRunning = true;
+            hand.PointAt("wretch");
+            hand.Press(Key.D4);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void WhatAPasteSays() => DrawSheet(
+        "43 a line" + (char)0x2019 + "s chords pasted onto another, and what is said",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt("Amazing");
+            hand.Press(Key.C, ModifierKeys.Control);
+            hand.PointAt("Twas");
+            hand.Press(Key.V, ModifierKeys.Control);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void ALongSongOnTheSheet() => DrawSheet("44 a longer song on the sheet", true, "It Is Well", AsItIs);
 }

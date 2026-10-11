@@ -928,29 +928,110 @@ public class ChordProTypingTests
         var view = new LibraryView(model);
         Look.Wear(view, dark: true);
         var pane = view.SongPane;
+        var header = Named<FrameworkElement>(pane, "Header");
         var name = Named<TextBlock>(pane, "SongName");
         var keys = Named<FrameworkElement>(pane, "Keys");
         var earlier = Named<Button>(pane, "Earlier");
+        var editors = pane.Switch;
 
-        (int NameSpan, int KeysRow, int KeysColumn, int EarlierRow, int EarlierColumn) Where(double width)
+        // Where a thing of the header is, in the pane.
+        Rect Of(FrameworkElement thing) => new(thing.TranslatePoint(default, pane), new Size(thing.ActualWidth, thing.ActualHeight));
+
+        HeaderRows? At(double width)
         {
             Pictures.LayOut(view, width, 600);
             Pictures.LayOut(view, width, 600);
-            return (Grid.GetColumnSpan(name), Grid.GetRow(keys), Grid.GetColumn(keys), Grid.GetRow(earlier), Grid.GetColumn(earlier));
+            // Whatever the way, nothing but the name is cut short, and nothing stands
+            // on anything else. (Of what is there: a song that could not be read has
+            // no switch and no keys.)
+            var there = new FrameworkElement[] { name, editors, earlier, keys }.Where(thing => thing.Visibility == Visibility.Visible).ToList();
+            foreach (var thing in there.Skip(1))
+            {
+                Assert.True(Of(thing).Left >= Of(header).Left - 0.5 && Of(thing).Right <= Of(header).Right + 0.5, thing.Name + " is not within the header at " + width);
+                Assert.True(thing.ActualWidth >= thing.DesiredSize.Width - thing.Margin.Left - 0.5, thing.Name + " is cut short at " + width);
+            }
+            var all = there.Select(Of).ToList();
+            for (var one = 0; one < all.Count; one++)
+            {
+                for (var other = one + 1; other < all.Count; other++)
+                {
+                    var both = Rect.Intersect(all[one], all[other]);
+                    Assert.True(both.IsEmpty || both.Width < 0.5 || both.Height < 0.5, "two things of the header stand on each other at " + width);
+                }
+            }
+            return pane.HeaderLaidOut;
         }
 
-        // Wide: one row, the name, Earlier Versions, the keys.
-        Assert.Equal((1, 0, 2, 0, 1), Where(1280));
-        // Narrower: the name over the keys, with Earlier Versions at the right of the
-        // keys' row.
-        Assert.Equal((3, 1, 0, 1, 2), Where(760));
-        // At the window's least: Earlier Versions beside the name, and the keys by
-        // themselves.
-        Assert.Equal((1, 1, 0, 0, 2), Where(620));
-        Assert.Equal(3, Grid.GetColumnSpan(keys));
-        // And wide again, it is one row again; nothing is cut short but the name.
-        Assert.Equal((1, 0, 2, 0, 1), Where(1280));
-        Assert.True(keys.ActualWidth >= keys.DesiredSize.Width - 15);
+        // Wide: one row, the name, the switch, Earlier Versions, the keys; and the switch
+        // in the middle of the pane.
+        Assert.Equal(HeaderRows.One, At(1600));
+        Assert.Equal(Of(header).Left + (Of(header).Width / 2), Of(editors).Left + (Of(editors).Width / 2), 1.0);
+        Assert.True(Of(name).Right <= Of(editors).Left && Of(editors).Right <= Of(earlier).Left && Of(earlier).Right <= Of(keys).Left);
+        Assert.Equal(Of(header).Right, Of(keys).Right, 0.5);
+        // (How wide the name is when none of it is cut short: what it asks for, where it
+        // is given more.)
+        var nameWhole = name.DesiredSize.Width;
+        Assert.InRange(nameWhole, 100, name.ActualWidth);
+
+        // Narrower and narrower: one row, then the keys under, then a row each, and
+        // never back to a wider way.
+        var seen = new List<HeaderRows>();
+        var offTheMiddle = 0;
+        for (var width = 1580.0; width >= 620; width -= 20)
+        {
+            var way = At(width)!.Value;
+            Assert.True(seen.Count == 0 || way >= seen[^1], "at " + width + " the header went back to " + way);
+            seen.Add(way);
+            var middle = Of(header).Left + (Of(header).Width / 2);
+            switch (way)
+            {
+                case HeaderRows.One:
+                    // The switch stands where the name's side ends, which SongLook says:
+                    // in the middle while each side can be read in its half, and after
+                    // that where the name and the keys leave it.
+                    var side = SongLook.NameSide(nameWhole, editors.ActualWidth, SongLook.AtTheRight(earlier.ActualWidth, keys.ActualWidth), Of(header).Width);
+                    Assert.True(
+                        Math.Abs(Of(header).Left + side + SongLook.Gap - Of(editors).Left) <= 1.5,
+                        string.Create(CultureInfo.InvariantCulture, $"at {width}: the header is {Of(header).Width} wide from {Of(header).Left}; the name {nameWhole} (now {name.ActualWidth}), the switch {editors.ActualWidth} at {Of(editors).Left}, Earlier Versions {earlier.ActualWidth} at {Of(earlier).Left}, the keys {keys.ActualWidth} at {Of(keys).Left}; the name's side should be {side} and its column is {((Grid)header).ColumnDefinitions[0].ActualWidth}"));
+                    Assert.Equal(Of(header).Right, Of(keys).Right, 0.5);
+                    Assert.True(Of(name).Right <= Of(editors).Left && Of(editors).Right <= Of(earlier).Left && Of(earlier).Right <= Of(keys).Left);
+                    Assert.True(name.ActualWidth >= nameWhole - 0.5, "the name is cut short on the one row at " + width);
+                    if (Math.Abs(Of(editors).Left + (Of(editors).Width / 2) - middle) > 5)
+                    {
+                        offTheMiddle++;
+                    }
+                    break;
+                case HeaderRows.KeysUnder:
+                    // The name and the switch over the keys, with Earlier Versions at the
+                    // right of the keys' row.
+                    Assert.Equal(Of(header).Right, Of(editors).Right, 0.5);
+                    Assert.True(Of(name).Right <= Of(editors).Left);
+                    Assert.True(name.ActualWidth >= nameWhole - 0.5, "the name is cut short beside the switch at " + width);
+                    Assert.True(Of(keys).Top >= Of(editors).Bottom && Of(earlier).Top >= Of(editors).Bottom);
+                    Assert.Equal(Of(header).Left, Of(keys).Left, 0.5);
+                    Assert.Equal(Of(header).Right, Of(earlier).Right, 0.5);
+                    break;
+                default:
+                    // The name with Earlier Versions, the switch in the middle, and the
+                    // keys, a row each.
+                    Assert.Equal(Of(header).Right, Of(earlier).Right, 0.5);
+                    Assert.True(Of(name).Right <= Of(earlier).Left);
+                    Assert.True(Of(editors).Top >= Of(earlier).Bottom && Of(keys).Top >= Of(editors).Bottom);
+                    Assert.Equal(middle, Of(editors).Left + (Of(editors).Width / 2), 1.0);
+                    Assert.Equal(Of(header).Left, Of(keys).Left, 0.5);
+                    break;
+            }
+        }
+        Assert.Equal([HeaderRows.One, HeaderRows.KeysUnder, HeaderRows.EachARow], seen.Distinct());
+        Assert.True(offTheMiddle > 0, "the switch was in the middle at every width at which the header was one row");
+        // And wide again, it is one row again.
+        Assert.Equal(HeaderRows.One, At(1600));
+        Assert.Equal(Of(header).Left + (Of(header).Width / 2), Of(editors).Left + (Of(editors).Width / 2), 1.0);
+        // A song that could not be read has a name and nothing else.
+        model.Open(pc.Song("Nonsense"));
+        At(1280);
+        Assert.Equal(Visibility.Collapsed, editors.Visibility);
+        Assert.Equal(Visibility.Collapsed, keys.Visibility);
     });
 
     [Fact]
@@ -994,26 +1075,47 @@ public class ChordProTypingTests
     [Fact]
     public void TheHeaderIsOneRowWhereTheNameCanBeReadWholeBesideTheRestAndOtherwiseTheKeysGoUnderIt()
     {
-        // A name of 200, Earlier Versions of 110 and keys of 260, each parted from what
-        // is at its left by 14: one row wants 598.
+        // A name of 200, a switch of 230, Earlier Versions of 110 and keys of 260, each
+        // parted from what is at its left by 14: one row wants 842.
         Assert.Equal(14, SongLook.Gap);
-        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, earlier: 110, keys: 260, room: 598));
-        // A little less, and the name would be cut short: the keys go under it, and
-        // Earlier Versions with them, at their row's right. That row wants 384.
-        Assert.Equal(HeaderRows.KeysUnderTheName, SongLook.Rows(name: 200, earlier: 110, keys: 260, room: 597));
-        Assert.Equal(HeaderRows.KeysUnderTheName, SongLook.Rows(name: 200, earlier: 110, keys: 260, room: 384));
-        // Less than that, and the keys have their row to themselves.
-        Assert.Equal(HeaderRows.KeysByThemselves, SongLook.Rows(name: 200, earlier: 110, keys: 260, room: 383));
+        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, editors: 230, earlier: 110, keys: 260, room: 842));
+        // A little less, and the name would be cut short: the keys go under it and the
+        // switch, and Earlier Versions with them, at their row's right. The name's row
+        // wants 444 and the keys' 384.
+        Assert.Equal(HeaderRows.KeysUnder, SongLook.Rows(name: 200, editors: 230, earlier: 110, keys: 260, room: 841));
+        Assert.Equal(HeaderRows.KeysUnder, SongLook.Rows(name: 200, editors: 230, earlier: 110, keys: 260, room: 444));
+        // Less than that, and each has a row.
+        Assert.Equal(HeaderRows.EachARow, SongLook.Rows(name: 200, editors: 230, earlier: 110, keys: 260, room: 443));
+        // With a shorter name it is the keys' row that says: it wants 384.
+        Assert.Equal(HeaderRows.KeysUnder, SongLook.Rows(name: 100, editors: 230, earlier: 110, keys: 260, room: 384));
+        Assert.Equal(HeaderRows.EachARow, SongLook.Rows(name: 100, editors: 230, earlier: 110, keys: 260, room: 383));
         // What is not there takes no room, nor a gap: a song with no earlier versions,
-        // and one that could not be read, which has no keys.
-        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, earlier: 0, keys: 260, room: 474));
-        Assert.Equal(HeaderRows.KeysUnderTheName, SongLook.Rows(name: 200, earlier: 0, keys: 260, room: 473));
-        Assert.Equal(HeaderRows.KeysUnderTheName, SongLook.Rows(name: 200, earlier: 0, keys: 260, room: 260));
-        Assert.Equal(HeaderRows.KeysByThemselves, SongLook.Rows(name: 200, earlier: 0, keys: 260, room: 259));
-        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, earlier: 110, keys: 0, room: 324));
-        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 900, earlier: 0, keys: 0, room: 900));
-        // A name too long for any row is cut short on a row of its own.
-        Assert.Equal(HeaderRows.KeysUnderTheName, SongLook.Rows(name: 900, earlier: 110, keys: 260, room: 500));
+        // and one that could not be read, which has no switch and no keys.
+        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, editors: 230, earlier: 0, keys: 260, room: 718));
+        Assert.Equal(HeaderRows.KeysUnder, SongLook.Rows(name: 200, editors: 230, earlier: 0, keys: 260, room: 717));
+        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 200, editors: 0, earlier: 110, keys: 0, room: 324));
+        Assert.Equal(HeaderRows.KeysUnder, SongLook.Rows(name: 200, editors: 0, earlier: 110, keys: 0, room: 323));
+        Assert.Equal(HeaderRows.One, SongLook.Rows(name: 900, editors: 0, earlier: 0, keys: 0, room: 900));
+        // A name too long for any row is cut short, on a row with Earlier Versions.
+        Assert.Equal(HeaderRows.EachARow, SongLook.Rows(name: 900, editors: 0, earlier: 110, keys: 0, room: 899));
+        Assert.Equal(HeaderRows.EachARow, SongLook.Rows(name: 900, editors: 230, earlier: 110, keys: 260, room: 500));
+
+        // What stands at the right, side by side.
+        Assert.Equal(384, SongLook.AtTheRight(earlier: 110, keys: 260));
+        Assert.Equal(260, SongLook.AtTheRight(earlier: 0, keys: 260));
+        Assert.Equal(110, SongLook.AtTheRight(earlier: 110, keys: 0));
+        Assert.Equal(0, SongLook.AtTheRight(earlier: 0, keys: 0));
+
+        // On the one row the switch is in the middle of the pane where each side can be
+        // read in half of what the switch leaves: of 1100, a switch of 230 and its two
+        // gaps leave 842, and the name's side has 421. The middle of the switch is then
+        // at 421 + 14 + 115, which is half of 1100.
+        Assert.Equal(421, SongLook.NameSide(name: 200, editors: 230, atTheRight: 384, room: 1100));
+        // Where what is at the right needs more than its half, it has it, and the name
+        // what is left: of 900, 642 are left, and 384 of them are the right's.
+        Assert.Equal(258, SongLook.NameSide(name: 200, editors: 230, atTheRight: 384, room: 900));
+        // And where the name needs more than its half, it has it.
+        Assert.Equal(500, SongLook.NameSide(name: 500, editors: 230, atTheRight: 100, room: 900));
     }
 
     // ---- With no box: ChordProTyping.cs

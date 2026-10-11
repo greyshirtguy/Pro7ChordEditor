@@ -1,0 +1,53 @@
+<!--
+  The bubble a chord is typed in: a one-line box, and over it what the chord might be
+  going to be, as a row of buttons that wraps (spec/03-chord-sheet.md, rule 29).
+
+  It does not zoom with the sheet (rule 14a), and it is the sheet's colours whatever
+  the system's look is: the sheet is dark on both platforms.
+
+  The box's template is this file's and not the look's, as the ChordPro text's is: a
+  text box of the system's look has an edge and a line under it, and this one is only
+  its letters on the bubble. Input methods are off in it, for the reason they are in the
+  ChordPro text (NOTES.md): a chord's name is plain letters.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.SheetEntry"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="330"
+             Focusable="False"
+             Cursor="Arrow">
+  <Border x:Name="Panel" CornerRadius="8" BorderThickness="1" SnapsToDevicePixels="True">
+    <DockPanel LastChildFill="True">
+      <TextBox x:Name="Box"
+               DockPanel.Dock="Bottom"
+               Height="24"
+               Margin="9,6,9,6"
+               Padding="0"
+               MinHeight="0"
+               BorderThickness="0"
+               Background="Transparent"
+               FontFamily="Segoe UI Variable Text, Segoe UI"
+               FontWeight="Bold"
+               FontSize="16"
+               VerticalContentAlignment="Center"
+               AcceptsReturn="False"
+               AcceptsTab="False"
+               MaxLines="1"
+               TextWrapping="NoWrap"
+               FocusVisualStyle="{x:Null}"
+               InputMethod.IsInputMethodEnabled="False"
+               ContextMenu="{x:Null}"
+               AutomationProperties.Name="The chord being typed">
+        <TextBox.Template>
+          <ControlTemplate TargetType="TextBox">
+            <Border Background="{TemplateBinding Background}">
+              <ScrollViewer x:Name="PART_ContentHost" Focusable="False" VerticalAlignment="Center" />
+            </Border>
+          </ControlTemplate>
+        </TextBox.Template>
+      </TextBox>
+      <!-- (Each of them has 5 under it, to part the rows; under the last row that is 4 too many.) -->
+      <WrapPanel x:Name="Offered" Margin="7,7,2,-4" />
+    </DockPanel>
+  </Border>
+</UserControl>

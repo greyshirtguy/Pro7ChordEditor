@@ -1,8 +1,8 @@
 // What the window shows, and what a click in it does, with no drawing in it: the places
 // found, the libraries of the one chosen, the songs of the library chosen, the song that
-// is open, its text as ChordPro, and its earlier versions. spec/06-library.md, "The
-// window"; spec/04-chordpro-editor.md; spec/07-backups.md, "Seeing them" and "Getting
-// one back".
+// is open in its two editors, and its earlier versions. spec/06-library.md, "The
+// window"; spec/03-chord-sheet.md; spec/04-chordpro-editor.md; spec/07-backups.md,
+// "Seeing them" and "Getting one back".
 //
 // The views only show what is here and pass on what the person does. Everything that is
 // a rule is in the layers below (Song: Places, Listing, Marks, SongText, Copies,
@@ -11,11 +11,17 @@
 // reads are here too, and not in the views, so that a test can hold them.
 //
 // A song is opened with its real safeguards: nothing is saved while ProPresenter runs,
-// nor before a copy of the file is kept. Three things here change a song's file: what
-// is typed in the ChordPro editor (spec/04; the rules of that are in
-// Song/ChordProEditor.cs, and this only says when to save), the two keys in the song's
-// header (spec/05-song-and-saving.md, rules 5 to 7), and putting an earlier version
-// back, or the song as it was opened (spec/07). The chord sheet of M6 is to come.
+// nor before a copy of the file is kept. Four things here change a song's file: what is
+// done on the chord sheet (spec/03; the rules of that are in Song/ChordSheet.cs, which
+// asks the song itself, and this is told when it has), what is typed in the ChordPro
+// editor (spec/04; the rules of that are in Song/ChordProEditor.cs, and this only says
+// when to save), the two keys in the song's header (spec/05-song-and-saving.md, rules 5
+// to 7), and putting an earlier version back, or the song as it was opened (spec/07).
+//
+// THE TWO EDITORS KEEP TO ONE SONG. Each asks the song, and neither remembers what the
+// song has. So when one has changed it the other is made again from it before it is
+// next shown: the sheet at once (`Reload`), the text when it is come back to
+// (`textIsStale`), since making the text again forgets what its box could undo.
 //
 // NOTHING IS SAVED BY HAND (spec/06, rule 12a). What is typed is saved a moment after
 // the typing stops, and before anything else is done: `Settle` is asked first by
@@ -52,6 +58,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>How many times its usual size the ChordPro text is, unless it was changed.</summary>
     public const double UsualTextZoom = 1.0;
 
+    /// <summary>How many times its usual size the chord sheet is drawn, unless it was changed (spec/03, rule 14a).</summary>
+    public const double UsualSheetZoom = 0.8;
+
     /// <summary>The sizes the text can be, each so many times its usual one (spec/03, rule 14a; spec/04, rule 25).</summary>
     public static readonly IReadOnlyList<double> Zooms = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5];
 
@@ -87,6 +96,13 @@ public sealed class LibraryModel : INotifyPropertyChanged
     // Whether what the quiet line says went wrong is that ProPresenter was running: that
     // goes from the line when ProPresenter does.
     private bool refusedForProPresenter;
+
+    // Whether the song refused the last thing the sheet asked of it.
+    private bool sheetRefused;
+
+    // Whether the song has been changed otherwise than by typing in the text, since the
+    // text was made from it: the text is then made again before it is next shown.
+    private bool textIsStale;
 
     // The song's file as it was when the song was opened here: what Revert puts back.
     private byte[]? asOpened;
@@ -224,6 +240,24 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// </summary>
     public sealed record Question(string Title, string Message, string Yes);
 
+    /// <summary>The two ways a song is worked on (spec/06, rule 12).</summary>
+    public enum Editor
+    {
+        /// <summary>The chord sheet: chords put on with the mouse and the keys.</summary>
+        Sheet,
+
+        /// <summary>The song as ChordPro text, typed in.</summary>
+        ChordPro,
+    }
+
+    /// <summary>
+    /// What the quiet line says while the sheet is shown: what the keys do
+    /// (spec/10-platforms.md has the words, with Ctrl where the Mac has its own keys).
+    /// </summary>
+    public static string SheetHelp { get; } =
+        "1 to 7: the key" + (char)0x2019 + "s chords  " + (char)0xB7 + "  A to G: type one, and a click on the next place keeps it  " + (char)0xB7 + "  "
+        + "Drag moves a chord, with Ctrl copies it  " + (char)0xB7 + "  Delete removes  " + (char)0xB7 + "  Ctrl+C and Ctrl+V: a line" + (char)0x2019 + "s chords onto another";
+
     // ---- What is shown
 
     public IReadOnlyList<Place> Places { get; private set; } = [];
@@ -245,6 +279,38 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     /// <summary>The song as ChordPro text; null if no song is open, or it could not be read.</summary>
     public ChordProShown? ChordPro { get; private set; }
+
+    /// <summary>Which of the two editors the song is shown in (spec/06, rule 12).</summary>
+    public Editor EditorShown { get; private set; } = Editor.Sheet;
+
+    /// <summary>
+    /// The song as the chord sheet has it; null if no song is open, or it could not be
+    /// read. Its view reads it and tells it what was done; what it asks of the song
+    /// comes back here.
+    /// </summary>
+    public ChordSheet? Sheet { get; private set; }
+
+    /// <summary>
+    /// Goes up whenever the sheet was changed from outside its own view, which is then to
+    /// lay it out and draw it again.
+    /// </summary>
+    public int SheetVersion { get; private set; }
+
+    /// <summary>
+    /// How many times its usual size the sheet is drawn: one of <see cref="Zooms"/>. The
+    /// words are smaller or larger by it, and so the slides' cards, and so how many of
+    /// them there are to a row (spec/03, "Zooming").
+    /// </summary>
+    public double SheetZoom { get; private set; } = UsualSheetZoom;
+
+    /// <summary>
+    /// The colour of a chord's name on the sheet, and of a chord in the ChordPro text,
+    /// each as "#rrggbb"; nothing where the usual colour is kept (spec/06, "Settings").
+    /// Only how chords look in this app: nothing in any song's file says a colour.
+    /// </summary>
+    public string? SheetChordColour { get; private set; }
+
+    public string? TextChordColour { get; private set; }
 
     public bool ProPresenterIsRunning { get; private set; }
 
@@ -383,6 +449,18 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     public bool CanZoomTextIn => TextZoom < Zooms[^1];
 
+    public bool CanZoomSheetIn => SheetZoom < Zooms[^1];
+
+    public bool CanZoomSheetOut => SheetZoom > Zooms[0];
+
+    /// <summary>
+    /// The song's own history, which every change of either editor is a step of: whether
+    /// the last change can be taken back, and put again (spec/03, rule 53).
+    /// </summary>
+    public bool CanUndo => CanChange && openSong?.CanUndo == true;
+
+    public bool CanRedo => CanChange && openSong?.CanRedo == true;
+
     public bool CanZoomTextOut => TextZoom > Zooms[0];
 
     /// <summary>What a place is called where one is picked: its name, and how it was found.</summary>
@@ -436,9 +514,14 @@ public sealed class LibraryModel : INotifyPropertyChanged
                 {
                     return "Nothing was done to this file.";
                 }
+                // What was just said (a copy, a paste, Ctrl+S) is said in either editor.
                 if (Said is not null)
                 {
                     return Said;
+                }
+                if (EditorShown == Editor.Sheet)
+                {
+                    return SheetHelp;
                 }
                 var slides = Shown.Slides == 1 ? "1 slide" : Number(Shown.Slides) + " slides";
                 var chords = Shown.Chords == 1 ? "1 chord" : Number(Shown.Chords) + " chords";
@@ -473,6 +556,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
         chosenFolders = [.. settings.ChosenFolders];
         ListsSplit = Within(settings.ListsSplit ?? UsualListsSplit);
         TextZoom = NearestZoom(settings.TextZoom ?? UsualTextZoom);
+        SheetZoom = NearestZoom(settings.SheetZoom ?? UsualSheetZoom);
+        SheetChordColour = ColourAsKept(settings.SheetChordColour);
+        TextChordColour = ColourAsKept(settings.TextChordColour);
         keptMarks = appData.ReadMarks();
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         var thrownAway = copies.Thin();
@@ -554,6 +640,8 @@ public sealed class LibraryModel : INotifyPropertyChanged
             Refused = null;
             refusedForProPresenter = false;
         }
+        // (The sheet draws what can and cannot be done on it now.)
+        SheetVersion++;
         return true;
     }
 
@@ -720,6 +808,18 @@ public sealed class LibraryModel : INotifyPropertyChanged
     {
         pauseStop?.Cancel();
         pauseStop = null;
+        // A chord being typed on the sheet is kept first (spec/03, rule 39).
+        if (Sheet is { Typing: true } typing)
+        {
+            sheetRefused = false;
+            typing.Settle();
+            SheetVersion++;
+            Changed();
+            if (sheetRefused)
+            {
+                return false;
+            }
+        }
         if (editor is null || openSong is not { } song)
         {
             return true;
@@ -797,6 +897,227 @@ public sealed class LibraryModel : INotifyPropertyChanged
         {
             Refuse(refusal, "");
         }
+        Sheet?.Reload();
+        SheetVersion++;
+        Changed();
+    }
+
+    // ---- The chord sheet (spec/03-chord-sheet.md)
+
+    /// <summary>
+    /// Shows the song in the other editor. What was being typed in the one that is left
+    /// is kept first, and the one that is come to is made again from the song, since the
+    /// other may have changed it.
+    /// </summary>
+    public void Show(Editor wanted)
+    {
+        if (wanted == EditorShown || !Settle())
+        {
+            return;
+        }
+        if (wanted == Editor.ChordPro)
+        {
+            if (editor is not null && textIsStale)
+            {
+                editor.Reload(keepingWhatIsTyped: false);
+                ShowText(editor);
+            }
+        }
+        else
+        {
+            Sheet?.Reload();
+        }
+        EditorShown = wanted;
+        SheetVersion++;
+        Changed();
+    }
+
+    /// <summary>The song's last change taken back (spec/03, rule 53).</summary>
+    public void Undo()
+    {
+        if (openSong?.CanUndo == true)
+        {
+            Change(song => song.Undo());
+            textIsStale = true;
+        }
+    }
+
+    /// <summary>The change last taken back, made again.</summary>
+    public void Redo()
+    {
+        if (openSong?.CanRedo == true)
+        {
+            Change(song => song.Redo());
+            textIsStale = true;
+        }
+    }
+
+    /// <summary>
+    /// Makes the sheet's words a step larger (1) or smaller (-1), or their usual size
+    /// (0). It is remembered. Answers with the size it now is.
+    /// </summary>
+    public double ZoomSheet(int direction)
+    {
+        var now = Zooms.ToList().IndexOf(NearestZoom(SheetZoom));
+        var wanted = direction == 0 ? UsualSheetZoom : Zooms[Math.Min(Math.Max(now + Math.Sign(direction), 0), Zooms.Count - 1)];
+        if (wanted != SheetZoom)
+        {
+            SheetZoom = wanted;
+            SheetVersion++;
+            if (started)
+            {
+                Remember();
+            }
+            Changed();
+        }
+        return SheetZoom;
+    }
+
+    /// <summary>
+    /// Chooses the colour of a chord's name on the sheet: "#rrggbb", or nothing for the
+    /// usual one. What is no colour so written is taken as nothing. It is remembered.
+    /// </summary>
+    public void SetSheetChordColour(string? colour)
+    {
+        SheetChordColour = ColourAsKept(colour);
+        SheetVersion++;
+        if (started)
+        {
+            Remember();
+        }
+        Changed();
+    }
+
+    /// <summary>The same for a chord in the ChordPro text.</summary>
+    public void SetTextChordColour(string? colour)
+    {
+        TextChordColour = ColourAsKept(colour);
+        if (started)
+        {
+            Remember();
+        }
+        Changed();
+    }
+
+    /// <summary>
+    /// A colour as it is kept: "#" and six of 0 to 9 and a to f, in small letters.
+    /// Nothing for anything else.
+    /// </summary>
+    internal static string? ColourAsKept(string? written)
+    {
+        if (written is null || written.Length != 7 || written[0] != '#' || !written.Skip(1).All(char.IsAsciiHexDigit))
+        {
+            return null;
+        }
+        return written.ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// A click on one of the key's seven chords in the strip: on the spot, or where a
+    /// chord was being typed, in place of what was typed.
+    /// </summary>
+    public void PutOfKey(int number)
+    {
+        if (Sheet is { } sheet)
+        {
+            sheet.PutOfKey(number);
+            SheetVersion++;
+            Changed();
+        }
+    }
+
+    /// <summary>
+    /// Copies the chords of the spot's line, or of its whole group, and says so on the
+    /// quiet line for a few seconds.
+    /// </summary>
+    public void CopyChords(bool wholeGroup)
+    {
+        if (Sheet?.Copy(wholeGroup) is { } sentence)
+        {
+            Refused = null;
+            refusedForProPresenter = false;
+            Say(sentence);
+        }
+    }
+
+    /// <summary>
+    /// Puts what was copied on the lines from the spot's on, and says what came of it: a
+    /// paste that changed nothing would otherwise look like a key that did not work, and
+    /// there are plain reasons it may change nothing.
+    /// </summary>
+    public void PasteChords()
+    {
+        if (Sheet is not { } sheet)
+        {
+            return;
+        }
+        if (sheet.Copied is null)
+        {
+            Say("Nothing has been copied yet. Ctrl+C copies the chords of the line the spot is on.");
+            return;
+        }
+        if (sheet.Paste() is not { } pasted)
+        {
+            return;
+        }
+        SheetVersion++;
+        // (What the song refused has its own sentence on the line already.)
+        if (pasted.Refused == 0 && WhatIsSaidOf(pasted) is { } sentence)
+        {
+            Say(sentence);
+        }
+        else
+        {
+            Changed();
+        }
+    }
+
+    /// <summary>What is said of a paste (spec/03, rule 52a).</summary>
+    internal static string? WhatIsSaidOf(ChordSheet.Pasted pasted)
+    {
+        const string otherKind = "chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none";
+        if (pasted.Lines == 0)
+        {
+            return pasted.PassedOver > 0 ? "Nothing was put here: " + otherKind + "." : null;
+        }
+        if (pasted.Chords == 0)
+        {
+            return "None of the copied chords had a word to go on here.";
+        }
+        var sentence = Number(pasted.Chords) + (pasted.Chords == 1 ? " chord" : " chords") + " put on " + (pasted.Lines == 1 ? "the line" : Number(pasted.Lines) + " lines") + ".";
+        if (pasted.LeftOut > 0)
+        {
+            sentence += " " + Number(pasted.LeftOut) + " had no word to go on, and " + (pasted.LeftOut == 1 ? "was" : "were") + " left out.";
+        }
+        if (pasted.PassedOver > 0)
+        {
+            sentence += " " + (pasted.PassedOver == 1 ? "1 line was" : Number(pasted.PassedOver) + " lines were") + " passed over: " + otherKind + ".";
+        }
+        return sentence;
+    }
+
+    // The sheet's song for a song just opened, or put back.
+    private ChordSheet MakeSheet(OpenSong song) => new(song)
+    {
+        PasteKeys = "Ctrl+V",
+        Refused = refusal =>
+        {
+            sheetRefused = true;
+            Refuse(refusal, "");
+            Changed();
+        },
+        Changed = SheetChanged,
+    };
+
+    // The song took a change the sheet asked for.
+    private void SheetChanged()
+    {
+        Refused = null;
+        refusedForProPresenter = false;
+        OffersOpeningAgain = false;
+        Said = null;
+        textIsStale = true;
+        NoteAChange();
         Changed();
     }
 
@@ -1136,6 +1457,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         RevertQuestion = null;
         editor = null;
         ChordPro = null;
+        Sheet = null;
         Said = null;
     }
 
@@ -1145,12 +1467,15 @@ public sealed class LibraryModel : INotifyPropertyChanged
         editor = new ChordProEditor(song);
         sitting++;
         ShowText(editor);
+        Sheet = MakeSheet(song);
+        SheetVersion++;
     }
 
     // Sets the text the view shows from the editor's, in place of whatever was typed.
     private void ShowText(ChordProEditor from)
     {
         textVersion++;
+        textIsStale = false;
         ChordPro = new ChordProShown(from.Text, textVersion, sitting, from.Barred);
     }
 
@@ -1294,5 +1619,8 @@ public sealed class LibraryModel : INotifyPropertyChanged
         LastLibrary = LibraryId,
         ListsSplit = ListsSplit == UsualListsSplit ? null : ListsSplit,
         TextZoom = TextZoom == UsualTextZoom ? null : TextZoom,
+        SheetZoom = SheetZoom == UsualSheetZoom ? null : SheetZoom,
+        SheetChordColour = SheetChordColour,
+        TextChordColour = TextChordColour,
     });
 }

@@ -15,7 +15,9 @@
   hand that goes to it out of habit, though nothing is saved by hand here, and Revert
   beside it, as in the window (spec/06, rule 12a). Edit has what a box of text takes,
   each sent to whatever has the keyboard: in the ChordPro text, Undo and Redo are the
-  text's own (spec/04, rule 23).
+  text's own (spec/04, rule 23); on the chord sheet they are the song's, and Copy and
+  Paste are of a line's chords (spec/03, rules 47 to 53). View has the two editors,
+  the one that is shown ticked, and the size of the words in it.
 
   The edge between the lists and the song is dragged sideways, to give either more
   width. How wide the lists then are in a window of a given width is ListsLook's
@@ -61,6 +63,14 @@
           <MenuItem Command="ApplicationCommands.Paste" />
           <Separator />
           <MenuItem Command="ApplicationCommands.SelectAll" />
+        </MenuItem>
+        <MenuItem Header="_View" SubmenuOpened="TheViewMenuWasOpened">
+          <MenuItem x:Name="ShowChords" Header="_Chords" InputGestureText="Ctrl+1" Click="ShowTheSheet" />
+          <MenuItem x:Name="ShowChordPro" Header="Chord_Pro" InputGestureText="Ctrl+2" Click="ShowTheText" />
+          <Separator />
+          <MenuItem x:Name="LargerWords" Header="_Larger" InputGestureText="Ctrl+Plus" Click="MakeTheWordsLarger" />
+          <MenuItem x:Name="SmallerWords" Header="_Smaller" InputGestureText="Ctrl+Minus" Click="MakeTheWordsSmaller" />
+          <MenuItem x:Name="UsualWords" Header="_Usual Size" InputGestureText="Ctrl+0" Click="MakeTheWordsTheirUsualSize" />
         </MenuItem>
         <MenuItem Header="_Song" SubmenuOpened="TheSongMenuWasOpened">
           <MenuItem x:Name="EarlierVersions" Header="_Earlier Versions&#x2026;" Click="ShowEarlierVersions" />

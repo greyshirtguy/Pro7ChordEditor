@@ -152,6 +152,8 @@ public class EarlierVersionsTests
         Assert.Equal(history.Now, pc.BytesOf("Plain Song"));
         Assert.Equal(("E", 8), (model.Shown!.Key, model.Shown.Chords));
         Assert.Null(model.JustPutBack);
+        // (Over the ChordPro text: on the sheet the line says what the keys do.)
+        model.Show(LibraryModel.Editor.ChordPro);
         Assert.Equal("4 slides, 8 chords. A change is saved a moment after it is typed.", model.Notice);
         Assert.Contains("  Putting back was undone for Plain Song.pro.", pc.Log, StringComparison.Ordinal);
         Assert.Equal(8, model.Marks[pc.Song("Plain Song")].Chords);
@@ -197,6 +199,8 @@ public class EarlierVersionsTests
         model.PickCopy(model.Earlier!.Copies[^1].Id);
         model.PutBackPicked();
         Assert.NotNull(model.JustPutBack);
+        // (Over the ChordPro text: on the sheet the line says what the keys do.)
+        model.Show(LibraryModel.Editor.ChordPro);
         var changes = 0;
         model.PropertyChanged += (_, _) => changes++;
 

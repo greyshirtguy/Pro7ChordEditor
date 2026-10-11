@@ -1,26 +1,29 @@
 <!--
-  The song that is open, at the right of the window: its name, its two keys, and the
-  song as ChordPro text to be typed in (ChordProText.xaml). spec/06-library.md, rules
-  12, 12a, 14 and 19; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules 5
-  to 7; spec/07-backups.md, rules 15, 22 and 22a. The chord sheet (M6) will stand
-  beside the text, with a switch between the two in the middle of the header.
+  The song that is open, at the right of the window: its name, the switch between its
+  two editors (EditorSwitch.xaml), its two keys, and the editor that is shown: the chord
+  sheet (ChordSheetView.xaml) or the song as ChordPro text to be typed in
+  (ChordProText.xaml). spec/06-library.md, rules 12, 12a, 14 and 19;
+  spec/03-chord-sheet.md; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules
+  5 to 7; spec/07-backups.md, rules 15, 22 and 22a.
 
     a band     across the top while ProPresenter is running: everything can be looked
                at and nothing changed. It goes by itself when ProPresenter does;
-    a header   the song's name at the left; at the right Earlier Versions, if copies of
-               it are kept, and its two keys, each to be set. Where the pane is too
-               narrow for the name to be read beside them, the keys go on a row of
-               their own under it (SongLook.cs);
-    a line     of help over the text; or, in a warmer colour, why this song can be read
-               here and not changed. At its right, the size of the text: a small letter
-               A and a large one;
-    the song   as ChordPro text; or the sentence that says why it could not be read;
-               or, with no song open, a few quiet words where it would be;
-    a line     at the foot, that says what is there to be seen, or what went wrong.
-               After a version has been put back it offers, for a few seconds, to undo
-               that; and after a file was found changed by something else, to open the
-               song again. At its right end: Revert, and where a Save button would be,
-               the words that say why there is none.
+    a header   the song's name at the left; the switch between the two editors in the
+               middle; at the right Earlier Versions, if copies of it are kept, and its
+               two keys, each to be set. Where the pane is too narrow for the name to
+               be read beside them, the keys go on a row of their own under it, and
+               where even that is too wide each has a row (SongLook.cs);
+    the song   on the chord sheet, under the strip of its key's chords; or as ChordPro
+               text, under a line of help (or, in a warmer colour, why this song can be
+               read there and not changed) with the size of the text at its right: a
+               small letter A and a large one; or the sentence that says why it could
+               not be read; or, with no song open, a few quiet words where it would be;
+    a line     at the foot, that says what the keys do on the sheet, what is there to
+               be seen, or what went wrong. After a version has been put back it
+               offers, for a few seconds, to undo that; and after a file was found
+               changed by something else, to open the song again. At its right end:
+               Revert, and where a Save button would be, the words that say why there
+               is none.
 -->
 <UserControl x:Class="Pro7ChordEditor.AppViews.SongPane"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -32,7 +35,7 @@
       <TextBlock x:Name="BandWords" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
     </Border>
 
-    <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" Padding="12,5,12,6">
+    <Border x:Name="Foot" DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" Padding="12,5,12,6">
       <DockPanel LastChildFill="True">
         <StackPanel x:Name="Saving" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
           <Button x:Name="Revert"
@@ -74,29 +77,41 @@
     </Border>
 
     <!--
-      The header. On one row: the name, and at the right Earlier Versions and the keys.
-      Where that would cut the name short: the name over the keys, with Earlier
-      Versions at the right of the keys' row. The code beside this moves them.
+      The header. On one row: the name, the switch in the middle of the pane, and at
+      the right Earlier Versions and the keys. Where that would cut the name short: the
+      name and the switch over the keys, with Earlier Versions at the right of the
+      keys' row. Where even that is too wide: the name with Earlier Versions, the
+      switch, and the keys, a row each. The code beside this moves them.
     -->
     <Grid x:Name="Header" DockPanel.Dock="Top" Margin="16,10,16,10">
+      <!--
+        Five columns: the name's; the switch's; what is left over, on the one row; Earlier
+        Versions'; the keys'. Everything but the name is in a column as wide as itself, or
+        lies across them all: nothing but the name is ever given less room than it needs.
+      -->
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="0" />
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="Auto" />
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto" />
         <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
       </Grid.RowDefinitions>
       <TextBlock x:Name="SongName" FontSize="20" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+      <views:EditorSwitch x:Name="Editors" Grid.Column="1" Margin="14,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" />
       <Button x:Name="Earlier"
-              Grid.Column="1"
+              Grid.Column="3"
               Content="Earlier Versions"
               Margin="14,0,0,0"
+              HorizontalAlignment="Right"
               VerticalAlignment="Center"
               Click="EarlierVersionsWasClicked"
               ToolTip="See this song as it was before it was changed here, and put a version back." />
-      <StackPanel x:Name="Keys" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+      <StackPanel x:Name="Keys" Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
         <TextBlock Text="Key" VerticalAlignment="Center" Margin="0,0,6,0" />
         <ComboBox x:Name="Key"
                   MinWidth="72"
@@ -160,6 +175,7 @@
         <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
         <views:ChordProText x:Name="Text" />
       </DockPanel>
+      <views:ChordSheetView x:Name="SheetView" Visibility="Collapsed" />
     </Grid>
   </DockPanel>
 </UserControl>

@@ -6,8 +6,9 @@
 // beside a song.
 //
 //   settings.json   the folders chosen by hand, the place and library last open,
-//                   where the bar between the two lists was left, and the size of the
-//                   ChordPro text
+//                   where the bar between the two lists was left, the sizes of the
+//                   chord sheet and of the ChordPro text, and the colours chosen for a
+//                   chord in each
 //   marks.json      the marks worked out for each song (Marks.cs)
 //   log.txt         a line for each thing the app did
 //
@@ -74,11 +75,27 @@ public sealed class AppData(string folder)
         /// </summary>
         public double? TextZoom { get; init; }
 
+        /// <summary>
+        /// How many times its usual size the chord sheet is drawn; nothing if it was
+        /// never changed (spec/03-chord-sheet.md, rule 14c).
+        /// </summary>
+        public double? SheetZoom { get; init; }
+
+        /// <summary>
+        /// The colour of a chord's name on the sheet, and of a chord in the ChordPro
+        /// text, each as "#rrggbb"; nothing where the usual one is kept
+        /// (spec/06-library.md, "Settings").
+        /// </summary>
+        public string? SheetChordColour { get; init; }
+
+        public string? TextChordColour { get; init; }
+
         // (A list is the same as another when it has the same things in it, which is
         // not what a record makes of one by itself.)
         public bool Equals(Settings? other) =>
             other is not null && ChosenFolders.SequenceEqual(other.ChosenFolders) && LastPlace == other.LastPlace
-            && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom;
+            && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom && SheetZoom == other.SheetZoom
+            && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour;
 
         public override int GetHashCode() => HashCode.Combine(ChosenFolders.Count, LastPlace, LastLibrary, ListsSplit);
     }
