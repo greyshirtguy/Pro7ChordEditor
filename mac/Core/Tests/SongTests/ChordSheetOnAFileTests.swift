@@ -85,6 +85,47 @@ struct ChordSheetOnAFileTests {
         #expect(try Data(contentsOf: song.url) == bytes)
     }
 
+    @Test("A chord dragged onto a slide that has no text box, and a line of chords alone pasted onto a blank slide: each is in the file, and each undoes as one, to the byte")
+    func draggedAndPastedOntoBlankSlides() throws {
+        let bench = try Workbench()
+        let song = try bench.open(ChordsWithNoWordsTests.shaped)
+        let bytes = try Data(contentsOf: song.url)
+        let sheet = ChordSheet(song: song)
+        var said: [String] = []
+        sheet.refused = { said.append("\($0)") }
+        let four = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 3 && sheet.rows[$0].alone })
+        let first = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 0 && sheet.rows[$0].blank })
+        let last = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 11 && sheet.rows[$0].blank })
+        #expect(sheet.rows[four].chords.map(\.name) == ["E", "B", "C#m", "A"])
+
+        // The second of the four, dragged to the last slide, which has nothing on it.
+        sheet.lift(four, 2)
+        sheet.carry(over: last, 0)
+        sheet.drop(copy: false)
+        #expect(sheet.rows[four].chords.map(\.name) == ["E", "C#m", "A"])
+        #expect(sheet.rows[last].chords == [Chord(at: 0, name: "B")] && !sheet.rows[last].blank)
+        #expect(!song.textBoxes[11].element.isEmpty && song.textBoxes[3].words == Chords.placeholders(3))
+        #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
+        try song.undo()
+        #expect(!song.canUndo)
+        #expect(try Data(contentsOf: song.url) == bytes)
+        sheet.reload()
+
+        // The line of four, copied, and pasted onto the first slide, which is blank.
+        sheet.setSpot(four, 0)
+        #expect(sheet.copy(whole: false) != nil)
+        sheet.setSpot(first, 0)
+        let pasted = try #require(sheet.paste())
+        #expect(pasted.lines == 1 && pasted.chords == 4)
+        #expect(sheet.rows[first].chords.map(\.name) == ["E", "B", "C#m", "A"] && sheet.rows[first].chords.map(\.at) == [0, 2, 4, 6])
+        #expect(song.textBoxes[0].words == Chords.placeholders(4))
+        #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
+        try song.undo()
+        #expect(!song.canUndo)
+        #expect(try Data(contentsOf: song.url) == bytes)
+        #expect(said.isEmpty, "\(said)")
+    }
+
     @Test("The last chord taken off a line of chords alone that has words over it: the line is then empty, has no row and takes the spot no more; and undo brings it back")
     func theLastChordOfALineUnderWords() throws {
         let bench = try Workbench()

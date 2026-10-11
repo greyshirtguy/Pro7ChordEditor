@@ -281,7 +281,7 @@ private struct Reader {
 // spec/01-file-format.md, "Chords with no words" and "Chords onto a blank slide". NEW:
 // the reference does neither of these this way (see the head of this file), and
 // testdata/vectors/stand-ins-in-rtf.json, which holds both, was made by
-// tools/make-fixtures.py, the reference for them.
+// tools/standins.py, the reference for them.
 //
 // Both answer with nothing where the thing cannot be done cleanly, and both read back
 // what they made before they answer with it: an RTF that comes from here has exactly
@@ -327,12 +327,12 @@ extension RTFWords {
         reader.read()
         let text = reader.text
         // The line: from `start`, to `end`.
+        guard line >= 0 else { return nil }
         var start = 0
-        for _ in 0..<max(0, line) {
+        for _ in 0..<line {
             guard let next = text[start...].firstIndex(of: Words.lineBreak) else { return nil }
             start = next + 1
         }
-        guard line >= 0 else { return nil }
         let end = text[start...].firstIndex(of: Words.lineBreak) ?? text.count
         guard end > start else { return nil }
 

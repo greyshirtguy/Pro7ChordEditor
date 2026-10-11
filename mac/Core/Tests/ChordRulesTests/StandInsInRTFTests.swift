@@ -10,7 +10,7 @@
 // spaces; a single chord often hangs on one. None of the RTF below is anyone's song.
 //
 // testdata/vectors/stand-ins-in-rtf.json holds the same rule for both apps, with more
-// cases, made by tools/make-fixtures.py (StandInVectorsTests.swift). These are here
+// cases, made by tools/standins.py (StandInVectorsTests.swift). These are here
 // because what they expect can be read beside what they are given.
 
 @testable import ChordRules
