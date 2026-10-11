@@ -14,6 +14,15 @@
 //   Safeguards.cs   what a song must be given before it may save anything
 //   Refusal.cs      why a thing was not done, as a sentence for the person
 //
+// And the library (spec/06-library.md), which finds songs and lists them and opens none:
+//
+//   Places.cs           where on this PC songs are kept as files
+//   Listing.cs          a place's libraries, a library's songs, the search
+//   Marks.cs            what is said of a song beside its name, and kept from one start to the next
+//   SongText.cs         a song as lines of text: what is shown of it, and what the ChordPro editor will work on
+//   ProPresenterApp.cs  whether ProPresenter is running
+//   AppData.cs          what the app keeps of its own, and where: settings, marks, a log
+//
 // The Mac app's is mac/Core/Sources/Song, file for file under the same names, and this
 // was ported from it with the reference beside
 // (reference/simple-presenter/src/presentationeditor.cpp), so that the two apps do the
@@ -22,7 +31,6 @@
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M3  finding ProPresenter's folder, the lists, whether ProPresenter is running
 //   M4  the copies kept before a file is changed, and putting one back
 //   M5  the song as ChordPro text
 //   M6  the chord sheet's model

@@ -12,6 +12,7 @@
     KeysAndRefusalsTests          the two keys; every refusal's sentence, and that it changes nothing
     ChordsWithNoWordsTests        a chord more or fewer on a line with no words; blank slides
     NotHeldByTheTestFilesTests    rules no test file holds, each by a song made for it
+    LibraryTests                  finding places, the lists, the marks, the app's own folder, a song as lines
     Workbench                     where they work: copies in a temporary folder
 
   It is an .exe because xUnit, from its third version, makes every project of tests a
