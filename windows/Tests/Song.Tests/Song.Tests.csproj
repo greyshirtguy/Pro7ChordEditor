@@ -6,9 +6,13 @@
   Nothing here ever writes into testdata/. A test that changes a file works on a copy
   in a temporary folder (AGENTS.md, "The person's files").
 
-  Until milestone M2 there is no song to try, and what is here proves the reader:
-  that it is made from the descriptions in this clone, that it reads a real file down
-  to its chords, and that a file read and written back loses nothing.
+    TheReaderTests                the reader of the format, before anything is built on it
+    ReadingASongTests             every test file read as Simple Presenter reads it
+    ChangingChordsTests           a box's chords set, saved, undone: the proofs of spec/05
+    KeysAndRefusalsTests          the two keys; every refusal's sentence, and that it changes nothing
+    ChordsWithNoWordsTests        a chord more or fewer on a line with no words; blank slides
+    NotHeldByTheTestFilesTests    rules no test file holds, each by a song made for it
+    Workbench                     where they work: copies in a temporary folder
 
   It is an .exe because xUnit, from its third version, makes every project of tests a
   program that can run itself. `dotnet test` runs it.

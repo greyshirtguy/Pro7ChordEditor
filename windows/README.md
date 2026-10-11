@@ -2,8 +2,9 @@
 
 The Windows app, being built second of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it has what the app will stand on and
-no app: its projects, the reader of ProPresenter's files, and the rules of chords,
-held to the same answers as the Mac app's. It opens one window, which says there is
+no app: its projects, the reader of ProPresenter's files, the rules of chords, held
+to the same answers as the Mac app's, and the song: a file opened, its chords and its
+keys changed, each change saved safely and undone. It opens one window, which says there is
 nothing to open yet. **There is nothing here to use, and nothing to download.**
 
 The first Windows editor, version 0.9.5, is in [`old/`](old/README.md) as it was, and
@@ -63,7 +64,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | --- | --- |
 | `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
-| `Song/` | The song as the editors see it, the library, the copies, the checks. No window in it. Empty until milestone M2 |
+| `Song/` | The song as the editors see it. The library, the copies and the checks are to come. No window in it |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
 | `App/` | The app itself: the few lines that start it, and how it is built to be given out |
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |

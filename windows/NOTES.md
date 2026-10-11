@@ -12,7 +12,9 @@ milestone; put right what has become untrue.
 | --- | --- | --- |
 | **M0** Setting up | Done, 2026-10-12 | The four layers and the app, empty; the reader of a `.pro` made at each build; forty-nine tests; one picture; the app published as one file, and started; the workflow, which passed on GitHub's Windows machine at the first push (its run of the tests, the picture among them, and the app as one file). The first editor moved to `old/` |
 | **M1** The rules | Done, 2026-10-12 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the stand-ins written into one, the key fit and the first editor's shift. Every case of the sixteen vector files M1 is held to passes (some thirty-one thousand answers), with cases of our own for what no vector holds |
-| **M2** The song | Next | Open a `.pro`; hand over its text boxes; set a box's chords; set the key; save safely; undo and redo. The proofs at the foot of `spec/05`, on copies of `testdata/files`. `mac/NOTES.md`, "The song (M2)" and "At M2", first |
+| **M2** The song | Done, 2026-10-12 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files. **And the song's part of M7**: a chord more or fewer on a line of chords alone, chords onto a blank slide, a slide given a box, a change of mind (decision 15) |
+| **M3** The library | Next | Find ProPresenter's folder; the lists; search; open a song and show it, read only; know when ProPresenter is running. `spec/06`. **Wants first** a look at this PC's ProPresenter: where version 22 on Windows keeps its folder, whether it has workspaces, and what RTF it writes ("Left rough") |
+| **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
 
 ## What the maintainer decided, 2026-10-12
 
@@ -80,6 +82,23 @@ And the same day, later:
 14. **A directive and a heading in a ChordPro file are found by hand**, not with .NET's
     regular expressions, as on the Mac (`ChordProSong.cs`); and so are the chords
     taken out of ChordPro text (`WithoutChords`).
+15. **The song's part of M7 was built at M2.** When the Mac's session built its M2,
+    `spec/05` said what a song was to do about chords with no words until M7 (refuse,
+    in a sentence of its own). Since the Mac's M7 the page has only the finished rule,
+    to the letter, and that sentence is gone from it. So there was nothing on the page
+    to build an in-between from, the plain functions it needs were M1's already
+    (decision 13), and the Mac's `OpenSong` was there to port whole. It is built once,
+    here, with M7's two proofs that a test can make. What M7 still is on Windows: the
+    two editors letting it be asked (they are not built yet, so they will never have
+    the limits the Mac's had for a while), and the maintainer seeing in ProPresenter a
+    song so changed.
+16. **A refusal is thrown**, as on the Mac (`Refusal`, which is an `Exception`), and
+    not answered: whoever asks the song for a change gets the change, or catches the
+    refusal and shows its sentence.
+17. **The song is ported from the Mac's `OpenSong.swift`**, file for file, with the
+    reference beside, and not from the reference alone: so that where the Mac's
+    session and the maintainer settled something the reference does otherwise, the two
+    apps do the same.
 
 ## How it is laid out, and why
 
@@ -164,6 +183,41 @@ the same names. What to know before changing any of it:
   one that fails: which file, which case, what was got, with every character that
   cannot be seen written as its number). Tests marked "Mine, not a vector" are just
   that.
+
+### The song (M2)
+
+`Song/Song.cs` is the way in and lists the files, which are the Mac's under the same
+names. What to know before changing any of it:
+
+- **Everything that may be asked ends in `OpenSong.Save`.** A new state of the whole
+  message is made beside the one in memory; the safeguards are asked; the file is
+  written beside itself, pushed onto the disk, swapped in and read back; and only then
+  does the new state become the song. So a refusal or a failure anywhere leaves the
+  song in memory as it was, with nothing to put back. Keep it so: nothing but `Save`
+  puts a message in the song's place.
+- **A message here is an object, where in Swift it is a value.** Giving one another
+  name is the same message, and changing the one changes the other. So everything
+  that changes one first takes a copy (`Clone`), and a message kept for undo is never
+  changed again. And a part that is not there is nothing (`null`), where in Swift it
+  reads as an empty one: `Reading.cs` says what is done about each. This is where a
+  port from the Mac goes wrong unseen; `Song.cs` has it at more length.
+- **The order in `Save`** is the order in `spec/05`, rule 10: no safeguards;
+  ProPresenter running; the file changed by something else (size, time AND bytes);
+  the copy; the write. A refusal before the copy leaves no copy.
+- **A step of undo** holds the part that changed, before and after: one cue, or
+  `music` (which a song may not have at all). 200 steps are kept, as the reference
+  keeps.
+- **The generated messages are named through `RV`** in this layer
+  (`using RV = Pro.SerializationInterop.RVProtoData;`): one of them is called
+  `Action`, which .NET has too, and another `Slide`.
+- **Slides do not change while a song is open**, so they are worked out once. The
+  text boxes are read from the message each time they are asked for. If that is ever
+  slow (it parses every box's RTF), keep them and throw them away in `Save`.
+- **Tests** work at a `Workbench`: a folder of its own under the system's temporary
+  folder, with copies of the test files and safeguards a test can set. Nothing is
+  ever saved into `testdata/`. **A second copy of a test file asked of one workbench
+  goes over the first**: a test that wants a song and the same song untouched reads
+  the second from `testdata/` itself, or under another name.
 
 ## What was found out
 
@@ -327,6 +381,49 @@ the same names. What to know before changing any of it:
   the reference and here, and not on the Mac. Nothing writes such a thing. **For the
   maintainer to pass on, or not.**
 
+### At M2
+
+- **Every test of the song passed the first time it was run**, the song having been
+  ported from the Mac's line by line. So, as at M1:
+- **How the proofs were shown to bite.** Ninety breakages of `Reading.cs`,
+  `Writing.cs` and `OpenSong.cs`, one at a time, in a clone made for it (one of the
+  ninety changed nothing, to see the count tell). Sixty-nine were caught at once.
+  **Fourteen were rules no test held**, and each has a song made for it now
+  (`NotHeldByTheTestFilesTests`): two cues with one id; a box of spaces and an em quad
+  with no chords; a text box with no settings; chords asked for a shape; a line with
+  both kinds of stand-in; a chord on the line break that ends a line of chords alone;
+  a slide with nothing written of itself; what a box given to a slide is named,
+  cleared of and put on top of; which box a blank slide's is modelled on. Five cannot
+  be told from the rule by any input (a file's size, when its bytes are held against
+  what was read anyway; looking at a box's other lines before a change of mind;
+  whether a first change is marked as joined; and each of two checks that a key is
+  already what it is asked to be). **One is held by nothing**: that the file is read
+  back and held against what was written. A test would need a disk that does not
+  keep what it is given.
+- **A case can be written for a breakage and not catch it.** The first case for a
+  chord on a line's own break put a new chord on the line: the chord wrongly kept
+  landed on the same stand-in and gave way to the new one, and the file came out
+  right for the wrong reason. Each new case was run against the breakage it was
+  written for, which is how that showed.
+- **On Windows two more things can stop a write than on the Mac**: a file marked
+  read-only, and a file another program holds open (ProPresenter itself may). Both
+  come out as the page's "could not be saved" with the system's own words after it,
+  the file untouched and what was being written beside it cleared away; both are
+  tests. The swap is `File.Replace`, as `spec/01` asks.
+- **Where the Mac's port writes two bytes more than this one.** A text box with no
+  settings written at all, asked to have no chords: the Mac's port gives it an empty
+  set of settings (Swift makes the part by reaching into it), which reads the same
+  and is a change saved; this one leaves it, since the request changes nothing
+  (`Writing.cs`). No file to hand has such a text box. **For the maintainer to pass
+  on, or not.**
+- **Eleven of the twenty-seven cases of `ranges.json`** have the words of a text box
+  in a clean test file, and are tried on the file itself (`spec/05`, the fifth
+  proof).
+- **A heredoc run from this session's shell can lose one of two backslashes, and can
+  trip over an apostrophe.** Seen when a throwaway script was to find a line of C#
+  with a backslash and an "n" in it. Edit such lines with the editing tool, or from a
+  script kept in a file.
+
 ## Left rough, and what to ask
 
 - **In Visual Studio, only the listing of the tests has been seen.** The maintainer
@@ -336,13 +433,20 @@ the same names. What to know before changing any of it:
   tests pass when run from there, and that F5 starts the app (`App` as the startup
   project), nobody has said. And Visual Studio may one day write the solution file
   again without its comment.
-- **The rules have been tried on no real song.** The Mac's session read 400 text
-  boxes of real songs with its reader and with Apple's own and found them the same
-  (`mac/NOTES.md`, "At M1"). Nothing of the kind has been done here: it wants the
-  maintainer's leave to read their library on this PC, and it is the same look that
-  is asked before M3 (below). When it is given: read every text box with `RtfWords`
-  and with `tools/look.py`, which has a reader of its own, and set the two side by
-  side.
+- **Neither the rules nor the song have been tried on a real song.** Two checks the
+  Mac's session made on copies of the maintainer's songs, outside the repository,
+  printing numbers only (`mac/NOTES.md`, "At M1" and "At M2"), and neither has been
+  made here:
+  - every text box read with the reader of RTF and with another, and the two set
+    side by side. On Windows the other reader is `tools/look.py`, which has one of
+    its own;
+  - every box given the chords it already has, and everything undone: every file to
+    come back to the byte.
+  They are the checks most worth having, the songs on this PC being where
+  ProPresenter on Windows may have written the RTF. It is the same look that is asked
+  before M3 (below).
+- **Putting a copy back (`PutBack`) is not in `OpenSong` yet**: it is M4's, with the
+  copies.
 - **If one of the six rules about text proves wrong for a case** (the list of songs
   sorted as the system sorts names, at M3), say why where it is switched off, and
   not for the whole project.
