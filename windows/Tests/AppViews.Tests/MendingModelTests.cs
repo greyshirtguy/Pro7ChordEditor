@@ -55,6 +55,11 @@ public class MendingModelTests
     // An offer as "sentence [Button] [Button]".
     private static string Said(LibraryModel.Offer offer) => offer.Sentence + string.Concat(offer.Buttons.Select(button => " [" + button.Label + "]"));
 
+    // Clicks the one button that says this, of what is offered for the open song: so
+    // that what a button does is held with what it says.
+    private static void Press(LibraryModel model, string label) =>
+        model.Take(model.Offers.SelectMany(offer => offer.Buttons).Single(button => button.Label == label).Action);
+
     private static byte[] Clean(string name) => TestData.InFiles("made-by-simple-presenter/" + name + ".pro");
 
     private static bool Same(byte[] one, byte[] other) => one.AsSpan().SequenceEqual(other);
@@ -151,7 +156,7 @@ public class MendingModelTests
         Assert.True(Same(TestData.InFiles("as-the-old-windows-app-left-them/" + Plain + ".pro"), pc.BytesOf(Plain, Old)));
         Assert.False(model.HasEarlierVersions);
 
-        model.Take(OfferAction.Mend);
+        Press(model, "Mend");
         Assert.True(Same(Clean("Plain Song"), pc.BytesOf(Plain, Old)));
         Assert.Empty(model.Offers);
         Assert.Null(model.Refused);
@@ -238,7 +243,7 @@ public class MendingModelTests
         Assert.True(model.Rows.Single(row => row.Name == MinorKey).WantsMending);
         Assert.Equal("It says it is in A flat, but its chords look like F sharp minor.", model.Rows.Single(row => row.Name == MinorKey).MendingTip);
 
-        model.Take(OfferAction.SetKey);
+        Press(model, "Set Key to F#m");
         Assert.Equal(("F#m", "F#m"), (model.Shown!.Key, model.Shown.ShownKey));
         Assert.Empty(model.Offers);
         Assert.False(model.Rows.Single(row => row.Name == MinorKey).WantsMending);
@@ -359,7 +364,7 @@ public class MendingModelTests
         Assert.Equal("24:D", SecondLine(model));
 
         // Show Me: on the sheet, whichever editor was shown, as it would be.
-        model.Take(OfferAction.ShowMoved);
+        Press(model, "Show Me");
         Assert.Equal((LibraryModel.Way.AsItWouldBe, LibraryModel.Editor.Sheet), (model.Judging, model.EditorShown));
         Assert.Equal("25:D", SecondLine(model));
         Assert.Equal(
@@ -386,15 +391,15 @@ public class MendingModelTests
         Assert.True(Same(asItWas, pc.BytesOf(Grace, Old)));
 
         // As it is, and as it would be again.
-        model.Take(OfferAction.ShowAsItIs);
+        Press(model, "Show As It Is");
         Assert.Equal(LibraryModel.Way.AsItIs, model.Judging);
         Assert.Equal("24:D", SecondLine(model));
         Assert.Equal("This is the song as it is. [Show Moved] [Move the Chords] [Leave Them]", Said(model.Offers[1]));
-        model.Take(OfferAction.ShowMoved);
+        Press(model, "Show Moved");
         Assert.Equal("25:D", SecondLine(model));
 
         // Leave Them: the song is shown as it is, and is as it was.
-        model.Take(OfferAction.Leave);
+        Press(model, "Leave Them");
         Assert.Null(model.Judging);
         Assert.Equal("24:D", SecondLine(model));
         Assert.True(Same(asItWas, pc.BytesOf(Grace, Old)));
@@ -402,8 +407,8 @@ public class MendingModelTests
 
         // Move the Chords: every chord below a first line is moved, and the file is then
         // the one it was made from, to the byte.
-        model.Take(OfferAction.ShowMoved);
-        model.Take(OfferAction.MoveBack);
+        Press(model, "Show Me");
+        Press(model, "Move the Chords");
         Assert.Null(model.Judging);
         Assert.Equal("25:D", SecondLine(model));
         Assert.True(Same(Clean("Amazing Grace"), pc.BytesOf(Grace, Old)));
@@ -417,6 +422,19 @@ public class MendingModelTests
         Assert.True(Same(asItWas, pc.BytesOf(Grace, Old)));
         Assert.Equal("24:D", SecondLine(model));
         Assert.False(model.CanUndo);
+        // And from the song shown as it is, the same button moves them all the same.
+        Press(model, "Show Me");
+        Press(model, "Show As It Is");
+        Press(model, "Move the Chords");
+        Assert.True(Same(Clean("Amazing Grace"), pc.BytesOf(Grace, Old)));
+        Assert.Null(model.Judging);
+        model.Undo();
+        // Leave Them, from the song as it is.
+        Press(model, "Show Me");
+        Press(model, "Show As It Is");
+        Press(model, "Leave Them");
+        Assert.Null(model.Judging);
+        Assert.True(Same(asItWas, pc.BytesOf(Grace, Old)));
     });
 
     [Fact]
@@ -521,6 +539,10 @@ public class MendingModelTests
             Assert.Equal([CopyReason.BeforeMending], kept.Select(copy => copy.Why));
             Assert.True(Same(TestData.InFiles("as-the-old-windows-app-left-them/" + name + ".pro"), File.ReadAllBytes(kept[0].Path)));
         }
+        // And the list shows each of them as a song with earlier versions.
+        model.Filter = MarkFilter.All;
+        Assert.All(model.Rows, row => Assert.True(row.HasCopies));
+        model.Filter = MarkFilter.WantingMending;
         Assert.Contains("Mend All: 4 songs.", pc.Log, StringComparison.Ordinal);
         Assert.Contains("Mended " + Grace + ".pro: 6 chords.", pc.Log, StringComparison.Ordinal);
         // (FOUND in the log of the real window's first Mend All: "1 chords".)

@@ -244,6 +244,90 @@ public sealed class MendingTests : IDisposable
         Assert.Equal(12, moved);
     }
 
+    // The song as it would be with its chords moved, to be shown beside the song as it
+    // is before anything is done (check 2: "with the song shown both ways").
+    [Fact]
+    public void TheSongAsItWouldBeHasItsChordsMovedAndTakesNoChangeAndTheSongItselfIsAsItWas()
+    {
+        var song = bench.Open("Amazing Grace (Chords).pro");
+        var asItWas = File.ReadAllBytes(song.Path);
+        var clean = new OpenSong(InTestData("Amazing Grace.pro")).TextBoxes;
+
+        // What the editors would be handed: the chords of the song this was made from.
+        var moved = song.TextBoxesMovedBack;
+        Assert.Equal(clean.Select(box => (box.Slide, box.Words)), moved.Select(box => (box.Slide, box.Words)));
+        Assert.Equal(clean.SelectMany(box => box.Chords), moved.SelectMany(box => box.Chords));
+        Assert.NotEqual(clean.SelectMany(box => box.Chords), song.TextBoxes.SelectMany(box => box.Chords));
+        // As a song for the sheet: those boxes, the song's key and its chords' names.
+        var shown = song.AsItWouldBeMovedBack();
+        Assert.Equal(moved.SelectMany(box => box.Chords), shown.TextBoxes.SelectMany(box => box.Chords));
+        Assert.Equal(song.Key, shown.Key);
+        Assert.Equal(song.UsedChords, shown.UsedChords);
+        // It takes no change, and says why.
+        var box = shown.TextBoxes[0];
+        var refused = Assert.Throws<Refusal>(() => shown.SetChords(box.Slide, box.Element, [], joined: false));
+        Assert.Equal(Refusal.Why.OnlyForReading, refused.Reason);
+        Assert.Equal("This is the song as it would be with its chords moved, shown to be looked at. Nothing was changed.", refused.Sentence);
+        Assert.Equal(Refusal.Why.OnlyForReading, Assert.Throws<Refusal>(() => shown.SetChordsAlone(box.Slide, box.Element, 0, ["G"], joined: false)).Reason);
+        // Nothing of this touched the song, its file, or the copies kept.
+        Assert.True(File.ReadAllBytes(song.Path).AsSpan().SequenceEqual(asItWas));
+        Assert.False(song.CanUndo);
+        Assert.Empty(bench.Copies);
+        Assert.True(song.Findings.Shift.Likely);
+    }
+
+    // ---- The marks (spec/06-library.md, rules 9 and 11)
+
+    [Fact]
+    public void ASongsMarksSayWhatTheChecksFindInItAndWhetherItWantsMending()
+    {
+        static Marks Of(string name)
+        {
+            var path = InTestData(name + ".pro");
+            return Marks.Read(new ListedSong(name, path, new FileInfo(path).Length, File.GetLastWriteTimeUtc(path)));
+        }
+
+        // The four the old editor left, each with what the checks find in it.
+        var plain = Of("Plain Song (Chords)");
+        Assert.Equal((11, true, 3, "", "", false), (plain.Chords, plain.IsOldEditorsCopy, plain.ShownTwice, plain.DoubtedKey, plain.LikelierKey, plain.LooksMovedLeft));
+        var grace = Of("Amazing Grace (Chords)");
+        Assert.Equal((6, "", "", true), (grace.ShownTwice, grace.DoubtedKey, grace.LikelierKey, grace.LooksMovedLeft));
+        var minor = Of("A Song - In A Minor Key (Chords)");
+        Assert.Equal((1, "Ab", "F#m", false), (minor.ShownTwice, minor.DoubtedKey, minor.LikelierKey, minor.LooksMovedLeft));
+        Assert.Equal(4, Of("It Is Well (Chords)").ShownTwice);
+        // A clean song: nothing. Its key is not doubted, and is not written down as if
+        // it were.
+        var clean = Of("Amazing Grace");
+        Assert.Equal((40, false, 0, "", "", false), (clean.Chords, clean.IsOldEditorsCopy, clean.ShownTwice, clean.DoubtedKey, clean.LikelierKey, clean.LooksMovedLeft));
+        // A song that states no key: the sum knows what its chords look like, and that
+        // is no mark of the song's.
+        var keyless = Of("Holy Holy Holy");
+        Assert.Equal(("", ""), (keyless.DoubtedKey, keyless.LikelierKey));
+
+        // What wants mending: chords shown twice, or a doubted key; and chords that look
+        // moved to the left only where that offer is on.
+        Assert.True(plain.WantsMending() && plain.WantsMending(offeringToMoveBack: true));
+        Assert.True(new Marks(DoubtedKey: "Ab", LikelierKey: "G").WantsMending());
+        Assert.True(new Marks(ShownTwice: 1).WantsMending());
+        Assert.False(new Marks(LooksMovedLeft: true).WantsMending());
+        Assert.True(new Marks(LooksMovedLeft: true).WantsMending(offeringToMoveBack: true));
+        Assert.False(new Marks(Chords: 40).WantsMending(offeringToMoveBack: true));
+        Assert.False(clean.WantsMending(offeringToMoveBack: true) || keyless.WantsMending(offeringToMoveBack: true));
+        Assert.False(new Marks(CannotBeRead: true).WantsMending(offeringToMoveBack: true));
+
+        // And the list narrowed to them: a song whose marks are not worked out yet is
+        // not one of them.
+        Assert.True(MarkFilter.WantingMending.Lets(plain));
+        Assert.False(MarkFilter.WantingMending.Lets(clean));
+        Assert.False(MarkFilter.WantingMending.Lets(null));
+        Assert.False(MarkFilter.WantingMending.Lets(new Marks(LooksMovedLeft: true)));
+        Assert.True(MarkFilter.WantingMending.Lets(new Marks(LooksMovedLeft: true), offeringToMoveBack: true));
+        // (The other three are as they were: a song that wants mending is with or
+        // without chords like any other.)
+        Assert.True(MarkFilter.WithChords.Lets(plain) && MarkFilter.All.Lets(plain));
+        Assert.False(MarkFilter.WithoutChords.Lets(plain));
+    }
+
     // ---- The third proof
 
     [Fact]
