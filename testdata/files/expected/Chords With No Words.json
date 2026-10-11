@@ -1,0 +1,257 @@
+{
+  "file": "Chords With No Words.pro",
+  "nameInside": "Chords With No Words",
+  "uuid": "C0DA0000-0000-4000-8000-00000000C0DA",
+  "hasMusic": false,
+  "originalKey": "",
+  "userKey": "",
+  "multitracks": false,
+  "textBoxes": [
+    {
+      "words": " ",
+      "length": 1,
+      "chords": [
+        {
+          "start": 0,
+          "end": 1,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Could my zeal no respite know\nCould my tears forever flow",
+      "length": 57,
+      "chords": []
+    },
+    {
+      "words": "​ ​ ​ ​\n​ ​",
+      "length": 11,
+      "chords": [
+        {
+          "start": 0,
+          "end": 1,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "name": "B",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 5,
+          "name": "C#m",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 6,
+          "end": 7,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 8,
+          "end": 9,
+          "name": "E",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 10,
+          "end": 11,
+          "name": "B",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "     \nFoul I to the fountain fly\nWash me Savior or I die",
+      "length": 56,
+      "chords": [
+        {
+          "start": 0,
+          "end": 1,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "name": "B",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 5,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 11,
+          "end": 32,
+          "name": "C#m",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 33,
+          "end": 56,
+          "name": "A",
+          "line": 2,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Be of sin the double cure\nSave from wrath and make me pure",
+      "length": 58,
+      "chords": []
+    },
+    {
+      "words": "​ ​ ​ ​",
+      "length": 7,
+      "chords": [
+        {
+          "start": 0,
+          "end": 1,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "name": "B",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 5,
+          "name": "C#m",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 6,
+          "end": 7,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "Let the water and the blood\nFrom thy wounded side which flowed",
+      "length": 62,
+      "chords": []
+    },
+    {
+      "words": "Naked come to thee for dress\n   ",
+      "length": 32,
+      "chords": [
+        {
+          "start": 0,
+          "end": 11,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 11,
+          "end": 28,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 29,
+          "end": 30,
+          "name": "B",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 31,
+          "end": 32,
+          "name": "E",
+          "line": 1,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": "",
+      "length": 0,
+      "chords": []
+    },
+    {
+      "words": "     ",
+      "length": 5,
+      "chords": [
+        {
+          "start": 0,
+          "end": 1,
+          "name": "E",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 2,
+          "end": 3,
+          "name": "A",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        },
+        {
+          "start": 4,
+          "end": 5,
+          "name": "B7",
+          "line": 0,
+          "overLineBreak": false,
+          "pastTheEnd": false
+        }
+      ]
+    },
+    {
+      "words": " ",
+      "length": 1,
+      "chords": []
+    }
+  ],
+  "folder": "shaped-as-real-ones"
+}

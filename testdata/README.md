@@ -16,8 +16,9 @@ it; [`spec/02-chord-rules.md`](../spec/02-chord-rules.md) says which rule each h
 | `sheet-model.json`, `layout.json` | What the chord sheet does with a song | `tools/make-vectors/sheet.js`, by running the functions of its `qml/ChordSheet.qml` and `qml/chordlayout.js` |
 | `key-fit.json` | Which key a song is likely in | `tools/keyfit.py`, which is the reference for that rule |
 | `line-break-shift.json` | One of the checks for mending | `tools/make-fixtures.py`, likewise |
+| `stand-ins-in-rtf.json` | The bytes a text box's RTF becomes when a line of chords alone is given more stand-ins or fewer, and the RTF made for a box that has no words ([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with no words") | `tools/standins.py`, likewise |
 
-The first three rows are a record of what Simple Presenter does. The last two are of
+The first three rows are a record of what Simple Presenter does. The last three are of
 rules that are new here.
 
 Some strings hold characters that cannot be seen: U+200B (a zero-width space) and
@@ -58,8 +59,7 @@ Presentations, as `.pro` files.
   Presenter's editor after the import (`tools/simple-presenter-scripts/import.qml`
   says how), so the two empty text boxes were written by it: their RTF still names a
   font, where a blank text box left by ProPresenter is an RTF with no font in it at
-  all. A song with a blank slide that ProPresenter made is still wanted
-  ([`spec/11-plan.md`](../spec/11-plan.md), before M7).
+  all. Chords With No Words (below) has one as ProPresenter leaves it.
 - **`as-the-old-windows-app-left-them/`**: four of them as the first Windows editor
   would have saved them, each with a different fault
   ([`spec/08-repair.md`](../spec/08-repair.md)). They are named as it named its copies,
@@ -76,6 +76,24 @@ Presentations, as `.pro` files.
   kind that says when the box is to be seen, which leaves a box its own words). Its
   groups have colours. `make-fixtures.py` describes it in `expected/` with the others,
   and `as-read-by-simple-presenter.json` has it as Simple Presenter reads it.
+- **`shaped-as-real-ones/`**: one song, **Chords With No Words**: the one above, with
+  nine of its twelve slides made again in the shapes that real songs have for chords
+  with no words. Putting a chord on such a slide is the one thing the apps do to the
+  RTF of a song, so it has to be tried on RTF as real songs have it, and real songs
+  are other people's. What was read from 425 of them (on the maintainer's Mac, for
+  how they are built and nothing else) is made here on ProPresenter's own file by
+  `tools/make-fixtures.py`, whose head lists every slide: a text box with no text as
+  ProPresenter leaves one; one holding a stray space; a slide with nothing on it;
+  chords alone as Multitracks writes them, each stand-in in the song's font and each
+  em quad between two in another; chords on plain spaces; one chord on one space; a
+  line of chords alone under a line of words, over two lines of words, and two such
+  lines in one box. The words are Toplady's still, the chords are made up, and made
+  again it is the same file to the byte.
+
+  **It is not in `as-read-by-simple-presenter.json`**: it was made after that was,
+  by a tool that runs anywhere, and Simple Presenter runs only where it is built.
+  `expected/Chords With No Words.json` has what is in it. When the vectors are next
+  made again on that machine, read this file there too.
 - **`expected/`**: what is in each file.
   - `<name>.json`: its words and every chord with its range as the file has it, by
     `tools/look.py --json`, which reads the file through `protoc`.
@@ -100,12 +118,16 @@ cmake --build /tmp/make-vectors
 /tmp/make-vectors/make-vectors testdata/vectors
 node tools/make-vectors/sheet.js /path/to/Simple-Presenter testdata/vectors
 python3 tools/keyfit.py testdata/vectors
+python3 tools/standins.py testdata/vectors
 
 # 2. the clean presentations, with Simple Presenter itself (a build with its test hook)
 #    in an empty workspace of its own: tools/README.md has the whole of it
-# 3. the damaged ones, and what is in every file
+# 3. the damaged ones, the one in the shapes of real songs, and what is in every file
 python3 tools/make-fixtures.py
 ```
+
+`tools/standins.py testdata/vectors` and step 3 need only Python and `protoc`, and
+run on any machine: neither reads anything of Simple Presenter's.
 
 `sheet.js` checks its own stand-ins against the vectors of step 1 and stops if they
 disagree; `make-fixtures.py` checks its reader of RTF the same way. Run them in that
@@ -166,9 +188,16 @@ not say the same, the vector is what the reference answers.
 
 **Still wanted**
 
-- A song with a blank slide in it that ProPresenter itself made, of words anyone may
-  use: the blank text boxes of Blank Slides were written by Simple Presenter
-  ([`spec/11-plan.md`](../spec/11-plan.md), before M7).
+- Chords With No Words (`files/shaped-as-real-ones`) read by Simple Presenter into
+  `as-read-by-simple-presenter.json`, the next time the Linux machine makes that.
+  (A song with a blank slide that ProPresenter itself made, which stood here, is no
+  longer wanted: that file has one, made to the shape of the real ones.)
+- **RTF as ProPresenter on Windows writes it**, with a character above ASCII in it,
+  for `rtf-text.json` and `stand-ins-in-rtf.json`. Every sample of both is Apple's
+  way of writing, or made up. If Windows writes a character to stand in after each
+  numbered one, a line of chords alone written there cannot yet be given a chord
+  more or fewer ([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with
+  no words", step 7).
 - A test file whose chords are not in order of place in the file: the Mac app's notes
   say no file here would notice that rule being left out.
 - In `songs/headings.cho`, a second chord on the line that has two spaces after its

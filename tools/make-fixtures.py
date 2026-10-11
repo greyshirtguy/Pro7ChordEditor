@@ -14,6 +14,9 @@ ChordPro import made of testdata/songs: testdata/README.md says how) and writes
         wrong with it and what its chords are once put right
   testdata/vectors/line-break-shift.json             the rule for one of the repairs,
         tried on made-up lines
+  testdata/files/shaped-as-real-ones/                the song ProPresenter wrote
+        (made-by-propresenter), with most of its slides made again in the shapes that
+        real songs have for chords with no words: see SHAPES below
 
 It is also the REFERENCE for the three checks of spec/08-repair.md: the functions below
 are those rules, and both apps' own versions are held to what this writes.
@@ -36,6 +39,31 @@ saved:
   D. Names. It saved beside the original as "<the name inside the file> (Chords).pro",
      leaving the name and the id inside as they were.
 
+SHAPES. What the app does to chords that have no words under them (spec/01-file-format.
+md, "Chords with no words") is the one thing it does to the RTF of a song, so it has to
+be tried on RTF as real songs have it. Those are other people's songs and cannot be
+here. What was read from them is only how such a slide is BUILT (mac/NOTES.md, "At
+M7"), and that is made here, on the one file of ProPresenter's own that the test data
+has: its slides, taken in the order they are shown, become
+
+   1  a text box with no text, as ProPresenter leaves one: an RTF with an empty font
+      table, and no settings that go by a stretch of text
+   2, 3, 5  the song's own words, as they were
+   4  four chords with no words as Multitracks writes them: each stand-in a zero-width
+      space in the song's font, each em quad between two in another font
+   6  three chords on plain spaces, with an em quad between each two
+   7  one chord on one plain space
+   8  a line of the song's words with two chords on it, over two chords on plain
+      spaces
+   9  three chords on plain spaces, each em quad in another font, over the slide's
+      two lines of words, which have a chord each
+  10  two lines of chords alone as Multitracks writes them, four chords and two
+  11  a text box that holds one plain space, in a font: blank, as some are
+  12  nothing at all: every element taken off the slide
+
+The words are Toplady's, as in the file it is made from, and the chords are made up.
+Made again it is the same file to the byte: nothing in it is random.
+
 Needs `protoc` and the submodule in proto/.
 """
 import json
@@ -49,6 +77,7 @@ sys.path.insert(0, HERE)
 import keyfit
 import look
 import proread
+import standins
 
 ROOT = os.path.dirname(HERE)
 CLEAN = os.path.join(ROOT, "testdata", "files", "made-by-simple-presenter")
@@ -56,6 +85,8 @@ OLD = os.path.join(ROOT, "testdata", "files", "as-the-old-windows-app-left-them"
 # What ProPresenter itself wrote. It is only described: nothing is made of it, and it
 # is not one of the files the checks are tried on (repairs.json).
 BY_PROPRESENTER = os.path.join(ROOT, "testdata", "files", "made-by-propresenter")
+# What is made here of that one, in the shapes real songs have: see SHAPES.
+SHAPED = os.path.join(ROOT, "testdata", "files", "shaped-as-real-ones")
 EXPECTED = os.path.join(ROOT, "testdata", "files", "expected")
 VECTORS = os.path.join(ROOT, "testdata", "vectors")
 
@@ -196,6 +227,160 @@ def damaged(source, target, ranges=False, by_hand=False, key_reset=False):
     proread.encode(decoded, target)
 
 
+# ---- A song in the shapes real ones have (SHAPES, at the top)
+
+# As Apple's text system writes a text box with no text in it.
+EMPTY_DOCUMENT = (b"{\\rtf1\\ansi\\ansicpg1252\\cocoartf2761\n\\cocoatextscaling0\\cocoaplatform0{\\fonttbl}\n"
+                  b"{\\colortbl;\\red255\\green255\\blue255;}\n{\\*\\expandedcolortbl;;}\n}")
+_CUSTOM = re.compile(r"^( *)custom_attributes \{\n.*?^\1\}\n", re.S | re.M)
+
+
+def quoted(data):
+    """Bytes as protoc's text writes a string of them."""
+    out = ""
+    for byte in data:
+        if byte == 0x0A:
+            out += "\\n"
+        elif byte in (0x22, 0x5C):
+            out += "\\" + chr(byte)
+        elif 0x20 <= byte < 0x7F:
+            out += chr(byte)
+        else:
+            out += "\\%03o" % byte
+    return out
+
+
+def block_end(text, start):
+    """Where the block that opens on the line at `start` closes: one past its last line."""
+    indent = re.match(r" *", text[start:]).group(0)
+    return re.compile(r"^" + indent + r"\}\n", re.M).search(text, start).end()
+
+
+def remade(cue, rtf=None, chords=None, whole=None, bare=False):
+    """One cue of protoc's text with its slide's text box changed: its RTF, if one is
+    given; its chords (start, name), ranged as the rules range them; every setting it
+    has that goes by a stretch of the text made to run over the whole of the new text
+    (`whole`, true) or taken off (false). Or, `bare`, with every element taken off the
+    slide."""
+    if bare:
+        while True:
+            found = re.search(r"^ *elements \{\n", cue, re.M)
+            if not found:
+                return cue
+            cue = cue[:found.start()] + cue[block_end(cue, found.start()):]
+    if rtf is not None:
+        cue, count = proread._RTF.subn(lambda _: 'rtf_data: "%s"' % quoted(rtf), cue)
+        assert count == 1
+    words = proread.plain_text(proread.unescape(proread._RTF.search(cue).group(1)))
+    if whole is False:
+        cue = _CUSTOM.sub("", cue)
+    elif whole:
+        cue, count = re.subn(r"(custom_attributes \{\n *range \{\n)(?: *start: \d+\n)?(?: *end: \d+\n)?", lambda m: m.group(1) + m.group(0).split("\n")[1].replace("range {", "  end: %d" % len(words)) + "\n", cue)
+        assert count >= 1
+    if chords:
+        last = None
+        for last in _CUSTOM.finditer(cue):
+            pass
+        indent = last.group(1) if last else re.search(r"^( *)stroke_color \{", cue, re.M).group(1)
+        at = last.end() if last else block_end(cue, re.search(r"^ *stroke_color \{", cue, re.M).start())
+        entries = ""
+        for chord in right_ranges(words, chords):
+            entries += indent + "custom_attributes {\n" + indent + "  range {\n"
+            if chord["start"]:
+                entries += indent + "    start: %d\n" % chord["start"]
+            entries += indent + "    end: %d\n" % chord["end"] + indent + "  }\n"
+            entries += indent + "  chord: \"%s\"\n" % chord["name"] + indent + "}\n"
+        cue = cue[:at] + entries + cue[at:]
+    return cue
+
+
+def shaped_as_real_ones(source, target):
+    decoded = proread.decode(source)
+    # The cues, by their ids, and the order they are shown in: that of the groups.
+    starts = [m.start() for m in re.finditer(r"^cues \{\n", decoded, re.M)]
+    cues = {}
+    for start in starts:
+        end = block_end(decoded, start)
+        cues[re.search(r'uuid \{\n *string: "([^"]+)"', decoded[start:end]).group(1)] = (start, end)
+    shown = [m.group(1) for group in re.finditer(r"^cue_groups \{\n.*?^\}\n", decoded, re.S | re.M)
+             for m in re.finditer(r'cue_identifiers \{\n *string: "([^"]+)"', group.group(0))]
+    assert len(shown) == 12 and sorted(shown) == sorted(cues), "the song is not the one this was written for"
+
+    Z, Q = standins.Z, standins.Q
+
+    def rtf_of(n):
+        return proread.unescape(proread._RTF.search(decoded[slice(*cues[shown[n]])]).group(1))
+
+    def opening(n, fonts=1):
+        """A slide's own RTF up to where its words begin; with a second font, if asked."""
+        rtf = rtf_of(n)
+        opening = rtf[:proread.written(rtf)[0][1]]
+        if fonts == 2:
+            assert opening.count(b"CenturyGothic;}") == 1
+            opening = opening.replace(b"CenturyGothic;}", b"CenturyGothic;\\f1\\fnil\\fcharset0 LucidaGrande;}")
+        return opening
+
+    def lines_of(n):
+        """A slide's own words, as their bytes: each line, as the RTF has it."""
+        rtf = rtf_of(n)
+        return rtf[proread.written(rtf)[0][1]:-1].split(b"\\\n")
+
+    def multitracks(count):
+        out = Z
+        for _ in range(count - 1):
+            out += b"\n\\f1 \\cf2 " + Q + b"\n\\f0 \\cf2 " + Z
+        return out
+
+    def spaces_in_two_fonts(count):
+        out = b" "
+        for _ in range(count - 1):
+            out += b"\n\\f1 \\cf2 " + Q + b"\n\\f0 \\cf2  "
+        return out
+
+    def at_words(line, *which):
+        """The places of some of a line's words, counted along it."""
+        places = [0] + [n + 1 for n, c in enumerate(line) if c == " "]
+        return [places[w] for w in which]
+
+    changes = {
+        0: dict(rtf=EMPTY_DOCUMENT, whole=False),
+        3: dict(rtf=opening(3, fonts=2) + multitracks(4) + b"}", chords=[(0, "E"), (2, "B"), (4, "C#m"), (6, "A")], whole=True),
+        5: dict(rtf=opening(5) + standins.on_spaces(3) + b"}", chords=[(0, "E"), (2, "A"), (4, "B7")], whole=True),
+        6: dict(rtf=opening(6) + b" }", chords=[(0, "E")], whole=True),
+        9: dict(rtf=opening(9, fonts=2) + multitracks(4) + b"\\\n" + multitracks(2) + b"}",
+                chords=[(0, "E"), (2, "B"), (4, "C#m"), (6, "A"), (8, "E"), (10, "B")], whole=True),
+        10: dict(rtf=opening(10) + b" }", whole=True),
+        11: dict(bare=True),
+    }
+    first = lines_of(7)[0]
+    words = first.decode("ascii")
+    changes[7] = dict(rtf=opening(7) + first + b"\\\n" + standins.on_spaces(2) + b"}",
+                      chords=[(p, name) for p, name in zip(at_words(words, 0, 2), ["E", "A"])] + [(len(words) + 1, "B"), (len(words) + 3, "E")], whole=True)
+    both = lines_of(8)
+    one, two = both[0].decode("ascii"), both[1].decode("ascii")
+    changes[8] = dict(rtf=opening(8, fonts=2) + spaces_in_two_fonts(3) + b"\\\n" + both[0] + b"\\\n" + both[1] + b"}",
+                      chords=[(0, "A"), (2, "B"), (4, "E"), (6 + at_words(one, 1)[0], "C#m"), (6 + len(one) + 1 + at_words(two, 0)[0], "A")], whole=True)
+
+    out = decoded
+    # (From the last cue in the file to the first, so that the places of those still to
+    # do are not moved by those done.)
+    for n in sorted(changes, key=lambda n: -cues[shown[n]][0]):
+        start, end = cues[shown[n]]
+        out = out[:start] + remade(out[start:end], **changes[n]) + out[end:]
+    out, count = re.subn(r'^name: "Rock Of Ages \(Toplady\)"$', 'name: "Chords With No Words"', out, flags=re.M)
+    assert count == 1
+    out, count = re.subn(r'\A(application_info \{\n.*?^\}\nuuid \{\n  string: )"[^"]+"', r'\1"C0DA0000-0000-4000-8000-00000000C0DA"', out, flags=re.S | re.M)
+    assert count == 1
+    os.makedirs(os.path.dirname(target), exist_ok=True)
+    proread.encode(out, target)
+
+    # What was made is what was meant: read it back.
+    boxes = proread.text_boxes(proread.decode(target))
+    assert len(boxes) == 11, len(boxes)
+    alone = [(n, [len(line) for line in box["words"].split("\n")], len(box["chords"])) for n, box in enumerate(boxes)]
+    return alone
+
+
 def main():
     wrong = proread.check_plain_text(VECTORS)
     if wrong:
@@ -226,10 +411,11 @@ def main():
     ]
     for source, target, how, _ in made:
         damaged(os.path.join(CLEAN, source), os.path.join(OLD, target), **how)
+    shaped_as_real_ones(os.path.join(BY_PROPRESENTER, "Rock Of Ages (Toplady).pro"), os.path.join(SHAPED, "Chords With No Words.pro"))
 
     own, offered = keyfit.tables(VECTORS)
     described = {}
-    for folder in (CLEAN, OLD, BY_PROPRESENTER):
+    for folder in (CLEAN, OLD, BY_PROPRESENTER, SHAPED):
         for name in sorted(os.listdir(folder)) if os.path.isdir(folder) else []:
             if not name.endswith(".pro"):
                 continue

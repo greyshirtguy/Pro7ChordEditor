@@ -43,7 +43,13 @@ public enum TestData {
         try Data(contentsOf: root.appendingPathComponent("songs").appendingPathComponent(name))
     }
 
-    /// The folders of `testdata/files` that hold presentations.
+    /// The folders of `testdata/files` that hold presentations: those that Simple
+    /// Presenter was asked to read, so that reading one can be held to what it read
+    /// (`expected/as-read-by-simple-presenter.json`).
+    ///
+    /// `shaped-as-real-ones` is not among them. Its one song was made afterwards, for
+    /// chords with no words, by a tool that runs anywhere, and Simple Presenter runs
+    /// only on the machine it is built on. The tests of chords with no words name it.
     public static let presentationFolders = ["made-by-simple-presenter", "as-the-old-windows-app-left-them", "made-by-propresenter"]
 
     /// Every presentation of `testdata/files`, as "folder/Name.pro", in order.

@@ -7,10 +7,11 @@ them.
 | | |
 | --- | --- |
 | `look.py` | Says what chords a `.pro` file has and where. `tools/look.py --chords "Some Song.pro"`. The first thing to reach for when a song behaves oddly. It only reads |
-| `proread.py` | What `look.py` and `make-fixtures.py` read a file with: through `protoc`, as text. Not how either app reads one |
+| `proread.py` | What `look.py`, `make-fixtures.py` and `standins.py` read a file and its RTF with: through `protoc`, as text. Not how either app reads one |
 | `make-vectors/` | Writes most of `testdata/vectors` from Simple Presenter's source: `main.cpp` (its C++ rules) and `sheet.js` (its chord sheet, run under Node) |
 | `keyfit.py` | The rule for which key a song is likely in, and its vectors |
-| `make-fixtures.py` | Makes the damaged test files from the clean ones, describes every test file, and is the reference for the mending checks |
+| `standins.py` | The rule for writing the characters that chords with no words hang on into a text box's RTF, and its vectors. It is the reference for that rule, which is new |
+| `make-fixtures.py` | Makes the damaged test files from the clean ones, and one in the shapes real songs have for chords with no words; describes every test file; and is the reference for the mending checks |
 | `simple-presenter-scripts/` | Two scripts that Simple Presenter itself runs, to make the clean test files and to read every test file back |
 | `as-read.py` | Writes `testdata/files/expected/as-read-by-simple-presenter.json` from what the second of those printed |
 
