@@ -597,9 +597,10 @@ changing any of it:
   are gone, and a line with a bracket still empty no longer waits.
 - **Tests**: `StandInsInRTFTests` (the bytes, worked out by hand), `StandInVectorsTests`
   (the vector file), `ChordsWithNoWordsTests` (the song, on the test files: the two
-  proofs of the plan, and that nothing else in the file changes), and cases in
-  `ChordProEditorTests`, `ChordSheetOnAFileTests`, `ChordProTypingTests` and
-  `ChordSheetViewTests` for each editor. Pictures 33 to 35.
+  proofs of the plan, and that nothing else in the file changes),
+  `AsAppleReadsItTests` (what was written, read by AppKit: the one place a test of
+  the rules uses it), and cases in `ChordProEditorTests`, `ChordSheetOnAFileTests`,
+  `ChordProTypingTests` and `ChordSheetViewTests` for each editor. Pictures 33 to 35.
 - **The test song is not among `TestData.presentationPaths()`**, which are the files
   Simple Presenter was asked to read: tests name it (`ChordsWithNoWordsTests.shaped`).
 
@@ -1062,6 +1063,16 @@ more.)
   those sequences are never typed: `StandInsInRTFTests` had them put back by a
   script, and everything since builds them (`"\\uc0\\u" + "\(unit) "`). If a file
   here ever shows a stray character from far up the table, that is what happened.
+- **What was written, read by Apple's own reader of RTF** (`AsAppleReadsItTests`,
+  and once on the copies of real songs). The app checks what it writes with the
+  rules' reader, which is the app agreeing with itself; ProPresenter reads with
+  Apple's. So `NSAttributedString` was handed every RTF the vectors make, every
+  change to the test song, and on real songs 340 changes to lines of chords alone
+  and 853 blank slides given chords. It read every one as the words meant; every
+  other line of a changed box set exactly as before (127 lines compared in the real
+  songs, none otherwise); and a blank slide's stand-ins in the font of the box they
+  were modelled on. This is the nearest a test comes to the plan's third proof, and
+  is not it.
 - **Each rule broken one small way, 56 ways** (21 of the change to an RTF, 35 of the
   song's part), after it was committed, the whole of the tests run for each. Six
   went unnoticed at first, and each has a case now: that a space is given another

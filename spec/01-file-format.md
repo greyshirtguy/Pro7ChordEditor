@@ -338,9 +338,15 @@ for this rule, which is new: both apps are right when they give those bytes.
 **Known**, of real songs (425 on the maintainer's Mac, 2026-10-11, on copies): every
 one of their 116 lines of chords alone could be given a chord more, a chord fewer, two
 more and none (423 changes), each leaving every byte of the RTF outside the line as it
-was and nothing else in the file changed, and each undone to the byte. **A guess**,
-until it has been seen: that ProPresenter shows the chords of a line so changed as it
-shows any other's. The maintainer is asked to look ([11-plan.md](11-plan.md), M7).
+was and nothing else in the file changed, and each undone to the byte. And **Apple's
+own reader of RTF**, which ProPresenter on the Mac reads a text box with, read every
+one as the words that were meant, with every other line of the box set as it was
+(its font, its size, its colour, its paragraph); and read the stand-ins a blank
+slide was given in the font of the box they were modelled on. On the Mac that is a
+test of its own (`NSAttributedString`); on Windows there is no such second reader
+to ask. **A guess**, still, until it has been seen: that ProPresenter shows the
+chords of a line so changed as it shows any other's. It does more with a text box
+than read its RTF. The maintainer is asked to look ([11-plan.md](11-plan.md), M7).
 
 ### Chords onto a blank slide
 
