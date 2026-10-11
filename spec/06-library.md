@@ -167,12 +167,8 @@ song the width they took.)
     last change, which is Undo's, and it may take back an hour's work:
 
     > **Revert “*the song's name*” to how it was when it was opened?**
-    > This takes back EVERY change made to this song since it was opened here
-    > (*when: "Today 09:14"*): all of them, not only the last one. To take back only
-    > the last change, cancel this and use Undo.
-    >
-    > The song as it is now is kept as an earlier version first, so a revert can
-    > itself be undone.
+    > This takes back EVERY change made to this song since it was opened in this
+    > editor.
     >
     > [ **Revert All Changes** ]  [ Cancel ]
 
@@ -188,7 +184,10 @@ song the width they took.)
     button that was always greyed stood beside the words for an hour, and was taken
     out: "you can leave out the save button". The question before a revert is the
     maintainer's too: "some wording that makes it clear it will revert ALL changes
-    the user just made (not just reverting the last step/change)".)
+    the user just made (not just reverting the last step/change)". It first said
+    more (when the song was opened, that Undo takes back only the last change, and
+    that a revert can be undone) and was cut to its one sentence, which is the
+    maintainer's own: it "seems too long".)
 13. A click on a song opens it. If a chord was being typed in the song being left, it
     is kept first ([03-chord-sheet.md](03-chord-sheet.md), rule 39;
     [04-chordpro-editor.md](04-chordpro-editor.md), rule 13).

@@ -57,7 +57,12 @@ M7 to M9 can change order to suit what the maintainer wants next.
 - **During M6**: the maintainer's hand on the mouse, more than once.
 - **Before M7**: a small song made in ProPresenter that has a blank slide in it (an
   intro made as an empty slide), of words anyone may use, for `testdata/files`; and
-  ProPresenter to look at what M7 writes.
+  ProPresenter to look at what M7 writes. (**The first is no longer asked**,
+  2026-10-11: what a blank slide is as ProPresenter writes one was read from the
+  maintainer's own files, thirty slides with no text box and some 2,400 empty boxes,
+  and a test file can be made to that shape from the one of ProPresenter's that
+  `testdata/files` has. `mac/NOTES.md` has what was found. The second is asked
+  still.)
 - **Before M8's check 2**: the one test with the old editor
   ([08-repair.md](08-repair.md)).
 - **Before M9**: a small presentation made in ProPresenter, of words anyone may use,

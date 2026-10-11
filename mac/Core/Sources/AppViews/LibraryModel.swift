@@ -150,9 +150,7 @@ public final class LibraryModel {
     /// that goes from the line when ProPresenter does.
     private var refusedForProPresenter = false
     /// The song's file as it was when the song was opened here: what Revert puts back.
-    /// And when that was, for saying so.
     private var asOpened: Data?
-    private var openedWhen = Date()
     /// What Revert asks before it does anything, while it is asking.
     public private(set) var revertQuestion: RevertQuestion?
 
@@ -345,7 +343,6 @@ public final class LibraryModel {
                 keepCopy: { file, why in try copies.keep(file, of: kept, why: why) }))
             openSong = opened
             asOpened = opened.bytes
-            openedWhen = Date()
             changedSinceOpened = false
             shown = Self.show(opened, named: song.name)
             edit(opened)
@@ -769,13 +766,12 @@ public final class LibraryModel {
     /// **Revert** asks first. It takes back everything done to the song since it was
     /// opened, which may be an hour's work, and its name alone could be read as taking
     /// back the last change, which is Undo's. So the question says which: all of them.
+    /// (In one sentence, which is the maintainer's: a longer one was not read.)
     public func askToRevert() {
         guard canRevert, let shown else { return }
         revertQuestion = RevertQuestion(
             title: "Revert \u{201C}\(shown.name)\u{201D} to how it was when it was opened?",
-            message: "This takes back EVERY change made to this song since it was opened here (\(copies.when(openedWhen))): all of them, "
-                + "not only the last one. To take back only the last change, cancel this and use Undo.\n\n"
-                + "The song as it is now is kept as an earlier version first, so a revert can itself be undone.",
+            message: "This takes back EVERY change made to this song since it was opened in this editor.",
             yes: "Revert All Changes")
     }
 

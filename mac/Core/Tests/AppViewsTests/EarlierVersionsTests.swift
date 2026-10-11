@@ -224,9 +224,7 @@ struct EarlierVersionsTests {
         model.askToRevert()
         let question = try #require(model.revertQuestion)
         #expect(question.title == "Revert \u{201C}Plain Song\u{201D} to how it was when it was opened?")
-        #expect(question.message.hasPrefix("This takes back EVERY change made to this song since it was opened here (Today "))
-        #expect(question.message.contains("all of them, not only the last one. To take back only the last change, cancel this and use Undo."))
-        #expect(question.message.hasSuffix("The song as it is now is kept as an earlier version first, so a revert can itself be undone."))
+        #expect(question.message == "This takes back EVERY change made to this song since it was opened in this editor.")
         #expect(question.yes == "Revert All Changes")
         #expect(try mac.bytes(of: "Plain Song") == changed)
         // No: nothing is done, and it can be asked again.

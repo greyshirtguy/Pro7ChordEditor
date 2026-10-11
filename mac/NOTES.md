@@ -271,7 +271,9 @@ And at M6, 2026-10-11:
     maintainer: "let's popup a confirmation about reverting - some wording that
     makes it clear it will revert ALL changes the user just made (not just reverting
     the last step/change)". The question is the model's (`askToRevert`,
-    `revertQuestion`), so that its words are tested; the window only shows it.
+    `revertQuestion`), so that its words are tested; the window only shows it. Its
+    one sentence is the maintainer's own; mine said three things more and was "too
+    long".
 
 ## How it is laid out, and why
 
@@ -902,6 +904,37 @@ changing any of it:
   a mouse is plugged in) would change the width the slides are fitted across as it
   came and went with the layout. Room is kept for one always in that case
   (`SheetCanvas.seenWidth`). Not seen to go wrong; reasoned.
+
+### Before M7: what real files show of blank slides
+
+Looked at on 2026-10-11, the maintainer having pointed to a song of theirs whose first
+slide has no text box ("I tested in the app and looked like I could enter a chord (the
+cursors appeared) - I did not enter - so you could look at it if needed"). On numbered
+copies of 426 songs outside the repository, shapes and numbers only, deleted after:
+
+- **30 slides of 7,238 have no text box, in 17 songs.** None has anything else drawn
+  on it either. As ProPresenter 21 on the Mac writes one, the slide is its size and
+  its id and nothing more (`base_slide { size, uuid }`, no `elements`), with the
+  `chord_chart` mark every slide has. 16 of the 30 are there to do something else when
+  they are shown: a video or a picture started (14), a macro (2), a stage layout, a
+  prop, a jump to another slide. So **the box M7 adds to such a slide is added to a
+  slide whose job is to start something**, and stays unseen there, its text being
+  stand-ins. That it does no harm is to be seen in ProPresenter.
+- **2,426 text boxes have no words.** All but 13 were written by Apple's text system,
+  and of those all but some 120 are the empty document `spec/01` describes ("Chords
+  onto a blank slide"): no font in its font table, no paragraph, no size, no colour.
+  Some 120 hold one plain space, in a font and a format. 13 begin `{\rtf0` and were
+  written by something else. 2,266 have no settings that go by a range of the text;
+  160 have from one to fifteen.
+- **The page's recipe holds for what was seen**: an opening taken from the nearest
+  box that has words, the stand-ins after it. In the song pointed to, that box's
+  other settings by range (how it is capitalised, its first font) each run over the
+  whole of its words: what the page leaves where they are, as a guess.
+- **The song itself cannot be a test file** (its words are someone's, and it names
+  the maintainer's own media). The test file for M7 is to be made from the one
+  ProPresenter wrote that `testdata/` has already (Rock of Ages): one slide's box
+  given the empty document these files have, and one slide's elements taken off.
+  The maintainer need not make one (`spec/11`, "What the maintainer is asked for").
 
 ### Rules the vectors did not hold, and what became of them
 
