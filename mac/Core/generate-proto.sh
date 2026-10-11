@@ -11,7 +11,8 @@
 # it, shared with the Windows app. Kept, the package builds from a clone with no
 # submodule and no protoc, on GitHub's machine too. The price is that this must be run
 # again by hand when the submodule moves on, which MadeFrom.swift is there to show: it
-# says what the code beside it was made from.
+# says what the code beside it was made from, and a test holds that to the submodule
+# wherever the submodule is checked out (Tests/SongTests/GeneratedReaderTests.swift).
 #
 # Only what a presentation needs is generated: presentation.proto and everything it
 # imports, worked out by protoc itself so that the list cannot go stale. The whole set

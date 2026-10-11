@@ -19,7 +19,18 @@ machine, each through the same milestones.
   what was found out about ProPresenter on this platform, what is left rough. The
   next session, which will remember nothing of this one, starts by reading it.
 - Commit at the end of each milestone, and oftener if the maintainer likes: small
-  commits that each say what they do in plain words. Push only when asked.
+  commits that each say what they do in plain words. Push only when asked; **but a
+  rule or a decision the maintainer has agreed, once it is in `spec/` (and in
+  `testdata/`, if it changes an answer), is pushed at once**. The two apps are built
+  by two sessions that never meet, and the repository is all that either knows of
+  what the other was told. (The maintainer, 2026-10-12: "we should push asap - so
+  the windows session can be kept up to date with decision or rule updates we agree
+  on ... my goal is all three apps work the same - same rules!" The third is Simple
+  Presenter, which a session of its own changes from what the maintainer passes
+  on: say in the report, in a few lines that can be passed on as they are, what a
+  decision asks of it.)
+- Start a session by fetching: the other app's session may have changed `spec/` or
+  `testdata/` since.
 
 ## The milestones
 

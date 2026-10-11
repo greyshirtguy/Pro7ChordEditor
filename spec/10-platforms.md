@@ -60,6 +60,16 @@ A place in a song's words is a number of **UTF-16 units**
   generated once and kept in the repository with the command that made it written
   beside it. [01-file-format.md](01-file-format.md) says which files of that folder,
   and why that folder. Do not write a reader by hand.
+  (As built: kept in the repository. swift-protobuf's plug-in takes only `.proto`
+  files inside its own package, and these are in a submodule outside it, shared with
+  the Windows app. So the Mac app builds from a clone with no submodule and no
+  `protoc`, on GitHub's machine too; `mac/Core/generate-proto.sh` is the command;
+  the code says which version of the descriptions it was made from; and a test
+  holds it to the submodule wherever the submodule is checked out. The Windows app
+  generates at every build, as below, and its clones and its workflow need the
+  submodule for it. **The two ways are each platform's own** and change nothing a
+  person sees: what the two apps must share is the commit of `proto/` they are made
+  from, and moving it on is one change to both.)
 - **The sheet is one custom-drawn view**, not a stack of SwiftUI texts and shapes: it
   has thousands of small things in it, follows the pointer at every move, and must
   know exactly where every character is. Draw it with `Canvas`, or as an `NSView`
