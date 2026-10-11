@@ -358,6 +358,72 @@ public sealed class OpenSong
     /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
     public void Redo() => Restore(forwards: true);
 
+    /// <summary>
+    /// Makes the song's file these bytes again: a copy kept earlier, or the song as it
+    /// was when it was opened (spec/07-backups.md, rules 19 to 22a). It is a save like
+    /// any other, asked the same things first, and the file as it is now is kept as a
+    /// copy before it is written over: so that this can itself be taken back, by
+    /// putting that copy back.
+    ///
+    /// The song then starts afresh from the file: its history of undo is empty, and its
+    /// next change keeps a copy as the first of a sitting does. Putting back what the
+    /// file already is, is nothing to do.
+    /// </summary>
+    /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
+    public void PutBack(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.SequenceEqual(bytesOnDisk))
+        {
+            return;
+        }
+        var asked = MaySave();
+        // What is put back must be a song: a copy that cannot be read is not swapped in.
+        var put = bytes.ToArray();
+        RV.Presentation copy;
+        try
+        {
+            copy = RV.Presentation.Parser.ParseFrom(put);
+        }
+        catch (InvalidProtocolBufferException)
+        {
+            throw Refusal.CannotBeRead("That copy", Refusal.NoPresentation);
+        }
+        try
+        {
+            asked.KeepCopy(Path, CopyReason.BeforePuttingBack);
+        }
+        catch (Exception exception)
+        {
+            throw Refusal.CopyNotKept(exception.Message);
+        }
+        try
+        {
+            SongFile.Write(put, Path);
+        }
+        catch (SongFile.Failure failure)
+        {
+            throw Refusal.NotSaved(failure.Message);
+        }
+        presentation = copy;
+        bytesOnDisk = put;
+        try
+        {
+            stamp = SongFile.StampOf(Path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or SongFile.Failure)
+        {
+        }
+        rows = Reading.SlideRows(copy);
+        undoSteps.Clear();
+        redoSteps.Clear();
+        // (And nothing is remembered of what was made for a blank slide's chords: that
+        // was of the file as it was, and this is another.)
+        madeForChords.Clear();
+        // (A new sitting with the song: its next change asks for a copy again, and none
+        // is made if the newest kept is already what the file is.)
+        copyKept = false;
+    }
+
     // ---- Chords with no words (spec/01-file-format.md)
 
     // A line of chords alone that has words already, of a kind: its stand-ins.

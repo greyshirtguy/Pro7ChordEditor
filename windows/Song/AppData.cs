@@ -10,6 +10,8 @@
 //   marks.json      the marks worked out for each song (Marks.cs)
 //   log.txt         a line for each thing the app did
 //
+//   Backups\        the copies of files kept before a change (Copies.cs)
+//
 // The log is for working out what happened when something has gone wrong. It has the
 // names of files in it and NEVER the words of songs, nor the names of chords.
 //
@@ -119,6 +121,9 @@ public sealed class AppData(string folder)
 
     // How marks.json is written: each file's path, and what was kept of it.
     private sealed record WrittenMarks(Dictionary<string, KeptMarks.Entry> Entries);
+
+    /// <summary>The copies kept, which are in <c>Backups</c> here. The app's version is for their index.</summary>
+    public Copies Copies(string appVersion = "") => new(Path.Combine(Folder, "Backups"), appVersion);
 
     /// <summary>The marks as they were last kept, or none.</summary>
     public KeptMarks ReadMarks() =>

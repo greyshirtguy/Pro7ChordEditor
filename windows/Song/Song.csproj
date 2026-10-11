@@ -17,7 +17,7 @@
   things worth trying by themselves.
 
   Song.cs is the way in, and lists the files. So far it is the song itself (milestone
-  M2) and the library (M3); the copies and the checks are to come.
+  M2), the library (M3) and the copies (M4); the checks are to come.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>

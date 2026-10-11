@@ -5,9 +5,9 @@
 //
 //   - whether ProPresenter is running. It has the library open, and what it does with a
 //     song that changes under it is not known (spec/06-library.md, rules 16 to 19).
-//     Asking the system is milestone M3.
+//     Asking the system is ProPresenterApp.cs.
 //   - keeping a copy of the file as it was, before the first change to it since it was
-//     opened (spec/07-backups.md). Where the copies go is milestone M4.
+//     opened (spec/07-backups.md). Where the copies go is Copies.cs.
 //
 // So the song is handed both, and asks each at the right moment (OpenSong's Save).
 // There is no way to make a song that saves without them: one opened with no safeguards

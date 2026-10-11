@@ -13,6 +13,7 @@
     ChordsWithNoWordsTests        a chord more or fewer on a line with no words; blank slides
     NotHeldByTheTestFilesTests    rules no test file holds, each by a song made for it
     LibraryTests                  finding places, the lists, the marks, the app's own folder, a song as lines
+    CopiesTests                   the copies kept before a change, and putting one back: the proofs of spec/07
     Workbench                     where they work: copies in a temporary folder
 
   It is an .exe because xUnit, from its third version, makes every project of tests a

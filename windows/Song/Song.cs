@@ -23,6 +23,12 @@
 //   ProPresenterApp.cs  whether ProPresenter is running
 //   AppData.cs          what the app keeps of its own, and where: settings, marks, a log
 //
+// And the copies (spec/07-backups.md):
+//
+//   Copies.cs           the copies kept of a file before it is changed: kept, listed, thinned
+//
+// (Putting one back is the song's own, `OpenSong.PutBack`: it is a save like any other.)
+//
 // The Mac app's is mac/Core/Sources/Song, file for file under the same names, and this
 // was ported from it with the reference beside
 // (reference/simple-presenter/src/presentationeditor.cpp), so that the two apps do the
@@ -31,7 +37,6 @@
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M4  the copies kept before a file is changed, and putting one back
 //   M5  the song as ChordPro text
 //   M6  the chord sheet's model
 //   M8  the checks for what the first Windows editor left, and the mending
