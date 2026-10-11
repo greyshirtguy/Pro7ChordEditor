@@ -265,7 +265,8 @@ taking one away changes how many stand-ins the line needs, and so its text: this
 one case where the app writes words. When it does:
 
 - the line becomes one stand-in for each chord with U+2001 between, using the stand-in
-  the line had (a plain space if it had spaces and no U+200B, else U+200B);
+  the line had (a plain space if it had spaces and no U+200B, else U+200B); **and one
+  U+200B where it has no chord**, so that it is a line of chords alone still;
 - the chords of the line go on places 0, 2, 4 ... of it, and the chords of the lines
   after it move by as many places as the line grew or shrank;
 - every other line of the box, and all its format, stays as it was.
@@ -281,11 +282,30 @@ To the letter:
   when the number of chords is another, and also when the line was never a clean run
   (three plain spaces with one chord on them). So after any such request the line has
   one stand-in for each of its chords and nothing else.
-- **No chords is no stand-ins**, and the line is then empty. From then on it is an
-  empty line and no longer a line of chords alone, as in Simple Presenter: the
-  editors put nothing on it. If the box has nothing else in it, the slide is then a
-  [blank slide](#from-the-presentation-down-to-a-text-box), and takes chords again as
-  one.
+- **A line with no chord is one zero-width space**, whatever it hung its chords on.
+  With its last chord taken off, the line is a line of chords alone still: it takes
+  the spot and takes chords, the first of them without a byte of the RTF changing.
+  Decided by the maintainer on 2026-10-12, for Simple Presenter and both apps: "if a
+  blank line had chords and you deleted all - you should be able to put some back on
+  that line". (Until then, and in Simple Presenter at the commit that `reference/`
+  holds, such a line was left with no stand-in at all. In a box with other lines that
+  is an empty line, which takes nothing; so a line of chords under a verse, once
+  emptied, was gone for good but for undo.)
+
+  It is a zero-width space even where the line hung its chords on plain spaces. A
+  text box left holding one plain space and no chord is, when the song is next read,
+  a stray space and nothing more ([above](#from-the-presentation-down-to-a-text-box)):
+  its slide a blank one, or the box not shown at all. **Known**, of real songs (on
+  copies, 2026-10-12): of 108 lines of chords alone that have chords, 55 hang them
+  on plain spaces. Left with a plain space, 32 would have been read back as blank
+  slides, and for 2 of those the slide's box would then have been another text box
+  of the slide, and chords put back would have gone there. Left with a zero-width
+  space, all 108 are read back as the lines they were, and a chord put back changes
+  not a byte of the RTF. Chords put on such a line afterwards hang on zero-width
+  spaces, that being then the stand-in the line has.
+- So a line of chords alone is never made empty by these apps, and step 2 below
+  (a line with no character has no place) is met only in a request for a line that
+  was never one.
 
 Simple Presenter does this by reading the RTF into its own model and writing the whole
 RTF again in its own words. **Do not copy that.** It suits an app that edits text
@@ -335,10 +355,11 @@ to have, and in some they were not, each with the bytes it becomes for a number 
 stand-ins, or that it cannot be done. `tools/standins.py` made it and is the reference
 for this rule, which is new: both apps are right when they give those bytes.
 
-**Known**, of real songs (425 on the maintainer's Mac, 2026-10-11, on copies): every
-one of their 116 lines of chords alone could be given a chord more, a chord fewer, two
-more and none (423 changes), each leaving every byte of the RTF outside the line as it
-was and nothing else in the file changed, and each undone to the byte. And **Apple's
+**Known**, of real songs (425 on the maintainer's Mac, 2026-10-11 and 12, on copies):
+every one of their 116 lines of chords alone could be given a chord more, a chord
+fewer and two more, and each of the 108 that have chords could have them all taken
+off and one put back (some 500 changes), each leaving every byte of the RTF outside
+the line as it was and nothing else in the file changed, and each undone to the byte. And **Apple's
 own reader of RTF**, which ProPresenter on the Mac reads a text box with, read every
 one as the words that were meant, with every other line of the box set as it was
 (its font, its size, its colour, its paragraph); and read the stand-ins a blank
@@ -441,7 +462,10 @@ To the letter:
 
 - What is remembered is kept by slide and box, a box's id being its own only on its
   own slide.
-- "Its last chord" is when the box is left with no chord and no words at all.
+- "Its last chord" is when the box is left with no chord, and nothing in it but
+  that line's stand-ins. This is looked for **before** the rule that a line with no
+  chord is one zero-width space: what was made here is unmade whole, and keeps
+  nothing.
 - For a box that was added, remember the slide's cue as the file had it, and put
   that back whole if the cue is otherwise what it was just after the box was added
   (which it always is: these apps change nothing else on a slide). The file is then
@@ -454,9 +478,9 @@ To the letter:
   remembered was of the one before.
 
 Once the song is closed the app remembers nothing. Chords taken off another day leave
-the box with the opening it was given and no words: blank to look at as it was, and
-still shown as a blank slide. A text box that was added stays, empty. Either can be
-given chords again, as any blank slide can.
+the box as any line of chords alone is left: with the opening it was given and one
+stand-in, nothing to look at as before, and shown as a line of chords alone with none
+on it. A text box that was added stays. Either takes chords again.
 
 **A guess**, until it has been seen in ProPresenter: that a box so written shows its
 chords on a stage screen as an intro from Multitracks does, its text being the same

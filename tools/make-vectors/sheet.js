@@ -121,9 +121,11 @@ function makeEditor(blocks, key) {
         blocks: JSON.parse(JSON.stringify(blocks)),
         key: key,
         calls: [],
-        // The text boxes that were added for a slide's chords, as the real one remembers
-        // them while the song is open (PresentationEditor::setChordsAlone): they go
-        // again when the chords do.
+        // What was made for the chords of blank slides, as the real one remembers it
+        // while the song is open (spec/01-file-format.md, "A change of mind"): the
+        // boxes that were given words, by their slide and id, and those of them that
+        // were added. What was made goes again when the chords do.
+        made: [],
         added: [],
         song() {
             return JSON.parse(JSON.stringify(this.blocks))
@@ -140,9 +142,22 @@ function makeEditor(blocks, key) {
             block.chords = tidy(block.text, chords.map(chord => ({ at: chord.at, name: tidied(chord.name) })))
             return ""
         },
-        // (As PresentationEditor::setChordsAlone: the line becomes one stand-in for each
-        // chord, in the character it hung its chords on before, and the chords of the
-        // lines after it move by as much as it grew or shrank.)
+        // The line becomes one stand-in for each chord, in the character it hung its
+        // chords on before, and the chords of the lines after it move by as much as it
+        // grew or shrank. (As PresentationEditor::setChordsAlone, but for one thing.)
+        //
+        // A line with NO chord is one zero-width space, whatever it hung its chords on,
+        // so that it is still a line of chords alone and a chord can be put on it
+        // again. Decided by the maintainer on 2026-10-12, for Simple Presenter and the
+        // two apps alike (spec/01-file-format.md, "Chords with no words"). At the
+        // commit of Simple Presenter that reference/ holds, setChordsAlone still leaves
+        // such a line with no stand-in at all, which in a box with other lines is an
+        // empty line that takes nothing; this stand-in went first, and
+        // sheet-model.json was made again with it.
+        //
+        // (A zero-width space and not the plain space the line may have had: a text
+        // box left holding one plain space and no chord is, as a song is read, a stray
+        // space and nothing more.)
         setChordsAlone(row, element, line, names, joined) {
             this.calls.push({ ask: "setChordsAlone", row, element, line, names: names.slice(), joined: joined === true })
             const block = this.find(row, element)
@@ -156,6 +171,7 @@ function makeEditor(blocks, key) {
                     block.element = "(a text box added for the chords)"
                     this.added.push(block.element)
                 }
+                this.made.push(block.row + "/" + block.element)
                 block.text = placeholders(names.length, ZW)
                 block.chords = names.map((name, i) => ({ at: i * 2, name: tidied(name) }))
                 block.blank = false
@@ -164,7 +180,7 @@ function makeEditor(blocks, key) {
             const lines = block.text.split("\n")
             const old = lines[line]
             const standIn = !old.includes(ZW) && old.includes(" ") ? " " : ZW
-            const made = placeholders(names.length, standIn)
+            const made = names.length === 0 ? ZW : placeholders(names.length, standIn)
             let start = 0
             for (let i = 0; i < line; ++i)
                 start += lines[i].length + 1
@@ -180,10 +196,12 @@ function makeEditor(blocks, key) {
             block.text = lines.join("\n")
             names.forEach((name, i) => kept.push({ at: start + i * 2, name: tidied(name) }))
             block.chords = tidy(block.text, kept)
-            // With its last chord gone a slide that has nothing else on it is blank
-            // again: handed over with no words, and without the text box if that was
-            // only added for the chords.
-            if (block.chords.length === 0 && noWords(block.text) && this.blocks.filter(other => other.row === block.row).length === 1) {
+            lines[line] = ""
+            if (names.length === 0 && block.chords.length === 0 && noWords(lines.join("\n")) && this.made.includes(block.row + "/" + block.element)) {
+                // The last chord taken off a blank slide that was given its chords while
+                // the song has been open: what was made for them is unmade. The slide
+                // is blank again, handed over with no words, and without the text box if
+                // that was only added for the chords.
                 block.text = ""
                 block.blank = true
                 if (this.added.includes(block.element))
@@ -354,6 +372,18 @@ const SONGS = {
             block(1, "", "Ending", true, "", [], true),
         ],
     },
+    // A line of chords alone under a line of words, in one text box, hung on plain
+    // spaces; and a slide of words after it. Row 0 is the name "Verse 1", row 1 the
+    // first slide's line of words, row 2 its line of chords alone, and row 3 the
+    // second slide's line. (For a line that loses its last chord and is to take one
+    // again: see the stand-in's setChordsAlone.)
+    "under": {
+        key: "E",
+        blocks: [
+            block(0, "A", "Verse 1", true, "Holy holy holy\n" + placeholders(2, " "), [{ at: 0, name: "E" }, { at: 15, name: "B" }, { at: 17, name: "E" }]),
+            block(1, "B", "Verse 1", false, "Lord God Almighty", [{ at: 0, name: "A" }]),
+        ],
+    },
 }
 
 // A scenario that names a row which is no line of words was written wrongly: say so,
@@ -429,6 +459,8 @@ model.walks = [
     walk("blank", { row: 6, at: 0 }, Array(9).fill("Left")),
     walk("blank", { row: 4, at: 20 }, Array(4).fill("Shift+Right")),
     walk("bare", null, Array(4).fill("Right")),
+    walk("under", null, Array(8).fill("Right")),
+    walk("under", { row: 3, at: 0 }, Array(6).fill("Left")),
 ]
 
 // One change at a time: what the document is asked, and the song after it
@@ -483,6 +515,24 @@ model.edits = [
          s => s.put(s.spotRow, s.spotAt, "D")),
     edit("bare", { row: 2, at: 0 }, { put: "D", then: { take: true }, note: "and taken off again: the text box that was added goes with it" },
          s => s.put(2, 0, "D") && s.take(2, 0)),
+    // A line of chords alone that loses its last chord keeps one stand-in, and is a
+    // line of chords alone still: a chord can be put on it again.
+    edit("intro", { row: 1, at: 0 }, { take: true, then: { take: true, then: { take: true } }, note: "every chord taken off a line of chords alone, the first each time: asked for two, for one, for none. It keeps one stand-in" },
+         s => s.take(1, 0) && s.take(1, 0) && s.take(1, 0)),
+    edit("intro", { row: 1, at: 0 }, { take: true, then: { take: true, then: { take: true, then: { put: "Em" } } }, note: "and one put on it again: on the stand-in it kept" },
+         s => s.take(1, 0) && s.take(1, 0) && s.take(1, 0) && s.put(1, 0, "Em")),
+    edit("intro", { row: 6, at: 0 }, { take: true, note: "the one chord of a slide that hung it on a plain space: asked for none. The line is then one zero-width space, which a stray space cannot be taken for" },
+         s => s.take(6, 0)),
+    edit("intro", { row: 6, at: 0 }, { take: true, then: { put: "A" }, note: "and a chord put there again: on the zero-width space" },
+         s => s.take(6, 0) && s.put(6, 0, "A")),
+    edit("under", { row: 2, at: 2 }, { put: "A", note: "a line of chords alone under a line of words: in place of its second" }, s => s.put(s.spotRow, s.spotAt, "A")),
+    edit("under", { row: 2, at: 0 }, { take: true, then: { take: true }, note: "both chords taken off a line of chords alone under a line of words: it is one zero-width space, and the words keep their chord" },
+         s => s.take(2, 0) && s.take(2, 0)),
+    edit("under", { row: 2, at: 0 }, { take: true, then: { take: true, then: { put: "F#m" } }, note: "and one put on it again" },
+         s => s.take(2, 0) && s.take(2, 0) && s.put(2, 0, "F#m")),
+    edit("under", { row: 2, at: 0 }, { take: true, then: { take: true, then: { put: "F#m", then: { put: "B", at: 2 } } }, note: "and a second after it: the line hangs its chords on zero-width spaces now, and the chord of the slide after is not touched" },
+         s => s.take(2, 0) && s.take(2, 0) && s.put(2, 0, "F#m") && s.put(2, 2, "B")),
+    edit("under", { row: 1, at: 0 }, { move: { row: 2, at: 4 }, note: "from a word to the end of the line of chords alone under it" }, s => s.move(1, 0, 2, 4, false)),
 ]
 
 // Typing a chord: the bubble opened, what was typed kept or thrown away

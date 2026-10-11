@@ -81,6 +81,9 @@ Request 2, to the letter:
   no stand-in, as it would get no entry.
 - Only a line of chords alone is made stand-ins. A line that has words, and an empty
   line, are refused.
+- **With no names the line is one zero-width space**, whatever it hung its chords
+  on, and is a line of chords alone still, with no chord on it: one can be put on
+  it again ([01-file-format.md](01-file-format.md), Chords with no words).
 - Where the line is those stand-ins already (its chords renamed, or put in another
   order), only the chord entries change, and not a byte of the RTF.
 - A chord that stands on the line, or on the line break that ends it, is one of the
@@ -92,7 +95,8 @@ Request 2, to the letter:
   by now, with words or without) is refused: "That slide is no longer blank."
 - The last chord taken off a blank slide that was given its chords while the song
   has been open unmakes what was made for them
-  ([01-file-format.md](01-file-format.md), A change of mind).
+  ([01-file-format.md](01-file-format.md), A change of mind), and that comes first:
+  nothing is kept, and the slide is blank again, as the file had it.
 
 It is one step of undo like any other, whatever it wrote: the RTF, a box.
 

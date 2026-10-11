@@ -330,6 +330,34 @@ overrule.
     asked for in so many words. Both are so that the Windows app can be held to the
     same bytes without ever seeing a real song.
 
+And on 2026-10-12, the maintainer having read what M7 left to ask:
+
+58. **A line of chords alone that loses its last chord takes chords again: it is left
+    one zero-width space** (`spec/01`, "Chords with no words"). The maintainer:
+    "hmm yes - if a blank line had chords and you deleted all - you should be able to
+    put some back on that line", to the question whether such a line should keep
+    one invisible character. For all three apps: "my goal is all three apps work the
+    same - same rules!". Mine, within that:
+    - **one rule for every line of chords alone**, the whole of a slide or one line
+      of a box, and not only the line under a verse that was the trouble;
+    - **a zero-width space, whatever the line hung its chords on.** Its own plain
+      space was kept at first, and copies of the real songs said no: a text box
+      left holding one plain space and no chord is read back as a stray space. Of
+      108 lines that have chords, 32 would have come back as blank slides, and 2 of
+      those as another text box's. With a zero-width space all 108 come back as the
+      lines they were;
+    - what was made for a blank slide in the same sitting is still unmade whole,
+      keeping nothing: that was decided first, and leaves the file as it was.
+
+    The song's stand-in in `tools/make-vectors/sheet.js` has the rule, and
+    `sheet-model.json` was made again on this Mac with cases for it
+    (`testdata/README.md` says how, and that not one old case changed). **Simple
+    Presenter's own code has not got it yet**: that is the maintainer's to pass on.
+59. **What is agreed is pushed at once.** The maintainer: "we should push asap - so
+    the windows session can be kept up to date with decision or rule updates we
+    agree on". A session is now building the Windows app from `spec/`, and reads
+    the repository for what the rules are.
+
 ## How it is laid out, and why
 
 ```
@@ -355,7 +383,8 @@ mac/
   it. Kept, the package builds from a clone with no submodule and no `protoc`.
   `Generated/MadeFrom.swift` says what it was made from. **Run
   `mac/Core/generate-proto.sh` again whenever the `proto/` submodule is moved on**;
-  nothing checks that for you (see "Left rough").
+  a test notices if the submodule names another version of ProPresenter than the
+  code was made from (see "Left rough" for what it does not notice).
 - **Only what a presentation needs is generated**: `presentation.proto` and what it
   imports, 32 files of the 148. For another kind of file, add its `.proto` to `ROOTS`
   in the script.
@@ -1084,10 +1113,21 @@ more.)
   given; and that a chord on a line's own break is that line's. Three of the six
   are in the vectors, for both apps. (A seventh change, one that changes nothing,
   was put in to see that the tests can also say "unnoticed": they did.)
-- **An emptied line stays a line of the ChordPro text**, and a chord typed on it
-  goes to the end of the line before (`tidy`): as for any empty line of a box, and
-  as the reference. On the sheet it has no row if it ended its box, and takes the
-  spot no more if it did not.
+- **A line with no chord and one stand-in is nothing new to the editors**: it is
+  what a file has that came with stand-ins and no chords, which both have shown
+  since M2 as a line of chords alone with none on it. So decision 58 changed two
+  lines of the song and nothing in either editor: the sheet's row stays and takes
+  the spot; the ChordPro text has an empty line there that takes chords.
+- **Decision 58 on copies of the real songs** (2026-10-12, numbers only, deleted
+  after): every chord taken off each of the 108 lines of chords alone that have
+  any, all at once and one at a time (the same either way), and one put back.
+  Each as meant; not a box lost or read as blank; not a byte outside the line
+  changed, nor anything else in the file; Apple's reader agreeing; the chord put
+  back changing no byte of the RTF; and all of it undone to the byte.
+- **The sheet's vectors can be made on this Mac**: `node` is here, and
+  `tools/make-vectors/sheet.js` run on `reference/simple-presenter` gave
+  `sheet-model.json` and `layout.json` to the byte, before it was touched. The
+  tests' `StandInSong` is that tool's stand-in in Swift, and was changed with it.
 
 ### Rules the vectors did not hold, and what became of them
 
@@ -1135,13 +1175,9 @@ second of Simple Presenter in so many words.
      behave as one of its own, and is anything odd when words are typed into it?
   5. the song saved from ProPresenter after that, and opened here again.
 - **The two new sentences** (decision 55) have been read by nobody but their writer.
-- **A line of chords alone that loses its last chord, in a box that has words too,
-  is dead**: an empty line, which the sheet puts nothing on. Undo brings it back,
-  and nothing else does. It is the reference's way and is kept. It could instead
-  keep one stand-in and stay a line of chords alone with none on it, so that a
-  chord could be put back; that would be a change to `spec/01` and to Simple
-  Presenter, and is the maintainer's to want or not. (3 of 89 such boxes in the
-  songs looked at have words as well.)
+- **Simple Presenter is to be given decision 58**, by the maintainer's other
+  session. Until it is, a line emptied there is dead (no stand-in), and emptied here
+  keeps one: the same file, left differently by the two.
 - **A blank slide in the ChordPro text is an empty line after an empty line.** It
   takes chords and saves them, and the tests hold that. Whether anyone can find the
   right one of the two by eye has not been tried (`spec/04`, rule 3).
@@ -1237,9 +1273,16 @@ second of Simple Presenter in so many words.
   (the page's "later").
 - **The window's looks are a first go** at the page's proposal, to be tried and
   changed with the maintainer.
-- **Nothing checks that `Generated/` matches the submodule.** The workflow could
-  generate again and compare, but GitHub's Mac would then need the same `protoc` and
-  `protoc-gen-swift` as made it, to the version. Not worth it yet.
+- **`Generated/` is held to the submodule only where the submodule is**
+  (`GeneratedReaderTests`, 2026-10-12: the version of ProPresenter that
+  `proto/autogen-proto/version.txt` names must be the one the code says it was made
+  from). So moving the submodule on and forgetting to generate fails a test on the
+  machine that did it. It does not see a change to the descriptions that leaves that
+  version as it was, and GitHub's Mac, which has no submodule, sees nothing. The
+  workflow could generate again and compare, but would then need the same `protoc`
+  and `protoc-gen-swift` as made the code, to the version. Not worth it yet. (The
+  Windows session asked, on its first day, why the Mac keeps its generated code
+  where Windows makes it at each build: `spec/10` now says, under the Mac.)
 - **A presentation that ProPresenter itself made, of words anyone may use**, is asked
   of the maintainer before M9 by the plan. It is wanted before M2: saving is proved
   there, and every test file so far was written by Simple Presenter. A few slides of

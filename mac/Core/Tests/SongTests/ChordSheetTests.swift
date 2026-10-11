@@ -104,13 +104,14 @@ struct ChordSheetTests {
                 return sheet.put(sheet.spot.row, sheet.spot.at, name)
             }
             guard sheet.put(spot.row, spot.at, name) else { return false }
-            if let second = then.put {
-                return sheet.put(spot.row, try #require(then.at), second)
-            }
-            return sheet.take(spot.row, spot.at)
+            return follow(then, at: spot, on: sheet)
         }
         if what.take == true {
-            return sheet.take(sheet.spot.row, sheet.spot.at)
+            guard let then = what.then else {
+                return sheet.take(sheet.spot.row, sheet.spot.at)
+            }
+            guard sheet.take(spot.row, spot.at) else { return false }
+            return follow(then, at: spot, on: sheet)
         }
         if let number = what.key {
             return sheet.put(sheet.spot.row, sheet.spot.at, sheet.inKey[number - 1])
@@ -122,6 +123,16 @@ struct ChordSheetTests {
         let to = try #require(what.copy, "a case of edits that says nothing this test knows how to do")
         sheet.move(from: spot, to: to.spot, copy: true)
         return nil
+    }
+
+    /// What a case says was done next, and after that: each at the case's own spot,
+    /// or at the place of its row that the step names; and each only if the one
+    /// before it was done, as the script that made the case has them (`a && b && c`).
+    private func follow(_ step: SheetVectors.Edit.What.Then, at spot: Spot, on sheet: ChordSheet) -> Bool {
+        let at = step.at ?? spot.at
+        let done = step.put.map { sheet.put(spot.row, at, $0) } ?? sheet.take(spot.row, at)
+        guard done, let next = step.then else { return done }
+        return follow(next, at: spot, on: sheet)
     }
 
     @Test("edits: for each thing done at the spot, what the song is asked, where the spot is left, and the song afterwards")

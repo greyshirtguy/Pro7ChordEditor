@@ -312,6 +312,53 @@
                     "blank": true
                 }
             ]
+        },
+        "under": {
+            "key": "E",
+            "textBoxes": [
+                {
+                    "row": 0,
+                    "slideId": "slide-0",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "A",
+                    "text": "Holy holy holy\n   ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        },
+                        {
+                            "at": 15,
+                            "name": "B"
+                        },
+                        {
+                            "at": 17,
+                            "name": "E"
+                        }
+                    ],
+                    "blank": false
+                },
+                {
+                    "row": 1,
+                    "slideId": "slide-1",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": false,
+                    "label": "",
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ],
+                    "blank": false
+                }
+            ]
         }
     },
     "rows": [
@@ -890,6 +937,87 @@
                     "last": true
                 }
             ]
+        },
+        {
+            "song": "under",
+            "mostLines": 2,
+            "used": [
+                "E",
+                "B",
+                "E",
+                "A"
+            ],
+            "rows": [
+                {
+                    "kind": "group",
+                    "name": "Verse 1",
+                    "color": "",
+                    "row": 0
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 0,
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 2
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 1,
+                    "row": 0,
+                    "element": "A",
+                    "text": "   ",
+                    "start": 15,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "B"
+                        },
+                        {
+                            "at": 2,
+                            "name": "E"
+                        }
+                    ],
+                    "alone": true,
+                    "blank": false,
+                    "first": false,
+                    "count": 2,
+                    "last": true
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 0,
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                }
+            ]
         }
     ],
     "wordStarts": [
@@ -1269,6 +1397,42 @@
             "usable": true,
             "out": [
                 0
+            ]
+        },
+        {
+            "song": "under",
+            "row": 0,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "under",
+            "row": 1,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                10
+            ]
+        },
+        {
+            "song": "under",
+            "row": 2,
+            "usable": true,
+            "out": [
+                0,
+                2,
+                4
+            ]
+        },
+        {
+            "song": "under",
+            "row": 3,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                9
             ]
         }
     ],
@@ -2163,6 +2327,95 @@
                 },
                 {
                     "row": 2,
+                    "at": 0
+                }
+            ]
+        },
+        {
+            "song": "under",
+            "start": null,
+            "keys": [
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right"
+            ],
+            "spots": [
+                {
+                    "row": 1,
+                    "at": 0
+                },
+                {
+                    "row": 1,
+                    "at": 5
+                },
+                {
+                    "row": 1,
+                    "at": 10
+                },
+                {
+                    "row": 2,
+                    "at": 0
+                },
+                {
+                    "row": 2,
+                    "at": 2
+                },
+                {
+                    "row": 2,
+                    "at": 4
+                },
+                {
+                    "row": 3,
+                    "at": 0
+                },
+                {
+                    "row": 3,
+                    "at": 5
+                }
+            ]
+        },
+        {
+            "song": "under",
+            "start": {
+                "row": 3,
+                "at": 0
+            },
+            "keys": [
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left"
+            ],
+            "spots": [
+                {
+                    "row": 2,
+                    "at": 4
+                },
+                {
+                    "row": 2,
+                    "at": 2
+                },
+                {
+                    "row": 2,
+                    "at": 0
+                },
+                {
+                    "row": 1,
+                    "at": 10
+                },
+                {
+                    "row": 1,
+                    "at": 5
+                },
+                {
+                    "row": 1,
                     "at": 0
                 }
             ]
@@ -5407,6 +5660,740 @@
                 }
             ],
             "answer": true
+        },
+        {
+            "song": "intro",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "take": true,
+                    "then": {
+                        "take": true
+                    }
+                },
+                "note": "every chord taken off a line of chords alone, the first each time: asked for two, for one, for none. It keeps one stand-in"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G",
+                        "A"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "A"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​",
+                    "chords": []
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": " ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "intro",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "take": true,
+                    "then": {
+                        "take": true,
+                        "then": {
+                            "put": "Em"
+                        }
+                    }
+                },
+                "note": "and one put on it again: on the stand-in it kept"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "G",
+                        "A"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "A"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 0,
+                    "names": [
+                        "Em"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 1,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "Em"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": " ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "intro",
+            "spot": {
+                "row": 6,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "note": "the one chord of a slide that hung it on a plain space: asked for none. The line is then one zero-width space, which a stray space cannot be taken for"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 2,
+                    "element": "C",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 6,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        },
+                        {
+                            "at": 4,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "​",
+                    "chords": []
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "intro",
+            "spot": {
+                "row": 6,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "put": "A"
+                },
+                "note": "and a chord put there again: on the zero-width space"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 2,
+                    "element": "C",
+                    "line": 0,
+                    "names": [],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 2,
+                    "element": "C",
+                    "line": 0,
+                    "names": [
+                        "A"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 6,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        },
+                        {
+                            "at": 4,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "under",
+            "spot": {
+                "row": 2,
+                "at": 2
+            },
+            "do": {
+                "put": "A",
+                "note": "a line of chords alone under a line of words: in place of its second"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "B",
+                        "A"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 2
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy\n   ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        },
+                        {
+                            "at": 15,
+                            "name": "B"
+                        },
+                        {
+                            "at": 17,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "under",
+            "spot": {
+                "row": 2,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "take": true
+                },
+                "note": "both chords taken off a line of chords alone under a line of words: it is one zero-width space, and the words keep their chord"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "E"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy\n​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "under",
+            "spot": {
+                "row": 2,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "take": true,
+                    "then": {
+                        "put": "F#m"
+                    }
+                },
+                "note": "and one put on it again"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "E"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "F#m"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy\n​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        },
+                        {
+                            "at": 15,
+                            "name": "F#m"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "under",
+            "spot": {
+                "row": 2,
+                "at": 0
+            },
+            "do": {
+                "take": true,
+                "then": {
+                    "take": true,
+                    "then": {
+                        "put": "F#m",
+                        "then": {
+                            "put": "B",
+                            "at": 2
+                        }
+                    }
+                },
+                "note": "and a second after it: the line hangs its chords on zero-width spaces now, and the chord of the slide after is not touched"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "E"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "F#m"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "F#m",
+                        "B"
+                    ],
+                    "joined": false
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 0
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy\n​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "E"
+                        },
+                        {
+                            "at": 15,
+                            "name": "F#m"
+                        },
+                        {
+                            "at": 17,
+                            "name": "B"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": true
+        },
+        {
+            "song": "under",
+            "spot": {
+                "row": 1,
+                "at": 0
+            },
+            "do": {
+                "move": {
+                    "row": 2,
+                    "at": 4
+                },
+                "note": "from a word to the end of the line of chords alone under it"
+            },
+            "asked": [
+                {
+                    "ask": "setChordsAlone",
+                    "row": 0,
+                    "element": "A",
+                    "line": 1,
+                    "names": [
+                        "B",
+                        "E",
+                        "E"
+                    ],
+                    "joined": false
+                },
+                {
+                    "ask": "setChords",
+                    "row": 0,
+                    "element": "A",
+                    "chords": [
+                        {
+                            "at": 15,
+                            "name": "B"
+                        },
+                        {
+                            "at": 17,
+                            "name": "E"
+                        },
+                        {
+                            "at": 19,
+                            "name": "E"
+                        }
+                    ],
+                    "joined": true
+                }
+            ],
+            "spotAfter": {
+                "row": 2,
+                "at": 4
+            },
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy\n     ",
+                    "chords": [
+                        {
+                            "at": 15,
+                            "name": "B"
+                        },
+                        {
+                            "at": 17,
+                            "name": "E"
+                        },
+                        {
+                            "at": 19,
+                            "name": "E"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "answer": null
         }
     ],
     "typing": [

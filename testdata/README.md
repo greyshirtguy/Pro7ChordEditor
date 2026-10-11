@@ -133,6 +133,12 @@ run on any machine: neither reads anything of Simple Presenter's.
 disagree; `make-fixtures.py` checks its reader of RTF the same way. Run them in that
 order.
 
+`sheet.js` by itself needs only Node and Simple Presenter's two QML files, which
+`reference/simple-presenter` has: `node tools/make-vectors/sheet.js
+reference/simple-presenter testdata/vectors` gives `sheet-model.json` and
+`layout.json` on any machine, the same to the byte as the Linux machine gave them
+(tried on a Mac, 2026-10-12, before anything below was changed).
+
 ## Made again on 2026-10-10, and what is still wanted
 
 What stood under this heading as "to be made again, and cases wanted" was asked for by
@@ -185,6 +191,36 @@ reference's own:
 Where a case of `mac/Core/Tests/ChordRulesTests/NotHeldByVectorsTests.swift` and a
 vector now say the same, the case can go, as that file's notes have it. Where they do
 not say the same, the vector is what the reference answers.
+
+## Made again on 2026-10-12, on the Mac: a line that has lost its last chord
+
+**The maintainer decided** that a line of chords alone whose last chord is taken off
+takes chords again, and so is left one zero-width space
+([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with no words": "if a
+blank line had chords and you deleted all - you should be able to put some back on
+that line"). It is a rule of the song, not of the sheet, and the sheet's functions
+are Simple Presenter's as they were. What changed is in this repository:
+
+- **The stand-in for the song in `tools/make-vectors/sheet.js`**: a line with no
+  chord is one zero-width space; and what was made for a blank slide's chords is
+  remembered there as the real song remembers it, so that taking its chords off
+  again in one sitting still leaves the slide blank.
+- **`vectors/sheet-model.json`, made again with it.** Not one case that was there
+  came out differently: none took the last chord off a line the song came with. So
+  cases were added that do: a sixth song, `under` (a line of chords alone, on plain
+  spaces, under a line of words in one text box), with its rows, its stops and two
+  walks; and nine `edits`, on `intro` and `under`: every chord taken off a line and
+  one put on it again, the same on a slide that hangs its one chord on a plain
+  space (which is then a zero-width space), and on the line under the words. An
+  edit can now be of more than two steps: `do.then` may have a `then`.
+- **`vectors/stand-ins-in-rtf.json`**, by `tools/standins.py`: for every line that
+  hangs its chords on plain spaces, the RTF it becomes as one zero-width space,
+  which is now asked of it.
+
+**Simple Presenter itself has not got the rule yet.** At the commit `reference/`
+holds, `PresentationEditor::setChordsAlone` still leaves a line with no chord
+with no stand-in at all. It is the maintainer's to pass on, and when it is done there the
+vectors made on that machine should come out as these are.
 
 **Still wanted**
 

@@ -269,13 +269,21 @@ struct ChordProEditorTests {
         #expect(editor.text == ChordProEditor(song: song).text)
 
         // The eighth: two chords on plain spaces, under a line of words that has two
-        // of its own. Both taken off: the line is empty, and the words keep theirs.
+        // of its own. Both taken off: the line is one zero-width space and a line of
+        // chords alone still, and the words keep theirs. A chord typed on it again
+        // is saved on it.
         let under = try #require(editor.lines.firstIndex { $0.slide == 7 && $0.kind == .chordsAlone })
         #expect(editor.text.components(separatedBy: "\n")[under] == "[B] [E]")
         #expect(typeOnLine(under, "") == .taken)
         #expect(try editor.save())
-        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Words()])
+        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Chords.placeholders(1)])
         #expect(song.textBoxes[7].chords == [Chord(at: 0, name: "E"), Chord(at: 11, name: "A")])
+        #expect(editor.lines[under].kind == .chordsAlone && editor.text.components(separatedBy: "\n")[under] == "")
+        #expect(editor.text == ChordProEditor(song: song).text)
+        #expect(typeOnLine(under, "[B7]") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Chords.placeholders(1)])
+        #expect(song.textBoxes[7].chords == [Chord(at: 0, name: "E"), Chord(at: 11, name: "A"), Chord(at: 29, name: "B7")])
         #expect(editor.text == ChordProEditor(song: song).text)
 
         // The ninth: three chords over two lines of words, each of which has one. One

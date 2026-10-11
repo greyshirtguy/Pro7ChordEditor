@@ -93,7 +93,7 @@ struct ChordsWithNoWordsTests {
 
     // ---- A line of chords alone
 
-    @Test("Every line of chords alone, given one more chord, one fewer, three more, and none: the line is that many stand-ins, the chords are on them, and those of the lines after it have moved with their words",
+    @Test("Every line of chords alone, given one more chord, one fewer, three more, and none: the line is a stand-in for each chord (and one zero-width space where it has none), the chords are on them, and those of the lines after it have moved with their words",
           arguments: files)
     func everyLine(path: String) throws {
         let bench = try Workbench()
@@ -110,7 +110,9 @@ struct ChordsWithNoWordsTests {
                     let names = (0..<count).map { ["Em", "C", "G/B", "D", "Am7", "F#m", "Bb"][$0 % 7] }
                     try song.setChordsAlone(slide: box.slide, element: box.element, line: line, names: names)
 
-                    let new = Chords.placeholders(count, standIn: standIn(of: old))
+                    // (A line with no chord is one zero-width space, whatever it
+                    // hung its chords on, and is a line of chords alone still.)
+                    let new = count == 0 ? Chords.placeholders(1) : Chords.placeholders(count, standIn: standIn(of: old))
                     var meant = lines
                     meant[line] = new
                     var chords: [Chord] = box.chords.filter { $0.at < start }
@@ -118,16 +120,13 @@ struct ChordsWithNoWordsTests {
                     chords += box.chords.filter { $0.at > start + old.length }.map { Chord(at: $0.at + new.length - old.length, name: $0.name) }
 
                     // What was asked is what the song now says, and what the file says.
-                    // (A slide left with nothing on it is a blank one, with no words.)
+                    // (No slide is left a blank one, nor any box left out: a line with
+                    // no chord has its zero-width space, which no stray space is.)
                     let read = try OpenSong(opening: song.url).textBoxes
                     #expect(read == song.textBoxes, "\(path), slide \(box.slide), line \(line), to \(count)")
                     let now = try #require(read.first { $0.slide == box.slide && $0.element == box.element })
-                    if meant.allSatisfy(\.isEmpty) {
-                        #expect(now.blank && now.words.isEmpty && now.chords.isEmpty, "\(path), slide \(box.slide), line \(line), to \(count)")
-                    } else {
-                        #expect(now.words.lines == meant, "\(path), slide \(box.slide), line \(line), to \(count)")
-                        #expect(now.chords == chords, "\(path), slide \(box.slide), line \(line), to \(count)")
-                    }
+                    #expect(!now.blank && now.words.lines == meant, "\(path), slide \(box.slide), line \(line), to \(count)")
+                    #expect(now.chords == chords, "\(path), slide \(box.slide), line \(line), to \(count)")
                     #expect(read.filter { $0.element != box.element } == untouched.filter { $0.element != box.element })
 
                     // Each chord of the line is written one long: its own stand-in.
@@ -259,10 +258,11 @@ struct ChordsWithNoWordsTests {
         #expect(song.textBoxes[8].chords.map(\.at) == [0, 2, 4, 5, 11, 33])
 
         // Every chord taken off the line: the one on its break goes too, and is not
-        // left standing on the empty line; the words' two move up by the five places.
+        // left standing on the one zero-width space the line then is; the words' two
+        // move up by the four places the line is shorter.
         try song.setChordsAlone(slide: 8, element: boxes[8].element, line: 0, names: [])
-        #expect(song.textBoxes[8].words.lines.map(\.length) == [0, 26, 23])
-        #expect(song.textBoxes[8].chords == [Chord(at: 6, name: "C#m"), Chord(at: 28, name: "A")])
+        #expect(song.textBoxes[8].words.lines.map(\.length) == [1, 26, 23] && song.textBoxes[8].words.lines[0] == Chords.placeholders(1))
+        #expect(song.textBoxes[8].chords == [Chord(at: 7, name: "C#m"), Chord(at: 29, name: "A")])
     }
 
     @Test("Names are tidied, and one that is nothing is left out and gets no stand-in")
@@ -318,12 +318,6 @@ struct ChordsWithNoWordsTests {
                         // (A slide that has been given a box is asked by that box's id.)
                         let mine = try #require(song.textBoxes.first { $0.slide == box.slide && ($0.element == box.element || box.element.isEmpty) })
                         let theirs = try #require(double.textBoxes.first { $0.slide == box.slide && ($0.element == box.element || box.element.isEmpty) })
-                        // A line that has lost its last chord, in a box with other
-                        // lines, is an empty line, and the editors ask nothing more
-                        // of it. (The stand-in song would make stand-ins of it again,
-                        // as the reference would of any line; the song refuses what
-                        // is not a line of chords alone, and nothing asks.)
-                        guard mine.blank || Chords.isPlaceholders(mine.words.lines[line]) else { break }
                         try song.setChordsAlone(slide: box.slide, element: mine.element, line: line, names: asked)
                         try double.setChordsAlone(slide: box.slide, element: theirs.element, line: line, names: asked, joined: false)
                         let expected = double.textBoxes.map { one in
@@ -678,7 +672,7 @@ struct ChordsWithNoWordsTests {
 
     // ---- What is remembered, and for how long
 
-    @Test("Another day: chords taken off a slide that was given them in an earlier sitting leave its box with the opening it was given and no words, and a box that was added stays, empty. Both are blank slides still")
+    @Test("Another day: chords taken off a slide that was given them in an earlier sitting leave its box with the opening it was given and one stand-in, as any line of chords alone is left, and a box that was added stays. Each takes chords again, the first without a byte of its RTF changing")
     func anotherDay() throws {
         let bench = try Workbench()
         let url = try bench.copy(of: Self.shaped)
@@ -696,21 +690,25 @@ struct ChordsWithNoWordsTests {
         try song.setChordsAlone(slide: 0, element: own, line: 0, names: [])
         try song.setChordsAlone(slide: 11, element: added, line: 0, names: [])
         #expect(try Data(contentsOf: url) != original)
-        #expect(song.textBoxes[0] == TextBox(slide: 0, group: "Verse 1", groupColour: song.textBoxes[0].groupColour, startsItsGroup: true, element: own, words: Words(), blank: true))
-        #expect(song.textBoxes[11].blank && song.textBoxes[11].element == added && song.textBoxes[11].words.isEmpty)
-        // The box keeps its opening: the RTF it was given, less its stand-ins' own
-        // bytes. It names a font still, which the empty document it was did not.
+        // Neither is a blank slide now: each is a line of chords alone with none on it.
+        #expect(song.textBoxes[0] == TextBox(slide: 0, group: "Verse 1", groupColour: song.textBoxes[0].groupColour, startsItsGroup: true, element: own, words: Chords.placeholders(1)))
+        #expect(!song.textBoxes[11].blank && song.textBoxes[11].element == added && song.textBoxes[11].words == Chords.placeholders(1) && song.textBoxes[11].chords.isEmpty)
+        // The box keeps its opening and its first stand-in: the RTF it was given, less
+        // the bytes of the stand-ins after the first. It names a font still, which the
+        // empty document it was did not.
         let left = try rtf(of: own, at: url)
         let span = try #require(RTFWords.span(ofLine: 0, of: given))
         #expect(Array(left.prefix(span.lowerBound)) == Array(given.prefix(span.lowerBound)))
-        #expect(RTFWords.words(ofRTF: left).isEmpty && String(decoding: left, as: UTF8.self).contains("CenturyGothic"))
+        #expect(RTFWords.words(ofRTF: left) == Chords.placeholders(1) && String(decoding: left, as: UTF8.self).contains("CenturyGothic"))
         #expect(try message(at: url).cues.flatMap { $0.actions.flatMap { $0.slide.presentation.baseSlide.elements } }.count == 12)
 
-        // And they can be given chords again, in place of the nothing they hold.
+        // And they are given chords again: one, on the stand-in that was kept, with
+        // not a byte of the RTF changed; and two, with a stand-in more.
         try song.setChordsAlone(slide: 0, element: own, line: 0, names: ["G"])
+        #expect(try rtf(of: own, at: url) == left)
         try song.setChordsAlone(slide: 11, element: added, line: 0, names: ["D", "G"])
         #expect(song.textBoxes[0].chords == [Chord(at: 0, name: "G")] && song.textBoxes[11].chords.map(\.name) == ["D", "G"])
-        #expect(song.textBoxes[11].element == added)
+        #expect(song.textBoxes[11].element == added && song.textBoxes[11].words == Chords.placeholders(2))
     }
 
     @Test("A copy put back is another file: what was made for a blank slide before it is not remembered after it")
@@ -730,8 +728,9 @@ struct ChordsWithNoWordsTests {
         #expect(song.textBoxes[0].chords.map(\.name) == ["E", "A", "B"])
         // Its chords taken off now are chords taken off another day: the box is not
         // made what it was when this sitting began, which the copy knows nothing of.
+        // It keeps one stand-in, as any line of chords alone does.
         try song.setChordsAlone(slide: 0, element: own, line: 0, names: [])
-        #expect(song.textBoxes[0].blank)
+        #expect(!song.textBoxes[0].blank && song.textBoxes[0].words == Chords.placeholders(1) && song.textBoxes[0].chords.isEmpty)
         #expect(try Data(contentsOf: url) != original)
         #expect(String(decoding: try rtf(of: own, at: url), as: UTF8.self).contains("CenturyGothic"))
     }

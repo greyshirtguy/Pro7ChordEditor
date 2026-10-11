@@ -150,10 +150,14 @@ struct SheetVectors: Decodable {
 
     struct Edit: Decodable {
         struct What: Decodable {
-            struct Then: Decodable {
+            /// What was done next, at the case's own spot or, if it names a place, at
+            /// that place of the spot's row; and what was done after that. (A class,
+            /// since a step can hold a step.)
+            final class Then: Decodable {
                 let put: String?
                 let at: Int?
                 let take: Bool?
+                let then: Then?
             }
 
             let put: String?
@@ -288,8 +292,10 @@ final class StandInSong: SheetSong {
     var key: String
     /// What it was asked, spelt out as `SheetVectors.Asked` spells what is expected.
     var asked: [String] = []
-    /// The text boxes that were added for a slide's chords: they go again when the
-    /// chords do.
+    /// What was made for the chords of blank slides, as the real song remembers it
+    /// while it is open: the boxes that were given words, by their slide and id, and
+    /// those of them that were added. What was made goes again when the chords do.
+    private var made: [String] = []
     private var added: [String] = []
     /// What to refuse everything with, if anything.
     var refusing: (any Error)?
@@ -343,6 +349,7 @@ final class StandInSong: SheetSong {
                 block.element = "(a text box added for the chords)"
                 added.append(block.element)
             }
+            made.append("\(block.slide)/\(block.element)")
             block.words = Chords.placeholders(names.count, standIn: Self.zeroWidth)
             block.chords = names.enumerated().map { Chord(at: $0.offset * 2, name: Chords.tidied($0.element)) }
             block.blank = false
@@ -351,9 +358,11 @@ final class StandInSong: SheetSong {
         var lines = block.words.lines
         let old = lines[line]
         let standIn: UInt16 = !old.contains(Self.zeroWidth) && old.contains(0x20) ? 0x20 : Self.zeroWidth
-        let made = Chords.placeholders(names.count, standIn: standIn)
+        // (A line with no chord is one zero-width space: decided on 2026-10-12, and in
+        // tools/make-vectors/sheet.js since.)
+        let standIns = names.isEmpty ? Chords.placeholders(1, standIn: Self.zeroWidth) : Chords.placeholders(names.count, standIn: standIn)
         let start = lines[..<line].reduce(0) { $0 + $1.length + 1 }
-        let shift = made.length - old.length
+        let shift = standIns.length - old.length
         var kept: [Chord] = []
         for chord in block.chords {
             if chord.at < start {
@@ -362,16 +371,19 @@ final class StandInSong: SheetSong {
                 kept.append(Chord(at: chord.at + shift, name: chord.name))
             }
         }
-        lines[line] = made
+        lines[line] = standIns
         block.words = Words(units: Array(lines.map(\.units).joined(separator: [Words.lineBreak])))
         for (n, name) in names.enumerated() {
             kept.append(Chord(at: start + n * 2, name: Chords.tidied(name)))
         }
         block.chords = Chords.tidy(block.words, kept)
-        // With its last chord gone a slide that has nothing else on it is blank again:
-        // handed over with no words, and without the text box if that was only added
-        // for the chords.
-        if block.chords.isEmpty && noWords(block.words) && textBoxes.filter({ $0.slide == block.slide }).count == 1 {
+        lines[line] = Words()
+        let without = Words(units: Array(lines.map(\.units).joined(separator: [Words.lineBreak])))
+        if names.isEmpty && block.chords.isEmpty && noWords(without) && made.contains("\(block.slide)/\(block.element)") {
+            // The last chord taken off a blank slide that was given its chords while
+            // the song has been open: what was made for them is unmade. The slide is
+            // blank again, handed over with no words, and without the text box if
+            // that was only added for the chords.
             block.words = Words()
             block.blank = true
             if added.contains(block.element) {

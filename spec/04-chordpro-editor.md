@@ -113,13 +113,13 @@ Since brackets are all there is to type:
     a text box ([01-file-format.md](01-file-format.md)). By rule 15 a bracket still
     empty is no chord yet: a line of three chords with the middle one's name being
     typed over has two for as long as that takes, and two stand-ins.
-17a. A line of chords alone with every chord taken off it has no stand-ins and is,
-    from then on, an empty line of its box like any other: a line of the text still,
-    with no character of its own for a chord to hang on, so that one typed there
-    goes where `tidy` puts it ([02-chord-rules.md](02-chord-rules.md)), which is the
-    end of the line before. A blank slide's line is a blank slide's again, and takes
-    chords as before. (As in Simple Presenter. Undo, on the sheet, brings such a
-    line back.)
+17a. A line of chords alone with every chord taken off it is a line of chords alone
+    still, the song making it one zero-width space
+    ([01-file-format.md](01-file-format.md)): an empty line of the text, as a blank
+    slide's is, on which chords typed again are saved as before. A blank slide's
+    line is a blank slide's again. (**Decided by the maintainer on 2026-10-12.**
+    Until then it became an empty line of words, and a chord typed on it went to the
+    end of the line before.)
 18. All the changes of one saving, however many rounds it took, undo as one step.
     (In the reference the next round waits for the next pause, and is a step of its
     own.)

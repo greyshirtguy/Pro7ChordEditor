@@ -182,6 +182,13 @@ public final class OpenSong {
     /// becomes that many stand-ins and its chords go on them, every other place; the
     /// chords of the lines after it move with their words.
     ///
+    ///   - **With no names the line is one zero-width space**, whatever it hung its
+    ///     chords on, and is a line of chords alone still, so that a chord can be put
+    ///     on it again. (Decided by the maintainer on 2026-10-12. The reference leaves
+    ///     such a line with no stand-in at all, which in a box with other lines is an
+    ///     empty line that takes nothing. And not the plain space the line may have
+    ///     had: a text box left holding one plain space and no chord is, as a song is
+    ///     read, a stray space and nothing more, and the line would be lost.)
     ///   - Where the line has those stand-ins already (its chords renamed, or put in
     ///     another order), only the chord entries change.
     ///   - Otherwise the line's characters are changed in the box's RTF, in place, and
@@ -231,9 +238,11 @@ public final class OpenSong {
             let old = lines[line]
             guard Chords.isPlaceholders(old) else { throw Refusal.notChordsAlone }
             // In the character the line hangs its chords on now: a plain space if it
-            // has spaces and no zero-width space, else a zero-width space.
+            // has spaces and no zero-width space, else a zero-width space. One for
+            // each chord; and where there is no chord, one zero-width space, which
+            // is what keeps the line a line of chords alone.
             let spaces = !old.contains(0x200B) && old.contains(0x0020)
-            let new = Chords.placeholders(names.count, standIn: spaces ? 0x0020 : 0x200B)
+            let new = names.isEmpty ? Chords.placeholders(1) : Chords.placeholders(names.count, standIn: spaces ? 0x0020 : 0x200B)
             // The chords of the other lines keep their characters; those after this
             // line move by as much as it grows or shrinks. This line's are replaced.
             let start = lines[..<line].reduce(0) { $0 + $1.length + 1 }
@@ -247,11 +256,12 @@ public final class OpenSong {
             }
 
             // A change of mind: the last chord taken off a blank slide that was given
-            // its chords here. What was made for them is unmade.
+            // its chords here, whose box has nothing in it but this line's stand-ins.
+            // What was made for them is unmade.
             if names.isEmpty, kept.isEmpty, let was = madeForChords[made] {
-                var after = lines
-                after[line] = new
-                if after.allSatisfy({ $0.isBlank && !$0.contains(0x200B) && !$0.contains(0x2001) }) {
+                var without = lines
+                without[line] = Words()
+                if without.allSatisfy({ $0.isBlank && !$0.contains(0x200B) && !$0.contains(0x2001) }) {
                     switch was {
                     case .words(let whole):
                         elements[index].element.text = whole

@@ -258,7 +258,10 @@ def main():
         for line in range(len(lines) + 1):
             # What the line hangs its chords on now, as the apps tell it: a plain space
             # if it has spaces and no zero-width space. Every number of chords from
-            # none to four on that, and two on the other, which the apps never ask for.
+            # none to four on that; and one and two on the other. (One zero-width
+            # space is what a line on plain spaces becomes when it loses its last
+            # chord. The rest of the other kind, and none at all, the apps never ask
+            # for: they are here because the rule answers them.)
             if line == len(lines):
                 # (A line the text has not got: once is enough.)
                 try_line("%s: line %d, which it has not got" % (name, line), rtf, line, 1, ZERO_WIDTH)
@@ -266,7 +269,7 @@ def main():
             text = lines[line]
             own = " " if " " in text and ZERO_WIDTH not in text else ZERO_WIDTH
             other = ZERO_WIDTH if own == " " else " "
-            for count, stand_in in [(count, own) for count in range(0, 5)] + [(2, other)]:
+            for count, stand_in in [(count, own) for count in range(0, 5)] + [(1, other), (2, other)]:
                 try_line("%s: line %d to %d on %s" % (name, line, count, "spaces" if stand_in == " " else "zero-width spaces"),
                          rtf, line, count, stand_in)
     with open(os.path.join(vectors, "rtf-text.json"), encoding="utf-8") as file:

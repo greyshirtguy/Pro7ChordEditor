@@ -434,10 +434,14 @@ one. Nothing in the sheet is different for any of it. What is seen:
 - A blank slide's row, once it has a chord, is a line of chords alone like any other.
   With its last chord taken off again it is a blank slide's row again, and the file
   is what it was ([01-file-format.md](01-file-format.md), "A change of mind").
-- A line of chords alone in a box that has other lines, with its last chord taken
-  off, is an empty line. It takes the spot no more (rule 4), and has no row at all if
-  it was the last line of its box (rule 2a). Undo brings it back. This is as Simple
-  Presenter has it.
+- **A line of chords alone with its last chord taken off is a line of chords alone
+  still**: its row stays, the spot stays on it, it has its one stop (rule 22) and its
+  thin rule (rule 13), and a chord is put on it again like its first. The song makes
+  it one zero-width space ([01-file-format.md](01-file-format.md)). `sheet-model.json`
+  has it in the song `under`, whose line of chords is under a line of words, and in
+  `intro`. (**Decided by the maintainer on 2026-10-12.** Until then such a line,
+  in a box with other lines, became an empty one that took nothing, and undo was the
+  only way back.)
 - What the song refuses is said on the quiet line under the sheet, in the song's own
   sentence ([05-song-and-saving.md](05-song-and-saving.md)). The one that will be
   met: a presentation with not one text box that has words (a run of pictures, a

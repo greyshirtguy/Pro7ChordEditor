@@ -126,7 +126,7 @@ struct ChordSheetOnAFileTests {
         #expect(said.isEmpty, "\(said)")
     }
 
-    @Test("The last chord taken off a line of chords alone that has words over it: the line is then empty, has no row and takes the spot no more; and undo brings it back")
+    @Test("The last chord taken off a line of chords alone that has words over it: the line is one zero-width space, its row is there still with the spot on it, and a chord is put on it again. So for one that is the whole of its slide")
     func theLastChordOfALineUnderWords() throws {
         let bench = try Workbench()
         let song = try bench.open(ChordsWithNoWordsTests.shaped)
@@ -142,17 +142,54 @@ struct ChordSheetOnAFileTests {
         #expect(sheet.rows[row].chords == [Chord(at: 0, name: "E")] && sheet.rows[row].text == Words(" "))
         sheet.setSpot(row, 0)
         sheet.takeAtSpot()
-        // (An empty line a text box ends with has no row: spec/03, rule 2a.)
-        #expect(sheet.rows.count == rows - 1)
-        #expect(!sheet.rows.contains { $0.slide == 7 && $0.alone })
-        #expect(sheet.usable(sheet.spot.row))
-        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Words()])
+        // Its row is as it was but for its chords: a line of chords alone with none,
+        // that takes the spot. It hung its chords on plain spaces; it is one
+        // zero-width space now, which a stray space cannot be taken for.
+        #expect(sheet.rows.count == rows)
+        #expect(sheet.rows[row].alone && !sheet.rows[row].blank && sheet.usable(row))
+        #expect(sheet.rows[row].chords.isEmpty && sheet.rows[row].text == Chords.placeholders(1))
+        #expect(sheet.spot == Spot(row: row, at: 0) && sheet.stops(row) == [0])
+        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Chords.placeholders(1)])
         #expect(song.textBoxes[7].chords.map(\.name) == ["E", "A"])
+        // A chord put on it again, and a second after it.
+        #expect(sheet.put(row, 0, "F#m"))
+        #expect(sheet.put(row, 2, "B"))
+        #expect(sheet.rows[row].chords == [Chord(at: 0, name: "F#m"), Chord(at: 2, name: "B")])
+        #expect(song.textBoxes[7].chords == [Chord(at: 0, name: "E"), Chord(at: 11, name: "A"), Chord(at: 29, name: "F#m"), Chord(at: 31, name: "B")])
+        #expect(song.textBoxes[7].words.lines[1] == Chords.placeholders(2))
+        #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
         #expect(said.isEmpty)
-        try song.undo()
-        try song.undo()
+        while song.canUndo { try song.undo() }
         sheet.reload()
         #expect(sheet.rows.count == rows && sheet.rows[row].chords.map(\.name) == ["B", "E"])
+        #expect(try Data(contentsOf: song.url) == bytes)
+
+        // The fourth slide is nothing but a line of four chords on zero-width spaces.
+        // With all four taken off it is that line still, and not a blank slide.
+        let whole = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 3 && sheet.rows[$0].alone })
+        for _ in 0..<4 {
+            sheet.setSpot(whole, 0)
+            sheet.takeAtSpot()
+        }
+        #expect(sheet.rows[whole].alone && !sheet.rows[whole].blank && sheet.rows[whole].chords.isEmpty)
+        #expect(song.textBoxes[3].words == Chords.placeholders(1) && !song.textBoxes[3].blank)
+        #expect(sheet.put(whole, 0, "E"))
+        #expect(song.textBoxes[3].chords == [Chord(at: 0, name: "E")] && song.textBoxes[3].words == Chords.placeholders(1))
+        while song.canUndo { try song.undo() }
+        #expect(try Data(contentsOf: song.url) == bytes)
+
+        // The seventh hangs its one chord on one plain space, and is the whole of its
+        // slide. With the chord taken off it is neither a blank slide nor gone, as a
+        // box that held a stray space would be: it is the line still.
+        sheet.reload()
+        let one = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 6 && sheet.rows[$0].alone })
+        #expect(sheet.rows[one].text == Words(" "))
+        sheet.setSpot(one, 0)
+        sheet.takeAtSpot()
+        #expect(sheet.rows[one].alone && !sheet.rows[one].blank && sheet.rows[one].text == Chords.placeholders(1))
+        #expect(!song.textBoxes[6].blank && song.textBoxes[6].words == Chords.placeholders(1))
+        #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
+        try song.undo()
         #expect(try Data(contentsOf: song.url) == bytes)
     }
 
