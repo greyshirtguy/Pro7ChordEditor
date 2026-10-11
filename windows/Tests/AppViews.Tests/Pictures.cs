@@ -94,6 +94,20 @@ public static class Pictures
         }
     }
 
+    /// <summary>
+    /// A view drawn into memory and not into a file, laid out in this much room: its
+    /// dots, row by row, each as its opacity, red, green and blue in one number.
+    /// </summary>
+    public static (int Width, int Height, int[] Dots) Drawn(FrameworkElement view, double width, double height)
+    {
+        LayOut(view, width, height);
+        var bitmap = new RenderTargetBitmap((int)(width * Scale), (int)(height * Scale), 96 * Scale, 96 * Scale, PixelFormats.Pbgra32);
+        bitmap.Render(view);
+        var dots = new int[bitmap.PixelWidth * bitmap.PixelHeight];
+        bitmap.CopyPixels(dots, bitmap.PixelWidth * 4, 0);
+        return (bitmap.PixelWidth, bitmap.PixelHeight, dots);
+    }
+
     /// <summary>Does everything this thread's queue has waiting.</summary>
     public static void Settle() => Dispatcher.CurrentDispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
 

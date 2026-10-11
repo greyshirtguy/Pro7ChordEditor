@@ -8,7 +8,14 @@
                     (ListsPane);
     at the right    the song that is open (SongPane);
     over it all     while it is asked for, the song's earlier versions
-                    (EarlierVersionsPanel).
+                    (EarlierVersionsPanel); and while Revert is asking, its question
+                    (RevertQuestionPanel).
+
+  The menu. File has what is done to the library and to the song's file: Save, for the
+  hand that goes to it out of habit, though nothing is saved by hand here, and Revert
+  beside it, as in the window (spec/06, rule 12a). Edit has what a box of text takes,
+  each sent to whatever has the keyboard: in the ChordPro text, Undo and Redo are the
+  text's own (spec/04, rule 23).
 
   The edge between the lists and the song is dragged sideways, to give either more
   width. How wide the lists then are in a window of a given width is ListsLook's
@@ -35,11 +42,25 @@
   <Grid>
     <DockPanel>
       <Menu DockPanel.Dock="Top" FontSize="13">
-        <MenuItem Header="_File">
+        <MenuItem Header="_File" SubmenuOpened="TheFileMenuWasOpened">
           <MenuItem Header="Choose _Folder&#x2026;" Click="ChooseAFolder" />
-          <MenuItem Header="_Settings&#x2026;" Click="OpenTheSettings" />
+          <Separator />
+          <MenuItem x:Name="Save" Header="_Save" InputGestureText="Ctrl+S" Click="SaveNow" />
+          <MenuItem x:Name="Revert" Header="_Revert to as Opened&#x2026;" Click="AskToRevert" />
+          <Separator />
+          <MenuItem Header="Se_ttings&#x2026;" Click="OpenTheSettings" />
           <Separator />
           <MenuItem Header="E_xit" InputGestureText="Alt+F4" Click="CloseTheWindow" />
+        </MenuItem>
+        <MenuItem Header="_Edit">
+          <MenuItem Command="ApplicationCommands.Undo" />
+          <MenuItem Command="ApplicationCommands.Redo" />
+          <Separator />
+          <MenuItem Command="ApplicationCommands.Cut" />
+          <MenuItem Command="ApplicationCommands.Copy" />
+          <MenuItem Command="ApplicationCommands.Paste" />
+          <Separator />
+          <MenuItem Command="ApplicationCommands.SelectAll" />
         </MenuItem>
         <MenuItem Header="_Song" SubmenuOpened="TheSongMenuWasOpened">
           <MenuItem x:Name="EarlierVersions" Header="_Earlier Versions&#x2026;" Click="ShowEarlierVersions" />
@@ -67,9 +88,10 @@
                       Focusable="False"
                       DragCompleted="TheEdgeWasDragged"
                       ToolTip="Drag left or right to give the lists or the song more room." />
-        <views:SongPane Grid.Column="2" />
+        <views:SongPane x:Name="Song" Grid.Column="2" />
       </Grid>
     </DockPanel>
     <views:EarlierVersionsPanel Visibility="Collapsed" />
+    <views:RevertQuestionPanel Visibility="Collapsed" />
   </Grid>
 </UserControl>

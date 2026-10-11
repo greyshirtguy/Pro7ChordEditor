@@ -4,7 +4,8 @@
 // passes on what is chosen in the menu.
 //
 // Two things in the menu open something of the system's or a window of their own, and
-// so are here and not in the model: choosing a folder, and the settings.
+// so are here and not in the model: choosing a folder, and the settings. And two keys
+// are the whole view's, whatever in it has the keyboard: Esc and Ctrl+S.
 
 using System.Windows;
 using System.Windows.Controls;
@@ -31,6 +32,9 @@ public partial class LibraryView : UserControl
     }
 
     public LibraryModel Model => (LibraryModel)DataContext;
+
+    /// <summary>The song's pane: for a test to type into its text.</summary>
+    internal SongPane SongPane => Song;
 
     /// <summary>
     /// Asks the person for a folder, with the system's own chooser, over the window
@@ -66,12 +70,25 @@ public partial class LibraryView : UserControl
         LayOut();
     }
 
-    // Esc puts the earlier versions away (spec/07, rule 17).
+    // Esc puts the earlier versions away (spec/07, rule 17), and is Cancel to what
+    // Revert asks. Ctrl+S, pressed out of habit, saves at once what was typed and is
+    // waiting for its pause, and the quiet line says there was nothing to do by hand
+    // (spec/06, rule 12a). The view is asked before whatever in it has the keyboard.
     private void AKeyWasPressed(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && Model.Earlier is not null)
+        if (e.Key == Key.Escape && Model.RevertQuestion is not null)
+        {
+            Model.DontRevert();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && Model.Earlier is not null)
         {
             Model.CloseEarlierVersions();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            Model.SaveNow();
             e.Handled = true;
         }
     }
@@ -91,8 +108,18 @@ public partial class LibraryView : UserControl
 
     private void CloseTheWindow(object sender, RoutedEventArgs e) => Window.GetWindow(this)?.Close();
 
+    private void SaveNow(object sender, RoutedEventArgs e) => Model.SaveNow();
+
+    private void AskToRevert(object sender, RoutedEventArgs e) => Model.AskToRevert();
+
     // (A command that has nothing to do just now is greyed, and is still there to be
     // found.)
+    private void TheFileMenuWasOpened(object sender, RoutedEventArgs e)
+    {
+        Save.IsEnabled = Model.Shown is { Problem: null };
+        Revert.IsEnabled = Model.CanRevert;
+    }
+
     private void TheSongMenuWasOpened(object sender, RoutedEventArgs e) => EarlierVersions.IsEnabled = Model.HasEarlierVersions;
 
     private void ShowEarlierVersions(object sender, RoutedEventArgs e) => Model.ShowEarlierVersions();

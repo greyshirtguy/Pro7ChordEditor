@@ -40,6 +40,10 @@ public partial class LibraryWindow : Window
         // (Asked before the model has started, as when the window is first shown, this
         // does nothing.)
         Activated += async (_, _) => await model.RefreshAsync();
+        // What was typed and is waiting for its pause is saved when the app is left for
+        // another program, and when the window is closed (spec/04, rule 13).
+        Deactivated += (_, _) => model.Settle();
+        Closing += (_, _) => model.Settle();
         looking.Tick += async (_, _) => await model.LookForProPresenterAsync();
         Closed += (_, _) => looking.Stop();
     }

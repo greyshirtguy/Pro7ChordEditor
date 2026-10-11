@@ -7,9 +7,9 @@
 // otherwise be a blank one that nobody happened to open.
 //
 // Each is a whole view, on a made-up PC (MadeUpPC.cs), in the dark look or the light
-// one as the test says, whatever this PC is set to. So far: the lists, a song shown to
-// be looked at, its earlier versions, and All Copies. From M5 on, the editors, and the
-// cases spec/10 lists.
+// one as the test says, whatever this PC is set to. So far: the lists, a song open as
+// ChordPro text and typed in, its two keys, Revert and its question, its earlier
+// versions, and All Copies. From M6 on, the chord sheet, and the cases spec/10 lists.
 
 using System.IO;
 using System.Windows;
@@ -278,4 +278,161 @@ public class PictureTests
         pc => Task.FromResult<FrameworkElement>(new AllCopiesView(new AllCopiesModel(pc.AppData.Copies()))),
         width: 960,
         height: 520);
+
+    // ---- The ChordPro editor (M5)
+
+    // The window's view with a song open in it, and someone at its text.
+    private static void DrawTyped(string name, bool dark, string song, Func<MadeUpPC, LibraryModel, Typist, Task> bring, double width = 1280, double height = 800, Action<MadeUpPC>? first = null) =>
+        DrawView(
+            name,
+            dark,
+            async pc =>
+            {
+                first?.Invoke(pc);
+                var model = pc.Model();
+                model.PauseBeforeSaving = TimeSpan.FromMilliseconds(1);
+                var view = new LibraryView(model);
+                await ASongOpen(pc, model, song);
+                await model.MarksAreWorkedOutAsync();
+                var typist = new Typist(view.SongPane.ChordPro, model);
+                view.SongPane.ChordPro.SaysNo = () => { };
+                await bring(pc, model, typist);
+                return view;
+            },
+            width,
+            height);
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void AChordBeingTyped(bool dark) => DrawTyped(
+        "20 a chord being typed, " + In(dark),
+        dark,
+        "Plain Song",
+        async (_, model, typist) =>
+        {
+            typist.CaretAt(typist.PlaceOf("Thirteen"));
+            typist.Type("[Am7");
+            await model.WhatWasTypedIsSavedAsync();
+            // (And one still being typed: its brackets are empty yet.)
+            typist.CaretAt(typist.PlaceOf("Sing it loud"));
+            typist.Type("[");
+        });
+
+    [Fact]
+    public void ASongThatCannotBeChangedAsChordProText() => DrawTyped(
+        "21 words with brackets of their own",
+        true,
+        "Plain Song",
+        (_, _, _) => Task.CompletedTask,
+        first: pc =>
+        {
+            var bytes = pc.BytesOf("Plain Song");
+            "Thir[een"u8.CopyTo(bytes.AsSpan(bytes.AsSpan().IndexOf("Thirteen"u8)));
+            File.WriteAllBytes(pc.Song("Plain Song"), bytes);
+        });
+
+    [Fact]
+    public void TheKeysUnderTheNameWhereThePaneIsNarrow() => DrawTyped(
+        "22 the keys under the name",
+        true,
+        "A Song - In A Minor Key",
+        (pc, model, _) =>
+        {
+            // (With an earlier version, so that its button is there too.)
+            model.SetShownKey("Bm");
+            return Task.CompletedTask;
+        },
+        width: 620,
+        height: 440);
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void RevertAsksFirst(bool dark) => DrawTyped(
+        "23 Revert asks first, " + In(dark),
+        dark,
+        "Amazing Grace",
+        async (_, model, typist) =>
+        {
+            typist.CaretAt(typist.PlaceOf("wretch"));
+            typist.Type("[Em");
+            await model.WhatWasTypedIsSavedAsync();
+            model.AskToRevert();
+        },
+        width: 1000,
+        height: 620);
+
+    [Fact]
+    public void RevertedWithTheOfferToUndo() => DrawTyped(
+        "24 reverted, with the offer to undo",
+        true,
+        "Amazing Grace",
+        async (_, model, typist) =>
+        {
+            typist.CaretAt(typist.PlaceOf("wretch"));
+            typist.Type("[Em");
+            await model.WhatWasTypedIsSavedAsync();
+            model.Revert();
+        },
+        width: 1000,
+        height: 620);
+
+    [Theory]
+    [InlineData(1.5, "largest")]
+    [InlineData(0.5, "smallest")]
+    public void TheTextAtItsLargestAndItsSmallest(double zoom, string said) => DrawTyped(
+        "25 the text at its " + said,
+        true,
+        "Amazing Grace",
+        (_, model, _) =>
+        {
+            for (var times = 0; times < 9; times++)
+            {
+                model.ZoomText(zoom > 1 ? 1 : -1);
+            }
+            Assert.Equal(zoom, model.TextZoom);
+            return Task.CompletedTask;
+        },
+        width: 1000,
+        height: 620);
+
+    [Fact]
+    public void ASongThatStatesNoKey() => DrawTyped(
+        "26 a song that states no key",
+        false,
+        "Holy Holy Holy",
+        (_, _, _) => Task.CompletedTask,
+        width: 1000,
+        height: 620);
+
+    [Fact]
+    public void ASaveRefusedBecauseProPresenterWasStartedUnseen() => DrawTyped(
+        "27 a save refused, ProPresenter started unseen",
+        true,
+        "Plain Song",
+        async (pc, model, typist) =>
+        {
+            typist.CaretAt(typist.PlaceOf("Thirteen"));
+            typist.Type("[Am7");
+            pc.ProPresenterIsRunning = true;
+            await model.WhatWasTypedIsSavedAsync();
+        },
+        width: 1000,
+        height: 620);
+
+    [Fact]
+    public void WhatTheKeyThatWouldSaveSays() => DrawTyped(
+        "28 Ctrl+S, pressed out of habit",
+        false,
+        "Plain Song",
+        (_, model, typist) =>
+        {
+            typist.CaretAt(typist.PlaceOf("Thirteen"));
+            typist.Type("[Am7");
+            model.SaveNow();
+            return Task.CompletedTask;
+        },
+        width: 1000,
+        height: 620);
 }

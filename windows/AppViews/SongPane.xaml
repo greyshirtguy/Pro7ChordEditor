@@ -1,20 +1,26 @@
 <!--
-  The song that is open, at the right of the window: its name, its key, and its lines
-  with their chords in brackets. So far it is only shown, and an earlier version of it
-  can be put back. spec/06-library.md, rules 12, 14 and 19; spec/07-backups.md, rules
-  15 and 22. The ChordPro editor (M5) and the chord sheet (M6) take the place of the
-  lines, and the two keys become pickers then.
+  The song that is open, at the right of the window: its name, its two keys, and the
+  song as ChordPro text to be typed in (ChordProText.xaml). spec/06-library.md, rules
+  12, 12a, 14 and 19; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules 5
+  to 7; spec/07-backups.md, rules 15, 22 and 22a. The chord sheet (M6) will stand
+  beside the text, with a switch between the two in the middle of the header.
 
     a band     across the top while ProPresenter is running: everything can be looked
                at and nothing changed. It goes by itself when ProPresenter does;
-    a header   the song's name; at its right the key it states, if it states one, and
-               Earlier Versions, if copies of it are kept;
-    the song   its lines (SongLines.cs), or the sentence that says why it could not be
-               read, or, with no song open, a few quiet words where it would be;
+    a header   the song's name at the left; at the right Earlier Versions, if copies of
+               it are kept, and its two keys, each to be set. Where the pane is too
+               narrow for the name to be read beside them, the keys go on a row of
+               their own under it (SongLook.cs);
+    a line     of help over the text; or, in a warmer colour, why this song can be read
+               here and not changed. At its right, the size of the text: a small letter
+               A and a large one;
+    the song   as ChordPro text; or the sentence that says why it could not be read;
+               or, with no song open, a few quiet words where it would be;
     a line     at the foot, that says what is there to be seen, or what went wrong.
                After a version has been put back it offers, for a few seconds, to undo
                that; and after a file was found changed by something else, to open the
-               song again.
+               song again. At its right end: Revert, and where a Save button would be,
+               the words that say why there is none.
 -->
 <UserControl x:Class="Pro7ChordEditor.AppViews.SongPane"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -28,38 +34,90 @@
 
     <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" Padding="12,5,12,6">
       <DockPanel LastChildFill="True">
-        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-          <Button x:Name="Undo"
-                  Content="Undo"
+        <StackPanel x:Name="Saving" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button x:Name="Revert"
+                  Content="Revert&#x2026;"
                   Margin="10,0,0,0"
                   Padding="9,2,9,3"
-                  Click="UndoWasClicked"
-                  ToolTip="Put the song back as it was a moment ago." />
-          <Button x:Name="OpenAgain"
-                  Content="Open Again"
-                  Margin="10,0,0,0"
-                  Padding="9,2,9,3"
-                  Click="OpenAgainWasClicked"
-                  ToolTip="Read the song afresh from its file, as it is now." />
+                  Click="RevertWasClicked"
+                  ToolTip="Take back every change made to this song since it was opened here, after asking. What the song is now is kept as an earlier version first."
+                  ToolTipService.ShowOnDisabled="True" />
+          <TextBlock x:Name="Autosave"
+                     Margin="10,0,0,0"
+                     FontSize="12"
+                     VerticalAlignment="Center"
+                     Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         </StackPanel>
-        <TextBlock x:Name="Quiet" FontSize="12.5" VerticalAlignment="Center" Margin="0,1,0,1" />
+        <!--
+          What the line says, and beside it what it offers. (Kept to the left, and as
+          wide as they are together: so the offer stands just after the words, and where
+          the words are too long for the line it is the words that are cut short.)
+        -->
+        <DockPanel HorizontalAlignment="Left" LastChildFill="True">
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+            <Button x:Name="OpenAgain"
+                    Content="Open Again"
+                    Margin="10,0,0,0"
+                    Padding="9,2,9,3"
+                    Click="OpenAgainWasClicked"
+                    ToolTip="Read the song again from its file, as it is now." />
+            <Button x:Name="Undo"
+                    Content="Undo"
+                    Margin="10,0,0,0"
+                    Padding="9,2,9,3"
+                    Click="UndoWasClicked"
+                    ToolTip="Put the song back as it was a moment ago." />
+          </StackPanel>
+          <TextBlock x:Name="Quiet" FontSize="12.5" VerticalAlignment="Center" Margin="0,1,0,1" />
+        </DockPanel>
       </DockPanel>
     </Border>
 
-    <DockPanel x:Name="Header" DockPanel.Dock="Top" Margin="16,10,16,10">
+    <!--
+      The header. On one row: the name, and at the right Earlier Versions and the keys.
+      Where that would cut the name short: the name over the keys, with Earlier
+      Versions at the right of the keys' row. The code beside this moves them.
+    -->
+    <Grid x:Name="Header" DockPanel.Dock="Top" Margin="16,10,16,10">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <TextBlock x:Name="SongName" FontSize="20" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
       <Button x:Name="Earlier"
-              DockPanel.Dock="Right"
+              Grid.Column="1"
               Content="Earlier Versions"
               Margin="14,0,0,0"
               VerticalAlignment="Center"
               Click="EarlierVersionsWasClicked"
               ToolTip="See this song as it was before it was changed here, and put a version back." />
-      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="12,0,0,3">
-        <TextBlock x:Name="Key" />
-        <TextBlock x:Name="ShownKey" Margin="12,0,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+      <StackPanel x:Name="Keys" Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+        <TextBlock Text="Key" VerticalAlignment="Center" Margin="0,0,6,0" />
+        <ComboBox x:Name="Key"
+                  MinWidth="72"
+                  MaxDropDownHeight="420"
+                  VerticalAlignment="Center"
+                  SelectionChanged="AKeyWasPicked"
+                  ToolTipService.ShowOnDisabled="True"
+                  AutomationProperties.Name="Key" />
+        <TextBlock Text="Shown in"
+                   VerticalAlignment="Center"
+                   Margin="14,0,6,0"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <ComboBox x:Name="ShownKey"
+                  MinWidth="72"
+                  MaxDropDownHeight="420"
+                  VerticalAlignment="Center"
+                  SelectionChanged="AShownKeyWasPicked"
+                  ToolTipService.ShowOnDisabled="True"
+                  AutomationProperties.Name="Shown in" />
       </StackPanel>
-      <TextBlock x:Name="SongName" FontSize="20" TextTrimming="CharacterEllipsis" />
-    </DockPanel>
+    </Grid>
     <Border x:Name="UnderTheHeader" DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
 
     <Grid>
@@ -68,9 +126,40 @@
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
       <TextBlock x:Name="Problem" Margin="16" TextWrapping="Wrap" VerticalAlignment="Top" />
-      <ScrollViewer x:Name="Scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="False">
-        <views:SongLines x:Name="Lines" Margin="16,12,16,16" />
-      </ScrollViewer>
+      <DockPanel x:Name="Editor">
+        <Border DockPanel.Dock="Top" Padding="16,6,12,6">
+          <DockPanel LastChildFill="True">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+              <Button x:Name="Smaller"
+                      Content="A"
+                      FontSize="10.5"
+                      FontWeight="SemiBold"
+                      Width="28"
+                      Height="24"
+                      Padding="0"
+                      Click="SmallerWasClicked"
+                      ToolTip="Smaller text. Ctrl with the minus key does the same."
+                      ToolTipService.ShowOnDisabled="True"
+                      AutomationProperties.Name="Smaller text" />
+              <Button x:Name="Larger"
+                      Content="A"
+                      FontSize="15"
+                      FontWeight="SemiBold"
+                      Width="28"
+                      Height="24"
+                      Padding="0"
+                      Margin="4,0,0,0"
+                      Click="LargerWasClicked"
+                      ToolTip="Larger text. Ctrl with the plus key does the same; Ctrl with 0 is the usual size."
+                      ToolTipService.ShowOnDisabled="True"
+                      AutomationProperties.Name="Larger text" />
+            </StackPanel>
+            <TextBlock x:Name="Help" FontSize="12.5" TextWrapping="Wrap" VerticalAlignment="Center" />
+          </DockPanel>
+        </Border>
+        <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+        <views:ChordProText x:Name="Text" />
+      </DockPanel>
     </Grid>
   </DockPanel>
 </UserControl>
