@@ -391,13 +391,16 @@ extension RTFWords {
     /// then these stand-ins, then as many closing brackets as that opening left open.
     ///
     /// Nothing, if the other has no character at all to say where its words begin, or
-    /// if what was made does not read back as the stand-ins and nothing else.
+    /// if what was made does not read back as the stand-ins and nothing else. (So it
+    /// is for stand-ins on plain spaces after an opening that ends in a control word
+    /// with no space of its own: the first would be taken for that word's end. The
+    /// apps put zero-width spaces here and nothing else, which begin with a backslash,
+    /// so the care the function above takes of that is not taken twice.)
     public static func rtf<Bytes: Sequence>(withTheOpeningOf model: Bytes, then standIns: Words) -> [UInt8]? where Bytes.Element == UInt8 {
         let model = Array(model)
         var reader = Reader(rtf: model)
         reader.read()
-        guard let first = reader.written.first, var put = bytes(of: standIns) else { return nil }
-        if first.openBefore && put.first == 0x20 { put.insert(0x20, at: 0) }
+        guard let first = reader.written.first, let put = bytes(of: standIns) else { return nil }
         let made = Array(model[..<first.from]) + put + Array(repeating: UInt8(ascii: "}"), count: first.depth)
         guard words(ofRTF: made).units == standIns.units else { return nil }
         return made

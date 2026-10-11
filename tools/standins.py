@@ -39,8 +39,9 @@ The rule, for a line of a text box that is to become a given run of stand-ins.
 
 And for a text box that has no words at all, which is given another's opening:
   8. The opening is the other's RTF up to the first byte of its first unit. (If it has
-     no unit there is no result.) After it go the stand-ins as in 5, with 6 holding,
-     and then as many closing curly brackets as there are groups open at that place.
+     no unit there is no result.) After it go the stand-ins as in 5, and then as many
+     closing curly brackets as there are groups open at that place. (They are always
+     zero-width spaces here, which begin with a backslash, so 6 has nothing to do.)
   9. The result is read again, and must be the stand-ins and nothing else.
 """
 import base64
@@ -137,9 +138,7 @@ def from_opening(model, wanted):
     put = spelt(wanted)
     if not units or put is None:
         return None
-    _, start, _, lost, _, depth = units[0]
-    if lost and put[:1] == b" ":
-        put = b" " + put
+    _, start, _, _, _, depth = units[0]
     made = model[:start] + put + b"}" * depth
     if proread.plain_text(made) != wanted:
         return None

@@ -467,6 +467,88 @@ struct ChordsWithNoWordsTests {
         #expect(try Data(contentsOf: song.url) == original)
     }
 
+    @Test("What tied the copied box to things on its own slide is cleared: how it comes on, how it goes off, and the steps its lines come in")
+    func whatTiedTheModelToItsSlide() throws {
+        let bench = try Workbench()
+        var made = try RVData_Presentation(serializedBytes: TestData.file(Self.shaped))
+        let boxes = try OpenSong(opening: TestData.root.appendingPathComponent("files").appendingPathComponent(Self.shaped)).textBoxes
+        // The tenth slide's box, which the last slide's is modelled on, is given a
+        // way on, a way off, and a step.
+        let here = try #require(place(of: boxes[9].element, in: made))
+        var build = RVData_Slide.Element.Build()
+        build.delayTime = 2
+        var step = RVData_Slide.Element.ChildBuild()
+        step.delayTime = 1
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].buildIn = build
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].buildOut = build
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].childBuilds = [step]
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Builds.pro"), safeguards: bench.safeguards)
+        try song.setChordsAlone(slide: 11, element: "", line: 0, names: ["G"])
+        let added = try element(song.textBoxes[11].element, at: song.url)
+        let model = try element(boxes[9].element, at: song.url)
+        #expect(model.hasBuildIn && model.hasBuildOut && model.childBuilds.count == 1)
+        #expect(!added.hasBuildIn && !added.hasBuildOut && added.childBuilds.isEmpty && added.dataLinks.isEmpty)
+        // And nothing else of it differs from its model but its id, its words and its chords.
+        var same = model
+        same.clearBuildIn()
+        same.clearBuildOut()
+        same.childBuilds = []
+        same.dataLinks = []
+        same.element.uuid = added.element.uuid
+        same.element.text = added.element.text
+        #expect(same == added)
+    }
+
+    @Test("A box that is shown for its chords and has not a character in it has no opening to give, and is passed over for the next nearest")
+    func aModelWithNoCharacter() throws {
+        let bench = try Workbench()
+        var made = try RVData_Presentation(serializedBytes: TestData.file(Self.shaped))
+        let boxes = try OpenSong(opening: TestData.root.appendingPathComponent("files").appendingPathComponent(Self.shaped)).textBoxes
+        // The second slide's box is left with ProPresenter's empty document for words,
+        // and a chord all the same: shown, not blank, and with nowhere for words to begin.
+        let empty = try rtf(of: boxes[0].element, at: TestData.root.appendingPathComponent("files").appendingPathComponent(Self.shaped))
+        let here = try #require(place(of: boxes[1].element, in: made))
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.rtfData = Data(empty)
+        var chord = Entry()
+        chord.range.end = 1
+        chord.chord = "G"
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.attributes.customAttributes.append(chord)
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "No Character.pro"), safeguards: bench.safeguards)
+        #expect(!song.textBoxes[1].blank && song.textBoxes[1].words.isEmpty && song.textBoxes[1].chords.count == 1)
+
+        // The first slide is blank; the nearest box after it is that one; the next is
+        // the third slide's, whose words are words.
+        try song.setChordsAlone(slide: 0, element: boxes[0].element, line: 0, names: ["E"])
+        let model = try rtf(of: boxes[2].element, at: song.url)
+        let words = try #require(String(decoding: model, as: UTF8.self).range(of: "Be of sin"))
+        let opening = Array(String(decoding: model, as: UTF8.self)[..<words.lowerBound].utf8)
+        #expect(shown(try rtf(of: boxes[0].element, at: song.url)) == shown(opening + written(Chords.placeholders(1)) + Array("}".utf8)))
+    }
+
+    @Test("A slide whose file has not so much as an empty slide written for it: given a text box and then left without, it is not written one")
+    func downToTheEmptyParts() throws {
+        let bench = try Workbench()
+        var made = try RVData_Presentation(serializedBytes: TestData.file(Self.shaped))
+        // The last cue shown has a slide with nothing on it. Here it has not even
+        // that: the part of the file that would hold its elements is left out.
+        let rows = made.cueGroups.flatMap(\.cueIdentifiers).map(\.string)
+        let cue = try #require(made.cues.firstIndex { $0.uuid.string == rows.last })
+        let action = try #require(made.cues[cue].actions.firstIndex { $0.type == .presentationSlide })
+        made.cues[cue].actions[action].slide.presentation.clearBaseSlide()
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Left Out.pro"), safeguards: bench.safeguards)
+        let original = try Data(contentsOf: song.url)
+        #expect(song.textBoxes[11].blank && song.textBoxes[11].element.isEmpty)
+        #expect(try !message(at: song.url).cues[cue].actions[action].slide.presentation.hasBaseSlide)
+
+        try song.setChordsAlone(slide: 11, element: "", line: 0, names: ["G", "D"])
+        #expect(try message(at: song.url).cues[cue].actions[action].slide.presentation.baseSlide.elements.count == 1)
+        try song.setChordsAlone(slide: 11, element: song.textBoxes[11].element, line: 0, names: ["D"])
+        try song.setChordsAlone(slide: 11, element: song.textBoxes[11].element, line: 0, names: [])
+        // Not "an empty slide" where there was none: the bytes it was.
+        #expect(try Data(contentsOf: song.url) == original)
+        #expect(try !message(at: song.url).cues[cue].actions[action].slide.presentation.hasBaseSlide)
+    }
+
     @Test("A name for the box that no other element of the slide has, and an id written as the file's others are")
     func namesAndIDs() {
         #expect(OpenSong.name("Lyrics", notAmong: []) == "Lyrics")

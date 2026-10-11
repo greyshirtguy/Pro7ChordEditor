@@ -363,9 +363,9 @@ Windows, and did name a font and a format.) So the RTF is made, from the song it
 2. Keep its **opening**: its bytes up to the first byte of its first character, found
    as step 1 of [the rule above](#chords-with-no-words) finds it. That is its fonts,
    its colours, and how its first words are set. After it put the stand-ins, written
-   as step 5 writes them (step 6 holding), and then as many closing curly brackets
-   as there are groups open at that place: one, in every RTF Apple's text system
-   writes. [09-chordpro-files.md](09-chordpro-files.md) gives a new song's text box
+   as step 5 writes them (they begin with a backslash, so step 6 has nothing to do
+   here), and then as many closing curly brackets as there are groups open at that
+   place: one, in every RTF Apple's text system writes. [09-chordpro-files.md](09-chordpro-files.md) gives a new song's text box
    its words the same way.
 3. Read it back and check that the plain text is the stand-ins and nothing else,
    before anything is saved. If it is not, the change is refused with the sentence
