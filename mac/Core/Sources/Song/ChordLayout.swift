@@ -27,6 +27,8 @@ public enum ChordLayout {
         public var width: Double = 0
         /// How wide the words are alone.
         public var wordsWidth: Double = 0
+
+        public init() {}
     }
 
     /// Where the chords of a line stand. `length` is how many units the line's words

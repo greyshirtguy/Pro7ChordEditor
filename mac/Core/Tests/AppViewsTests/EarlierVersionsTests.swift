@@ -95,6 +95,7 @@ struct EarlierVersionsTests {
         #expect(try mac.bytes(of: "Plain Song") == now)
         #expect(model.shown?.key == "E" && model.shown?.chords == 8)
         #expect(model.justPutBack == nil)
+        model.show(editor: .chordPro)
         #expect(model.notice == "4 slides, 8 chords. A change is saved a moment after it is typed.")
     }
 

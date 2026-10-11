@@ -283,7 +283,7 @@ struct ChordProEditorTests {
         }
         let editor = ChordProEditor(song: song)
         #expect(editor.text.contains("Thir[teen]"))
-        #expect(editor.barred == "This song's words have square brackets of their own in them, so it cannot be changed as ChordPro text.")
+        #expect(editor.barred == "This song's words have square brackets of their own in them, so it cannot be changed as ChordPro text. The chord sheet can still be used.")
         let before = try Data(contentsOf: song.url)
         #expect(try type(editor, "Five six", as: "Five [A]six") == .notTheWords)
         #expect(try editor.save() == false)

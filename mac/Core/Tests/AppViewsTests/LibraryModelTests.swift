@@ -54,6 +54,10 @@ struct LibraryModelTests {
         #expect(shown.slides == 4 && shown.chords == 11)
         #expect(shown.lines.first?.text == "{c: Verse 1}")
         #expect(shown.lines.last?.text == "[G] [D/F#] [Em]")
+        // The quiet line says what the keys do on the sheet, which a song opens on; and
+        // as ChordPro text, that there is no need to save.
+        #expect(model.editorShown == .sheet && model.notice == LibraryModel.sheetHelp)
+        model.show(editor: .chordPro)
         #expect(model.notice == "4 slides, 11 chords. A change is saved a moment after it is typed.")
 
         model.open(song: mac.song("Nonsense"))

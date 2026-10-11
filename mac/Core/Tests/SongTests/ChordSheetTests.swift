@@ -309,6 +309,9 @@ struct ChordSheetTests {
         #expect(placed.xs == [0, 26, 52])
         #expect(intro.placeAt(1, along: 3, exact: true, widths) == 0)
         #expect(intro.placeAt(1, along: 30, exact: true, widths) == 2)
+        // (A bubble is pointed at from a little past its right edge too: 5.)
+        #expect(intro.placeAt(1, along: 50, exact: true, widths) == 2)
+        #expect(intro.placeAt(1, along: 54, exact: true, widths) == 4)
         #expect(intro.placeAt(1, along: 60, exact: false, widths) == 4)
         #expect(intro.placeAt(1, along: 300, exact: true, widths) == 6)
         #expect(intro.xOf(1, 2, widths) == 26)
@@ -317,6 +320,22 @@ struct ChordSheetTests {
         let (blank, _) = try vectors.sheet("blank")
         #expect(blank.placeAt(1, along: 200, exact: true, widths) == 0)
         #expect(blank.xOf(1, 0, widths) == 0)
+    }
+
+    @Test("Mine, not a vector. A chord belongs to the line its place is in, up to but not including its line break; an empty line is one place wide (rule 3)")
+    func whichLineAChordIsOn() {
+        // "ab", an empty line, "cd": places 0 1 (2 the break) (3 the empty line, and its
+        // break) 4 5.
+        let boxes = [TextBox(slide: 0, element: "A", words: "ab\n\ncd",
+                             chords: [Chord(at: 1, name: "G"), Chord(at: 2, name: "X"), Chord(at: 3, name: "D"), Chord(at: 4, name: "C")])]
+        let sheet = ChordSheet(song: StandInSong(boxes, key: "C"))
+        #expect(sheet.rows.map(\.chords) == [[Chord(at: 1, name: "G")], [Chord(at: 0, name: "D")], [Chord(at: 0, name: "C")]])
+        #expect(sheet.rows.map(\.start) == [0, 3, 4])
+        // The empty line cannot take the spot, and a change to the first line hands the
+        // other lines' chords back as they were, the empty line's with them.
+        #expect(!sheet.usable(1))
+        sheet.put(0, 0, "Am")
+        #expect(sheet.rows[1].chords == [Chord(at: 0, name: "D")] && sheet.rows[2].chords == [Chord(at: 0, name: "C")])
     }
 
     @Test("Mine, not a vector. A place is never the second half of a character that takes two units")

@@ -1,7 +1,9 @@
-// The song that is open, at the right of the window: its name, its two keys, and the
-// song as ChordPro text to be typed in (ChordProView.swift). spec/06-library.md, rules
-// 12, 14 and 19; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules 5 to 7.
-// The chord sheet (M6) will stand beside the text, with a switch between the two.
+// The song that is open, at the right of the window: its name, its two keys, a switch
+// between its two editors, and the one that is shown: the chord sheet
+// (ChordSheetView.swift) or the song as ChordPro text to be typed in
+// (ChordProView.swift). spec/06-library.md, rules 12, 14 and 19;
+// spec/03-chord-sheet.md; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules
+// 5 to 7.
 //
 // `SongLines` is a song's lines only to be looked at, each line of words with its chords
 // before the characters they stand over: what an earlier version of a song is shown as
@@ -32,6 +34,10 @@ struct SongPane: View {
                         .textSelection(.enabled)
                         .padding(16)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                } else if model.editorShown == .sheet, let sheet = model.sheet {
+                    SheetStrip(model: model, sheet: sheet, key: shown.key)
+                    ChordSheetCanvasView(model: model, version: model.sheetVersion)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let chordPro = model.chordPro {
                     // One line of help over the text; or, in a warmer colour, why this
                     // song can be read here and not changed.
@@ -58,7 +64,7 @@ struct SongPane: View {
                 Text(model.notice.isEmpty ? " " : model.notice)
                     .font(.callout)
                     .foregroundStyle(model.refusal == nil ? .secondary : .primary)
-                    .lineLimit(model.refusal == nil ? 2 : 4)
+                    .lineLimit(4)
                     .fixedSize(horizontal: false, vertical: true)
                 if model.offersOpeningAgain {
                     Button("Open Again") { model.openAgain() }
@@ -160,6 +166,15 @@ struct SongPane: View {
         .disabled(!model.canChange || shown.key.isEmpty)
         .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
                                 : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
+        // The switch between the song's two editors.
+        Picker("Editor", selection: Binding(get: { model.editorShown }, set: { model.show(editor: $0) })) {
+            Text("Chords").tag(LibraryModel.Editor.sheet)
+            Text("ChordPro").tag(LibraryModel.Editor.chordPro)
+        }
+        .pickerStyle(.segmented)
+        .labelsHidden()
+        .fixedSize()
+        .help("The chord sheet, for the mouse and the keys; or the song as ChordPro text, to be typed in.")
     }
 }
 

@@ -62,12 +62,13 @@ struct PictureTests {
         return file
     }
 
-    private func modelWithASongOpen(_ mac: MadeUpMac, song: String = "Amazing Grace") async -> LibraryModel {
+    private func modelWithASongOpen(_ mac: MadeUpMac, song: String = "Amazing Grace", editor: LibraryModel.Editor = .chordPro) async -> LibraryModel {
         let model = mac.model()
         await model.start()
         model.choose(library: mac.library("Songs"))
         await model.marksAreWorkedOut()
         model.open(song: mac.song(song))
+        model.show(editor: editor)
         return model
     }
 
@@ -198,5 +199,90 @@ struct PictureTests {
     func blankSlidesInTheDark() async throws {
         let mac = try MadeUpMac()
         try draw(LibraryWindow(model: await modelWithASongOpen(mac, song: "Blank Slides")), named: "13 blank slides, dark", dark: true)
+    }
+
+    // ---- The chord sheet (spec/03-chord-sheet.md; to be set beside spec/pictures)
+
+    private static let sheetSize = NSSize(width: 1200, height: 760)
+
+    /// The row of the sheet that has these words.
+    private func row(_ words: String, of sheet: ChordSheet) throws -> Int {
+        try #require(sheet.rows.firstIndex { $0.kind == .line && $0.text.string == words }, "no line \(words)")
+    }
+
+    @Test("The chord sheet of Amazing Grace, as opened")
+    func theSheet() async throws {
+        let mac = try MadeUpMac()
+        try draw(LibraryWindow(model: await modelWithASongOpen(mac, editor: .sheet)), named: "14 the chord sheet", size: Self.sheetSize)
+    }
+
+    @Test("The sheet with the spot on a word, and on a chord")
+    func theSpot() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        sheet.setSpot(try row("That saved a wretch like me", of: sheet), 5)
+        sheet.picked = 1
+        try draw(LibraryWindow(model: model), named: "15 the spot on a word", size: Self.sheetSize)
+        let chorded = try #require(sheet.rows.firstIndex { $0.kind == .line && !$0.alone && $0.chords.count > 1 })
+        sheet.setSpot(chorded, sheet.rows[chorded].chords[1].at)
+        try draw(LibraryWindow(model: model), named: "16 the spot on a chord", size: Self.sheetSize)
+    }
+
+    @Test("The bubble a chord is typed in, with D/ typed")
+    func typingAChord() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        sheet.setSpot(try row("Amazing grace how sweet the sound", of: sheet), 8)
+        sheet.startTyping(seed: "D")
+        sheet.type("D/")
+        sheet.pointerOver(try row("That saved a wretch like me", of: sheet), 13)
+        try draw(LibraryWindow(model: model), named: "17 typing a chord", size: Self.sheetSize)
+        sheet.press(.down)
+        sheet.press(.down)
+        try draw(LibraryWindow(model: model), named: "18 typing, the second offered picked", size: Self.sheetSize)
+        sheet.press(.escape)
+    }
+
+    @Test("A chord being dragged to another word")
+    func dragging() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        let from = try row("That saved a wretch like me", of: sheet)
+        let chord = try #require(sheet.rows[from].chords.first)
+        sheet.lift(from, chord.at)
+        sheet.carry(over: from, 13)
+        try draw(LibraryWindow(model: model), named: "19 dragging a chord", size: Self.sheetSize)
+        sheet.dropNowhere()
+    }
+
+    @Test("The sheet of a song with blank slides and a line of chords alone")
+    func theSheetWithBlankSlides() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "Blank Slides", editor: .sheet)
+        let sheet = try #require(model.sheet)
+        let blank = try #require(sheet.rows.firstIndex { $0.blank })
+        sheet.setSpot(blank, 0)
+        try draw(LibraryWindow(model: model), named: "20 the sheet, blank slides", size: Self.sheetSize)
+    }
+
+    @Test("The sheet of a song ProPresenter wrote: no key stated, groups in their colours; and with ProPresenter running")
+    func theSheetOfAFileProPresenterWrote() async throws {
+        let mac = try MadeUpMac()
+        mac.proPresenterIsRunning = true
+        try draw(LibraryWindow(model: await modelWithASongOpen(mac, song: "Rock Of Ages (Toplady)", editor: .sheet)),
+                 named: "21 the sheet, a song ProPresenter wrote", size: Self.sheetSize)
+    }
+
+    @Test("The sheet in a narrow window, and what it said after a copy")
+    func theSheetNarrow() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "It Is Well", editor: .sheet)
+        let sheet = try #require(model.sheet)
+        sheet.setSpot(try #require(sheet.rows.indices.first(where: sheet.usable)), 0)
+        model.copyChords(wholeGroup: true)
+        try draw(LibraryWindow(model: model), named: "22 the sheet, narrow, after a copy", size: NSSize(width: 820, height: 520))
     }
 }

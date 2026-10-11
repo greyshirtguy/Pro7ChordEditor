@@ -23,6 +23,8 @@ struct ChordProTypingTests {
         model.choose(library: mac.library("Songs"))
         await model.marksAreWorkedOut()
         model.open(song: mac.song(name))
+        // (A song opens on the chord sheet; these are of the other editor.)
+        model.show(editor: .chordPro)
         return model
     }
 

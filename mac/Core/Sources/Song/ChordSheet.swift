@@ -164,6 +164,9 @@ public final class ChordSheet {
     public private(set) var typing = false
     public private(set) var typingAt = Spot(row: -1, at: 0)
     public private(set) var entry = Entry()
+    /// Goes up each time the bubble is opened: what tells a chord's typing from the
+    /// next one's at the same place.
+    public private(set) var typingsBegun = 0
     /// A chord being dragged: where from, and its name.
     public private(set) var dragged: (from: Spot, name: String)?
     public private(set) var copied: [CopiedLine]?
@@ -650,6 +653,7 @@ public final class ChordSheet {
         typing = true
         let text = seed ?? chordAt(spot.row, spot.at)
         entry = Entry(text: text, last: text, pick: -1, begun: text, selected: seed == nil)
+        typingsBegun += 1
     }
 
     /// What was typed in the box, as the box would have it now. Only what could be a

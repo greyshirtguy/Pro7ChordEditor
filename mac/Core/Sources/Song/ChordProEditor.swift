@@ -68,7 +68,7 @@ public final class ChordProEditor {
     public static let help = "Type chords in square brackets among the words: [G]  [D/F#]  [Am7].  Only the chords can be changed here; the words are the slides'."
     /// (The reference ends "The chord editor can still be used." The page has "The chord
     /// sheet", and until there is one, M6, this says neither.)
-    static let wordsHaveBrackets = "This song's words have square brackets of their own in them, so it cannot be changed as ChordPro text."
+    static let wordsHaveBrackets = "This song's words have square brackets of their own in them, so it cannot be changed as ChordPro text. The chord sheet can still be used."
     static let cannotBeSaidExactly = "This song cannot be changed as ChordPro text: one of its chords has a square bracket or a line break in its name, or its words have a broken character in them."
 
     public let song: OpenSong

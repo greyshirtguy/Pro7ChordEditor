@@ -112,6 +112,33 @@ public final class LibraryModel {
     public private(set) var offersOpeningAgain = false
     /// The song as ChordPro text; nil if no song is open, or it could not be read.
     public private(set) var chordPro: ChordProShown?
+    /// Which of the two editors the song is shown in (spec/06, rule 12).
+    public private(set) var editorShown: Editor = .sheet
+    /// The song as the chord sheet has it; nil if no song is open, or it could not be
+    /// read. Its view reads it and tells it what was done; what it asks of the song
+    /// comes back here (`sheetChanged`, `refuse`).
+    public private(set) var sheet: ChordSheet?
+    /// Goes up whenever the sheet was changed from outside its own view, which is then
+    /// to lay it out and draw it again.
+    public private(set) var sheetVersion = 0
+    /// What the sheet just said ("4 chords copied ..."), for a few seconds.
+    public private(set) var said: String?
+    private var saying: Task<Void, Never>?
+    /// Whether the song refused the last thing the sheet asked of it.
+    private var sheetRefused = false
+    /// Whether the song has been changed otherwise than by typing in the text, since
+    /// the text was made from it: the text is then made again before it is next shown.
+    private var textIsStale = false
+
+    public enum Editor: String, Sendable, CaseIterable {
+        case sheet, chordPro
+    }
+
+    /// What the quiet line says while the sheet is shown: what the keys do.
+    public static let sheetHelp = "1 to 7: the key\u{2019}s chords  \u{00B7}  A to G: type one, and a click on the next place keeps it  \u{00B7}  "
+        + "Drag moves a chord, with Option copies it  \u{00B7}  Delete removes  \u{00B7}  Command+C and Command+V: a line\u{2019}s chords onto another"
+    /// How long what the sheet said stays on the quiet line.
+    public var sayingLasts: Duration = .seconds(6)
 
     /// How long after the typing stops a change is saved (spec/04, rule 13).
     public var pauseBeforeSaving: Duration = .milliseconds(700)
@@ -160,6 +187,7 @@ public final class LibraryModel {
         if let justPutBack { return justPutBack.sentence }
         if let shown {
             if shown.problem != nil { return "Nothing was done to this file." }
+            if editorShown == .sheet { return said ?? Self.sheetHelp }
             let slides = shown.slides == 1 ? "1 slide" : "\(shown.slides) slides"
             let chords = shown.chords == 1 ? "1 chord" : "\(shown.chords) chords"
             // (There is no Save button to look for, so it says there is no need of one;
@@ -302,6 +330,13 @@ public final class LibraryModel {
     public func settle() -> Bool {
         pause?.cancel()
         pause = nil
+        // A chord being typed on the sheet is kept first (spec/03, rule 39).
+        if let sheet, sheet.typing {
+            sheetRefused = false
+            sheet.settle()
+            sheetVersion += 1
+            if sheetRefused { return false }
+        }
         guard let editor, openSong != nil else { return true }
         do {
             if try editor.save() {
@@ -347,6 +382,93 @@ public final class LibraryModel {
         } catch {
             refuse(error)
         }
+        sheet?.reload()
+        sheetVersion += 1
+    }
+
+    // ---- The chord sheet (spec/03-chord-sheet.md)
+
+    /// Shows the song in the other editor. What was being typed in the one that is
+    /// left is kept first, and the one that is come to is made again from the song,
+    /// since the other may have changed it.
+    public func show(editor wanted: Editor) {
+        guard wanted != editorShown, settle() else { return }
+        switch wanted {
+        case .chordPro:
+            if let editor, textIsStale {
+                editor.reload(keepingWhatIsTyped: false)
+                showText(of: editor)
+            }
+        case .sheet:
+            sheet?.reload()
+        }
+        editorShown = wanted
+        sheetVersion += 1
+    }
+
+    /// The song's own history, which every change of either editor is a step of: the
+    /// last change taken back, and put again (spec/03, rule 53).
+    public var canUndo: Bool { canChange && openSong?.canUndo == true }
+    public var canRedo: Bool { canChange && openSong?.canRedo == true }
+
+    public func undo() {
+        guard openSong?.canUndo == true else { return }
+        change { try $0.undo() }
+        textIsStale = true
+    }
+
+    public func redo() {
+        guard openSong?.canRedo == true else { return }
+        change { try $0.redo() }
+        textIsStale = true
+    }
+
+    /// A click on one of the key's seven chords in the strip: on the spot, or where a
+    /// chord was being typed, in place of what was typed.
+    public func putOfKey(_ number: Int) {
+        sheet?.putOfKey(number)
+        sheetVersion += 1
+    }
+
+    /// Copies the chords of the spot's line, or of its whole group, and says so on the
+    /// quiet line for a few seconds.
+    public func copyChords(wholeGroup: Bool) {
+        guard let sentence = sheet?.copy(whole: wholeGroup) else { return }
+        refusal = nil
+        said = sentence
+        saying?.cancel()
+        let lasts = sayingLasts
+        saying = Task { [weak self] in
+            try? await Task.sleep(for: lasts)
+            guard !Task.isCancelled else { return }
+            self?.said = nil
+        }
+    }
+
+    /// Waits until what the sheet said has gone from the quiet line again.
+    public func whatWasSaidIsGone() async {
+        await saying?.value
+    }
+
+    /// The sheet's song for a song just opened, or put back.
+    private func makeSheet(of song: OpenSong) -> ChordSheet {
+        let made = ChordSheet(song: song)
+        made.pasteKeys = "Command+V"
+        made.refused = { [weak self] error in
+            self?.sheetRefused = true
+            self?.refuse(error)
+        }
+        made.changed = { [weak self] in self?.sheetChanged() }
+        return made
+    }
+
+    /// The song took a change the sheet asked for.
+    private func sheetChanged() {
+        refusal = nil
+        offersOpeningAgain = false
+        said = nil
+        textIsStale = true
+        noteAChange()
     }
 
     // ---- Earlier versions (spec/07-backups.md, rules 14 to 23)
@@ -468,6 +590,8 @@ public final class LibraryModel {
         openSong = nil
         editor = nil
         chordPro = nil
+        sheet = nil
+        said = nil
     }
 
     /// The song as text, made afresh from it: a new sitting at the editor.
@@ -476,11 +600,14 @@ public final class LibraryModel {
         editor = made
         sitting += 1
         showText(of: made)
+        sheet = makeSheet(of: song)
+        sheetVersion += 1
     }
 
     /// Sets the text the view shows from the editor's, in place of whatever was typed.
     private func showText(of editor: ChordProEditor) {
         textVersion += 1
+        textIsStale = false
         chordPro = ChordProShown(text: editor.text, version: textVersion, sitting: sitting, barred: editor.barred)
     }
 
