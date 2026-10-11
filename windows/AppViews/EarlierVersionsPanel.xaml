@@ -1,0 +1,105 @@
+<!--
+  Earlier versions of the song that is open: the copies kept of it, the one picked shown
+  as it was, and Put This One Back. spec/07-backups.md, rules 15 to 23.
+
+      Earlier versions of "Amazing Grace"
+
+      Today 09:14     before a change      |   the song as it was then, to look
+      Sunday 4 Oct    before a change      |   at and not to change
+      2 Aug  (the first) before a change   |
+
+      31 chords, in G.  Now: 34 chords, in G.      [ Done ] [ Put This One Back ]
+
+  (The page draws it in a frame. A comment in a file of this kind may not have two
+  hyphens together, so it is drawn here without.)
+
+  It lies over the whole window, which is dimmed behind it. Esc, Done, or a click on
+  the dimmed part puts it away (rule 17). It is not a window of its own: a test draws
+  it as it draws the rest, and it cannot be lost behind the window it belongs to.
+
+  A copy is shown as its lines with chords in brackets, as a song is in the window,
+  until the chord sheet is built (M6), when it is to be drawn as the sheet draws it.
+
+  Putting one back is the first thing in the app that changes a song's file. It is a
+  save like any other (LibraryModel.PutBackPicked, OpenSong.PutBack): refused while
+  ProPresenter runs, and never before the file as it is now has been copied, so that
+  nothing can be lost by putting the wrong one back.
+
+  A copy that is of another song than the one now here (rule 23) is asked about first,
+  at the foot, in place of the line and the two buttons.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.EarlierVersionsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:Pro7ChordEditor.AppViews">
+  <Grid>
+    <!-- The window behind, dimmed. A click on it puts the panel away. -->
+    <Border Background="#73000000" MouseLeftButtonDown="OutsideWasClicked" />
+    <Border MaxWidth="900"
+            MaxHeight="560"
+            Margin="36,30,36,30"
+            CornerRadius="8"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
+            Background="{DynamicResource ApplicationBackgroundBrush}">
+      <DockPanel>
+        <TextBlock x:Name="Heading" DockPanel.Dock="Top" FontSize="15" FontWeight="SemiBold" Margin="16,12,16,12" TextTrimming="CharacterEllipsis" />
+        <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" Padding="12,10,12,10">
+          <DockPanel LastChildFill="True">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+              <Button x:Name="Done" Content="Done" Margin="10,0,0,0" Click="DoneWasClicked" />
+              <Button x:Name="PutBack"
+                      Content="Put This One Back"
+                      Margin="8,0,0,0"
+                      Click="PutBackWasClicked"
+                      ToolTip="Make the song's file this version again. The song as it is now is kept first, so this can be undone." />
+              <Button x:Name="Leave" Content="Leave It" Margin="10,0,0,0" Click="LeaveItWasClicked" />
+              <Button x:Name="Sure" Content="Put It Back" Margin="8,0,0,0" Click="PutItBackWasClicked" />
+            </StackPanel>
+            <TextBlock x:Name="Foot" TextWrapping="Wrap" VerticalAlignment="Center" />
+          </DockPanel>
+        </Border>
+
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <ListBox x:Name="Copies"
+                   Grid.Column="0"
+                   Background="Transparent"
+                   BorderThickness="0"
+                   HorizontalContentAlignment="Stretch"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   SelectedValuePath="Id"
+                   SelectionChanged="ACopyWasPicked">
+            <ListBox.Resources>
+              <Thickness x:Key="ListBoxItemPadding">12,6,10,6</Thickness>
+            </ListBox.Resources>
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right"
+                             Text="{Binding Why}"
+                             Margin="8,0,0,0"
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                  <TextBlock Text="{Binding When}" TextTrimming="CharacterEllipsis" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <Border Grid.Column="1" Width="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+          <Grid Grid.Column="2">
+            <TextBlock x:Name="Problem" Margin="16" TextWrapping="Wrap" VerticalAlignment="Top" />
+            <ScrollViewer x:Name="Scroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Focusable="False">
+              <views:SongLines x:Name="Lines" Margin="16,12,16,16" />
+            </ScrollViewer>
+          </Grid>
+        </Grid>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

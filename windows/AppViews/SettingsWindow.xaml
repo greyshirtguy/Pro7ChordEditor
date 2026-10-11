@@ -1,0 +1,23 @@
+<!--
+  The settings: a window of their own, opened from File > Settings (spec/10-platforms.md:
+  "a settings page or dialog"). spec/06-library.md, "Settings", has them in sections.
+  So far there is one, Backups: the copies that are kept, all of them (AllCopiesView).
+  The chords' colours are the editors' milestones.
+
+  It is opened over the app's window and is to be closed before that is gone back to:
+  nothing in it changes a song, and what it shows of the copies is as they were when it
+  was opened.
+
+  A window only frames what is in it. What is in it is a view of its own, put in by the
+  code beside this, so that a test can draw it into a picture.
+-->
+<Window x:Class="Pro7ChordEditor.AppViews.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings"
+        Width="960"
+        Height="560"
+        MinWidth="760"
+        MinHeight="420"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" />

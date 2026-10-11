@@ -80,6 +80,35 @@ internal sealed class MadeUpPC : IDisposable
 
     internal string Log => File.ReadAllText(Path.Combine(AppData.Folder, "log.txt"));
 
+    /// <summary>
+    /// Gives Plain Song a history: nine days ago its key was set to E, and two days ago
+    /// the three chords of its first slide were taken off, leaving eight of its eleven.
+    /// So it has two copies kept: the file as it first was, and as it was in E.
+    /// </summary>
+    internal void GivePlainSongAHistory()
+    {
+        Change("Plain Song", 9, song => song.SetKey("E"));
+        Change("Plain Song", 2, song => song.SetChords(song.TextBoxes[0].Slide, song.TextBoxes[0].Element, []));
+    }
+
+    /// <summary>The name the app's copies know this PC's one place by: it is the ProPresenter folder in Documents.</summary>
+    internal const string PlaceName = "Documents";
+
+    /// <summary>A song's file, as it is now.</summary>
+    internal byte[] BytesOf(string name, string library = "Songs") => File.ReadAllBytes(Song(name, library));
+
+    /// <summary>
+    /// Changes a song of the library as the app would, some days ago: with a copy kept
+    /// first, among the app's own things, dated then.
+    /// </summary>
+    internal void Change(string name, double daysAgo, Action<OpenSong> what, string library = "Songs")
+    {
+        var copies = AppData.Copies("test");
+        var kept = new KeptSong(PlaceName, library, name);
+        var then = DateTime.UtcNow.AddDays(-daysAgo);
+        what(new OpenSong(Song(name, library), new Safeguards(() => false, (file, why) => copies.Keep(file, kept, why, then))));
+    }
+
     /// <summary>Takes the PC's folder away, and everything in it.</summary>
     public void Dispose()
     {

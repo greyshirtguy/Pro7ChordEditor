@@ -4,6 +4,10 @@
 
     LibraryModelTests   what the window shows and what a click does, with nothing drawn:
                         the model on a made-up PC
+    EarlierVersionsTests
+                        earlier versions in the window, and All Copies, with nothing
+                        drawn: the mark, looking at a copy, putting one back, taking
+                        that back
     WindowListsTests    the two lists as far as they are numbers and words; the small
                         pictures before names; the look
     PictureTests        pictures of the window, to be looked at

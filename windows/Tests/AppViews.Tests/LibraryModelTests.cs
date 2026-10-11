@@ -507,7 +507,7 @@ public class LibraryModelTests
 
         var log = pc.Log;
         Assert.Contains("  Started. 1 places found, 3 libraries in the one open.", log, StringComparison.Ordinal);
-        Assert.Contains("  Opened Amazing Grace.pro to be looked at.", log, StringComparison.Ordinal);
+        Assert.Contains("  Opened Amazing Grace.pro.", log, StringComparison.Ordinal);
         Assert.Contains("  Could not read Nonsense.pro.", log, StringComparison.Ordinal);
         Assert.Contains("  A folder was chosen: Old copies.", log, StringComparison.Ordinal);
         Assert.Contains("  ProPresenter is running.", log, StringComparison.Ordinal);

@@ -14,7 +14,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Win32;
 using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
@@ -60,6 +59,10 @@ public partial class ListsPane : UserControl
         public bool IsOldEditorsCopy => song.IsOldEditorsCopy;
 
         public bool HasChords => song.HasChords;
+
+        public bool HasCopies => song.HasCopies;
+
+        public string HasCopiesTip => LibraryModel.SongRow.HasCopiesTip;
 
         public string CannotBeReadTip => LibraryModel.SongRow.CannotBeReadTip;
 
@@ -222,16 +225,12 @@ public partial class ListsPane : UserControl
         Show();
     }
 
+    // (The same as Choose Folder in the menu, which is where the asking is.)
     private void ChooseAFolder(object sender, RoutedEventArgs e)
     {
-        var asking = new OpenFolderDialog
+        if (LibraryView.AskForAFolder(this) is { } folder)
         {
-            Title = "Choose a ProPresenter folder, its Libraries folder, or any folder of .pro files",
-            Multiselect = false,
-        };
-        if (asking.ShowDialog(Window.GetWindow(this)) == true && asking.FolderName.Length > 0)
-        {
-            model?.Add(asking.FolderName);
+            model?.Add(folder);
         }
     }
 

@@ -93,7 +93,7 @@ public class WindowListsTests
     [Fact]
     public void ALineOfChordProIsPartedIntoChordsAndWhatIsBetweenThemAndPutTogetherAgainIsTheLine()
     {
-        static string Shown(string line) => string.Join("|", SongPane.Parts(line).Select(part => (part.IsChord ? "*" : "") + part.Text));
+        static string Shown(string line) => string.Join("|", SongLines.Parts(line).Select(part => (part.IsChord ? "*" : "") + part.Text));
 
         Assert.Equal("*[G]|One two three |*[D]|four", Shown("[G]One two three [D]four"));
         Assert.Equal("*[G]| |*[D/F#]| |*[Em]", Shown("[G] [D/F#] [Em]"));
@@ -108,7 +108,7 @@ public class WindowListsTests
         Assert.Equal("a]b|*[C]|c", Shown("a]b[C]c"));
         foreach (var line in new[] { "[G]One two three [D]four", "one [two", "a]b[C]c", "[C][G]", " ", "{c: Verse 1}" })
         {
-            Assert.Equal(line, string.Concat(SongPane.Parts(line).Select(part => part.Text)));
+            Assert.Equal(line, string.Concat(SongLines.Parts(line).Select(part => part.Text)));
         }
         // What the band says is the page's sentence (spec/06, rule 19).
         Assert.Equal("ProPresenter is running. Quit it to change chords here.", SongPane.ProPresenterIsRunning);

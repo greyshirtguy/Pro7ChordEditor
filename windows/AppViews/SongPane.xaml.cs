@@ -1,18 +1,19 @@
 // The code beside SongPane.xaml, which says what the pane is. Here: what the model
-// says of the song is put into the pane whenever the model says it has changed, and the
-// song's lines are made into lines of text.
+// says of the song is put into the pane whenever the model says it has changed, and
+// what the person clicks is passed on.
 //
 // Nothing here is a rule. What a song's lines are is Song/SongText.cs's, and what the
 // band, the quiet line and the words in place of a song say is LibraryModel's, bar the
 // few words of the header, which only name the key.
+//
+// ONE THING THE PANE DOES BY ITSELF: the offer to undo a putting back goes after a few
+// seconds (spec/07-backups.md, rule 22). The model is told it has gone; the copy is in
+// the earlier versions all the same.
 
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using Pro7ChordEditor.Song;
+using System.Windows.Threading;
 
 namespace Pro7ChordEditor.AppViews;
 
@@ -22,17 +23,23 @@ public partial class SongPane : UserControl
     /// <summary>What the band says while ProPresenter is running (spec/06, rule 19).</summary>
     public const string ProPresenterIsRunning = "ProPresenter is running. Quit it to change chords here.";
 
-    // A line of a song is set in letters all of one width, so that a chord in brackets
-    // takes the room it would in the file it came from.
-    private static readonly FontFamily OfOneWidth = new("Cascadia Mono, Consolas, Courier New");
+    /// <summary>How long the offer to undo a putting back stays.</summary>
+    public static readonly TimeSpan TheOfferStays = TimeSpan.FromSeconds(8);
 
+    private readonly DispatcherTimer offer = new() { Interval = TheOfferStays };
     private LibraryModel? model;
     private LibraryModel.ShownSong? shownSong;
+    private LibraryModel.PutBack? offered;
 
     public SongPane()
     {
         InitializeComponent();
         BandWords.Text = ProPresenterIsRunning;
+        offer.Tick += (_, _) =>
+        {
+            offer.Stop();
+            model?.ForgetWhatWasPutBack();
+        };
         DataContextChanged += (_, _) => Follow(DataContext as LibraryModel);
     }
 
@@ -62,10 +69,31 @@ public partial class SongPane : UserControl
             return;
         }
         Band.Visibility = Seen(model.ProPresenterIsRunning);
+
+        // The quiet line. What went wrong is said in full, on as many lines as it
+        // needs, and stays until the next thing is done; anything else is one line.
+        var wrong = model.Refused is not null;
         Quiet.Text = model.Notice;
+        Quiet.TextWrapping = wrong ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        Quiet.TextTrimming = wrong ? TextTrimming.None : TextTrimming.CharacterEllipsis;
+        Quiet.SetResourceReference(TextBlock.ForegroundProperty, wrong ? "TextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
+        Undo.Visibility = Seen(model.JustPutBack is not null && !wrong);
+        OpenAgain.Visibility = Seen(model.OffersOpeningAgain);
+        // The offer to undo is counted from when it was made, not from each time
+        // something else changes.
+        if (!ReferenceEquals(model.JustPutBack, offered))
+        {
+            offered = model.JustPutBack;
+            offer.Stop();
+            if (offered is not null)
+            {
+                offer.Start();
+            }
+        }
 
         var song = model.Shown;
         Header.Visibility = UnderTheHeader.Visibility = Seen(song is not null);
+        Earlier.Visibility = Seen(model.HasEarlierVersions);
         NoSong.Text = model.NoSongSentence;
         NoSong.Visibility = Seen(song is null);
         Problem.Visibility = Seen(song?.Problem is not null);
@@ -75,7 +103,7 @@ public partial class SongPane : UserControl
             return;
         }
         shownSong = song;
-        Lines.Children.Clear();
+        Lines.Show(song?.Lines ?? []);
         if (song is null)
         {
             return;
@@ -94,95 +122,12 @@ public partial class SongPane : UserControl
         ShownKey.Visibility = Seen(shownInAnother);
         ShownKey.Text = "Shown in " + song.ShownKey;
         ShownKey.ToolTip = "The key ProPresenter is set to show this song" + (char)0x2019 + "s chords in.";
-
-        foreach (var line in song.Lines)
-        {
-            Lines.Children.Add(Drawn(line));
-        }
         Scroll.ScrollToHome();
     }
 
-    // One line of the song, as it is drawn.
-    private UIElement Drawn(SongLine line)
-    {
-        switch (line.Kind)
-        {
-            case SongLineKind.Group:
-                // The group's name, with a spot of its colour before it if the file
-                // gives it one.
-                var heading = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 6, 0, 2) };
-                if (line.GroupColour is { } colour)
-                {
-                    heading.Children.Add(new Ellipse
-                    {
-                        Width = 9,
-                        Height = 9,
-                        Margin = new Thickness(0, 1, 6, 0),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Fill = new SolidColorBrush(Color.FromRgb(Part(colour.Red), Part(colour.Green), Part(colour.Blue))),
-                    });
-                }
-                var name = new TextBlock { Text = line.Group, FontWeight = FontWeights.SemiBold };
-                name.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorSecondaryBrush");
-                heading.Children.Add(name);
-                return heading;
+    private void EarlierVersionsWasClicked(object sender, RoutedEventArgs e) => model?.ShowEarlierVersions();
 
-            case SongLineKind.Gap:
-                return new Border { Height = 10 };
+    private void UndoWasClicked(object sender, RoutedEventArgs e) => model?.TakeBack();
 
-            case SongLineKind.BlankSlide:
-                var blank = new TextBlock { Text = "(a blank slide)", FontFamily = OfOneWidth, Margin = new Thickness(0, 1, 0, 1), ToolTip = "This slide has no words." };
-                blank.SetResourceReference(TextBlock.ForegroundProperty, "TextFillColorTertiaryBrush");
-                return blank;
-
-            default:
-                // (A line with nothing in it still takes a line's height.)
-                var words = new TextBlock { FontFamily = OfOneWidth, Margin = new Thickness(0, 1, 0, 1) };
-                foreach (var (text, isChord) in Parts(line.Text.Length == 0 ? " " : line.Text))
-                {
-                    var run = new Run(text);
-                    if (isChord)
-                    {
-                        run.SetResourceReference(TextElement.ForegroundProperty, Look.Chord);
-                    }
-                    words.Inlines.Add(run);
-                }
-                return words;
-        }
-    }
-
-    // A part of a colour as the file has it, from nought to one, as a screen has it,
-    // from 0 to 255.
-    private static byte Part(double ofOne) => (byte)Math.Round(Math.Clamp(ofOne, 0, 1) * 255);
-
-    /// <summary>
-    /// A line of ChordPro in its parts, each a chord or not: a chord is everything from
-    /// a "[" to its "]", brackets and all. The colouring never changes the text: the
-    /// parts put together again are the line.
-    /// </summary>
-    internal static IReadOnlyList<(string Text, bool IsChord)> Parts(string line)
-    {
-        var parts = new List<(string, bool)>();
-        var from = 0;
-        while (from < line.Length)
-        {
-            var open = line.IndexOf('[', from);
-            var close = open < 0 ? -1 : line.IndexOf(']', open);
-            if (close < 0)
-            {
-                break;
-            }
-            if (open > from)
-            {
-                parts.Add((line[from..open], false));
-            }
-            parts.Add((line[open..(close + 1)], true));
-            from = close + 1;
-        }
-        if (from < line.Length)
-        {
-            parts.Add((line[from..], false));
-        }
-        return parts;
-    }
+    private void OpenAgainWasClicked(object sender, RoutedEventArgs e) => model?.OpenAgain();
 }

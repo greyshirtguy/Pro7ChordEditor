@@ -1,12 +1,16 @@
 <!--
-  What the window holds: one view, in two parts. spec/06-library.md, "The window".
+  What the window holds: one view. spec/06-library.md, "The window".
 
-    at the left    two lists, one over the other, as ProPresenter has them: the place
-                   and its libraries, and under them the songs of the library chosen
-                   (ListsPane);
-    at the right   the song that is open (SongPane).
+    across the top  the window's own menu, with every command in it
+                    (spec/10-platforms.md, "Menus");
+    at the left     two lists, one over the other, as ProPresenter has them: the place
+                    and its libraries, and under them the songs of the library chosen
+                    (ListsPane);
+    at the right    the song that is open (SongPane);
+    over it all     while it is asked for, the song's earlier versions
+                    (EarlierVersionsPanel).
 
-  The edge between the two is dragged sideways, to give the lists or the song more
+  The edge between the lists and the song is dragged sideways, to give either more
   width. How wide the lists then are in a window of a given width is ListsLook's
   arithmetic, which the code beside this asks whenever the window's width changes.
 
@@ -26,28 +30,46 @@
              Foreground="{DynamicResource TextFillColorPrimaryBrush}"
              FontFamily="Segoe UI Variable Text, Segoe UI"
              FontSize="13"
-             UseLayoutRounding="True">
+             UseLayoutRounding="True"
+             PreviewKeyDown="AKeyWasPressed">
   <Grid>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition x:Name="Lists" Width="270" MinWidth="210" MaxWidth="480" />
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="*" MinWidth="380" />
-    </Grid.ColumnDefinitions>
-    <views:ListsPane Grid.Column="0" />
-    <!-- The edge. It is the bar's colour, and has the look's own small grip in its middle. -->
-    <GridSplitter x:Name="Edge"
-                  Grid.Column="1"
-                  Width="5"
-                  MinWidth="5"
-                  Padding="0"
-                  HorizontalAlignment="Center"
-                  VerticalAlignment="Stretch"
-                  ResizeBehavior="PreviousAndNext"
-                  ResizeDirection="Columns"
-                  Background="{DynamicResource Pro7.Bar}"
-                  Focusable="False"
-                  DragCompleted="TheEdgeWasDragged"
-                  ToolTip="Drag left or right to give the lists or the song more room." />
-    <views:SongPane Grid.Column="2" />
+    <DockPanel>
+      <Menu DockPanel.Dock="Top" FontSize="13">
+        <MenuItem Header="_File">
+          <MenuItem Header="Choose _Folder&#x2026;" Click="ChooseAFolder" />
+          <MenuItem Header="_Settings&#x2026;" Click="OpenTheSettings" />
+          <Separator />
+          <MenuItem Header="E_xit" InputGestureText="Alt+F4" Click="CloseTheWindow" />
+        </MenuItem>
+        <MenuItem Header="_Song" SubmenuOpened="TheSongMenuWasOpened">
+          <MenuItem x:Name="EarlierVersions" Header="_Earlier Versions&#x2026;" Click="ShowEarlierVersions" />
+        </MenuItem>
+      </Menu>
+      <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition x:Name="Lists" Width="270" MinWidth="210" MaxWidth="480" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" MinWidth="380" />
+        </Grid.ColumnDefinitions>
+        <views:ListsPane Grid.Column="0" />
+        <!-- The edge. It is the bar's colour, and has the look's own small grip in its middle. -->
+        <GridSplitter x:Name="Edge"
+                      Grid.Column="1"
+                      Width="5"
+                      MinWidth="5"
+                      Padding="0"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Stretch"
+                      ResizeBehavior="PreviousAndNext"
+                      ResizeDirection="Columns"
+                      Background="{DynamicResource Pro7.Bar}"
+                      Focusable="False"
+                      DragCompleted="TheEdgeWasDragged"
+                      ToolTip="Drag left or right to give the lists or the song more room." />
+        <views:SongPane Grid.Column="2" />
+      </Grid>
+    </DockPanel>
+    <views:EarlierVersionsPanel Visibility="Collapsed" />
   </Grid>
 </UserControl>

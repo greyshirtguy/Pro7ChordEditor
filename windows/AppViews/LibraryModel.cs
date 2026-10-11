@@ -1,16 +1,18 @@
 // What the window shows, and what a click in it does, with no drawing in it: the places
 // found, the libraries of the one chosen, the songs of the library chosen, the song that
-// is open. spec/06-library.md, "The window".
+// is open, and its earlier versions. spec/06-library.md, "The window"; spec/07-backups.md,
+// "Seeing them" and "Getting one back".
 //
 // The views only show what is here and pass on what the person does. Everything that is
-// a rule is in the layers below (Song: Places, Listing, Marks, SongText), which this
-// calls; so that the rules are proved by `dotnet test` with no window, and are the same
-// in the Mac app. The words the person reads in the lists are here too, and not in the
-// views, so that a test can hold them.
+// a rule is in the layers below (Song: Places, Listing, Marks, SongText, Copies,
+// OpenSong), which this calls; so that the rules are proved by `dotnet test` with no
+// window, and are the same in the Mac app. The words the person reads in the lists are
+// here too, and not in the views, so that a test can hold them.
 //
-// So far (milestone M3) a song is opened only to be looked at: it is handed no
-// safeguards, and so cannot be changed (Song/Safeguards.cs). The copies of M4 and the
-// editors of M5 and M6 are to come.
+// A song is opened with its real safeguards: nothing is saved while ProPresenter runs,
+// nor before a copy of the file is kept. So far (milestone M4) one thing here changes a
+// song's file: putting an earlier version of it back. The editors of M5 and M6 are to
+// come.
 //
 // It is handed what it would otherwise ask the PC for (where the app keeps its own
 // things, how to find places, whether ProPresenter is running), so that tests can hand
@@ -19,13 +21,15 @@
 // ONE THREAD. Everything here is to be asked from one thread, the window's. A song's
 // marks are worked out on another, since a big library takes a while, and come back to
 // the window's thread to be shown: which they do by themselves where that thread has a
-// queue of its own, as a window's has. (The tests give theirs one: OnTheWindowsThread.)
+// queue of its own, as a window's has. (The tests give theirs one:
+// Pictures.OnAThreadOfItsOwn.)
 //
 // The Mac's is LibraryModel.swift.
 
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
@@ -39,6 +43,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
     private const int AFew = 20;
 
     private readonly AppData appData;
+    private readonly Copies copies;
     private readonly Func<IReadOnlyList<string>, PlaceFinder> finder;
     private readonly Func<bool> askWhetherProPresenterIsRunning;
     private bool started;
@@ -47,18 +52,25 @@ public sealed class LibraryModel : INotifyPropertyChanged
     private CancellationTokenSource? markingStop;
     private List<string> chosenFolders = [];
     private Dictionary<string, Marks> marks = new(Paths.ById);
+    private IReadOnlySet<string> songsWithCopies = new HashSet<string>();
     private OpenSong? openSong;
     private string typed = "";
     private MarkFilter filter = MarkFilter.All;
 
-    public LibraryModel(AppData appData, Func<IReadOnlyList<string>, PlaceFinder> finder, Func<bool> proPresenterIsRunning)
+    /// <param name="appVersion">The app's version, which a copy's index records.</param>
+    public LibraryModel(AppData appData, Func<IReadOnlyList<string>, PlaceFinder> finder, Func<bool> proPresenterIsRunning, string appVersion = "")
     {
         this.appData = appData;
+        copies = appData.Copies(appVersion);
         this.finder = finder;
         askWhetherProPresenterIsRunning = proPresenterIsRunning;
     }
 
-    public static LibraryModel OnThisPC() => new(AppData.OnThisPC(), chosen => PlaceFinder.OnThisPC(chosen), ProPresenterApp.IsRunning);
+    public static LibraryModel OnThisPC() => new(AppData.OnThisPC(), chosen => PlaceFinder.OnThisPC(chosen), ProPresenterApp.IsRunning, AppVersion);
+
+    /// <summary>The version of the app that is running, as "0.1.0"; "" if it has none.</summary>
+    public static string AppVersion =>
+        Assembly.GetEntryAssembly()?.GetName().Version is { } version ? version.ToString(3) : "";
 
     /// <summary>
     /// Something here is no longer what it was. It does not say what: whoever shows this
@@ -85,7 +97,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
     }
 
     /// <summary>A song as the list shows it: its name, and what its marks say in words.</summary>
-    public sealed record SongRow(string Id, string Name, Marks? Marks)
+    public sealed record SongRow(string Id, string Name, Marks? Marks, bool HasCopies = false)
     {
         public bool CannotBeRead => Marks?.CannotBeRead == true;
 
@@ -100,8 +112,33 @@ public sealed class LibraryModel : INotifyPropertyChanged
         public static string OldEditorsCopyTip =>
             "A copy saved by the first Windows chord editor, which named its copies " + (char)0x201C + (char)0x2026 + Marks.OldEditorsEnding + (char)0x201D + ".";
 
+        public static string HasCopiesTip => "Earlier versions of this song are kept.";
+
         public string ChordsTip => Marks is null ? "" : Marks.Chords == 1 ? "Has 1 chord." : "Has " + Number(Marks.Chords) + " chords.";
     }
+
+    /// <summary>The copies of the song that is open, and the one picked to be looked at.</summary>
+    public sealed record EarlierVersions(IReadOnlyList<KeptCopy> Copies)
+    {
+        public string? PickedId { get; init; }
+
+        /// <summary>The copy picked, as it was: its lines, to look at and not to change.</summary>
+        public ShownSong? Picked { get; init; }
+
+        /// <summary>One line that sets it against the song as it is now: how many chords each has, and their keys.</summary>
+        public string Comparison { get; init; } = "";
+
+        /// <summary>If putting the picked one back wants asking first (spec/07, rule 23): the question.</summary>
+        public string? Question { get; init; }
+    }
+
+    /// <summary>
+    /// What was just put back, for the few seconds in which the line under the song
+    /// offers to undo it.
+    /// </summary>
+    /// <param name="Sentence">"Put back the version of 4 Oct."</param>
+    /// <param name="Before">The copy that was made just before: putting THAT back is the undoing.</param>
+    public sealed record PutBack(string Sentence, KeptCopy Before);
 
     // ---- What is shown
 
@@ -123,6 +160,20 @@ public sealed class LibraryModel : INotifyPropertyChanged
     public ShownSong? Shown { get; private set; }
 
     public bool ProPresenterIsRunning { get; private set; }
+
+    /// <summary>The panel of earlier versions, while it is open.</summary>
+    public EarlierVersions? Earlier { get; private set; }
+
+    public PutBack? JustPutBack { get; private set; }
+
+    /// <summary>What went wrong with the last thing asked, as a sentence; nothing if nothing did.</summary>
+    public string? Refused { get; private set; }
+
+    /// <summary>
+    /// Whether that was that the file has been changed by something else, so that the
+    /// song is offered read again.
+    /// </summary>
+    public bool OffersOpeningAgain { get; private set; }
 
     /// <summary>
     /// How much of the height of the two lists at the window's left the libraries have,
@@ -177,7 +228,10 @@ public sealed class LibraryModel : INotifyPropertyChanged
     }
 
     /// <summary>The songs listed, each as its row shows it.</summary>
-    public IReadOnlyList<SongRow> Rows => [.. ListedSongs.Select(song => new SongRow(song.Id, song.Name, marks.GetValueOrDefault(song.Id)))];
+    public IReadOnlyList<SongRow> Rows => [.. ListedSongs.Select(song => new SongRow(song.Id, song.Name, marks.GetValueOrDefault(song.Id), HasCopies(song)))];
+
+    /// <summary>Whether the song that is open has copies kept.</summary>
+    public bool HasEarlierVersions => Songs.FirstOrDefault(song => Paths.Same(song.Id, SongId)) is { } song && HasCopies(song);
 
     /// <summary>What a place is called where one is picked: its name, and how it was found.</summary>
     public static string Describe(Place place) => place.Kind switch
@@ -208,13 +262,22 @@ public sealed class LibraryModel : INotifyPropertyChanged
     public string SongsCount => Library is null ? "" : ListsLook.Count(ListedSongs.Count, Songs.Count);
 
     /// <summary>
-    /// The quiet line under the song: what is there to be seen. Nothing here is a
-    /// promise of what the app will do.
+    /// The quiet line under the song: what went wrong, if something did; what was just
+    /// put back; or what is there to be seen. Nothing here is a promise of what the app
+    /// will do.
     /// </summary>
     public string Notice
     {
         get
         {
+            if (Refused is not null)
+            {
+                return Refused;
+            }
+            if (JustPutBack is not null)
+            {
+                return JustPutBack.Sentence;
+            }
             if (Shown is not null)
             {
                 if (Shown.Problem is not null)
@@ -237,9 +300,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
     // ---- What the person does
 
     /// <summary>
-    /// When the window first shows: what the app kept is read, the places are found, and
-    /// the place and library last open are opened again. Asked a second time it does
-    /// nothing.
+    /// When the window first shows: what the app kept is read, copies that are kept no
+    /// longer are thrown away, the places are found, and the place and library last open
+    /// are opened again. Asked a second time it does nothing.
     /// </summary>
     public async Task StartAsync()
     {
@@ -252,6 +315,12 @@ public sealed class LibraryModel : INotifyPropertyChanged
         chosenFolders = [.. settings.ChosenFolders];
         ListsSplit = Within(settings.ListsSplit ?? UsualListsSplit);
         keptMarks = appData.ReadMarks();
+        // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
+        var thrownAway = copies.Thin();
+        if (thrownAway > 0)
+        {
+            appData.Log(Number(thrownAway) + " old copies were thrown away.");
+        }
         FindPlaces(settings.LastPlace, settings.LastLibrary);
         ProPresenterIsRunning = askWhetherProPresenterIsRunning();
         appData.Log("Started. " + Number(Places.Count) + " places found, " + Number(Libraries.Count) + " libraries in the one open.");
@@ -273,8 +342,11 @@ public sealed class LibraryModel : INotifyPropertyChanged
         FindPlaces(PlaceId, LibraryId);
         ProPresenterIsRunning = askWhetherProPresenterIsRunning();
         // The song that is open stays open if its file is still the one that was read.
-        // If something else has changed the file meanwhile, it is read again.
-        if (song is not null && Songs.Any(one => Paths.Same(one.Id, song)) && openSong?.FileIsAsLastRead != true)
+        // If something else has changed the file meanwhile, it is read again: nothing
+        // could be saved over it anyway. (Not while the panel of earlier versions is
+        // open over it: that is put away by the person, not by the app coming to the
+        // front.)
+        if (song is not null && Songs.Any(one => Paths.Same(one.Id, song)) && Earlier is null && openSong?.FileIsAsLastRead != true)
         {
             Open(song);
         }
@@ -336,8 +408,12 @@ public sealed class LibraryModel : INotifyPropertyChanged
     {
         SongId = id;
         openSong = null;
+        Earlier = null;
+        JustPutBack = null;
+        Refused = null;
+        OffersOpeningAgain = false;
         var song = Songs.FirstOrDefault(one => Paths.Same(one.Id, id));
-        if (song is null)
+        if (song is null || KeptSongOf(song) is not { } kept)
         {
             SongId = null;
             Shown = null;
@@ -347,18 +423,12 @@ public sealed class LibraryModel : INotifyPropertyChanged
         var file = Path.GetFileName(song.Path);
         try
         {
-            var opened = new OpenSong(song.Path);
-            var boxes = opened.TextBoxes;
+            // With its safeguards: ProPresenter is asked after before every save, and a
+            // copy is kept before the first.
+            var opened = new OpenSong(song.Path, new Safeguards(askWhetherProPresenterIsRunning, (path, why) => copies.Keep(path, kept, why)));
             openSong = opened;
-            Shown = new ShownSong(song.Name)
-            {
-                Key = opened.Key,
-                ShownKey = opened.ShownKey,
-                Lines = SongText.Lines(boxes),
-                Slides = opened.SlideCount,
-                Chords = boxes.Sum(box => box.Chords.Count),
-            };
-            appData.Log("Opened " + file + " to be looked at.");
+            Shown = Show(opened, song.Name);
+            appData.Log("Opened " + file + ".");
         }
         catch (Refusal refusal)
         {
@@ -367,6 +437,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
         }
         Changed();
     }
+
+    /// <summary>"Open Again": the song read afresh from its file, after something else changed it.</summary>
+    public void OpenAgain() => Open(SongId);
 
     /// <summary>A folder chosen by hand becomes a place, is remembered, and is opened.</summary>
     public void Add(string folder)
@@ -399,6 +472,185 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>Waits until the marks of the songs listed have been worked out.</summary>
     public Task MarksAreWorkedOutAsync() => marking;
 
+    // ---- Earlier versions (spec/07-backups.md, rules 14 to 23)
+
+    /// <summary>Opens the panel, with the newest copy picked. A song with no copies has none to show.</summary>
+    public void ShowEarlierVersions()
+    {
+        if (Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } song || KeptSongOf(song) is not { } kept)
+        {
+            return;
+        }
+        var all = copies.CopiesOf(kept);
+        if (all.Count == 0)
+        {
+            return;
+        }
+        Earlier = new EarlierVersions(all);
+        PickCopy(all[0].Id);
+    }
+
+    /// <summary>When a copy was made, as the list says it: "Today 09:14", "Sunday 4 Oct".</summary>
+    public string When(KeptCopy copy) => copies.When(copy.Made);
+
+    /// <summary>What the list says of why a copy was made: the page's words, and that it is the first if it is.</summary>
+    public static string Why(KeptCopy copy) =>
+        (copy.IsTheFirst ? "(the first) " : "") + copy.Why switch
+        {
+            CopyReason.BeforeAChange => "before a change",
+            CopyReason.BeforePuttingBack => "before putting back a copy",
+            CopyReason.BeforeMending => "before mending",
+            _ => "",
+        };
+
+    /// <summary>Esc, or a click outside, puts the panel away.</summary>
+    public void CloseEarlierVersions()
+    {
+        if (Earlier is not null)
+        {
+            Earlier = null;
+            Changed();
+        }
+    }
+
+    /// <summary>Picking one shows it as it was, and one line that sets it against the song now.</summary>
+    public void PickCopy(string? id)
+    {
+        if (Earlier is not { } panel || panel.Copies.FirstOrDefault(one => one.Id == id) is not { } copy)
+        {
+            return;
+        }
+        Earlier = panel with
+        {
+            PickedId = copy.Id,
+            Question = null,
+            Picked = Looked(copy),
+            Comparison = Count(copy.Chords, copy.Key) + ".  Now: " + (Shown is null ? "" : Count(Shown.Chords, Shown.Key)) + ".",
+        };
+        Changed();
+    }
+
+    /// <summary>A copy as it was: its lines, to look at. Or, of one that cannot be read, the sentence that says so.</summary>
+    public static ShownSong Looked(KeptCopy copy)
+    {
+        try
+        {
+            return Show(new OpenSong(copy.Path), copy.SongName);
+        }
+        catch (Refusal)
+        {
+            return new ShownSong(copy.SongName) { Problem = "This copy could not be read as a ProPresenter presentation." };
+        }
+    }
+
+    /// <summary>
+    /// "Put This One Back". A copy that belongs to another song than the one now at that
+    /// place (another id inside) asks first, saying both names; <paramref name="sure"/>
+    /// is the yes.
+    /// </summary>
+    public void PutBackPicked(bool sure = false)
+    {
+        if (Earlier is not { } panel || panel.Copies.FirstOrDefault(one => one.Id == panel.PickedId) is not { } copy || openSong is not { } song)
+        {
+            return;
+        }
+        if (!sure && copy.SongId.Length > 0 && !string.Equals(copy.SongId, song.Id, StringComparison.Ordinal))
+        {
+            Earlier = panel with
+            {
+                Question = "This copy is of " + (char)0x201C + copy.SongName + (char)0x201D + ", and the song here now is " + (char)0x201C + song.Name + (char)0x201D
+                    + ": another song under the same name. Put the copy in its place?",
+            };
+            Changed();
+            return;
+        }
+        PutBackCopy(copy, undoing: false);
+    }
+
+    /// <summary>Undoes the putting back, which is only putting back the copy made just before it.</summary>
+    public void TakeBack()
+    {
+        if (JustPutBack is { } done)
+        {
+            PutBackCopy(done.Before, undoing: true);
+        }
+    }
+
+    /// <summary>The offer to undo goes after a few seconds; the copy is in the list all the same.</summary>
+    public void ForgetWhatWasPutBack()
+    {
+        if (JustPutBack is not null)
+        {
+            JustPutBack = null;
+            Changed();
+        }
+    }
+
+    // Makes the song's file a copy again. It is a save like any other, and the file as
+    // it is now is kept as a copy first, so that this can be taken back.
+    private void PutBackCopy(KeptCopy copy, bool undoing)
+    {
+        if (openSong is not { } song || Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } listed || KeptSongOf(listed) is not { } kept)
+        {
+            return;
+        }
+        var file = Path.GetFileName(listed.Path);
+        Refused = null;
+        OffersOpeningAgain = false;
+        try
+        {
+            byte[] bytes;
+            try
+            {
+                bytes = File.ReadAllBytes(copy.Path);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
+            {
+                throw new CopyCannotBeRead();
+            }
+            // Putting back what the file already is, is nothing to do (spec/07, rule
+            // 21): no copy is made first, and so there is nothing to offer to undo.
+            if (bytes.AsSpan().SequenceEqual(song.Bytes.Span))
+            {
+                Earlier = null;
+                Changed();
+                return;
+            }
+            song.PutBack(bytes);
+        }
+        catch (Exception exception) when (exception is Refusal or CopyCannotBeRead)
+        {
+            Refuse(exception as Refusal, "The copy could not be read.", file);
+            appData.Log("An earlier version of " + file + " was not put back.");
+            if (Earlier is not null)
+            {
+                Earlier = Earlier with { Question = null };
+            }
+            Changed();
+            return;
+        }
+        // The song starts afresh from its file. The newest copy now is the file as it
+        // was just before: the one to put back, to take this back.
+        Shown = Show(song, listed.Name);
+        Earlier = null;
+        var when = copies.When(copy.Made);
+        if (undoing)
+        {
+            JustPutBack = null;
+            appData.Log("Putting back was undone for " + file + ".");
+        }
+        else if (copies.CopiesOf(kept).FirstOrDefault() is { } before)
+        {
+            JustPutBack = new PutBack("Put back the version of " + when + ".", before);
+            appData.Log("Put back an earlier version of " + file + ", the one of " + when + ".");
+        }
+        NoteAChange(listed);
+        Changed();
+    }
+
+    // A copy's own file could not be read. (Only ever thrown and caught above.)
+    private sealed class CopyCannotBeRead : Exception;
+
     // ---- How
 
     private static double Within(double share) => double.IsNaN(share) ? UsualListsSplit : Math.Min(Math.Max(share, 0.1), 0.9);
@@ -406,7 +658,62 @@ public sealed class LibraryModel : INotifyPropertyChanged
     // A number as it is written in a sentence, the same on every PC.
     private static string Number(int number) => number.ToString(CultureInfo.InvariantCulture);
 
+    private static string Count(int chords, string key) =>
+        (chords == 1 ? "1 chord" : Number(chords) + " chords") + (key.Length == 0 ? ", no key" : ", in " + key);
+
+    private static ShownSong Show(OpenSong song, string name)
+    {
+        var boxes = song.TextBoxes;
+        return new ShownSong(name)
+        {
+            Key = song.Key,
+            ShownKey = song.ShownKey,
+            Lines = SongText.Lines(boxes),
+            Slides = song.SlideCount,
+            Chords = boxes.Sum(box => box.Chords.Count),
+        };
+    }
+
     private void Changed() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+
+    // A song as its copies know it: by its place, its library and its name.
+    private KeptSong? KeptSongOf(ListedSong song) =>
+        Place is { } place && Library is { } library ? new KeptSong(place.Name, library.Name, song.Name) : null;
+
+    // (A song's folder of copies is its name made fit to be a folder's.)
+    private bool HasCopies(ListedSong song) => songsWithCopies.Contains(Copies.FolderName(song.Name));
+
+    private void NoteCopies() =>
+        songsWithCopies = Place is { } place && Library is { } library ? copies.NamesWithCopies(place.Name, library.Name) : new HashSet<string>();
+
+    // Something was not done: its sentence, and what follows from why.
+    private void Refuse(Refusal? refusal, string otherwise, string file)
+    {
+        Refused = refusal?.Sentence ?? otherwise;
+        OffersOpeningAgain = refusal?.Reason == Song.Refusal.Why.ChangedByAnother;
+        if (refusal?.Reason == Song.Refusal.Why.ProPresenterIsRunning)
+        {
+            // (It was started with this app in front all the while: the band is there
+            // from now. spec/06, rule 19.)
+            ProPresenterIsRunning = true;
+        }
+        appData.Log("A change to " + file + " was refused.");
+    }
+
+    // The song's file has been changed from here: its marks in the list, and whether
+    // it has copies, are brought up to date.
+    private void NoteAChange(ListedSong listed)
+    {
+        if (Listing.AsItIsNow(listed) is { } now)
+        {
+            Songs = [.. Songs.Select(song => Paths.Same(song.Id, now.Id) ? now : song)];
+            var found = Song.Marks.Read(now);
+            marks[now.Id] = found;
+            keptMarks.Keep(found, now);
+            appData.Keep(keptMarks);
+        }
+        NoteCopies();
+    }
 
     private void FindPlaces(string? wanted, string? library)
     {
@@ -430,7 +737,12 @@ public sealed class LibraryModel : INotifyPropertyChanged
             SongId = null;
             Shown = null;
             openSong = null;
+            Earlier = null;
+            JustPutBack = null;
+            Refused = null;
+            OffersOpeningAgain = false;
         }
+        NoteCopies();
         // What was worked out before, for the files that are as they were then; the
         // rest in the background, a few at a time, so that the list is there at once.
         marks = new Dictionary<string, Marks>(Paths.ById);
