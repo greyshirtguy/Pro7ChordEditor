@@ -6,44 +6,149 @@
 // the size asked for, and has something in it; a picture that failed to draw would
 // otherwise be a blank one that nobody happened to open.
 //
-// Milestone M0 has the one view there is. From M3 on these are the library's lists,
-// the song, the chord sheet, and the cases spec/10 lists.
+// Each is the whole view the window holds, on a made-up PC (MadeUpPC.cs), in the dark
+// look or the light one as the test says, whatever this PC is set to. So far
+// (milestone M3): the lists, and a song shown to be looked at. From M5 on, the
+// editors, and the cases spec/10 lists.
 
-using System.IO;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Pro7ChordEditor.Song;
 using Xunit;
 
 namespace Pro7ChordEditor.AppViews.Tests;
 
 public class PictureTests
 {
-    [Fact]
-    public void TheWindowAsItOpens()
-    {
-        Pictures.OnAThreadOfItsOwn(() =>
+    // Draws the window's view of a model that has been brought to some state, and
+    // holds the picture to what a test can tell of one.
+    private static void Draw(string name, bool dark, Func<MadeUpPC, LibraryModel, Task> bring, double width = 1280, double height = 800) =>
+        Pictures.OnAThreadOfItsOwn(async () =>
         {
-            // What LibraryWindow holds, in the room that window opens with.
-            var path = Pictures.Draw(new NotBuiltYet(), 1280, 800, "01 the window as it opens");
+            using var pc = new MadeUpPC();
+            var model = pc.Model();
+            var view = new LibraryView(model);
+            Look.Wear(view, dark);
+            await bring(pc, model);
+            await model.MarksAreWorkedOutAsync();
 
-            var picture = Read(path);
-            Assert.Equal(1280 * Pictures.Scale, picture.Width);
-            Assert.Equal(800 * Pictures.Scale, picture.Height);
-            // A ground and two lines of words in two colours, with the shades between
-            // that smooth the letters' edges: some dozens of colours. A view that drew
-            // nothing would be one.
-            Assert.True(picture.Colours > 10, $"{path} has only {picture.Colours} colours in it: was anything drawn?");
+            var path = Pictures.Draw(view, width, height, name);
+
+            var picture = Pictures.Read(path);
+            Assert.Equal(((int)width * Pictures.Scale, (int)height * Pictures.Scale), (picture.Width, picture.Height));
+            // Grounds of several greys, words, and the shades between that smooth the
+            // letters' edges: some hundreds of colours. A view that drew nothing would
+            // be one.
+            Assert.True(picture.Colours > 100, $"{path} has only {picture.Colours} colours in it: was anything drawn?");
         });
+
+    private static async Task ASongOpen(MadeUpPC pc, LibraryModel model, string song)
+    {
+        await model.StartAsync();
+        model.ChooseLibrary(pc.Library("Songs"));
+        model.Open(pc.Song(song));
     }
 
-    // A picture file's size in dots, and how many different colours it has.
-    private static (int Width, int Height, int Colours) Read(string path)
-    {
-        using var file = File.OpenRead(path);
-        var frame = new PngBitmapDecoder(file, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad).Frames[0];
-        var dots = new FormatConvertedBitmap(frame, PixelFormats.Bgra32, null, 0);
-        var all = new int[dots.PixelWidth * dots.PixelHeight];
-        dots.CopyPixels(all, dots.PixelWidth * 4, 0);
-        return (dots.PixelWidth, dots.PixelHeight, all.Distinct().Count());
-    }
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheWindowAsItOpens(bool dark) => Draw(
+        "01 the window as it opens, " + (dark ? "dark" : "light"),
+        dark,
+        async (pc, model) =>
+        {
+            await model.StartAsync();
+            model.ChooseLibrary(pc.Library("Songs"));
+        });
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ASongOpenToBeLookedAt(bool dark) => Draw(
+        "02 a song open, " + (dark ? "dark" : "light"),
+        dark,
+        (pc, model) => ASongOpen(pc, model, "Amazing Grace"));
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheBandWhileProPresenterIsRunning(bool dark) => Draw(
+        "03 ProPresenter running, " + (dark ? "dark" : "light"),
+        dark,
+        async (pc, model) =>
+        {
+            pc.ProPresenterIsRunning = true;
+            await ASongOpen(pc, model, "Plain Song");
+        });
+
+    [Fact]
+    public void AFileThatCannotBeRead() => Draw("04 a file that cannot be read", true, (pc, model) => ASongOpen(pc, model, "Nonsense"));
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void NoPlaceFound(bool dark) => Draw(
+        "05 no place found, " + (dark ? "dark" : "light"),
+        dark,
+        async (pc, model) =>
+        {
+            pc.HasAProPresenterFolder = false;
+            await model.StartAsync();
+        });
+
+    [Fact]
+    public void TheListNarrowedByWhatIsTypedAndByMark() => Draw(
+        "06 the list narrowed",
+        true,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Holy Holy Holy");
+            await model.MarksAreWorkedOutAsync();
+            model.Typed = "o";
+            model.Filter = MarkFilter.WithChords;
+        });
+
+    [Fact]
+    public void TheOldEditorsCopiesAndAChosenFolder() => Draw(
+        "07 the old editor's copies, in a chosen folder",
+        false,
+        async (pc, model) =>
+        {
+            await model.StartAsync();
+            model.Add(System.IO.Path.Combine(pc.Place, "Libraries"));
+            model.ChooseLibrary(model.Libraries.Single(library => library.Name == "Old copies").Id);
+            model.Open(model.Songs.Single(song => song.Name == "It Is Well (Chords)").Id);
+        });
+
+    [Fact]
+    public void ASongWithBlankSlidesAndChordsWithNoWords() => Draw(
+        "08 blank slides and chords with no words",
+        true,
+        (pc, model) => ASongOpen(pc, model, "Chords With No Words"));
+
+    [Fact]
+    public void TheWindowAtItsSmallest() => Draw(
+        "09 the window at its smallest",
+        true,
+        (pc, model) => ASongOpen(pc, model, "Amazing Grace"),
+        width: 640,
+        height: 440);
+
+    [Fact]
+    public void TheBarDraggedSoThatTheLibrariesHaveMostOfTheHeight() => Draw(
+        "10 the bar dragged down",
+        false,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Blank Slides");
+            model.SetListsSplit(0.7);
+        });
+
+    [Fact]
+    public void APlaceWithNoLibrariesInIt() => Draw(
+        "11 a place with no libraries",
+        true,
+        async (pc, model) =>
+        {
+            await model.StartAsync();
+            model.Add(System.IO.Directory.CreateDirectory(System.IO.Path.Combine(pc.Folder, "Nothing in it")).FullName);
+        });
 }

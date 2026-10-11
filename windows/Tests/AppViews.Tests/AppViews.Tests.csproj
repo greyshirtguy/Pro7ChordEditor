@@ -2,11 +2,25 @@
   The tests of the window (../../AppViews): of what it shows and what a click does,
   and pictures of it.
 
+    LibraryModelTests   what the window shows and what a click does, with nothing drawn:
+                        the model on a made-up PC
+    WindowListsTests    the two lists as far as they are numbers and words; the small
+                        pictures before names; the look
+    PictureTests        pictures of the window, to be looked at
+    MadeUpPC            what they stand on: a ProPresenter folder of copies of the test
+                        files, in a temporary folder
+    Pictures            drawing a view into a picture file; and a thread of the kind a
+                        window has, for a test to work on
+
   THE PICTURES. An agent cannot look at a window; it can look at a picture file. So
   some of these tests draw a view into a PNG, and whoever changed how something is
   drawn opens the pictures and looks at them (spec/10-platforms.md, "Seeing what you
   have drawn"). Pictures.cs says where they go and how they are drawn. They do not go
   in the repository.
+
+  Nothing here asks this PC's ProPresenter anything, reads a real library, or writes
+  outside a folder of its own under the system's temporary folder (AGENTS.md, "The
+  person's files").
 
   It is an .exe because xUnit, from its third version, makes every project of tests a
   program that can run itself. `dotnet test` runs it.
@@ -24,5 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\AppViews\AppViews.csproj" />
+    <ProjectReference Include="..\..\Song\Song.csproj" />
+    <ProjectReference Include="..\TestData\TestData.csproj" />
   </ItemGroup>
 </Project>

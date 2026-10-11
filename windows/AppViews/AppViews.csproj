@@ -10,7 +10,20 @@
   rule: what a click does to a song is worked out in Song, with no window in it, and
   shown here (AGENTS.md, "Keep the rules out of the window's code").
 
-  Until milestone M3 it has one window with a sentence in it.
+  What is where:
+
+    LibraryModel    everything the window shows and does, with no drawing in it
+    LibraryWindow   the window, which frames LibraryView and tells the model what only
+                    a window knows
+    LibraryView     what the window holds: ListsPane at the left, SongPane at the right
+    ListsPane       the place and its libraries, over the songs of the library chosen
+    SongPane        the song that is open
+    ListsLook       the two lists as far as they are numbers and words
+    ListIcons       the two small pictures that stand before names in the lists
+    Look            the system's look, dark and light, and the app's own few colours
+
+  Its tests (Tests/AppViews.Tests) may see what is kept inside it, for the few small
+  things worth trying by themselves.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -19,6 +32,9 @@
     <RootNamespace>Pro7ChordEditor.AppViews</RootNamespace>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pro7ChordEditor.AppViews.Tests" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
     <ProjectReference Include="..\Song\Song.csproj" />

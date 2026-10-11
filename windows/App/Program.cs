@@ -20,6 +20,8 @@ public static class Program
     public static void Main()
     {
         var app = new Application();
+        // The look of Windows 11, dark or light as the system is (AppViews/Look.cs).
+        Look.GiveTheSystemsLook(app);
         app.Run(new LibraryWindow());
     }
 }

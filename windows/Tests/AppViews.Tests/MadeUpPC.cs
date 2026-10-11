@@ -1,0 +1,98 @@
+// What the tests of the window stand on: a made-up PC, in a folder of its own under the
+// system's temporary folder. It has a Documents folder with a ProPresenter folder in
+// it, laid out as ProPresenter lays one out, with copies of the test files for songs; a
+// folder for the app's own things; and a ProPresenter that is running or not as the
+// test says.
+//
+// No test of the window asks this PC's ProPresenter anything, reads a real library, or
+// writes outside its own folder (AGENTS.md, "The person's files").
+//
+// The Mac's is MadeUpMac.swift.
+
+using System.IO;
+using Pro7ChordEditor.Song;
+using Pro7ChordEditor.Tests;
+
+namespace Pro7ChordEditor.AppViews.Tests;
+
+internal sealed class MadeUpPC : IDisposable
+{
+    private const string Prefix = "Pro7ChordEditorViewTests-";
+    private readonly DirectoryInfo folder = Directory.CreateTempSubdirectory(Prefix);
+
+    internal MadeUpPC()
+    {
+        Documents = Path.Combine(folder.FullName, "Documents");
+        Place = Path.Combine(Documents, "ProPresenter");
+        var songs = Directory.CreateDirectory(Path.Combine(Place, "Libraries", "Songs")).FullName;
+        var copies = Directory.CreateDirectory(Path.Combine(Place, "Libraries", "Old copies")).FullName;
+        Directory.CreateDirectory(Path.Combine(Place, "Libraries", "Kids"));
+        foreach (var path in TestData.PresentationPaths())
+        {
+            File.WriteAllBytes(Path.Combine(path.StartsWith("as-the-old", StringComparison.Ordinal) ? copies : songs, Path.GetFileName(path)), TestData.InFiles(path));
+        }
+        File.WriteAllText(Path.Combine(songs, "Nonsense.pro"), "This is not a song.");
+    }
+
+    /// <summary>The names of the songs of the library "Songs", as they are listed.</summary>
+    internal static readonly string[] Songs =
+        ["A Song - In A Minor Key", "Amazing Grace", "Blank Slides", "Chords With No Words", "Holy Holy Holy", "It Is Well", "Nonsense", "Plain Song", "Rock Of Ages (Toplady)"];
+
+    /// <summary>Those of them that have chords.</summary>
+    internal static readonly string[] SongsWithChords =
+        ["A Song - In A Minor Key", "Amazing Grace", "Blank Slides", "Chords With No Words", "Holy Holy Holy", "It Is Well", "Plain Song"];
+
+    internal string Folder => folder.FullName;
+
+    /// <summary>The PC's Documents folder.</summary>
+    internal string Documents { get; }
+
+    /// <summary>ProPresenter's folder, in Documents.</summary>
+    internal string Place { get; }
+
+    internal bool ProPresenterIsRunning { get; set; }
+
+    /// <summary>How many times ProPresenter was asked after.</summary>
+    internal int TimesAsked { get; private set; }
+
+    /// <summary>
+    /// Whether the PC has ProPresenter's folder where one is looked for. If not, there
+    /// is no place to be found at all, though the folder is still on the disk for a
+    /// test to choose by hand.
+    /// </summary>
+    internal bool HasAProPresenterFolder { get; set; } = true;
+
+    internal AppData AppData => new(Path.Combine(Folder, "Own"));
+
+    /// <summary>A model of the window on this PC. Each is a new start of the app.</summary>
+    internal LibraryModel Model() => new(
+        AppData,
+        chosen => new PlaceFinder(() => null, HasAProPresenterFolder ? Documents : null, chosen),
+        () =>
+        {
+            TimesAsked++;
+            return ProPresenterIsRunning;
+        });
+
+    internal string Library(string name) => Paths.IdOf(Path.Combine(Place, "Libraries", name));
+
+    internal string Song(string name, string library = "Songs") => Paths.IdOf(Path.Combine(Place, "Libraries", library, name + ".pro"));
+
+    internal string Log => File.ReadAllText(Path.Combine(AppData.Folder, "log.txt"));
+
+    /// <summary>Takes the PC's folder away, and everything in it.</summary>
+    public void Dispose()
+    {
+        // (Only ever the folder made above, under the system's temporary folder, and
+        // only if it is named as one of these: looked at before it is deleted.)
+        if (folder.Exists && folder.Name.StartsWith(Prefix, StringComparison.Ordinal)
+            && folder.FullName.StartsWith(Path.GetTempPath(), StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var file in folder.EnumerateFiles("*", SearchOption.AllDirectories))
+            {
+                file.Attributes = FileAttributes.Normal;
+            }
+            folder.Delete(recursive: true);
+        }
+    }
+}
