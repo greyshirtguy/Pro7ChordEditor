@@ -495,5 +495,14 @@ public class SheetGridTests
         sheet.SetSpot(lines[3], 6);
         grid.StepLine(1);
         Assert.Equal(new Spot(lines[8], 0), sheet.Spot);
+
+        // Of two stops as near, the one further left: from 50 along "abcde fgh", the
+        // line under it has its stops at 0 and at 100.
+        var two = new ChordSheet(new Song(Slide(0, "abcde fgh\nabcdefghi jkl")));
+        var under = SheetGrid.LayOut(two, new Sizes(), 600);
+        Assert.Equal([0, 10], two.Stops(1));
+        two.SetSpot(0, 5);
+        under.StepLine(1);
+        Assert.Equal(new Spot(1, 0), two.Spot);
     }
 }

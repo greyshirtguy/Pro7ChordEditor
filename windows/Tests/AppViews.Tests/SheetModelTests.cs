@@ -196,7 +196,7 @@ public class SheetModelTests
         Assert.Equal("#ffd9a8", LibraryModel.ColourAsKept("#ffd9a8"));
         Assert.Equal("#ffd9a8", LibraryModel.ColourAsKept("#FFD9A8"));
         Assert.Equal("#00ff7f", LibraryModel.ColourAsKept("#00Ff7F"));
-        foreach (var none in new string?[] { null, "", "#", "ffd9a8", "#ffd9a", "#ffd9a8a", "#gggggg", "#12345g", " #ffd9a8", "#ffd9a8 ", "#+12345", "orange" })
+        foreach (var none in new string?[] { null, "", "#", "ffd9a8", "0ffd9a8", "affd9a8", "#ffd9a", "#ffd9a8a", "#gggggg", "#12345g", " #ffd9a8", "#ffd9a8 ", "#+12345", "orange" })
         {
             Assert.Null(LibraryModel.ColourAsKept(none));
         }
@@ -289,9 +289,18 @@ public class SheetModelTests
         static int Green((int Width, int Height, int[] Dots) drawn) =>
             drawn.Dots.Count(dot => ((dot >> 8) & 0xFF) > 170 && ((dot >> 16) & 0xFF) < 90 && (dot & 0xFF) is > 60 and < 140);
         Assert.True(Green(Pictures.Drawn(view, 1280, 800)) > 400, "the sheet's chords are not drawn in the colour chosen");
-        // The text's is its own, and has not changed.
+        // At another size they are in it still: the measures are made again for a size,
+        // and the colour is not theirs to forget.
+        model.ZoomSheet(1);
+        Assert.True(Green(Pictures.Drawn(view, 1280, 800)) > 400, "at another size the sheet's chords are not drawn in the colour chosen");
+        model.ZoomSheet(-1);
+        // And what is typed in the bubble is in it.
+        Assert.Equal(green, Of(canvas.Entry.Ink));
+        // The text's is its own, and has not changed: nor is there a usual colour for it
+        // to be put back to.
         Assert.Null(model.TextChordColour);
         Assert.Equal(orange, Of(underlay.ChordBrush));
+        Assert.False(Named<Button>(chords, "TextUsual").IsEnabled);
         // Asked again, the well starts from the colour chosen.
         Click(Named<Button>(chords, "SheetWell"));
         Assert.Equal(green, from);
@@ -320,7 +329,9 @@ public class SheetModelTests
         // Usual Colour puts back the one each came with, and nothing is kept.
         Click(Named<Button>(chords, "SheetUsual"));
         Assert.Null(model.SheetChordColour);
+        Assert.True(Named<Button>(chords, "TextUsual").IsEnabled);
         Assert.Equal(SheetLook.ChordName, canvas.ChordColour);
+        Assert.Equal(SheetLook.ChordName, Of(canvas.Entry.Ink));
         Assert.Equal(SheetLook.ChordName, Of(Named<Border>(chords, "SheetColour").Background));
         Assert.False(Named<Button>(chords, "SheetUsual").IsEnabled);
         Click(Named<Button>(chords, "TextUsual"));

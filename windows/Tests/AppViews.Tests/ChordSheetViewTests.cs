@@ -89,6 +89,13 @@ public class ChordSheetViewTests
         var line = hand.Grid.Lines[place.Row];
         Assert.Equal(line.ChordTop + canvas.Metrics.BubbleHeight + 3, frame.Bottom, 0.01);
         Assert.Equal(hand.Grid.XOf(place), frame.Left, 0.01);
+        // And it stays there, wherever along the line the pointer goes meanwhile, and
+        // the spot with the pointer.
+        hand.PointAt("wretch");
+        Pictures.LayOut(view, 1280, 800);
+        Assert.Equal(hand.PlaceOf("wretch"), hand.Sheet.Spot);
+        Assert.Equal(place, hand.Sheet.TypingAt);
+        Assert.Equal(frame, canvas.EntryFrame);
 
         // What could not be on the way to a chord is not taken: the box is as it was,
         // and its caret where it was.
@@ -108,6 +115,21 @@ public class ChordSheetViewTests
         Pictures.LayOut(view, 1280, 800);
         Assert.False(hand.BubbleIsOpen);
         Assert.False(hand.Sheet.Typing);
+    });
+
+    // The sheet is at least as big as what is seen of it, so that a click beside a short
+    // song, or under it, is a click on the sheet still.
+    [Fact]
+    public void TheSheetFillsWhatIsSeenOfItHoweverShortTheSong() => OnAMadeUpPC(async pc =>
+    {
+        var (_, view, hand) = await Open(pc, "Plain Song");
+        var scroll = Named<ScrollViewer>(view.SongPane.ChordSheet, "Scroll");
+        // (Four slides in one row: the song is far less tall than what is seen, and
+        // less wide.)
+        Assert.True(hand.Grid.Content.Height < scroll.ViewportHeight - 100);
+        Assert.True(hand.Grid.Content.Width < scroll.ViewportWidth - 50);
+        Assert.True(hand.Canvas.ActualHeight >= scroll.ViewportHeight - 0.5, "the sheet is " + hand.Canvas.ActualHeight + " tall, and " + scroll.ViewportHeight + " is seen");
+        Assert.True(hand.Canvas.ActualWidth >= scroll.ViewportWidth - 0.5, "the sheet is " + hand.Canvas.ActualWidth + " wide, and " + scroll.ViewportWidth + " is seen");
     });
 
     // ---- The spot, and the pointer
@@ -157,6 +179,12 @@ public class ChordSheetViewTests
         Assert.Equal(wretch, sheet.Spot);
         hand.Canvas.PointerMoved(Hand.BareSheet, shift: false);
         Assert.Equal(wretch, sheet.Spot);
+        // And the pointer, gone there from over a chord, shows nothing to take hold of.
+        hand.Canvas.PointerMoved(bubble, shift: false);
+        Assert.Same(Cursors.Hand, hand.Canvas.Cursor);
+        hand.Canvas.PointerMoved(Hand.BareSheet, shift: false);
+        Assert.Same(Cursors.Arrow, hand.Canvas.Cursor);
+        Assert.Equal(sweet, sheet.Spot);
 
         // Over the room above a card's first line it is that line's, and under its
         // last, the last's.
@@ -1640,6 +1668,27 @@ public class ChordSheetViewTests
         // At the window's least it has four lines at the most, cut short with dots.
         Pictures.LayOut(view, 640, 480);
         Assert.InRange(quiet.ActualHeight, 3 * 16.0, (4 * 17.0) + 1);
+        // On the sheet its words go on to the next line where one is not enough; over
+        // the text they are one line.
+        Assert.Equal(TextWrapping.Wrap, quiet.TextWrapping);
+        model.Show(LibraryModel.Editor.ChordPro);
+        Pictures.LayOut(view, 640, 480);
+        Assert.Equal(TextWrapping.NoWrap, quiet.TextWrapping);
+        Assert.True(quiet.ActualHeight < 2 * 17.0);
+
+        // Where four lines are not enough it has four and no more: in a pane by itself,
+        // narrower than the window ever makes it, where what the keys do would run to a
+        // dozen.
+        // (Of a song newly opened, with nothing just said of it.)
+        var (another, _, _) = await Open(pc, "Plain Song");
+        var alone = new SongPane { DataContext = another };
+        Look.Wear(alone, dark: true);
+        Pictures.LayOut(alone, 330, 600);
+        var narrow = Named<TextBlock>(alone, "Quiet");
+        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), narrow.Text);
+        var line = Math.Ceiling(narrow.FontFamily.LineSpacing * narrow.FontSize);
+        Assert.InRange(narrow.ActualHeight, (3 * line) + 1, (4 * line) + 0.5);
+        Assert.Equal(TextTrimming.CharacterEllipsis, narrow.TextTrimming);
     });
 
     // ---- Where the bubble may stand, and what else is the box's
@@ -1925,6 +1974,16 @@ public class ChordSheetViewTests
         Assert.Equal(0.5, model.TextZoom);
         Assert.False(smaller.IsEnabled);
         Assert.True(larger.IsEnabled);
+        Chosen(usual);
+        // (And at the text's largest, though the sheet could be larger still.)
+        for (var times = 0; times < 9; times++)
+        {
+            Chosen(larger);
+        }
+        Opened();
+        Assert.Equal((0.8, 1.5), (model.SheetZoom, model.TextZoom));
+        Assert.False(larger.IsEnabled);
+        Assert.True(smaller.IsEnabled);
         Chosen(usual);
         Chosen(chords);
         Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
