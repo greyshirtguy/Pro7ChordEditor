@@ -309,10 +309,18 @@ struct ChordSheetViewTests {
         let cell = try #require(short, "the song was to have slides of differing numbers of lines side by side")
         canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.maxY - 3), shift: true)
         #expect(sheet.spot.row == cell.rows.upperBound - 1)
+        // Its frame's foot, and the strip of frame over the card, are bare sheet: the
+        // spot stays where it was, though a place of the line would be another.
         let was = sheet.spot
-        canvas.pointerMoved(to: NSPoint(x: cell.frame.minX + 30, y: cell.frame.maxY - 3), shift: false)
-        canvas.pointerMoved(to: NSPoint(x: cell.frame.minX + 1, y: cell.frame.midY), shift: false)
+        let length = sheet.rows[was.row].text.length
+        #expect(length > 3)
+        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.frame.maxY - 3), shift: false)
         #expect(sheet.spot == was)
+        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.frame.minY + 1), shift: false)
+        #expect(sheet.spot == was)
+        // (The same place along, down on the card, is the line's last letter.)
+        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.card.maxY - 3), shift: false)
+        #expect(sheet.spot == Spot(row: was.row, at: length - 1))
     }
 
     @Test("Command with minus and plus make the words a step smaller and larger, and Command with 0 their usual size; it stops at its ends, and is remembered")
