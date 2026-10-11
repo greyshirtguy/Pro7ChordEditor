@@ -423,14 +423,28 @@ already has may be dragged, copied and pasted like any other, and is put as it i
 slash on its end is not left off either (rule 36 is for what is typed). To change
 one, it is typed over.
 
-## Until chords with no words are built (M7)
+## Chords with no words
 
-The sheet is built before the app can add a stand-in to a line of chords alone or take
-one away ([11-plan.md](11-plan.md)). Until it can, such a line and a blank slide's are
-drawn and take the spot like any other; the sheet asks the song as rules 22 and 45
-say; and the song refuses what would change how many chords the line has, in its own
-sentence ([05-song-and-saving.md](05-song-and-saving.md)), which the quiet line under
-the sheet shows. A chord there can be renamed, and moved along its line.
+The sheet asks the song as rules 4, 22, 45 and 51 say, and the song does the rest
+([01-file-format.md](01-file-format.md), "Chords with no words" and after): it writes
+the stand-ins a line of chords alone needs for a chord more or a chord fewer, gives a
+blank slide's box its words at its first chord, and gives a slide with no text box
+one. Nothing in the sheet is different for any of it. What is seen:
+
+- A blank slide's row, once it has a chord, is a line of chords alone like any other.
+  With its last chord taken off again it is a blank slide's row again, and the file
+  is what it was ([01-file-format.md](01-file-format.md), "A change of mind").
+- A line of chords alone in a box that has other lines, with its last chord taken
+  off, is an empty line. It takes the spot no more (rule 4), and has no row at all if
+  it was the last line of its box (rule 2a). Undo brings it back. This is as Simple
+  Presenter has it.
+- What the song refuses is said on the quiet line under the sheet, in the song's own
+  sentence ([05-song-and-saving.md](05-song-and-saving.md)). The one that will be
+  met: a presentation with not one text box that has words (a run of pictures, a
+  countdown) shows its blank slides, and a chord put on one is refused.
+
+(The sheet was built a milestone before the song could do these, and until then the
+song refused them in a sentence of its own.)
 
 ## What to hold your build to
 

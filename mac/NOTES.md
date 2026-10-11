@@ -15,8 +15,9 @@ milestone; put right what has become untrue.
 | **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
 | **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
-| **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom**. **Until M7** a chord cannot be added to a line of chords alone or a blank slide, nor taken from one |
-| **M7** Chords with no words | Next | Wants, before it: a small song made in ProPresenter that has a blank slide in it (the plan, "What the maintainer is asked for") |
+| **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
+| **M7** Chords with no words | Built, 2026-10-11; **not yet seen in ProPresenter, and not done until it has been** | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made; **its third, that ProPresenter shows what was written, is the maintainer's to make** |
+| **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -275,6 +276,60 @@ And at M6, 2026-10-11:
     one sentence is the maintainer's own; mine said three things more and was "too
     long".
 
+And at M7, the same day. The maintainer said yes to five lines of plan (a chord more
+or fewer on a line with no words, changing only that line's bytes; a first chord on a
+blank slide with an empty box; on one with no box, which is given a copy of the
+song's own; chords taken off again in the same sitting leaving the file byte for
+byte; the "not yet" limits lifted in both editors) and to the test file being made
+here and not by them. **Everything below is mine, within that**, and is in `spec/01`
+and `spec/05` for the Windows app to do the same. Each is for the maintainer to
+overrule.
+
+50. **A line's stand-ins are changed by their own bytes and nothing between them**
+    (`spec/01`, "Chords with no words", steps 1 to 7). The page said "find the bytes
+    that are that line's text and put the new stand-ins there, leaving every other
+    byte alone". Real songs showed what that has to mean: Multitracks writes each
+    stand-in in the song's font and each em quad in another, so control words lie
+    between the characters of one line. They stay, since they say how what follows
+    is set; what is taken out is each character's own bytes; what is new goes where
+    the first of those was, or after the line's last character. A `\uc0` before a
+    character is not the character's and stays too, so a line that has lost chords
+    is left with a few control words in a row that say nothing. They harm nothing,
+    and ProPresenter writes the RTF afresh the next time it saves the slide.
+51. **What the app cannot be sure of it does not write.** Whatever is made is read
+    back, and must be the old text with that one line changed. One kind of RTF is
+    known to fail that on purpose (a character standing in after each numbered one,
+    which Apple's text system never writes and ProPresenter on Windows may): such a
+    line is refused, in a sentence. Writing in that way of RTF too was thought of
+    and not done: no file of it has been seen.
+52. **Only a line of chords alone is ever made stand-ins.** A line that has words is
+    refused, and so is an empty line. The reference makes stand-ins of whatever line
+    it is asked for, words and all, and is safe only because nothing in it asks.
+53. **A line that is not a clean run of stand-ins is made one the first time it is
+    changed** (three plain spaces with a chord on them; more stand-ins than chords),
+    even where the number of chords stays. That is what the reference ends with, and
+    what the sheet takes for granted: chord n of the line on place 2n.
+54. **What was made for a blank slide is remembered by its slide and its id**, an id
+    being one box's only on its own slide (in 100 of 425 real songs, boxes share
+    ids); and **is forgotten when an earlier version is put back**, which is another
+    file. For a box that was added, the slide's cue is remembered as it was and put
+    back whole, so that the file is what it was down to its empty parts.
+55. **Two sentences are new** (`spec/05`, "What a refusal says"): "That is not a line
+    of chords with no words. Nothing was changed.", which nothing in the app can
+    bring about, and "A chord could not be added to this line, or taken from it: its
+    text box is written in a way that cannot be changed here safely. Nothing was
+    changed." **The maintainer has not read either.**
+56. **A new id is written in capitals**, as ProPresenter on the Mac writes them,
+    unless the box it is a copy of has an id in small letters. The page said
+    "written as the file's others are".
+57. **The rule has a reference and vectors of its own**: `tools/standins.py` and
+    `testdata/vectors/stand-ins-in-rtf.json`, as the key fit and the mending checks
+    have, being new. And **a test song in the shapes real ones have**,
+    `testdata/files/shaped-as-real-ones/Chords With No Words.pro`, made by
+    `tools/make-fixtures.py` from the one file of ProPresenter's own. Neither was
+    asked for in so many words. Both are so that the Windows app can be held to the
+    same bytes without ever seeing a real song.
+
 ## How it is laid out, and why
 
 ```
@@ -520,9 +575,33 @@ changing any of it:
   copies of the test files and reads the files; `ChordSheetViewTests` calls the
   canvas's handlers with points from `SheetCanvas.point(over:)`, hands it real key
   events, and types into the bubble's box through its field editor.
-- **When M7 is built**: nothing in the sheet changes. It asks already; the song stops
-  refusing. The two tests named UNTIL M7 (`ChordSheetOnAFileTests`,
-  `ChordSheetViewTests`) are then to say the other thing.
+- **M7 changed nothing in the sheet.** It asked already; the song stopped refusing.
+
+### Chords with no words (M7)
+
+- **In `ChordRules`**: `RTFWords.swift`. Its reader now keeps, for every unit of the
+  plain text, where it is written (`Written`: its bytes, whether a control word with
+  no space of its own ends just before it or is it, and how many groups are open).
+  At its foot are the only two things that write: `rtf(_:withLine:become:)`, which
+  changes one line in place, and `rtf(withTheOpeningOf:then:)`, which makes an RTF
+  for a box with no words. Each reads back what it made and answers with nothing
+  rather than with a doubt. `span(ofLine:of:)` is for the tests, to say what "outside
+  the line" is.
+- **In `Song`**: `OpenSong.setChordsAlone` sorts what is asked into three: a line of
+  chords alone (`change(line:ofBox:)`), a blank slide's own box (`giveWords`), a
+  blank slide with none (`giveABox`). `boxToModelOn` finds the nearest box with
+  words. `madeForChords` is what a change of mind goes back to. Every change of a
+  slide now goes through `changeCue`, which hands over the cue; `changeText` is that
+  for one box's text.
+- **In the editors**: nothing added. `ChordProEditor.canBeSavedYet` and its verdict
+  are gone, and a line with a bracket still empty no longer waits.
+- **Tests**: `StandInsInRTFTests` (the bytes, worked out by hand), `StandInVectorsTests`
+  (the vector file), `ChordsWithNoWordsTests` (the song, on the test files: the two
+  proofs of the plan, and that nothing else in the file changes), and cases in
+  `ChordProEditorTests`, `ChordSheetOnAFileTests`, `ChordProTypingTests` and
+  `ChordSheetViewTests` for each editor. Pictures 33 to 35.
+- **The test song is not among `TestData.presentationPaths()`**, which are the files
+  Simple Presenter was asked to read: tests name it (`ChordsWithNoWordsTests.shaped`).
 
 ## What was found out
 
@@ -936,6 +1015,58 @@ copies of 426 songs outside the repository, shapes and numbers only, deleted aft
   given the empty document these files have, and one slide's elements taken off.
   The maintainer need not make one (`spec/11`, "What the maintainer is asked for").
 
+(Done at M7: `testdata/files/shaped-as-real-ones`, which has both, and seven shapes
+more.)
+
+### At M7
+
+- **Tried on copies of 425 real songs**, numbered, outside the repository, numbers
+  only, deleted after (a throwaway test, as before):
+  - 116 lines of chords alone, each given a chord more, a chord fewer, two more and
+    none: 423 changes, none refused. Every one left the words and chords as meant,
+    every byte of the RTF outside the line as it was, and nothing else in the file
+    changed; and every one was undone to the byte.
+  - 1,552 blank slides with a text box (1,431 the empty document, 110 holding stray
+    space in a font, 11 something else) and 34 with none. 853 were given chords:
+    each as meant, nothing else in the file changed, undone and redone to the byte,
+    and back to the byte when the chords were taken off again by way of one more and
+    fewer.
+  - **The other 733 are in 63 presentations with not one text box that has words**,
+    and not a chord: pictures, countdowns, announcements. They are refused in the
+    page's sentence, as decided ("the apps do not devise a text box"). So on such a
+    presentation the sheet shows blank slides and a spot, and a chord put there
+    says why not. It was not known there were so many.
+  - **In 100 of them, text boxes on different slides have one id** (1,480 ids that
+    are some other box's too). The app always looked for a box on its slide; the
+    first run of this check did not, and called 456 good changes bad. `spec/01` now
+    says an id is one box's only on its own slide.
+- **A slip that no test caught, and two programs agreed on.** Whether a space put in
+  would be lost (decision 50's step 6) was asked after the control word in hand had
+  been read, so that for a numbered character with no space of its own, straight
+  after another control word, the answer was no where it should have been yes. The
+  app's code and the tool's had it alike, having been written alike by one hand, and
+  so agreed on every vector. It was found by reading the answers: a case that said
+  "cannot be done" for no reason. Nothing unsafe came of it (what was made did not
+  read back, and was refused), but a line that could be changed was not. Put right
+  in both, with a case of its own (`StandInsInRTFTests`). **What it says of the
+  vectors**: two programs by one writer are one check and a half, not two.
+- **One of the answers worked out by hand was wrong, and was changed.** For a model
+  whose own words begin with a stand-in, the opening was expected to end before the
+  `\uc0` that stands before it. By the rule as it is written the `\uc0` is part of
+  the opening, and another follows it. The rule was kept and the expectation put
+  right (`OpeningOfAnRTFTests.otherModels` says why). It is said here because an
+  expected answer was changed: it was mine, of a rule a day old, and no vector's.
+- **The tool this was written with turns a backslash, a "u" and four digits into one
+  character**, and RTF is full of them. A test file came out with Chinese
+  characters where its control words were, and the tool with two invisible ones. So
+  those sequences are never typed: `StandInsInRTFTests` had them put back by a
+  script, and everything since builds them (`"\\uc0\\u" + "\(unit) "`). If a file
+  here ever shows a stray character from far up the table, that is what happened.
+- **An emptied line stays a line of the ChordPro text**, and a chord typed on it
+  goes to the end of the line before (`tidy`): as for any empty line of a box, and
+  as the reference. On the sheet it has no row if it ended its box, and takes the
+  spot no more if it did not.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -968,6 +1099,37 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Nobody has seen in ProPresenter what M7 writes.** This is the plan's third proof
+  and the only one that matters to a musician. To be tried by the maintainer, on a
+  song made up for it or a COPY of one of their own, with ProPresenter quit while
+  the chords are put on:
+  1. a chord more on an intro's line of chords, and one taken off: does the stage
+     screen show the line's chords as before, each over its place?
+  2. a first chord on a slide whose text box is empty: are the chords there, and is
+     the slide still blank to the audience?
+  3. a first chord on a slide with nothing on it: the same; and does the slide
+     still do whatever it was there to do (start its video, run its macro)?
+  4. each of those opened in ProPresenter's own editor: does the text box look and
+     behave as one of its own, and is anything odd when words are typed into it?
+  5. the song saved from ProPresenter after that, and opened here again.
+- **The two new sentences** (decision 55) have been read by nobody but their writer.
+- **A line of chords alone that loses its last chord, in a box that has words too,
+  is dead**: an empty line, which the sheet puts nothing on. Undo brings it back,
+  and nothing else does. It is the reference's way and is kept. It could instead
+  keep one stand-in and stay a line of chords alone with none on it, so that a
+  chord could be put back; that would be a change to `spec/01` and to Simple
+  Presenter, and is the maintainer's to want or not. (3 of 89 such boxes in the
+  songs looked at have words as well.)
+- **A blank slide in the ChordPro text is an empty line after an empty line.** It
+  takes chords and saves them, and the tests hold that. Whether anyone can find the
+  right one of the two by eye has not been tried (`spec/04`, rule 3).
+- **RTF as ProPresenter on Windows writes it is still not known.** If it is the kind
+  decision 51 refuses, a library kept on Windows will say "written in a way that
+  cannot be changed here safely" for every chord added to a line with no words.
+  Renaming would still work. The Windows session is to look first.
+- **The "Earlier Versions" button is cut short** ("Earlier Ver...") in the song's
+  header at some widths, once a song has a copy kept: seen in picture 34. Not of
+  M7's making, and not yet looked into.
 - **Command+S and the File menu's Save and Revert to as Opened are the app's own
   few lines**, which no test of the package reaches: they are built, and that is
   all. To be pressed by a hand; and that Revert in the menu greys and ungreys as

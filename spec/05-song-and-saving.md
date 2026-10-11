@@ -56,7 +56,10 @@ of undo with the change before it.
 2. **Set a line of chords alone**: the slide, the element, which line of its words, the
    names in order. The line's text becomes that many stand-ins and its chords go on
    them; the chords of the lines after it move with their words
-   ([01-file-format.md](01-file-format.md), Chords with no words).
+   ([01-file-format.md](01-file-format.md), Chords with no words). For a blank slide
+   it names the slide's box and line 0, or no box at all (an empty `element`) if the
+   slide has none, and the slide is given its words, or a box
+   ([01-file-format.md](01-file-format.md), Chords onto a blank slide).
 3. **Set the key**: see below.
 
 If the text box named has gone (the file was changed by something else since), the
@@ -72,10 +75,26 @@ as `tidied` would have it ("g", or a name with a space at its end) is written ti
 the first time anything in its box is changed. None of the 1,299 chords in the songs
 looked at has such a name.
 
-Request 2, until M7 is built, is done only where the line has as many stand-ins as
-there are names (its chords renamed or put in another order), and is otherwise refused.
-For a blank slide it names the slide's box, or no box at all (an empty `element`) if
-the slide has none; no names for a blank slide that has none is nothing to do.
+Request 2, to the letter:
+
+- The names are tidied (`tidied`), and one that is then nothing is left out: it gets
+  no stand-in, as it would get no entry.
+- Only a line of chords alone is made stand-ins. A line that has words, and an empty
+  line, are refused.
+- Where the line is those stand-ins already (its chords renamed, or put in another
+  order), only the chord entries change, and not a byte of the RTF.
+- A chord that stands on the line, or on the line break that ends it, is one of the
+  line's, and is replaced by the names. One before the line stays; one after it
+  moves by as much as the line grew or shrank.
+- No names for a blank slide is nothing to do, whether it has a box or none: nothing
+  is written, and nothing is made.
+- An empty `element` for a slide that is not a blank slide with no box (it has a box
+  by now, with words or without) is refused: "That slide is no longer blank."
+- The last chord taken off a blank slide that was given its chords while the song
+  has been open unmakes what was made for them
+  ([01-file-format.md](01-file-format.md), A change of mind).
+
+It is one step of undo like any other, whatever it wrote: the RTF, a box.
 
 ## The key
 
@@ -140,8 +159,9 @@ and answers with one of these, to be shown as it is. Both apps say the same.
 | No line of that number in the box | The text box has no such line. Nothing was changed. |
 | What was given is no key | “*key*” is not a key. Nothing was changed. |
 | The shown-in key, for a song with no key | This song does not say what key it is in. Set its key first, and then the key ProPresenter is to show it in. |
-| One more or fewer chords on a line of chords alone, or a first chord on a blank slide, before M7 | A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed. |
-| A chord for a slide with no text box, in a song with no box to copy | This song has no text box with words in it to model one on, so chords cannot be put on a slide that has none. Nothing was changed. |
+| A line of chords alone is asked for, and the line has words or is empty | That is not a line of chords with no words. Nothing was changed. |
+| The stand-ins could not be written into the box's RTF and read back as meant | A chord could not be added to this line, or taken from it: its text box is written in a way that cannot be changed here safely. Nothing was changed. |
+| A chord for a blank slide, in a song with no box that has words to copy, or to take an opening from | This song has no text box with words in it to model one on, so chords cannot be put on a slide that has none. Nothing was changed. |
 | A chord for a slide with no text box, that has one by now | That slide is no longer blank. Nothing was changed. |
 | ProPresenter is running | ProPresenter is running. Quit it to change chords here. Nothing was changed. |
 | The file was changed by something else | This song's file has been changed by something else since it was opened here. Nothing was changed. Open the song again to see it as it is now. |

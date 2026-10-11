@@ -39,8 +39,9 @@ and with it the app is already of use.
    the text has two empty lines running there, and only by what is kept beside the
    text does the editor know which is the slide. Chords typed on it are saved as a
    line of chords alone. (**New**, and the part of blank slides least sure to be
-   right: two empty lines look alike. To be tried with M7. The sheet is the better
-   place to put chords on a blank slide.)
+   right: two empty lines look alike. It is built, and saves as it should; whether
+   it can be lived with is for a hand at the keys to say, and **the maintainer has
+   not yet tried it**. The sheet is the better place to put chords on a blank slide.)
 4. Chords are coloured orange, brackets and all. The lines in curly brackets are
    greyed. The colouring never changes the text.
 5. Over the text is one line of help: "Type chords in square brackets among the words:
@@ -108,6 +109,17 @@ Since brackets are all there is to type:
 17. A line of chords alone is saved as its chords' names in order. Since that can
     change its text box's words (the stand-ins), the song is read again after it, and
     any other lines still to be saved go in the next round, which follows at once.
+    A blank slide's line is saved the same way, and its slide is given its words, or
+    a text box ([01-file-format.md](01-file-format.md)). By rule 15 a bracket still
+    empty is no chord yet: a line of three chords with the middle one's name being
+    typed over has two for as long as that takes, and two stand-ins.
+17a. A line of chords alone with every chord taken off it has no stand-ins and is,
+    from then on, an empty line of its box like any other: a line of the text still,
+    with no character of its own for a chord to hang on, so that one typed there
+    goes where `tidy` puts it ([02-chord-rules.md](02-chord-rules.md)), which is the
+    end of the line before. A blank slide's line is a blank slide's again, and takes
+    chords as before. (As in Simple Presenter. Undo, on the sheet, brings such a
+    line back.)
 18. All the changes of one saving, however many rounds it took, undo as one step.
     (In the reference the next round waits for the next pause, and is a step of its
     own.)
@@ -162,21 +174,10 @@ Since brackets are all there is to type:
     asked for by the maintainer on 2026-10-11, the sheet having a zoom and the text
     none.)
 
-## Until chords with no words are built (M7)
-
-The ChordPro editor is built before the app can add a stand-in to a line of chords
-alone or take one away ([11-plan.md](11-plan.md)). Until it can:
-
-- a line of chords alone that is changed must still have as many pairs of brackets as
-  it has stand-ins, so its chords can be renamed and that is all; and a blank
-  slide's line takes nothing. A change that would be let through by rule 6 and fails
-  this is not made, and the line under the song says the sentence of
-  [05-song-and-saving.md](05-song-and-saving.md) for it ("A chord cannot yet be added
-  to a line that has no words ...");
-- such a line with a bracket still empty is not saved until the bracket is filled.
-
-So the text never shows a chord that cannot be saved. With M7 both go, and rules 6
-and 17 stand as they are written.
+(The ChordPro editor was built two milestones before the app could add a stand-in to
+a line of chords alone or take one away. Until it could, such a line kept as many
+chords as it had, and a blank slide's took none. Both limits went with M7, and rules
+6 and 17 stand as they are written.)
 
 ## Different from the reference, on purpose
 
