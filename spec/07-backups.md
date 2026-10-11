@@ -115,6 +115,15 @@ back. This is that idea finished. Nothing here has been built or tried.
     same copy is at the top of Earlier Versions, marked "before putting back a copy".
     There is no second mechanism, and nothing that can be lost by putting the wrong
     one back.
+22a. **Revert** ([06-library.md](06-library.md), rule 12a) is a putting back like any
+    other, of the song as it was when it was opened here: the bytes its file had when
+    the app read it, which the app keeps in memory for as long as the song is open.
+    Rules 19 to 22 hold for it as they do for a copy: it is a save, refused as one;
+    the file as it is now is copied first; the song is opened afresh, with no
+    history of undo; and the line under the editor says "The song is as it was when
+    it was opened here. **Undo**", the copy just made being what Undo puts back. It
+    is offered only while the file is no longer those bytes. A song left and come
+    back to is opened again: what it then is, is what Revert goes back to.
 23. Putting back a copy that belongs to another song (a song now at that path with
     another id inside than the copy has) asks first, saying both names: "This copy is
     of “*its name*”, and the song here now is “*this one's*”: another song under the

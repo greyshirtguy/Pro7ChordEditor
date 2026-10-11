@@ -147,6 +147,30 @@ song the width they took.)
     until the first is. Where the pane is too narrow for the name to be read beside
     them, the keys go on a row of their own under it. What went wrong stays on the
     quiet line until the next thing is done.
+12a. **Nothing is saved by hand, and the window says so.** At the right end of the
+    quiet line under the song are:
+    - **Revert**, which makes the song what it was when it was opened here
+      ([07-backups.md](07-backups.md), rule 22a). It is greyed until something has
+      been changed since, and while nothing can be saved.
+    - **Save**, a button that is always greyed, for the eye that looks for one, and
+      beside it "Autosave on". Its tip says why: "There is nothing to save by hand:
+      every change is saved as it is made, with a copy of the song as it was kept
+      first." While ProPresenter is running the words beside it are "Autosave
+      paused".
+    - **Ctrl+S**, for the hand that presses it out of habit, saves at once whatever
+      was typed in the ChordPro text and is still waiting for its pause
+      ([04-chordpro-editor.md](04-chordpro-editor.md), rule 13), and the quiet line
+      says: "Saved. Every change here is saved as it is made: there is nothing to
+      save by hand." While ProPresenter is running it says what the band says, and
+      no more. On the Mac both are in the File menu too, as Save and Revert to as
+      Opened.
+
+    (**New**, 2026-10-11. The maintainer asked whether saving should be a setting,
+    at once or by hand, the old editor having had a Save button; was advised that
+    saving at once is what the app's safety is made of
+    ([05-song-and-saving.md](05-song-and-saving.md)) and that saving by hand would
+    need a song changed in memory and not on the disk, with a question asked
+    everywhere a song is left; and chose this.)
 13. A click on a song opens it. If a chord was being typed in the song being left, it
     is kept first ([03-chord-sheet.md](03-chord-sheet.md), rule 39;
     [04-chordpro-editor.md](04-chordpro-editor.md), rule 13).

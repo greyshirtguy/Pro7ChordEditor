@@ -29,6 +29,17 @@ struct Pro7ChordEditorApp: App {
             LibraryWindow(model: model)
         }
         .defaultSize(width: 1280, height: 800)
+        .commands {
+            // File > Save, for the hand that presses Command+S out of habit: nothing is
+            // saved by hand here, and the window says so. And Revert, beside it, as in
+            // the window (spec/06-library.md, rule 12a).
+            CommandGroup(replacing: .saveItem) {
+                Button("Save") { model.saveNow() }
+                    .keyboardShortcut("s", modifiers: .command)
+                Button("Revert to as Opened") { model.revert() }
+                    .disabled(!model.canRevert)
+            }
+        }
 
         // Command+comma: the settings, in sections. The chords' colours, and the copies
         // kept, all of them (spec/06-library.md, "Settings"; spec/07-backups.md, rule 18).

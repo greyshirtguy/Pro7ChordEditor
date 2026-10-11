@@ -192,4 +192,95 @@ struct EarlierVersionsTests {
         #expect(try Data(contentsOf: saved) == original)
         #expect(model.savePicked(to: mac.folder.appendingPathComponent("No such folder/Saved.pro"))?.hasPrefix("The copy could not be saved there") == true)
     }
+
+    @Test("Revert makes the song what it was when it was opened here: offered only once something has been changed, undone like any putting back, and refused like any save")
+    func reverted() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelOn(mac)
+        let opened = try mac.bytes(of: "Plain Song")
+        #expect(!model.canRevert && !model.changedSinceOpened && model.savingCaption == "Autosave on")
+        // With nothing changed there is nothing to revert, and nothing is done.
+        model.revert()
+        #expect(model.justPutBack == nil && !model.hasEarlierVersions)
+
+        // Changes of the key, of the sheet and of the text.
+        model.setKey("E")
+        #expect(model.canRevert)
+        let sheet = try #require(model.sheet)
+        let line = try #require(sheet.rows.indices.first { sheet.usable($0) && !sheet.rows[$0].alone })
+        sheet.setSpot(line, 4)
+        model.putOfKey(4)
+        model.show(editor: .chordPro)
+        let text = try #require(model.chordPro?.text)
+        #expect(model.textMayBecome(text.replacingOccurrences(of: "three", with: "thr[F#m]ee")))
+        model.settle()
+        let changed = try mac.bytes(of: "Plain Song")
+        #expect(changed != opened && model.canRevert && model.canUndo)
+
+        model.revert()
+        #expect(try mac.bytes(of: "Plain Song") == opened)
+        #expect(!model.canRevert && model.shown?.key == "G" && !model.canUndo)
+        #expect(model.notice == "The song is as it was when it was opened here.")
+        #expect(model.chordPro?.text == text.replacingOccurrences(of: "[A]", with: "").replacingOccurrences(of: "One [", with: "One [") || model.chordPro?.text.contains("F#m") == false)
+        #expect(model.chordPro?.text.contains("F#m") == false && model.sheet?.rows[line].chords.contains { $0.at == 4 } == false)
+        // What it was just before is kept, and the line offers to take the revert back.
+        #expect(model.justPutBack != nil && model.hasEarlierVersions)
+        model.takeBack()
+        #expect(try mac.bytes(of: "Plain Song") == changed && model.canRevert)
+        #expect(model.chordPro?.text.contains("thr[F#m]ee") == true)
+        // And reverted once more, it is as opened once more.
+        model.revert()
+        #expect(try mac.bytes(of: "Plain Song") == opened && !model.canRevert)
+
+        // While ProPresenter is running it is refused like any save, in the same words.
+        model.setKey("A")
+        let inA = try mac.bytes(of: "Plain Song")
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        #expect(model.savingCaption == "Autosave paused" && !model.canRevert)
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+        #expect(model.canRevert && model.savingCaption == "Autosave on")
+        mac.proPresenterIsRunning = true
+        model.revert()
+        #expect(model.notice == "ProPresenter is running. Quit it to change chords here. Nothing was changed.")
+        #expect(try mac.bytes(of: "Plain Song") == inA)
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+
+        // The song left and come back to: as opened is what it is now.
+        model.open(song: mac.song("Amazing Grace"))
+        #expect(!model.canRevert)
+        model.open(song: mac.song("Plain Song"))
+        #expect(!model.canRevert && model.shown?.key == "A")
+        let log = try String(contentsOf: mac.appData.folder.appendingPathComponent("log.txt"), encoding: .utf8)
+        #expect(log.contains("Reverted Plain Song.pro to as it was opened."))
+    }
+
+    @Test("Command+S saves nothing by hand: what was typed and is waiting for the pause is saved at once, and the quiet line says there was nothing to do")
+    func savedByHabit() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelOn(mac)
+        // (A long pause, so that what is typed stays unsaved until something saves it.)
+        model.pauseBeforeSaving = .seconds(60)
+        model.show(editor: .chordPro)
+        let before = try mac.bytes(of: "Plain Song")
+        let text = try #require(model.chordPro?.text)
+        #expect(model.textMayBecome(text.replacingOccurrences(of: "three", with: "thr[F#m]ee")))
+        #expect(try mac.bytes(of: "Plain Song") == before)
+        model.saveNow()
+        #expect(try mac.bytes(of: "Plain Song") != before)
+        #expect(model.notice == "Saved. Every change here is saved as it is made: there is nothing to save by hand.")
+        // While ProPresenter is running it says that and no more.
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        model.saveNow()
+        #expect(model.notice == "ProPresenter is running. Quit it to change chords here.")
+        // With no song open there is nothing to say.
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+        model.open(song: nil)
+        model.saveNow()
+        #expect(model.shown == nil && !model.notice.hasPrefix("Saved"))
+    }
 }

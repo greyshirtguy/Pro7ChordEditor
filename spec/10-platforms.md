@@ -15,6 +15,7 @@ the list of those things. Anything not on it is to be the same.
 | Copying a chord while dragging | Option held (the Mac's key for "copy as you drag") | Ctrl held |
 | Zooming the sheet, and the size of the ChordPro text | Command with minus, plus (or equals) and 0; for the sheet, a pinch on the trackpad too | Ctrl with the same keys; Ctrl with the wheel, if the platform's own views do that |
 | Showing the sheet, and the ChordPro text | Command+1, Command+2 | Ctrl+1, Ctrl+2 |
+| The key that would save | Command+S, which is also File > Save | Ctrl+S |
 | What the quiet line says the keys do | "... Drag moves a chord, with Option copies it ... Command+C and Command+V: a line's chords onto another" | The same with Ctrl for both |
 | Deleting | Either delete key | Delete or Backspace |
 | Open on what is at the spot | Return | Enter, F2 |

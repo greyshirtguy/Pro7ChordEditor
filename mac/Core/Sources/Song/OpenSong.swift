@@ -120,6 +120,11 @@ public final class OpenSong {
     public var canUndo: Bool { !undoSteps.isEmpty }
     public var canRedo: Bool { !redoSteps.isEmpty }
 
+    /// The file's bytes as they were last read from it or written to it: what the song
+    /// is, as a file. (What Revert remembers of a song when it is opened, and holds
+    /// the song against afterwards.)
+    public var bytes: Data { bytesOnDisk }
+
     /// Whether the file on disk is still the one that was last read here or written
     /// from here: in its size, its time of last change and its bytes. If it is not,
     /// something else has changed it, and nothing will be saved over it.

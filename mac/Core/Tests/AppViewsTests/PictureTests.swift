@@ -324,4 +324,14 @@ struct PictureTests {
         try draw(ChordColourSettings(model: model), named: "29 settings, two colours chosen", size: NSSize(width: 560, height: 330), dark: true)
         try draw(LibraryWindow(model: model), named: "30 the sheet, another colour for chords", size: Self.sheetSize)
     }
+
+    @Test("Under the song: Revert, with something to revert, and the Save button that is always greyed")
+    func revertAndSave() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        model.setKey("A")
+        try draw(LibraryWindow(model: model), named: "31 Revert and the greyed Save, something changed", size: Self.sheetSize)
+        model.revert()
+        try draw(LibraryWindow(model: model), named: "32 just reverted", size: NSSize(width: 1000, height: 560), dark: true)
+    }
 }

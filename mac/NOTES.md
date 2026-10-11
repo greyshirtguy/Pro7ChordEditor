@@ -257,6 +257,13 @@ And at M6, 2026-10-11:
     for both; "the usual colour" kept as nothing, so that the ChordPro text's goes on
     following the system's orange; the earlier versions' panels, which only show a
     song, keep the system's orange.)
+48. **Nothing is saved by hand, and the window says so: Revert, and a Save button
+    that is always greyed** (`spec/06`, rule 12a; `spec/07`, rule 22a). The
+    maintainer asked for saving at once or by hand as a setting, and for thoughts;
+    was given them ("Asked for by the maintainer, for later" has them still); and
+    chose: "autosave indicator and Revert". (Mine: where they stand, at the right
+    of the quiet line; "Autosave paused" while ProPresenter runs; Command+S saying
+    there is nothing to do; and both in the File menu.)
 
 ## How it is laid out, and why
 
@@ -460,6 +467,13 @@ changing any of it:
   which folds from one row to two and to three as the pane narrows.
 - **The size of the ChordPro text** is `LibraryModel.textZoom`; `ChordProText.setScale`
   gives the text view its two fonts at that size and colours it again.
+- **Revert** is `LibraryModel.revert`: the song's bytes are remembered when it is
+  opened (`asOpened`, from `OpenSong.bytes`), and put back through the same
+  `putBack` an earlier version goes through, so that it is refused, copied before
+  and undone as that is. `changedSinceOpened` is brought up to date wherever a
+  change is noted. The greyed Save and its words are `SongPane.saving`; Command+S
+  and the File menu's two items are in `App/Pro7ChordEditorApp.swift` and call
+  `LibraryModel.saveNow` and `.revert`.
 - **The settings** are `SettingsWindow.swift`: the tabs, `ChordColourSettings`, and
   `ChordColour`, which turns a colour as it is kept ("#rrggbb") into one that is
   drawn. The two colours are `LibraryModel.sheetChordColour` and `.textChordColour`,
@@ -912,6 +926,10 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Command+S and the File menu's Save and Revert to as Opened are the app's own
+  few lines**, which no test of the package reaches: they are built, and that is
+  all. To be pressed by a hand; and that Revert in the menu greys and ungreys as
+  the button does.
 - **Nobody has pressed the new switch, or Command+1 and Command+2, or the keys that
   size the ChordPro text**: the switch is in the pictures and its model is tested;
   the text's keys are tested by handing the text view a key. To be seen by a hand:
@@ -1082,12 +1100,14 @@ second of Simple Presenter in so many words.
      case were ever allowed, a third net: a look at the file a moment after it was
      saved, to say so if it is no longer what was written.
 
-- **Saving by hand, as a setting beside saving at once** (the maintainer, 2026-10-11:
+- **Saving by hand, as a setting beside saving at once: NOT TO BE BUILT, by the
+  maintainer's choice of 2026-10-11** ("autosave indicator and Revert", decision
+  48). What follows is what was said before the choice, kept for why. (The
+  maintainer, 2026-10-11:
   "let's add a setting for auto/live save vs manual save and default - I'm not sure
   which to default - the old app was a manual save... got any thoughts/feedback ...
   I lean towards defaulting to auto save (but maybe show the save button in a
-  disabled state with a caption like 'Autosave Enabled'"). **Not built: thoughts
-  were given and the maintainer is to say.** What was said:
+  disabled state with a caption like 'Autosave Enabled'".) What was said:
   1. *As the app is built, saving at once is not a habit laid over it but what its
      safety is made of.* Every change goes through one door (`OpenSong.save`): the
      safeguards are asked, a copy is kept before the first change, the file is

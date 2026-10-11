@@ -88,6 +88,9 @@ struct SongPane: View {
                         .help("Put the song back as it was a moment ago.")
                 }
                 Spacer(minLength: 0)
+                if let shown = model.shown, shown.problem == nil {
+                    saving
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
@@ -98,6 +101,26 @@ struct SongPane: View {
             }
         }
         .background(Color(nsColor: .textBackgroundColor))
+    }
+
+    /// At the right of the quiet line: Revert, and where a Save button would be, one
+    /// that is always greyed, with why beside it. Nothing is saved by hand here: every
+    /// change is saved as it is made (spec/06, rule 12a).
+    @ViewBuilder
+    private var saving: some View {
+        Button("Revert") { model.revert() }
+            .controlSize(.small)
+            .disabled(!model.canRevert)
+            .help("Put the song back as it was when it was opened here. What it is now is kept as an earlier version first, so this can be undone.")
+        Button("Save") {}
+            .controlSize(.small)
+            .disabled(true)
+            .help("There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first.")
+        Text(model.savingCaption)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .help(model.canChange ? "Every change is saved as it is made." : "Nothing is saved while ProPresenter is running.")
     }
 
     /// One of the two buttons that make the ChordPro text smaller and larger: a small

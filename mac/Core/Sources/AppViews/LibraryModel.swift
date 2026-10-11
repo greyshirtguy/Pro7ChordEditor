@@ -149,6 +149,11 @@ public final class LibraryModel {
     /// Whether what the quiet line says went wrong is that ProPresenter was running:
     /// that goes from the line when ProPresenter does.
     private var refusedForProPresenter = false
+    /// The song's file as it was when the song was opened here: what Revert puts back.
+    private var asOpened: Data?
+    /// Whether the song's file is no longer that: something has been changed here
+    /// since the song was opened, and Revert has something to do.
+    public private(set) var changedSinceOpened = false
     /// Whether the song has been changed otherwise than by typing in the text, since
     /// the text was made from it: the text is then made again before it is next shown.
     private var textIsStale = false
@@ -210,7 +215,9 @@ public final class LibraryModel {
         if let justPutBack { return justPutBack.sentence }
         if let shown {
             if shown.problem != nil { return "Nothing was done to this file." }
-            if editorShown == .sheet { return said ?? Self.sheetHelp }
+            // What was just said (a copy, a paste, Command+S) is said in either editor.
+            if let said { return said }
+            if editorShown == .sheet { return Self.sheetHelp }
             let slides = shown.slides == 1 ? "1 slide" : "\(shown.slides) slides"
             let chords = shown.chords == 1 ? "1 chord" : "\(shown.chords) chords"
             // (There is no Save button to look for, so it says there is no need of one;
@@ -325,6 +332,8 @@ public final class LibraryModel {
                 proPresenterIsRunning: askWhetherProPresenterIsRunning,
                 keepCopy: { file, why in try copies.keep(file, of: kept, why: why) }))
             openSong = opened
+            asOpened = opened.bytes
+            changedSinceOpened = false
             shown = Self.show(opened, named: song.name)
             edit(opened)
             appData.log("Opened \(song.url.lastPathComponent).")
@@ -708,14 +717,23 @@ public final class LibraryModel {
     }
 
     private func putBack(_ copy: KeptCopy, undoing: Bool) {
+        let when = copies.when(copy.made)
+        putBack(bytes: { try Data(contentsOf: copy.url) }, undoing: undoing, said: "Put back the version of \(when).",
+                logged: { "Put back an earlier version of \($0), the one of \(when)." }, notDone: { "An earlier version of \($0) was not put back." })
+    }
+
+    /// Makes the song's file these bytes again: an earlier version of it, or the song
+    /// as it was when it was opened. It is a save like any other, and the file as it
+    /// is now is kept as a copy first, so that this can be taken back.
+    private func putBack(bytes: () throws -> Data, undoing: Bool, said: String, logged: (String) -> String, notDone: (String) -> String) {
         guard settle(), let song = openSong, let listed = songs.first(where: { $0.id == songID }), let kept = keptSong(listed) else { return }
         refusal = nil
         offersOpeningAgain = false
         do {
-            try song.putBack(try Data(contentsOf: copy.url))
+            try song.putBack(try bytes())
         } catch {
-            refusal = (error as? Refusal)?.sentence ?? "The copy could not be read."
-            appData.log("An earlier version of \(listed.url.lastPathComponent) was not put back.")
+            refuse(error, or: "The copy could not be read.")
+            appData.log(notDone(listed.url.lastPathComponent))
             earlier?.question = nil
             return
         }
@@ -724,13 +742,46 @@ public final class LibraryModel {
         edit(song)
         noteAChange()
         earlier = nil
-        let when = copies.when(copy.made)
         if undoing {
             justPutBack = nil
             appData.log("Putting back was undone for \(listed.url.lastPathComponent).")
         } else if let before = copies.copies(of: kept).first {
-            justPutBack = PutBack(sentence: "Put back the version of \(when).", before: before)
-            appData.log("Put back an earlier version of \(listed.url.lastPathComponent), the one of \(when).")
+            justPutBack = PutBack(sentence: said, before: before)
+            appData.log(logged(listed.url.lastPathComponent))
+        }
+    }
+
+    // ---- Saving, which is not done by hand (spec/06, rule 12a; spec/07, rule 22a)
+
+    /// **Revert**: the song is made what it was when it was opened here. It is a
+    /// putting back like that of an earlier version: what the song is now is kept as a
+    /// copy first, and the quiet line offers to undo it.
+    public func revert() {
+        guard let asOpened, changedSinceOpened else { return }
+        putBack(bytes: { asOpened }, undoing: false, said: "The song is as it was when it was opened here.",
+                logged: { "Reverted \($0) to as it was opened." }, notDone: { "\($0) was not reverted." })
+    }
+
+    public var canRevert: Bool { canChange && changedSinceOpened }
+
+    /// What stands beside the Save button, which is always greyed: there is nothing
+    /// to save by hand, since every change is saved as it is made. While ProPresenter
+    /// is running nothing is saved at all.
+    public var savingCaption: String {
+        canChange ? "Autosave on" : "Autosave paused"
+    }
+
+    /// Command+S, pressed out of habit. What has been typed and not yet saved is saved
+    /// without waiting for the pause, and the quiet line says that there was nothing
+    /// to do by hand.
+    public func saveNow() {
+        guard openSong != nil else { return }
+        guard !proPresenterIsRunning else {
+            say("ProPresenter is running. Quit it to change chords here.")
+            return
+        }
+        if settle() {
+            say("Saved. Every change here is saved as it is made: there is nothing to save by hand.")
         }
     }
 
@@ -759,6 +810,8 @@ public final class LibraryModel {
         pause?.cancel()
         pause = nil
         openSong = nil
+        asOpened = nil
+        changedSinceOpened = false
         editor = nil
         chordPro = nil
         sheet = nil
@@ -783,9 +836,9 @@ public final class LibraryModel {
     }
 
     /// Something was not done: its sentence, and what follows from why.
-    private func refuse(_ error: Error) {
+    private func refuse(_ error: Error, or otherwise: String? = nil) {
         let refused = error as? Refusal
-        refusal = refused?.sentence ?? "That could not be done: \(error.localizedDescription)"
+        refusal = refused?.sentence ?? otherwise ?? "That could not be done: \(error.localizedDescription)"
         offersOpeningAgain = refused?.reason == .changedByAnother
         refusedForProPresenter = refused?.reason == .proPresenterIsRunning
         if refusedForProPresenter {
@@ -801,6 +854,7 @@ public final class LibraryModel {
     private func noteAChange() {
         guard let song = openSong, let index = songs.firstIndex(where: { $0.id == songID }) else { return }
         shown = Self.show(song, named: songs[index].name)
+        changedSinceOpened = song.bytes != asOpened
         // (A URL keeps what it was last told of its file; a new one asks again.)
         let values = try? URL(fileURLWithPath: songs[index].url.path).resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
         songs[index].size = values?.fileSize ?? songs[index].size
