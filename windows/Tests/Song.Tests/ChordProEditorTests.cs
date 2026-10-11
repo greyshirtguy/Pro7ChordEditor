@@ -654,6 +654,14 @@ public sealed class ChordProEditorTests : IDisposable
         Assert.True(editor.Save());
         Assert.Equal(["0:Am", "2:Dm", "4:C", "6:G", "8:Am", "22:F", last + ":E"], ChordsOf(3, song.Path));
         Assert.Equal(box.Words, new OpenSong(song.Path).TextBoxes[3].Words);
+        // A chord taken off the words is gone, and does not come back with the line of
+        // chords alone, which keeps its four.
+        var words = editor.Lines.ToList().FindIndex(line => line.Box == 3 && line.Kind == SongLineKind.Words);
+        var typed = editor.Text.Split('\n')[words];
+        Assert.Contains("[F]", typed, StringComparison.Ordinal);
+        Assert.Equal(ChordProEditor.Verdict.Taken, TypeOnLine(editor, words, typed.Replace("[F]", "", StringComparison.Ordinal)));
+        Assert.True(editor.Save());
+        Assert.Equal(["0:Am", "2:Dm", "4:C", "6:G", "8:Am", last + ":E"], ChordsOf(3, song.Path));
     }
 
     [Fact]
