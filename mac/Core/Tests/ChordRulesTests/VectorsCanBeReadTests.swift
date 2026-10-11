@@ -14,13 +14,13 @@ import TestData
 
 @Suite("The vectors can be read")
 struct VectorsCanBeReadTests {
-    /// The seventeen files testdata/README.md lists. Written out here, so that a file
+    /// The eighteen files testdata/README.md lists. Written out here, so that a file
     /// that goes missing is noticed, and one that is added is given tests.
     static let expected = [
         "carried.json", "chord-names.json", "chordpro.json", "completions.json", "diatonic.json",
         "key-fit.json", "keys.json", "layout.json", "line-break-shift.json", "notated.json",
         "parse-song.json", "ranges.json", "rtf-text.json", "sheet-model.json", "shown.json",
-        "tidy.json", "transposed.json",
+        "stand-ins-in-rtf.json", "tidy.json", "transposed.json",
     ]
 
     @Test("Every vector file is there")

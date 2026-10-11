@@ -85,24 +85,45 @@ def plain_text(rtf):
 
     Written to the same rules as Simple Presenter's reader (reference/simple-presenter/
     src/rtf.cpp), and held to testdata/vectors/rtf-text.json by check_plain_text()."""
-    lines = [[]]
+    return "".join(unit[0] for unit in written(rtf))
+
+
+def written(rtf):
+    """The plain text of an RTF, one entry for each of its units, each with where in
+    the RTF it is written:
+
+        (character, start, end, open_before, open_after, depth)
+
+    `start` and `end` are the unit's own bytes, from the first to one past the last: a
+    control word's are its backslash, its letters and number, and the space that ends
+    it if it has one. `open_before` says a control word with no space after it ends
+    exactly where the unit begins, and `open_after` that the unit is itself such a
+    word: a plain space put in at either place would be taken for the word's end and
+    would not be text. `depth` is how many groups are open there.
+
+    It is what standins.py goes by to change one line of an RTF and leave the rest."""
+    units = []
     i = 0
     skipping = []      # for each open group: whether what is in it is not text
     starred = False
     pending = 0        # characters still to pass over after a \u
     skip_count = [1]   # \uc, for each open group
+    open_end = -1      # where the last control word that had no space after it ended
 
-    def put(character):
+    def note(character, start, end, open_before):
+        units.append((character, start, end, open_before, end == open_end, len(skipping)))
+
+    def put(character, start, end, open_before=None):
         nonlocal pending
         if pending > 0:
             pending -= 1
             return
         if not (skipping and skipping[-1]):
-            lines[-1].append(character)
+            note(character, start, end, start == open_end if open_before is None else open_before)
 
-    def new_paragraph():
+    def new_paragraph(start, end, open_before):
         if not (skipping and skipping[-1]):
-            lines.append([])
+            note("\n", start, end, open_before)
 
     while i < len(rtf):
         c = rtf[i]
@@ -121,24 +142,28 @@ def plain_text(rtf):
         elif c == 0x5C:  # backslash
             if i >= len(rtf):
                 break
+            at = i - 1
+            # (Asked now: this may itself be a control word with no space after it,
+            # and would then be the last such.)
+            was_open = at == open_end
             n = rtf[i]
             if not (65 <= n <= 90 or 97 <= n <= 122):
                 i += 1
                 if n == 0x27:  # \'hh
-                    put(_CP1252[int(rtf[i:i + 2], 16)])
                     i += 2
+                    put(_CP1252[int(rtf[i - 2:i], 16)], at, i, was_open)
                 elif n == 0x2A:  # \*
                     starred = True
                 elif n in (0x0A, 0x0D):
-                    new_paragraph()
+                    new_paragraph(at, i, was_open)
                 elif n == 0x7E:
-                    put("\u00a0")
+                    put(chr(0x00A0), at, i, was_open)
                 elif n == 0x5F:
-                    put("\u2011")
+                    put(chr(0x2011), at, i, was_open)
                 elif n == 0x2D:
                     pass
                 else:
-                    put(chr(n))
+                    put(chr(n), at, i, was_open)
                 continue
             start = i
             while i < len(rtf) and (65 <= rtf[i] <= 90 or 97 <= rtf[i] <= 122):
@@ -152,6 +177,8 @@ def plain_text(rtf):
             number = int(rtf[start:i]) if i > start and rtf[start:i] != b"-" else None
             if i < len(rtf) and rtf[i] == 0x20:
                 i += 1
+            else:
+                open_end = i
             if starred:
                 # The first word after "{\*" names something that is not text.
                 starred = False
@@ -164,20 +191,20 @@ def plain_text(rtf):
                 if skipping:
                     skipping[-1] = True
             elif word == "par":
-                new_paragraph()
+                new_paragraph(at, i, was_open)
             elif word == "line":
-                put("\n")
+                put("\n", at, i, was_open)
             elif word == "tab":
-                put("\t")
+                put("\t", at, i, was_open)
             elif word == "u" and number is not None:
-                put(chr(number + 65536 if number < 0 else number))
+                put(chr(number + 65536 if number < 0 else number), at, i, was_open)
                 pending = skip_count[-1]
             elif word == "uc" and number is not None:
                 skip_count[-1] = number
         elif c in (0x0A, 0x0D):
             pass
         elif c < 0x80:
-            put(chr(c))
+            put(chr(c), i - 1, i)
         else:
             # Bytes above ASCII written straight in: UTF-8 if they are, else the code page.
             start = i - 1
@@ -187,15 +214,20 @@ def plain_text(rtf):
             try:
                 decoded = run.decode("utf-8")
             except UnicodeDecodeError:
-                decoded = "".join(_CP1252[b] for b in run)
+                for n, b in enumerate(run):
+                    put(_CP1252[b], start + n, start + n + 1)
+                continue
+            at = start
             for character in decoded:
+                after = at + len(character.encode("utf-8"))
                 if ord(character) > 0xFFFF:
                     high, low = divmod(ord(character) - 0x10000, 0x400)
-                    put(chr(0xD800 + high))
-                    put(chr(0xDC00 + low))
+                    put(chr(0xD800 + high), at, after)
+                    put(chr(0xDC00 + low), at, after)
                 else:
-                    put(character)
-    return "\n".join("".join(line) for line in lines)
+                    put(character, at, after)
+                at = after
+    return units
 
 
 # ---- The text boxes of a presentation, and their chords
