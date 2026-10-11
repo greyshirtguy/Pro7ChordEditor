@@ -12,29 +12,53 @@
 
   What is where:
 
-    LibraryModel    everything the window shows and does, with no drawing in it
+    LibraryModel    everything the window shows and does, with no drawing in it. In
+                    three files: the main one, and what is about mending
+                    (LibraryModel.Mending) and about the old editor's copies
+                    (LibraryModel.Folding)
     LibraryWindow   the window, which frames LibraryView and tells the model what only
                     a window knows
     LibraryView     what the window holds: its menu, ListsPane at the left, SongPane at
-                    the right, and over them the earlier versions while they are asked
-                    for, and what Revert asks
+                    the right, and over them the panels below while they are wanted
     ListsPane       the place and its libraries, over the songs of the library chosen
-    SongPane        the song that is open: its name, its two keys, and its text
+    SongPane        the song that is open: its name, the switch between its two
+                    editors, its two keys, what is offered for it, and the editor shown
     SongLook        the song's header as far as it is numbers
+    EditorSwitch    the two buttons, Chords and ChordPro
+
+    ChordSheetView  the chord sheet: the strip of the key's chords over the sheet,
+                    which scrolls
+    ChordSheetCanvas
+                    the sheet itself, drawn, and what the pointer and the keys do on it
+    SheetGrid       where every slide, line and chord of the sheet stands, as numbers
+    SheetMetrics    how wide words and chords' names are, asked of WPF
+    SheetKeys       which key of the keyboard does what on the sheet
+    SheetEntry      the bubble a chord is typed in, with what is offered under its box
+    SheetLook       the sheet's colours and sizes
+
     ChordProText    the song as ChordPro text, to be typed in: WPF's text box, kept to
                     the song's words
     ChordProUnderlay
                     the same letters in their colours, drawn behind that box
     ChordProTyping  what the box works out with no box in it: the one change between
                     two texts, line breaks as the song counts them, the box's own undo
-    RevertQuestionPanel
-                    what Revert asks before it does anything
+
+    QuestionPanel   what is asked before something is done that may not be meant:
+                    Revert's question, and the two of putting a copy's chords back
+    MendAllPanel    Mend All: its question, how far it has got, and what it did
     SongLines       a song's lines, to look at: an earlier version of a song
     EarlierVersionsPanel
                     the copies kept of the song that is open, and putting one back
-    AllCopiesModel  every copy the app keeps, with no drawing in it
+
+    SettingsWindow  the settings, which frame SettingsView
+    SettingsView    the settings' sections, each a tab
+    ChordColourSettings
+                    Chords: the colour of a chord in each of the two editors
+    ColourPicker    the system's own picker of a colour
+    MendingSettings Mending: its one switch
+    AllCopiesModel  Backups: every copy the app keeps, with no drawing in it
     AllCopiesView   that, shown: to look at a copy, or save it as a file
-    SettingsWindow  the settings, which frame AllCopiesView
+
     ListsLook       the two lists as far as they are numbers and words
     ListIcons       the two small pictures that stand before names in the lists
     Look            the system's look, dark and light, and the app's own few colours

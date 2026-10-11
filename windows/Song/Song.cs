@@ -38,15 +38,27 @@
 //                       each thing done at the spot asks of the song
 //   ChordLayout.cs      where the chords of one line stand, from the widths of its words
 //
-// The Mac app's is mac/Core/Sources/Song, file for file under the same names, and this
-// was ported from it with the reference beside
-// (reference/simple-presenter/src/presentationeditor.cpp), so that the two apps do the
-// same thing to a file. The type is `OpenSong`, not `Song`: a type named as its
-// namespace is makes trouble. "The song that is open" is what the page calls it.
+// And what the first Windows editor left in songs (spec/08-repair.md):
+//
+//   Checks.cs           what is found in a song's file: chords shown twice, chords that
+//                       look moved to the left, a key that does not fit the chords
+//   Folding.cs          that editor's "(Chords)" copies: which song one is a copy of, and
+//                       what putting its chords into that song would do
+//   SongAsItWouldBe.cs  a song with its chords moved, to be looked at before they are
+//
+// (The putting right is the song's own, as putting a copy back is: `OpenSong.Mend`,
+// `MoveBack` and `FoldIn`, each one save and one step of undo. And the mark that says a
+// song wants mending is with the other marks, in Marks.cs.)
+//
+// The Mac app's is mac/Core/Sources/Song, file for file under the same names as far as
+// it has got (it has nothing of spec/08 yet), and what it has was ported from it with
+// the reference beside (reference/simple-presenter/src/presentationeditor.cpp), so that
+// the two apps do the same thing to a file. The type is `OpenSong`, not `Song`: a type
+// named as its namespace is makes trouble. "The song that is open" is what the page
+// calls it.
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M8  the checks for what the first Windows editor left, and the mending
 //   M9  a song made from a ChordPro file, and written out as one
 //
 // What holds for every line written here (AGENTS.md, "What must stay true"):

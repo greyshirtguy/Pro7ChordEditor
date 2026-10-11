@@ -332,6 +332,73 @@ public class MendingViewTests
         Assert.Empty(view.SongPane.OffersShown);
     });
 
+    // ---- The old editor's copies
+
+    [Fact]
+    public void PuttingACopysChordsInAsksOverTheWindowAndThenWhatOfTheCopyAndEscGivesTheSecondButtonOfEach() => OnAMadeUpPC(async pc =>
+    {
+        pc.GiveTheOldCopiesTheirOriginals();
+        var (model, view) = await AtTheOldCopies(pc, Plain);
+        var pane = view.SongPane;
+        var panel = view.QuestionPanel;
+        var open = ((char)0x201C).ToString();
+        var close = ((char)0x201D).ToString();
+        Button Fold() => pane.OffersShown[^1].Buttons.Single();
+        Assert.Equal("Put Its Chords into " + open + "Plain Song" + close + (char)0x2026, Label(Fold()));
+        Assert.Equal(Visibility.Collapsed, panel.Visibility);
+
+        // The question that says what is about to be done; Cancel is the button that
+        // Enter gives.
+        Click(Fold());
+        LayOut(view);
+        Assert.Equal(Visibility.Visible, panel.Visibility);
+        Assert.Equal((model.FoldQuestion!.Title, model.FoldQuestion.Message, "Put the Chords In", "Cancel"), panel.Says);
+        Assert.True(panel.Buttons.Other.IsDefault && panel.Buttons.Other.IsCancel);
+        Assert.False(panel.Buttons.Yes.IsDefault);
+        // Esc: Cancel. Nothing is done.
+        Assert.True(view.KeyPressed(Key.Escape, ModifierKeys.None));
+        Assert.Equal(Visibility.Collapsed, panel.Visibility);
+        Assert.Equal(pc.Song(Plain, Old), model.SongId);
+
+        // Asked again, and yes: the original is open, with the chords, and the next
+        // question is asked at once, with its own two buttons.
+        Click(Fold());
+        Click(panel.Buttons.Yes);
+        LayOut(view);
+        Assert.Equal(pc.Song("Plain Song", Old), model.SongId);
+        Assert.Equal(11, model.Shown!.Chords);
+        Assert.Equal(Visibility.Visible, panel.Visibility);
+        Assert.Equal((model.CopyQuestion!.Title, model.CopyQuestion.Message, "Move It Out", "Leave It"), panel.Says);
+        // The window's other keys do nothing behind it.
+        Assert.True(view.KeyPressed(Key.D2, ModifierKeys.Control));
+        Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
+        // Esc: Leave It.
+        Assert.True(view.KeyPressed(Key.Escape, ModifierKeys.None));
+        Assert.Equal(Visibility.Collapsed, panel.Visibility);
+        Assert.Contains(Plain, model.Songs.Select(song => song.Name));
+
+        // The copy, opened again, offers to be moved out; its button asks the same, and
+        // Move It Out takes it from the list.
+        model.Open(pc.Song(Plain, Old));
+        LayOut(view);
+        Assert.Equal("Move This Copy Out of the Library" + (char)0x2026, Label(Fold()));
+        Click(Fold());
+        Assert.Equal(("Move It Out", "Leave It"), (panel.Says.Yes, panel.Says.Other));
+        Click(panel.Buttons.Yes);
+        LayOut(view);
+        Assert.Equal(Visibility.Collapsed, panel.Visibility);
+        Assert.DoesNotContain(Plain, view.ListsPane.RowsShown.Select(row => row.Name));
+        Assert.Contains("Plain Song", view.ListsPane.RowsShown.Select(row => row.Name));
+
+        // While ProPresenter is running neither button can be clicked.
+        model.Open(pc.Song(Well, Old));
+        pc.ProPresenterIsRunning = true;
+        model.ProPresenterMayHaveChanged();
+        LayOut(view);
+        Assert.StartsWith("Put Its Chords into", Label(Fold()), StringComparison.Ordinal);
+        Assert.False(Fold().IsEnabled);
+    });
+
     // ---- The settings' switch
 
     [Fact]

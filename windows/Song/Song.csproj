@@ -16,8 +16,9 @@
   They may see what is kept inside the project (the lines below), for the few small
   things worth trying by themselves.
 
-  Song.cs is the way in, and lists the files. So far it is the song itself (milestone
-  M2), the library (M3) and the copies (M4); the checks are to come.
+  Song.cs is the way in, and lists the files: the song itself (milestone M2), the
+  library (M3), the copies (M4), the two editors as far as they are rules (M5, M6), and
+  the checks and the mending (M8).
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>

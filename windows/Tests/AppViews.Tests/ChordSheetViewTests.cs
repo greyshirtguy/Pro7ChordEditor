@@ -110,6 +110,10 @@ public class ChordSheetViewTests
         Assert.Empty(canvas.Entry.Shown);
         Assert.Equal(38, canvas.EntryFrame.Height, 2.0);
         Assert.Equal(line.ChordTop + canvas.Metrics.BubbleHeight + 3, canvas.EntryFrame.Bottom, 0.01);
+        // (Placed again for its new height, it is still where its chord will stand, and
+        // not where the pointer went.)
+        Assert.Equal(hand.Grid.XOf(place), canvas.EntryFrame.Left, 0.01);
+        Assert.NotEqual(hand.Grid.XOf(hand.Sheet.Spot), hand.Grid.XOf(place));
         // Esc throws the typing away, and the bubble is gone.
         hand.Press(Key.Escape);
         Pictures.LayOut(view, 1280, 800);

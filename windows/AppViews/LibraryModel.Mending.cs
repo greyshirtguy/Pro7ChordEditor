@@ -49,6 +49,15 @@ public sealed partial class LibraryModel
 
         /// <summary>Check 2, not taken: the song is left as it is.</summary>
         Leave,
+
+        /// <summary>A "(Chords)" copy: its chords are put into the song it was saved beside, once what that will do has been read (LibraryModel.Folding.cs).</summary>
+        Fold,
+
+        /// <summary>A "(Chords)" copy: the song it was saved beside is opened.</summary>
+        OpenOriginal,
+
+        /// <summary>A "(Chords)" copy whose original has its chords already: it is moved out of the library, once that has been asked.</summary>
+        MoveCopyOut,
     }
 
     public sealed record OfferButton(string Label, OfferAction Action);
@@ -157,6 +166,10 @@ public sealed partial class LibraryModel
                         + (found.KeyIsTheOldEditors ? " The old Windows chord editor, which saved this song, wrote " + KeyInWords(found.StatedKey) + " by mistake." : ""),
                     [new OfferButton("Set Key to " + found.Key.Suggested, OfferAction.SetKey)]));
             }
+            if (FoldOffer is { } fold)
+            {
+                offers.Add(fold);
+            }
             return offers;
         }
     }
@@ -197,6 +210,18 @@ public sealed partial class LibraryModel
                 break;
             case OfferAction.Leave:
                 LeaveThem();
+                break;
+            case OfferAction.Fold:
+                AskToFold();
+                break;
+            case OfferAction.OpenOriginal:
+                if (Foldable is { } pair)
+                {
+                    Open(pair.Original.Id);
+                }
+                break;
+            case OfferAction.MoveCopyOut:
+                AskToMoveTheCopyOut();
                 break;
         }
     }

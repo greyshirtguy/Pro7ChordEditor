@@ -60,6 +60,9 @@ public sealed class Refusal : Exception
 
         /// <summary>The file could not be written, or did not read back as written.</summary>
         NotSaved,
+
+        /// <summary>A copy's chords were to be put into the song, and the two have not the same words.</summary>
+        WordsDiffer,
     }
 
     private Refusal(Why reason, string sentence)
@@ -84,6 +87,10 @@ public sealed class Refusal : Exception
     internal static Refusal ShownAsItWouldBe => new(
         Why.OnlyForReading,
         "This is the song as it would be with its chords moved, shown to be looked at. Nothing was changed.");
+
+    internal static Refusal WordsDiffer => new(
+        Why.WordsDiffer,
+        "The two songs have not the same words, so the chords of the one cannot be put into the other. Nothing was changed.");
 
     internal static Refusal SlideGone => new(Why.SlideGone, "That slide is no longer in the song. Nothing was changed.");
 

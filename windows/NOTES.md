@@ -673,7 +673,8 @@ names. What to know before changing any of it:
     stale.
 - **`SongPane`** has the header (laid out by `SongLook`), the line of help with the
   two letters, the box, and the quiet line with Revert and the words about saving.
-  **`RevertQuestionPanel`** is over the window while Revert is asking.
+  **`QuestionPanel`** (`RevertQuestionPanel` until M8) is over the window while
+  Revert is asking.
 - **The tests type into the real box**, by the doors a keyboard uses
   (`Typist.cs`): a character is raised as WPF raises one, a key is told to
   `KeyPressed` and, if not taken, the command it stands for is given to the box.

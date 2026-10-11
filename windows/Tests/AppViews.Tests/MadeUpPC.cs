@@ -102,6 +102,31 @@ internal sealed class MadeUpPC : IDisposable
         Change("Plain Song", 2, song => song.SetChords(song.TextBoxes[0].Slide, song.TextBoxes[0].Element, []));
     }
 
+    /// <summary>The songs the old editor's copies, in the library "Old copies", are copies of.</summary>
+    internal static readonly string[] OriginalsOfTheOldCopies = ["A Song - In A Minor Key", "Amazing Grace", "It Is Well", "Plain Song"];
+
+    /// <summary>
+    /// Puts beside each of the old editor's copies the song it would have been saved
+    /// beside: the song the copy was made from, with every chord taken off it (as the
+    /// app itself takes one off), or with its chords left on.
+    /// </summary>
+    internal void GiveTheOldCopiesTheirOriginals(bool withTheirChords = false)
+    {
+        foreach (var name in OriginalsOfTheOldCopies)
+        {
+            var path = Path.Combine(Place, "Libraries", "Old copies", name + ".pro");
+            File.WriteAllBytes(path, TestData.InFiles("made-by-simple-presenter/" + name + ".pro"));
+            if (!withTheirChords)
+            {
+                var song = new OpenSong(path, new Safeguards(() => false, (_, _) => { }));
+                foreach (var box in song.TextBoxes.Where(box => box.Chords.Count > 0).ToList())
+                {
+                    song.SetChords(box.Slide, box.Element, []);
+                }
+            }
+        }
+    }
+
     /// <summary>The name the app's copies know this PC's one place by: it is the ProPresenter folder in Documents.</summary>
     internal const string PlaceName = "Documents";
 

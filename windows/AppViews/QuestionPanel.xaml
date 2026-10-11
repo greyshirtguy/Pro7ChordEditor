@@ -1,20 +1,25 @@
 <!--
-  What Revert asks before it does anything, over the window while it is asking.
-  spec/06-library.md, rule 12a:
+  A question put before something is done that the person may not mean, over the window
+  while it is asked. Revert's was the first (spec/06-library.md, rule 12a):
 
       Revert "the song's name" to how it was when it was opened?
       This takes back EVERY change made to this song since it was opened in this
       editor.
                                         [ Revert All Changes ]  [ Cancel ]
 
-  Cancel is what Esc and Enter give: Enter is not to be what throws an hour's work
-  away. A click on the dimmed window behind is Cancel too.
+  and the two that putting a copy's chords into its original asks are the others
+  (spec/08-repair.md, D; LibraryModel.Folding.cs): what is about to be done, before it
+  is; and, after, whether the copy is to be moved out of the library.
+
+  The second button, Cancel or what the question names it, is what Esc and Enter give:
+  Enter is not to be what throws an hour's work away, or takes a file out of a library.
+  A click on the dimmed window behind gives it too.
 
   It is drawn in the window, as the earlier versions are, and is not a window of the
-  system's: the system's own asks with buttons it names itself, Yes or OK, and this
-  one's button is to say what it does. The words are LibraryModel's.
+  system's: the system's own asks with buttons it names itself, Yes or OK, and these
+  buttons are to say what they do. The words are LibraryModel's.
 -->
-<UserControl x:Class="Pro7ChordEditor.AppViews.RevertQuestionPanel"
+<UserControl x:Class="Pro7ChordEditor.AppViews.QuestionPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              KeyboardNavigation.TabNavigation="Cycle"
@@ -34,7 +39,7 @@
         <TextBlock x:Name="Message" Margin="0,10,0,0" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
           <Button x:Name="Yes" Click="YesWasClicked" />
-          <Button x:Name="Cancel" Content="Cancel" Margin="8,0,0,0" IsDefault="True" IsCancel="True" Click="CancelWasClicked" />
+          <Button x:Name="Cancel" Margin="8,0,0,0" IsDefault="True" IsCancel="True" Click="CancelWasClicked" />
         </StackPanel>
       </StackPanel>
     </Border>

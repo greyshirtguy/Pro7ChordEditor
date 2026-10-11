@@ -251,10 +251,11 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     public sealed record ChordProShown(string Text, int Version, int Sitting, string? Barred);
 
     /// <summary>
-    /// A question put to the person before a song is reverted: its two sentences, and
-    /// what the button that says yes says.
+    /// A question put to the person before something is done that they may not mean: its
+    /// two sentences, what the button that says yes says, and what the other says, which
+    /// is the one Enter and Esc give.
     /// </summary>
-    public sealed record Question(string Title, string Message, string Yes);
+    public sealed record Question(string Title, string Message, string Yes, string No = "Cancel");
 
     /// <summary>The two ways a song is worked on (spec/06, rule 12).</summary>
     public enum Editor
@@ -1496,6 +1497,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         Sheet = null;
         Said = null;
         Judging = null;
+        FoldQuestion = null;
     }
 
     // The song as text, made afresh from it: a new sitting at the editor.

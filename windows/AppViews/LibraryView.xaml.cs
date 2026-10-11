@@ -43,6 +43,9 @@ public partial class LibraryView : UserControl
     /// <summary>Mend All's panel, over the window: for a test to read and to answer.</summary>
     internal MendAllPanel MendAllPanel => MendAll;
 
+    /// <summary>The panel a question is asked in, over the window: for a test to read and to answer.</summary>
+    internal QuestionPanel QuestionPanel => Asking;
+
     /// <summary>
     /// Asks the person for a folder, with the system's own chooser, over the window
     /// this is in. Nothing, if they chose none.
@@ -115,15 +118,15 @@ public partial class LibraryView : UserControl
         // keyboard goes to the one shown. Not while something is asked over the window.
         if (held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2)
         {
-            if (Model.RevertQuestion is null && Model.Earlier is null && Model.Shown is { Problem: null })
+            if (Model.Asked is null && Model.Earlier is null && Model.Shown is { Problem: null })
             {
                 Show(key is Key.D1 or Key.NumPad1 ? LibraryModel.Editor.Sheet : LibraryModel.Editor.ChordPro);
             }
             return true;
         }
-        if (key == Key.Escape && held == ModifierKeys.None && Model.RevertQuestion is not null)
+        if (key == Key.Escape && held == ModifierKeys.None && Model.Asked is not null)
         {
-            Model.DontRevert();
+            Model.Answer(false);
             return true;
         }
         if (key == Key.Escape && held == ModifierKeys.None && Model.Earlier is not null)

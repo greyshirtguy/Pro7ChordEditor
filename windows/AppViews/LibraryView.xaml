@@ -9,7 +9,7 @@
     at the right    the song that is open (SongPane);
     over it all     while it is asked for, the song's earlier versions
                     (EarlierVersionsPanel); and while Revert is asking, its question
-                    (RevertQuestionPanel).
+                    (QuestionPanel).
 
   The menu. File has what is done to the library and to the song's file: Save, for the
   hand that goes to it out of habit, though nothing is saved by hand here, and Revert
@@ -102,7 +102,7 @@
       </Grid>
     </DockPanel>
     <views:EarlierVersionsPanel Visibility="Collapsed" />
-    <views:RevertQuestionPanel Visibility="Collapsed" />
+    <views:QuestionPanel x:Name="Asking" Visibility="Collapsed" />
     <views:MendAllPanel x:Name="MendAll" Visibility="Collapsed" />
   </Grid>
 </UserControl>

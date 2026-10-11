@@ -749,6 +749,70 @@ public class PictureTests
             model.Take(LibraryModel.OfferAction.ShowMoved);
         });
 
+    // One of the old editor's copies open, with the song it was saved beside in the
+    // library too, and no chords on that.
+    private static Task ACopyBesideItsOriginal(MadeUpPC pc, LibraryModel model, string song)
+    {
+        pc.GiveTheOldCopiesTheirOriginals();
+        return AnOldCopyOpen(pc, model, song);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ACopyThatOffersToPutItsChordsIntoItsOriginal(bool dark) => Draw(
+        "58 a copy that offers to put its chords into its original, " + In(dark),
+        dark,
+        (pc, model) => ACopyBesideItsOriginal(pc, model, "It Is Well (Chords)"));
+
+    [Fact]
+    public void WhatPuttingACopysChordsInWillDoIsSaidFirst() => Draw(
+        "59 what putting a copy" + (char)0x2019 + "s chords in will do is said first",
+        true,
+        async (pc, model) =>
+        {
+            await ACopyBesideItsOriginal(pc, model, "A Song - In A Minor Key (Chords)");
+            model.Take(LibraryModel.OfferAction.Fold);
+        });
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheOriginalWithTheChordsInItAndWhatOfTheCopy(bool dark) => Draw(
+        "60 the original with the chords in it, and what of the copy, " + In(dark),
+        dark,
+        async (pc, model) =>
+        {
+            await ACopyBesideItsOriginal(pc, model, "It Is Well (Chords)");
+            model.Take(LibraryModel.OfferAction.Fold);
+            model.Answer(true);
+        });
+
+    [Fact]
+    public void TheCopyMovedOutOfTheLibrary() => Draw(
+        "61 the copy moved out of the library",
+        true,
+        async (pc, model) =>
+        {
+            await ACopyBesideItsOriginal(pc, model, "It Is Well (Chords)");
+            model.Take(LibraryModel.OfferAction.Fold);
+            model.Answer(true);
+            model.Answer(true);
+        });
+
+    [Fact]
+    public void ACopyWhoseOriginalHasItsChordsAlready() => Draw(
+        "62 a copy whose original has its chords already",
+        true,
+        async (pc, model) =>
+        {
+            await ACopyBesideItsOriginal(pc, model, "Plain Song (Chords)");
+            model.Take(LibraryModel.OfferAction.Fold);
+            model.Answer(true);
+            model.Answer(false);
+            model.Open(pc.Song("Plain Song (Chords)", "Old copies"));
+        });
+
     [Theory]
     [InlineData(true)]
     [InlineData(false)]

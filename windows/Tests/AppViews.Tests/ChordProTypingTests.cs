@@ -828,7 +828,7 @@ public class ChordProTypingTests
 
         // Revert asks first, over the window; Cancel leaves everything; yes makes the
         // song what it was, and the line under it offers to undo that.
-        var question = Found<RevertQuestionPanel>(view);
+        var question = Found<QuestionPanel>(view);
         Assert.Equal(Visibility.Collapsed, question.Visibility);
         Click(revert);
         Assert.Equal(Visibility.Visible, question.Visibility);

@@ -33,7 +33,7 @@
 //     zero-width space, and takes chords again (the maintainer's, 2026-10-12). There
 //     it is left with none.
 //   - What the first Windows editor left in a song can be put right (`Mend`,
-//     `MoveBack`: spec/08-repair.md). There is nothing of the kind there.
+//     `MoveBack`, `FoldIn`: spec/08-repair.md). There is nothing of the kind there.
 //
 // Not safe to use from two threads at once, and not meant to be: the app keeps a song
 // where its window is.
@@ -410,6 +410,77 @@ public sealed class OpenSong : ISheetSong
     /// </summary>
     /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
     public void MoveBack() => ChangeEveryBox(MovedBack);
+
+    /// <summary>
+    /// NEW (spec/08-repair.md, D): takes the chords and the key of a copy of this song
+    /// that the first Windows editor saved beside it (Folding.cs). Each text box of
+    /// this song is given the chords of the box that is in its place in the copy, in
+    /// place of its own, and its `music` is made the copy's. The chords are written as
+    /// everything is written here, so what that editor wrote wrongly of them is mended
+    /// on the way.
+    ///
+    /// Only where the two have the same words, box for box, in the same order: a chord
+    /// is kept by its place among its box's words, and means nothing among others. If
+    /// they have not, it is refused.
+    ///
+    /// One save and one step of undo, with a copy of this song's file kept first as
+    /// before a mending. The copy's own file is not touched here, and is not this
+    /// song's to keep a copy of: whoever asks hands in the keeping of that
+    /// (<paramref name="keepTheCopysOwn"/>), which is done once it is known that there
+    /// is something to save and that it may be saved, and before anything is. If it
+    /// fails, nothing is saved.
+    /// </summary>
+    /// <param name="copy">The copy's file, whole.</param>
+    /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
+    public void FoldIn(ReadOnlySpan<byte> copy, Action? keepTheCopysOwn = null)
+    {
+        RV.Presentation other;
+        try
+        {
+            other = RV.Presentation.Parser.ParseFrom(copy);
+        }
+        catch (InvalidProtocolBufferException)
+        {
+            throw Refusal.CannotBeRead("That copy", Refusal.NoPresentation);
+        }
+        var changed = Folding.Folded(presentation, other) ?? throw Refusal.WordsDiffer;
+        var units = new List<CueUnit>();
+        for (var index = 0; index < presentation.Cues.Count; index++)
+        {
+            if (!changed.Cues[index].Equals(presentation.Cues[index]))
+            {
+                units.Add(new CueUnit(index, presentation.Cues[index], changed.Cues[index]));
+            }
+        }
+        var musicBefore = presentation.Music;
+        var musicAfter = changed.Music;
+        var musicChanges = !Equals(musicBefore, musicAfter);
+        if (units.Count == 0 && !musicChanges)
+        {
+            return;
+        }
+        if (keepTheCopysOwn is not null)
+        {
+            MaySave();
+            try
+            {
+                keepTheCopysOwn();
+            }
+            catch (Exception exception)
+            {
+                throw Refusal.CopyNotKept(exception.Message);
+            }
+        }
+        Save(changed, CopyReason.BeforeMending);
+        if (units.Count > 0)
+        {
+            Record(new CuesUnit(units), joined: false);
+        }
+        if (musicChanges)
+        {
+            Record(new MusicUnit(musicBefore, musicAfter), joined: units.Count > 0);
+        }
+    }
 
     /// <summary>
     /// What the editors would be handed if `MoveBack` were done: for the song to be

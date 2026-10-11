@@ -260,7 +260,8 @@ public partial class SongPane : UserControl
             var button = new Button { Content = one.Label, Padding = new Thickness(12, 4, 12, 5), Margin = new Thickness(buttons.Children.Count == 0 ? 0 : 6, 0, 0, 0) };
             // What changes the song cannot be done while ProPresenter is running; what
             // only shows it can.
-            var changes = action is LibraryModel.OfferAction.Mend or LibraryModel.OfferAction.SetKey or LibraryModel.OfferAction.MoveBack;
+            var changes = action is LibraryModel.OfferAction.Mend or LibraryModel.OfferAction.SetKey or LibraryModel.OfferAction.MoveBack
+                or LibraryModel.OfferAction.Fold or LibraryModel.OfferAction.MoveCopyOut;
             button.IsEnabled = canChange || !changes;
             button.Click += (_, _) => model?.Take(action);
             buttons.Children.Add(button);
