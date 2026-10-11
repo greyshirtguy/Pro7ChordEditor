@@ -37,6 +37,9 @@ final class ChordProText: NSObject, NSTextViewDelegate {
         var typed: (String) -> Bool
         /// The text as it last was when it might: what to go back to.
         var good: () -> String?
+        /// The text a step larger (1) or smaller (-1), or its usual size (0): answers
+        /// with how many times its usual size it then is.
+        var zoom: (Int) -> Double? = { _ in nil }
     }
 
     final class View: NSTextView {
@@ -55,6 +58,32 @@ final class ChordProText: NSObject, NSTextViewDelegate {
         // format in the song, not here.)
         override func pasteAsRichText(_ sender: Any?) {
             pasteAsPlainText(sender)
+        }
+
+        /// Told when a key that makes the text larger or smaller is pressed.
+        var zoomed: (Int) -> Void = { _ in }
+
+        // Command with plus (or equals, which is plus without Shift), minus and 0: the
+        // text larger, smaller, and its usual size. A window's views are asked before
+        // its menus are, and this one answers while it has the keyboard.
+        override func performKeyEquivalent(with event: NSEvent) -> Bool {
+            let flags = event.modifierFlags.intersection([.command, .control, .option, .shift])
+            if window?.firstResponder === self, event.type == .keyDown, flags.contains(.command), flags.isSubset(of: [.command, .shift]) {
+                switch event.charactersIgnoringModifiers ?? "" {
+                case "=", "+":
+                    zoomed(1)
+                    return true
+                case "-":
+                    zoomed(-1)
+                    return true
+                case "0" where !flags.contains(.shift):
+                    zoomed(0)
+                    return true
+                default:
+                    break
+                }
+            }
+            return super.performKeyEquivalent(with: event)
         }
 
         // Undo and Redo in the Edit menu, and their keys, arrive as these two messages
@@ -87,8 +116,11 @@ final class ChordProText: NSObject, NSTextViewDelegate {
     private var shownVersion: Int?
     private var shownSitting: Int?
 
-    static let font = NSFont.monospacedSystemFont(ofSize: 14, weight: .regular)
-    static let chordFont = NSFont.monospacedSystemFont(ofSize: 14, weight: .bold)
+    /// How many times its usual size the text is, and the size it usually is.
+    private(set) var scale = 1.0
+    static let usualSize = 14.0
+    var font: NSFont { NSFont.monospacedSystemFont(ofSize: Self.usualSize * scale, weight: .regular) }
+    var chordFont: NSFont { NSFont.monospacedSystemFont(ofSize: Self.usualSize * scale, weight: .bold) }
 
     init(asks: Asks) {
         self.asks = asks
@@ -114,7 +146,7 @@ final class ChordProText: NSObject, NSTextViewDelegate {
         text.allowsUndo = true
         text.usesFindBar = true
         text.isIncrementalSearchingEnabled = true
-        text.font = Self.font
+        text.font = font
         text.textColor = .textColor
         text.backgroundColor = .textBackgroundColor
         text.insertionPointColor = .textColor
@@ -131,6 +163,10 @@ final class ChordProText: NSObject, NSTextViewDelegate {
         text.smartInsertDeleteEnabled = false
         text.delegate = self
         text.setAccessibilityLabel("The song as ChordPro text")
+        text.zoomed = { [weak self] direction in
+            guard let self, let scale = self.asks.zoom(direction) else { return }
+            self.setScale(scale)
+        }
 
         scroll.documentView = text
         scroll.hasVerticalScroller = true
@@ -169,22 +205,31 @@ final class ChordProText: NSObject, NSTextViewDelegate {
         }
     }
 
+    /// Shows the text so many times its usual size. Only its size changes: not a
+    /// character of it, nor where the caret is, nor what can be undone.
+    func setScale(_ wanted: Double) {
+        guard wanted != scale else { return }
+        scale = wanted
+        text.font = font
+        colour()
+    }
+
     /// Chords are coloured, brackets and all; the lines in curly brackets are greyed.
     /// Only how the text looks is touched: no character of it.
     private func colour() {
         guard let storage = text.textStorage else { return }
         let colouring = ChordProEditor.colouring(of: text.string)
         storage.beginEditing()
-        storage.setAttributes([.font: Self.font, .foregroundColor: NSColor.textColor], range: NSRange(location: 0, length: storage.length))
+        storage.setAttributes([.font: font, .foregroundColor: NSColor.textColor], range: NSRange(location: 0, length: storage.length))
         for range in colouring.greyed {
             storage.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: NSRange(location: range.lowerBound, length: range.count))
         }
         for range in colouring.chords {
-            storage.addAttributes([.foregroundColor: NSColor.systemOrange, .font: Self.chordFont], range: NSRange(location: range.lowerBound, length: range.count))
+            storage.addAttributes([.foregroundColor: NSColor.systemOrange, .font: chordFont], range: NSRange(location: range.lowerBound, length: range.count))
         }
         storage.endEditing()
         // (What is typed next starts plain, whatever it is typed beside.)
-        text.typingAttributes = [.font: Self.font, .foregroundColor: NSColor.textColor]
+        text.typingAttributes = [.font: font, .foregroundColor: NSColor.textColor]
     }
 
     /// Makes a change from here, as if it had been typed: asked about, and one step of
@@ -259,9 +304,11 @@ struct ChordProView: NSViewRepresentable {
     var model: LibraryModel
     var shown: LibraryModel.ChordProShown
     var canType: Bool
+    /// How many times its usual size the text is.
+    var scale: Double
 
     private var asks: ChordProText.Asks {
-        .init(typed: { [model] in model.textMayBecome($0) }, good: { [model] in model.chordPro?.text })
+        .init(typed: { [model] in model.textMayBecome($0) }, good: { [model] in model.chordPro?.text }, zoom: { [model] in model.zoomText($0) })
     }
 
     func makeCoordinator() -> ChordProText {
@@ -269,12 +316,14 @@ struct ChordProView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSScrollView {
+        context.coordinator.setScale(scale)
         context.coordinator.show(shown, canType: canType)
         return context.coordinator.scroll
     }
 
     func updateNSView(_ view: NSScrollView, context: Context) {
         context.coordinator.asks = asks
+        context.coordinator.setScale(scale)
         context.coordinator.show(shown, canType: canType)
     }
 }

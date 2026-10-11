@@ -127,6 +127,11 @@ public final class LibraryModel {
     public private(set) var sheetZoom = LibraryModel.usualSheetZoom
     public static let sheetZooms: [Double] = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5]
     public static let usualSheetZoom = 0.8
+    /// How many times its usual size the ChordPro text is: one of the same steps, kept
+    /// apart from the sheet's, since a size that suits a grid of slides is not the one
+    /// that suits a page of text.
+    public private(set) var textZoom = LibraryModel.usualTextZoom
+    public static let usualTextZoom = 1.0
     /// How much of the height of the two lists at the window's left the libraries have,
     /// the songs having the rest: what the bar between them is dragged to.
     public private(set) var listsSplit = LibraryModel.usualListsSplit
@@ -226,6 +231,7 @@ public final class LibraryModel {
         chosenFolders = settings.chosenFolders.map { URL(fileURLWithPath: $0, isDirectory: true) }
         sheetZoom = Self.nearestZoom(to: settings.sheetZoom ?? Self.usualSheetZoom)
         listsSplit = Self.within(settings.listsSplit ?? Self.usualListsSplit)
+        textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         let thrownAway = copies.thin()
@@ -486,6 +492,24 @@ public final class LibraryModel {
     private static func within(_ share: Double) -> Double {
         min(max(share, 0.1), 0.9)
     }
+
+    /// Makes the ChordPro text a step larger (1) or smaller (-1), or its usual size
+    /// (0). It is remembered. Answers with the size it now is.
+    @discardableResult
+    public func zoomText(_ direction: Int) -> Double {
+        let now = Self.sheetZooms.firstIndex(of: Self.nearestZoom(to: textZoom)) ?? 0
+        let wanted = direction == 0 ? Self.usualTextZoom : Self.sheetZooms[min(max(now + direction, 0), Self.sheetZooms.count - 1)]
+        if wanted != textZoom {
+            textZoom = wanted
+            if started {
+                remember()
+            }
+        }
+        return textZoom
+    }
+
+    public var canZoomTextIn: Bool { textZoom < (Self.sheetZooms.last ?? 1) }
+    public var canZoomTextOut: Bool { textZoom > (Self.sheetZooms.first ?? 1) }
 
     public var canZoomSheetIn: Bool { sheetZoom < (Self.sheetZooms.last ?? 1) }
     public var canZoomSheetOut: Bool { sheetZoom > (Self.sheetZooms.first ?? 1) }
@@ -788,6 +812,7 @@ public final class LibraryModel {
         settings.lastLibrary = libraryID
         settings.sheetZoom = sheetZoom == Self.usualSheetZoom ? nil : sheetZoom
         settings.listsSplit = listsSplit == Self.usualListsSplit ? nil : listsSplit
+        settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
         appData.settings = settings
     }
 }

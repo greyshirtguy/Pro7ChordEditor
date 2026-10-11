@@ -1,6 +1,6 @@
-// The song that is open, at the right of the window: its name, its two keys, a switch
-// between its two editors, and the one that is shown: the chord sheet
-// (ChordSheetView.swift) or the song as ChordPro text to be typed in
+// The song that is open, at the right of the window: its name, the switch between its
+// two editors (EditorSwitch.swift), its two keys, and the editor that is shown: the
+// chord sheet (ChordSheetView.swift) or the song as ChordPro text to be typed in
 // (ChordProView.swift). spec/06-library.md, rules 12, 14 and 19;
 // spec/03-chord-sheet.md; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules
 // 5 to 7.
@@ -41,17 +41,25 @@ struct SongPane: View {
                 } else if let chordPro = model.chordPro {
                     // One line of help over the text; or, in a warmer colour, why this
                     // song can be read here and not changed.
-                    Text(chordPro.barred ?? ChordProEditor.help)
-                        .font(.callout)
-                        .foregroundStyle(chordPro.barred == nil ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.orange))
-                        .lineLimit(4)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                        .background(Color(nsColor: .windowBackgroundColor))
+                    // At its right, the size of the text: where the sheet has the two
+                    // buttons that zoom it.
+                    HStack(alignment: .center, spacing: 10) {
+                        Text(chordPro.barred ?? ChordProEditor.help)
+                            .font(.callout)
+                            .foregroundStyle(chordPro.barred == nil ? AnyShapeStyle(.secondary) : AnyShapeStyle(Color.orange))
+                            .lineLimit(4)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        textSize("textformat.size.smaller", by: -1, can: model.canZoomTextOut,
+                                 says: "Smaller text. Command with the minus key does the same.")
+                        textSize("textformat.size.larger", by: 1, can: model.canZoomTextIn,
+                                 says: "Larger text. Command with the plus key does the same; Command with 0 is the usual size.")
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 6)
+                    .background(Color(nsColor: .windowBackgroundColor))
                     Divider()
-                    ChordProView(model: model, shown: chordPro, canType: model.canType)
+                    ChordProView(model: model, shown: chordPro, canType: model.canType, scale: model.textZoom)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             } else {
@@ -92,49 +100,79 @@ struct SongPane: View {
         .background(Color(nsColor: .textBackgroundColor))
     }
 
-    /// The song's name, its keys, and the switch between its two editors: on one row
-    /// where the pane is wide enough for the name to be read; otherwise the keys on a
-    /// row of their own under it; and where even that is too wide, the switch on a
-    /// third. Nothing is ever cut short to fit but the name.
+    /// One of the two buttons that make the ChordPro text smaller and larger: a small
+    /// letter A and a large one.
+    private func textSize(_ picture: String, by direction: Int, can: Bool, says: String) -> some View {
+        Button {
+            model.zoomText(direction)
+        } label: {
+            Image(systemName: picture)
+                .font(.system(size: 13, weight: .medium))
+                .frame(width: 26, height: 24)
+                .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(Color.primary.opacity(0.08)))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(can ? .primary : .tertiary)
+        .disabled(!can)
+        .help(says)
+        .accessibilityLabel(direction < 0 ? "Smaller text" : "Larger text")
+    }
+
+    /// The song's name at the left, the switch between its two editors in the middle,
+    /// and its keys at the right: on one row where the pane is wide enough for all
+    /// three with the name whole. Otherwise the keys go on a row of their own under
+    /// the other two; and where even that is too wide, each has a row. Nothing is
+    /// ever cut short to fit but the name.
     private func header(_ shown: LibraryModel.ShownSong) -> some View {
         ViewThatFits(in: .horizontal) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
+            // (The two sides are given the same width, so that the switch is in the
+            // middle of the pane and not of what is left over.)
+            HStack(alignment: .center, spacing: 12) {
                 name(shown, whole: true)
-                Spacer(minLength: 8)
-                earlierVersions
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 if shown.problem == nil {
-                    keys(shown)
-                    editorSwitch
+                    EditorSwitch(model: model)
                 }
-            }
-            VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    name(shown, whole: false)
-                    Spacer(minLength: 8)
                     earlierVersions
                     if shown.problem == nil {
-                        editorSwitch
+                        keys(shown)
                     }
                 }
-                if shown.problem == nil {
-                    HStack(alignment: .firstTextBaseline, spacing: 12) {
-                        keys(shown)
-                        Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            // (Narrower: the name has what the switch leaves, and is not cut short
+            // for the sake of the switch standing in the middle.)
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .center, spacing: 12) {
+                    name(shown, whole: false)
+                    Spacer(minLength: 8)
+                    if shown.problem == nil {
+                        EditorSwitch(model: model)
                     }
+                }
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    if shown.problem == nil {
+                        keys(shown)
+                    }
+                    Spacer(minLength: 0)
+                    earlierVersions
                 }
             }
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .firstTextBaseline, spacing: 12) {
                     name(shown, whole: false)
                     Spacer(minLength: 8)
                     earlierVersions
                 }
                 if shown.problem == nil {
+                    EditorSwitch(model: model)
+                        .frame(maxWidth: .infinity)
                     HStack(alignment: .firstTextBaseline, spacing: 12) {
                         keys(shown)
                         Spacer(minLength: 0)
                     }
-                    editorSwitch
                 }
             }
         }
@@ -186,18 +224,6 @@ struct SongPane: View {
         .disabled(!model.canChange || shown.key.isEmpty)
         .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
                                 : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
-    }
-
-    /// The switch between the song's two editors.
-    private var editorSwitch: some View {
-        Picker("Editor", selection: Binding(get: { model.editorShown }, set: { model.show(editor: $0) })) {
-            Text("Chords").tag(LibraryModel.Editor.sheet)
-            Text("ChordPro").tag(LibraryModel.Editor.chordPro)
-        }
-        .pickerStyle(.segmented)
-        .labelsHidden()
-        .fixedSize()
-        .help("The chord sheet, for the mouse and the keys; or the song as ChordPro text, to be typed in.")
     }
 }
 

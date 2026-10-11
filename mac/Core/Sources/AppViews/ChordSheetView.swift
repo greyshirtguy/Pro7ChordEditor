@@ -15,8 +15,8 @@
 // slide is a card in a frame of its group's colour, with the slide's number on the
 // frame's foot and, on the first slide of each group, the group's name. As many go to
 // a row as fit across, so a wider window, or smaller words (the sheet zooms), shows
-// more of the song at once. A column of the grid is only as wide as the widest slide
-// in it needs: no room is kept for what might be put on a line later. That is the maintainer's, on trying the reference's layout
+// more of the song at once. All the slides are one width, and no wider than the widest
+// of them needs: no room is kept for what might be put on a line later. That is the maintainer's, on trying the reference's layout
 // with real songs: one column of slides left most of a window empty and showed few
 // words. How a LINE is drawn (words, bubbles, tails, the spot) is the reference's
 // (qml/ChordSheet.qml), number for number, times the zoom.
@@ -87,6 +87,11 @@ enum SheetLook {
     /// grows upwards from the line it is for, and over the first row of slides it
     /// would otherwise have nowhere to grow to but down over the words.
     static let top = 30.0
+    /// The shape of a card: as tall for its width as a screen is, 9 to 16. But a card
+    /// is not made taller for its shape's sake than this many lines need, or a song
+    /// of long lines would have cards mostly empty.
+    static let shape = 9.0 / 16.0
+    static let shapedUpTo = 4.0
     static let entryWidth = 330.0
 
     static func height(of font: NSFont) -> Double {
@@ -249,6 +254,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         var rows: Range<Int>
         var frame: NSRect
         var card: NSRect
+        /// Where the first of its lines starts, down the sheet.
+        var linesTop: Double
         var colour: NSColor
         var label: String
         var gridRow: Int
@@ -350,8 +357,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     }
 
     /// Lays the slides out as a grid: in the order of the song, as many to a row as fit
-    /// across. A column is as wide as the widest of its slides needs and no wider, and
-    /// the cards of one row are as tall as the one of them with the most lines.
+    /// across. Every card is one width, what the widest slide of the song needs, and
+    /// the shape of a screen, 16 by 9 (though never taller for that than four lines
+    /// need); a row with a slide of more lines than that holds is as tall as that
+    /// slide needs. A slide's lines stand in the middle of its card, up and down.
     private func layOut() {
         laidWidth = seenWidth
         guard let sheet else {
@@ -383,30 +392,13 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let pad = metrics.cardPad
         let around = SheetLook.around
 
-        // As many columns as fit: the most for which the slides, dealt out along the
-        // rows in order, leave every column (as wide as its widest slide) on the sheet.
+        // Every slide is as wide as the widest of them needs, and as many go to a row
+        // as fit across at that width. What is left of the sheet is at its right.
         let across = laidWidth - 2 * SheetLook.margin
-        let narrowest = slides.map(\.needs).min() ?? 1
-        var widths = [slides.map(\.needs).max() ?? 0]
-        var most = min(slides.count, max(1, Int(across / max(narrowest, 1))))
-        while most > 1 {
-            var tried = Array(repeating: 0.0, count: most)
-            for (n, slide) in slides.enumerated() {
-                tried[n % most] = max(tried[n % most], slide.needs)
-            }
-            if tried.reduce(0, +) <= across {
-                widths = tried
-                break
-            }
-            most -= 1
-        }
-        columns = widths.count
-        var lefts: [Double] = []
-        var left = SheetLook.margin
-        for width in widths {
-            lefts.append(left)
-            left += width
-        }
+        let width = slides.map(\.needs).max() ?? 0
+        columns = max(1, min(slides.count, Int(across / max(width, 1))))
+        let cardWidth = width - 2 * around - 2 * SheetLook.frame
+        let shaped = min(cardWidth * SheetLook.shape, SheetLook.shapedUpTo * metrics.lineHeight + 2 * pad)
 
         var made: [Cell] = []
         var top = SheetLook.top
@@ -414,25 +406,30 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         var from = 0
         while from < slides.count {
             let these = slides[from..<min(from + columns, slides.count)]
-            let cardHeight = Double(these.map(\.count).max() ?? 1) * metrics.lineHeight + 2 * pad
+            // The shape of a screen; or taller, if the row's lines need more than that.
+            let needed = Double(these.map(\.count).max() ?? 1) * metrics.lineHeight + 2 * pad
+            let cardHeight = max(needed, shaped)
             for (column, slide) in these.enumerated() {
-                let frame = NSRect(x: lefts[column] + around, y: top + around,
-                                   width: widths[column] - 2 * around, height: SheetLook.frame + cardHeight + SheetLook.label)
-                let card = NSRect(x: frame.minX + SheetLook.frame, y: frame.minY + SheetLook.frame, width: frame.width - 2 * SheetLook.frame, height: cardHeight)
+                let frame = NSRect(x: SheetLook.margin + Double(column) * width + around, y: top + around,
+                                   width: width - 2 * around, height: SheetLook.frame + cardHeight + SheetLook.label)
+                let card = NSRect(x: frame.minX + SheetLook.frame, y: frame.minY + SheetLook.frame, width: cardWidth, height: cardHeight)
                 let box = sheet.blocks[rows[slide.first].block]
                 let colour = box.groupColour.map { NSColor(srgbRed: $0.red, green: $0.green, blue: $0.blue, alpha: 1) } ?? SheetLook.group
+                // The slide's lines, in the middle of its card up and down.
+                let linesTop = card.minY + (cardHeight - Double(slide.count) * metrics.lineHeight) / 2
                 for line in 0..<slide.count {
                     lines[slide.first + line].cell = made.count
                     lines[slide.first + line].left = card.minX + pad
-                    lines[slide.first + line].chordTop = card.minY + pad + Double(line) * metrics.lineHeight + 2 * metrics.scale
+                    lines[slide.first + line].chordTop = linesTop + Double(line) * metrics.lineHeight + 2 * metrics.scale
                 }
                 made.append(Cell(slide: rows[slide.first].slide, rows: slide.first..<(slide.first + slide.count), frame: frame, card: card,
-                                 colour: colour, label: slide.label, gridRow: gridRow, column: column))
+                                 linesTop: linesTop, colour: colour, label: slide.label, gridRow: gridRow, column: column))
             }
             top += 2 * around + SheetLook.frame + cardHeight + SheetLook.label
             gridRow += 1
             from += columns
         }
+        let left = SheetLook.margin + Double(columns) * width
         cells = made
         laid = lines
         laidRows = rows
@@ -563,10 +560,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     // ---- What is where
 
     /// The line of a card that a point is on. Every part of a card is one of its lines:
-    /// below the last of them, the last.
+    /// over the first of them, the first, and under the last, the last.
     private func line(at point: NSPoint) -> Int? {
         guard let cell = cells.first(where: { $0.card.contains(point) }) else { return nil }
-        let down = Int(((point.y - cell.card.minY - metrics.cardPad) / metrics.lineHeight).rounded(.down))
+        let down = Int(((point.y - cell.linesTop) / metrics.lineHeight).rounded(.down))
         return cell.rows.lowerBound + min(max(down, 0), cell.rows.count - 1)
     }
 

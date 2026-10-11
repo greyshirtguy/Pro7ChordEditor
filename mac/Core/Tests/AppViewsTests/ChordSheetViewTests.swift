@@ -123,7 +123,7 @@ struct ChordSheetViewTests {
         #expect(zip(more, more.dropFirst()).allSatisfy { $0 <= $1 })
     }
 
-    @Test("The slides are a grid: as many to a row as fit across, a column as wide as its widest slide needs and no wider, those of a row one height; a narrower window has fewer to a row, and smaller words more")
+    @Test("The slides are a grid of cards of one size: as many to a row as fit across, each as wide as the widest slide of the song needs and the shape of a screen, with its lines in its middle; a narrower window has fewer to a row, and smaller words more")
     func aGridOfSlides() async throws {
         let mac = try MadeUpMac()
         let model = await open("It Is Well", on: mac)
@@ -142,82 +142,82 @@ struct ChordSheetViewTests {
         func held(_ what: String) {
             #expect(canvas.cells.count == slides, "\(what)")
             #expect(canvas.cells.map(\.slide) == Array(0..<slides), "\(what)")
+            let first = canvas.cells[0]
+            let line = canvas.metrics.lineHeight
+            // The shape of a screen, 16 by 9, though never taller for that than four
+            // lines need.
+            let shaped = min(first.card.width * 9 / 16, 4 * line + 2 * canvas.metrics.cardPad)
             for (n, cell) in canvas.cells.enumerated() {
                 // In the order of the song: along a row, and then the next row.
                 #expect(cell.gridRow == n / canvas.columns && cell.column == n % canvas.columns, "\(what)")
-                // Those of a column stand in line and are one width, which is enough
-                // for each of them.
-                let first = canvas.cells[cell.column]
-                #expect(abs(cell.frame.minX - first.frame.minX) < 0.01 && abs(cell.frame.width - first.frame.width) < 0.01, "\(what)")
+                // Every card is one width, which is enough for each of them.
+                #expect(abs(cell.frame.width - first.frame.width) < 0.01, "\(what)")
                 #expect(cell.card.width >= needed(by: cell) - 0.01, "\(what)")
                 // The card is inside its frame, with the frame's foot under it.
                 #expect(cell.frame.contains(cell.card) && abs(cell.frame.maxY - cell.card.maxY - SheetLook.label) < 0.01, "\(what)")
-                // Every line of the slide is in its card, one under another.
-                for (line, row) in cell.rows.enumerated() {
+                // Its lines are in it, one under another, as much room over the first
+                // as under the last.
+                for (down, row) in cell.rows.enumerated() {
                     #expect(canvas.laid[row].cell == n, "\(what)")
-                    #expect(canvas.laid[row].left > cell.card.minX && canvas.laid[row].chordTop > cell.card.minY, "\(what)")
-                    #expect(canvas.laid[row].chordTop + canvas.metrics.lineHeight <= cell.card.maxY + 0.01, "\(what)")
-                    if line > 0 {
-                        #expect(abs(canvas.laid[row].chordTop - canvas.laid[row - 1].chordTop - canvas.metrics.lineHeight) < 0.01, "\(what)")
-                    }
+                    #expect(canvas.laid[row].left > cell.card.minX, "\(what)")
+                    #expect(abs(canvas.laid[row].chordTop - (cell.linesTop + Double(down) * line + 2 * canvas.metrics.scale)) < 0.01, "\(what)")
                 }
+                let over = cell.linesTop - cell.card.minY
+                let under = cell.card.maxY - (cell.linesTop + Double(cell.rows.count) * line)
+                #expect(abs(over - under) < 0.01 && over >= canvas.metrics.cardPad - 0.01, "\(what)")
             }
+            // No card is wider than it need be: the widest slide's lines fill it.
+            #expect((canvas.cells.map { $0.card.width - needed(by: $0) }.min() ?? 1) < 0.01, "\(what)")
             for gridRow in 0...(canvas.cells.last?.gridRow ?? 0) {
                 let inRow = canvas.cells.filter { $0.gridRow == gridRow }
                 let most = inRow.map(\.rows.count).max() ?? 0
-                // Those of a row stand level, and are as tall as the one with the most
-                // lines; no two overlap, and the next row starts under this one.
+                // Those of a row stand level, the shape of a screen, or as tall as the
+                // one of them with the most lines needs if that is more; no two
+                // overlap, and the next row starts under this one.
                 for cell in inRow {
                     #expect(abs(cell.frame.minY - inRow[0].frame.minY) < 0.01, "\(what)")
-                    #expect(abs(cell.card.height - (Double(most) * canvas.metrics.lineHeight + 2 * canvas.metrics.cardPad)) < 0.01, "\(what)")
+                    #expect(abs(cell.card.height - max(Double(most) * line + 2 * canvas.metrics.cardPad, shaped)) < 0.01, "\(what)")
                 }
                 for (one, other) in zip(inRow, inRow.dropFirst()) {
-                    #expect(one.frame.maxX + 2 * SheetLook.around <= other.frame.minX + 0.01, "\(what)")
+                    #expect(abs(other.frame.minX - one.frame.maxX - 2 * SheetLook.around) < 0.01, "\(what)")
                 }
                 if let below = canvas.cells.first(where: { $0.gridRow == gridRow + 1 }) {
                     #expect(abs(below.frame.minY - inRow[0].frame.maxY - 2 * SheetLook.around) < 0.01, "\(what)")
                 }
             }
-            // No column is wider than it need be: its widest slide's lines fill its
-            // card from side to side (or the words on a slide's foot fill its frame).
-            for column in 0..<canvas.columns {
-                let inColumn = canvas.cells.filter { $0.column == column }
-                let spare = inColumn.map { $0.card.width - needed(by: $0) }.min() ?? 0
-                let footFills = inColumn.contains { cell in
-                    abs(cell.frame.width - (SheetMetrics.width(of: SheetMetrics.line(cell.label, font: SheetLook.labelFont)) + 16)) < 0.01
-                }
-                #expect(spare < 0.01 || footFills, "\(what), column \(column)")
-            }
-            // Nothing is wider than what it is seen through, where one slide fits it.
+            // Nothing is wider than what it is seen through, where one slide fits it;
+            // and one more to a row would not have fitted.
             let right = canvas.cells.map(\.frame.maxX).max() ?? 0
             let seen = Double(window.contentView?.bounds.width ?? 0)
-            if canvas.cells.allSatisfy({ $0.frame.width + 2 * SheetLook.around + 2 * SheetLook.margin <= seen }) {
+            let cell = first.frame.width + 2 * SheetLook.around
+            if cell + 2 * SheetLook.margin <= seen {
                 #expect(right + SheetLook.around + SheetLook.margin <= seen + 0.01, "\(what)")
+                #expect(canvas.columns == slides || Double(canvas.columns + 1) * cell + 2 * SheetLook.margin > seen, "\(what)")
             }
         }
 
         held("wide")
         let wide = canvas.columns
         #expect(wide >= 2)
+        // (This song's slides have three lines at most, which the shape of a screen
+        // holds at this size: every card of it is the same height.)
+        #expect(Set(canvas.cells.map { ($0.card.height * 100).rounded() }).count == 1)
+        #expect(abs(canvas.cells[0].card.height - canvas.cells[0].card.width * 9 / 16) < 0.01)
         widen(window, to: 620, canvas)
         held("narrow")
         let narrow = canvas.columns
         #expect(narrow < wide && narrow >= 1)
 
-        // A chord that sticks out past the end of the widest line of a column makes
-        // that column wider by as much, and no other; taken off, it is as it was.
+        // A chord that sticks out past the end of the widest line of the song makes
+        // every card wider by as much; taken off, they are as they were.
         widen(window, to: 1500, canvas)
         let before = canvas.cells.map(\.frame.width)
-        let widestOfFirst = try #require(canvas.cells.filter { $0.column == 0 }.max { needed(by: $0) < needed(by: $1) })
-        let line = try #require(widestOfFirst.rows.max { canvas.laid[$0].placed.width < canvas.laid[$1].placed.width })
-        let end = sheet.rows[line].text.length - 1
-        #expect(sheet.put(line, end, "F#m7b5/A"))
+        let widest = try #require(canvas.cells.max { needed(by: $0) < needed(by: $1) })
+        let line = try #require(widest.rows.max { canvas.laid[$0].placed.width < canvas.laid[$1].placed.width })
+        #expect(sheet.put(line, sheet.rows[line].text.length - 1, "F#m7b5/A"))
         canvas.sync()
-        if canvas.columns == wide {
-            let after = canvas.cells.map(\.frame.width)
-            #expect(after[0] > before[0] + 20)
-            #expect(zip(after, before).enumerated().allSatisfy { $0.offset % wide == 0 || abs($0.element.0 - $0.element.1) < 0.01 })
-        }
+        let after = canvas.cells.map(\.frame.width)
+        #expect(after.allSatisfy { $0 > before[0] + 20 } && Set(after.map { ($0 * 100).rounded() }).count == 1)
         held("with a long chord at a line's end")
         model.undo()
         canvas.sync()
@@ -246,48 +246,99 @@ struct ChordSheetViewTests {
         func setChordsAlone(slide: Int, element: String, line: Int, names: [String], joined: Bool) throws {}
     }
 
-    @Test("A slide is as wide as its lines need and no wider: a line of chords alone, with room past its last chord for the next to be pointed at; a blank slide, for its one place; and never too narrow for the words on its foot")
-    func asWideAsItNeeds() throws {
-        let boxes = [
-            TextBox(slide: 0, group: "Intro", startsItsGroup: true, element: "A", words: Chords.placeholders(2),
-                    chords: [Chord(at: 0, name: "Dsus4"), Chord(at: 2, name: "G/B")]),
-            TextBox(slide: 1, group: "Intro", element: "B", words: Words(), blank: true),
-            TextBox(slide: 2, group: "A very long name for a group of one small slide", startsItsGroup: true, element: "C", words: "Oh"),
-            TextBox(slide: 3, group: "Verse", startsItsGroup: true, element: "D", words: "One two three four five six", chords: [Chord(at: 24, name: "F#m7b5/A")]),
-            TextBox(slide: 4, group: "Verse", element: "E", words: "Oh"),
-        ]
+    /// The sheet of a made-up song, in a window wide enough for all of it in one row.
+    private func canvas(of boxes: [TextBox], scale: Double = 1) -> (SheetCanvas, ChordSheet, NSWindow) {
         let sheet = ChordSheet(song: MadeUpSong(boxes))
-        let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 2000, height: 600))
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 2000, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
+        let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 3000, height: 600))
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 3000, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = scroll
-        defer { window.close() }
-        let canvas = scroll.canvas
-        canvas.show(sheet, scale: 1)
-        // (Wide enough for each to be a column by itself.)
-        #expect(canvas.columns == 5 && canvas.cells.count == 5)
-        let pad = canvas.metrics.cardPad
+        scroll.canvas.show(sheet, scale: scale)
+        return (scroll.canvas, sheet, window)
+    }
+
+    @Test("A card is as wide as the widest slide needs and no wider: a line of chords alone, with room past its last chord for the next to be pointed at; a blank slide, for its one place; never too narrow for the words on its foot; and never less than the least")
+    func asWideAsItNeeds() throws {
+        // Each of these is a song of one slide, so that its card is as wide as that
+        // one slide needs.
         // Two chords alone: their bubbles, and 44 more for the place past the last.
-        let alone = canvas.laid[canvas.cells[0].rows.lowerBound].placed
-        #expect(abs(canvas.cells[0].card.width - (alone.width + 44 + 2 * pad)) < 0.01)
-        canvas.pointerMoved(to: NSPoint(x: canvas.cells[0].card.maxX - pad - 3, y: canvas.cells[0].card.midY), shift: false)
-        #expect(sheet.spot == Spot(row: canvas.cells[0].rows.lowerBound, at: 4))
+        do {
+            let (canvas, sheet, window) = canvas(of: [TextBox(slide: 0, element: "A", words: Chords.placeholders(2),
+                                                              chords: [Chord(at: 0, name: "Dsus4"), Chord(at: 2, name: "G/B")])])
+            defer { window.close() }
+            let pad = canvas.metrics.cardPad
+            #expect(abs(canvas.cells[0].card.width - (canvas.laid[0].placed.width + 44 + 2 * pad)) < 0.01)
+            canvas.pointerMoved(to: NSPoint(x: canvas.cells[0].card.maxX - pad - 3, y: canvas.cells[0].card.midY), shift: false)
+            #expect(sheet.spot == Spot(row: 0, at: 4))
+        }
         // A blank slide: its one place, and no more.
-        #expect(abs(canvas.cells[1].card.width - (44 + 2 * pad)) < 0.01)
-        canvas.pointerMoved(to: NSPoint(x: canvas.cells[1].card.midX, y: canvas.cells[1].card.midY), shift: false)
-        #expect(sheet.spot == Spot(row: canvas.cells[1].rows.lowerBound, at: 0))
+        do {
+            let (canvas, sheet, window) = canvas(of: [TextBox(slide: 0, element: "A", words: Words(), blank: true)])
+            defer { window.close() }
+            #expect(abs(canvas.cells[0].card.width - (44 + 2 * canvas.metrics.cardPad)) < 0.01)
+            canvas.pointerMoved(to: NSPoint(x: canvas.cells[0].card.midX, y: canvas.cells[0].card.midY), shift: false)
+            #expect(sheet.spot == Spot(row: 0, at: 0))
+        }
         // Two letters under a long name: the frame is as wide as the foot's words need.
-        let foot = SheetMetrics.width(of: SheetMetrics.line(canvas.cells[2].label, font: SheetLook.labelFont))
-        #expect(canvas.cells[2].label == "3  A very long name for a group of one small slide")
-        #expect(abs(canvas.cells[2].frame.width - (foot + 16)) < 0.01)
+        do {
+            let (canvas, _, window) = canvas(of: [TextBox(slide: 0, group: "A very long name for a group of one small slide", startsItsGroup: true,
+                                                          element: "A", words: "Oh")])
+            defer { window.close() }
+            #expect(canvas.cells[0].label == "1  A very long name for a group of one small slide")
+            let foot = SheetMetrics.width(of: SheetMetrics.line(canvas.cells[0].label, font: SheetLook.labelFont))
+            #expect(abs(canvas.cells[0].frame.width - (foot + 16)) < 0.01)
+        }
         // A chord that sticks out past the end of the words: the card is as wide as
         // the line WITH it.
-        let words = canvas.laid[canvas.cells[3].rows.lowerBound].placed
-        #expect(words.width > words.wordsWidth + 20)
-        #expect(abs(canvas.cells[3].card.width - (words.width + 2 * pad)) < 0.01)
-        // And the least a card is, for two letters: 40 and the room inside it.
-        #expect(canvas.cells[4].label == "5")
-        #expect(abs(canvas.cells[4].card.width - (40 + 2 * pad)) < 0.01)
+        do {
+            let (canvas, _, window) = canvas(of: [TextBox(slide: 0, element: "A", words: "One two three four five six",
+                                                          chords: [Chord(at: 24, name: "F#m7b5/A")])])
+            defer { window.close() }
+            let words = canvas.laid[0].placed
+            #expect(words.width > words.wordsWidth + 20)
+            #expect(abs(canvas.cells[0].card.width - (words.width + 2 * canvas.metrics.cardPad)) < 0.01)
+        }
+        // The least a card is, for two letters: 40 and the room inside it.
+        do {
+            let (canvas, _, window) = canvas(of: [TextBox(slide: 0, element: "A", words: "Oh")])
+            defer { window.close() }
+            #expect(canvas.cells[0].label == "1")
+            #expect(abs(canvas.cells[0].card.width - (40 + 2 * canvas.metrics.cardPad)) < 0.01)
+        }
+        // And together in one song, every card is as wide as the one that needs most.
+        do {
+            let (canvas, _, window) = canvas(of: [
+                TextBox(slide: 0, element: "A", words: "Oh"),
+                TextBox(slide: 1, element: "B", words: "One two three four five six"),
+                TextBox(slide: 2, element: "C", words: Words(), blank: true),
+            ])
+            defer { window.close() }
+            let widest = canvas.laid[1].placed.width + 2 * canvas.metrics.cardPad
+            #expect(canvas.columns == 3 && canvas.cells.allSatisfy { abs($0.card.width - widest) < 0.01 })
+        }
+    }
+
+    @Test("The shape of a screen has its limits: a song of long lines has cards no taller for it than four lines need, and a slide of more lines than the shape holds makes its row as tall as it needs, and no other row")
+    func theShapeHasItsLimits() throws {
+        let long = String(repeating: "word ", count: 30) + "end"
+        let many = (1...7).map { "Line \($0)" }.joined(separator: "\n")
+        let (canvas, _, window) = canvas(of: [
+            TextBox(slide: 0, element: "A", words: Words(long)),
+            TextBox(slide: 1, element: "B", words: Words(many)),
+            TextBox(slide: 2, element: "C", words: "Short"),
+        ], scale: 0.5)
+        defer { window.close() }
+        let line = canvas.metrics.lineHeight
+        let pad = canvas.metrics.cardPad
+        // (At half size the three are side by side in the test's wide window, or one
+        // under another: either way each row is as tall as its tallest needs.)
+        let four = 4 * line + 2 * pad
+        #expect(canvas.cells[0].card.width * 9 / 16 > four)
+        for cell in canvas.cells {
+            let most = canvas.cells.filter { $0.gridRow == cell.gridRow }.map(\.rows.count).max() ?? 0
+            #expect(abs(cell.card.height - max(Double(most) * line + 2 * pad, four)) < 0.01)
+        }
+        #expect(canvas.cells.contains { abs($0.card.height - (7 * line + 2 * pad)) < 0.01 })
     }
 
     @Test("A slide's frame says its number, and on the first slide of each group the group's name; a group with a colour frames its slides in it")
@@ -381,36 +432,32 @@ struct ChordSheetViewTests {
         #expect(abs(canvas.visibleRect.minY - (canvas.cells[3].frame.minY - 10)) < 1)
     }
 
-    @Test("The room under a short slide's lines, in a row with a taller one, is its last line's; a frame and its foot are bare sheet")
-    func underAShortSlide() async throws {
+    @Test("Every part of a card is one of its lines: the room over its first line is that line's, and the room under its last, the last's; a frame and its foot are bare sheet")
+    func overAndUnderItsLines() async throws {
         let mac = try MadeUpMac()
         let model = await open("It Is Well", on: mac)
         let (canvas, window) = view(for: model, width: 1500)
         defer { window.close() }
         let sheet = try #require(model.sheet)
-        // A slide with fewer lines than another of its row, at one width or another.
-        var short: SheetCanvas.Cell?
-        for width in stride(from: 1500.0, through: 700, by: -100) {
-            widen(window, to: width, canvas)
-            short = canvas.cells.first { cell in
-                canvas.cells.contains { $0.gridRow == cell.gridRow && $0.rows.count > cell.rows.count } && sheet.usable(cell.rows.upperBound - 1)
-            }
-            if short != nil { break }
-        }
-        let cell = try #require(short, "the song was to have slides of differing numbers of lines side by side")
-        canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.maxY - 3), shift: true)
+        // A slide of two lines or more, both of which can take the spot.
+        let cell = try #require(canvas.cells.first { $0.rows.count >= 2 && sheet.usable($0.rows.lowerBound) && sheet.usable($0.rows.upperBound - 1) })
+        #expect(cell.linesTop - cell.card.minY > 6)
+        canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.minY + 2), shift: true)
+        #expect(sheet.spot.row == cell.rows.lowerBound)
+        canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.maxY - 2), shift: true)
         #expect(sheet.spot.row == cell.rows.upperBound - 1)
         // Its frame's foot, and the strip of frame over the card, are bare sheet: the
         // spot stays where it was, though a place of the line would be another.
         let was = sheet.spot
         let length = sheet.rows[was.row].text.length
         #expect(length > 3)
-        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.frame.maxY - 3), shift: false)
+        let along = canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1
+        canvas.pointerMoved(to: NSPoint(x: along, y: cell.frame.maxY - 3), shift: false)
         #expect(sheet.spot == was)
-        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.frame.minY + 1), shift: false)
+        canvas.pointerMoved(to: NSPoint(x: along, y: cell.frame.minY + 1), shift: false)
         #expect(sheet.spot == was)
         // (The same place along, down on the card, is the line's last letter.)
-        canvas.pointerMoved(to: NSPoint(x: canvas.laid[was.row].left + canvas.metrics.advance(row: was.row, units: length - 1) + 1, y: cell.card.maxY - 3), shift: false)
+        canvas.pointerMoved(to: NSPoint(x: along, y: cell.card.maxY - 3), shift: false)
         #expect(sheet.spot == Spot(row: was.row, at: length - 1))
     }
 

@@ -305,6 +305,67 @@ struct ChordProTypingTests {
         return (editor, window)
     }
 
+    @Test("The text can be made larger and smaller, with its buttons and with Command and the plus, minus and 0 keys: only its size changes, and the size is remembered apart from the sheet's")
+    func theSizeOfTheText() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Plain Song", on: mac)
+        let editor = ChordProText(asks: .init(typed: { model.textMayBecome($0) }, good: { model.chordPro?.text }, zoom: { model.zoomText($0) }))
+        editor.saysNo = {}
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 400), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = editor.scroll
+        defer { window.close() }
+        editor.setScale(model.textZoom)
+        editor.show(try #require(model.chordPro), canType: model.canType)
+        window.makeFirstResponder(editor.text)
+        func key(_ characters: String, _ flags: NSEvent.ModifierFlags) throws -> NSEvent {
+            try #require(NSEvent.keyEvent(with: .keyDown, location: .zero, modifierFlags: flags, timestamp: 0, windowNumber: window.windowNumber,
+                                          context: nil, characters: characters, charactersIgnoringModifiers: characters, isARepeat: false, keyCode: 0))
+        }
+        /// The size of the letters at a place of the text, and whether they are bold.
+        func letters(at place: Int) -> (size: Double, bold: Bool) {
+            let font = editor.text.textStorage?.attribute(.font, at: place, effectiveRange: nil) as? NSFont
+            return (Double(font?.pointSize ?? 0), font?.fontDescriptor.symbolicTraits.contains(.bold) ?? false)
+        }
+        let before = editor.text.string
+        let chord = try place(of: "[G]", in: editor)
+        let word = try place(of: "One", in: editor)
+        #expect(model.textZoom == 1 && letters(at: word).size == 14 && letters(at: chord) == (14, true))
+        editor.text.setSelectedRange(NSRange(location: word + 2, length: 0))
+
+        #expect(editor.text.performKeyEquivalent(with: try key("-", .command)))
+        #expect(model.textZoom == 0.9)
+        #expect(abs(letters(at: word).size - 12.6) < 0.01 && !letters(at: word).bold)
+        #expect(abs(letters(at: chord).size - 12.6) < 0.01 && letters(at: chord).bold)
+        // Not a character of the text, nor where the caret is, nor the song.
+        #expect(editor.text.string == before && editor.text.selectedRange().location == word + 2)
+        #expect(!model.canUndo && model.chordPro?.text == before)
+        // What is typed next is the new size too.
+        editor.text.setSelectedRange(NSRange(location: word, length: 0))
+        editor.text.insertText("[", replacementRange: editor.text.selectedRange())
+        #expect(abs(letters(at: word).size - 12.6) < 0.01)
+        model.settle()
+
+        #expect(editor.text.performKeyEquivalent(with: try key("=", .command)))
+        #expect(editor.text.performKeyEquivalent(with: try key("+", [.command, .shift])))
+        #expect(model.textZoom == 1.1 && abs(letters(at: chord).size - 15.4) < 0.01)
+        #expect(editor.text.performKeyEquivalent(with: try key("0", .command)))
+        #expect(model.textZoom == 1 && letters(at: chord).size == 14)
+        // A key that is not one of these is not taken: Command with 1 is the header's.
+        #expect(!editor.text.performKeyEquivalent(with: try key("1", .command)))
+
+        // From its two buttons, to its ends; and the sheet's zoom is another thing.
+        for _ in 0..<12 { model.zoomText(1) }
+        #expect(model.textZoom == 1.5 && !model.canZoomTextIn && model.canZoomTextOut)
+        for _ in 0..<12 { model.zoomText(-1) }
+        #expect(model.textZoom == 0.5 && !model.canZoomTextOut)
+        #expect(model.sheetZoom == LibraryModel.usualSheetZoom)
+        model.zoomSheet(1)
+        let again = mac.model()
+        await again.start()
+        #expect(again.textZoom == 0.5 && again.sheetZoom == 0.9)
+    }
+
     private func place(of string: String, in editor: ChordProText) throws -> Int {
         let range = (editor.text.string as NSString).range(of: string)
         try #require(range.location != NSNotFound)
