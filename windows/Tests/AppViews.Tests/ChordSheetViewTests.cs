@@ -17,6 +17,7 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using Pro7ChordEditor.Song;
 using Xunit;
 
@@ -513,9 +514,17 @@ public class ChordSheetViewTests
         var offered = entry.Shown.ToList();
         Assert.True(offered.Count > 2);
         Assert.Equal(-1, entry.Picked);
-        // Down picks the first, and the next; Up goes back; and round and round.
+        // Each is a button; none is lit until one is picked.
+        List<Border> Buttons() => [.. Named<WrapPanel>(entry, "Offered").Children.OfType<Border>()];
+        static Color Of(Border button) => ((SolidColorBrush)button.Background).Color;
+        Assert.Equal(offered, Buttons().Select(button => ((TextBlock)button.Child).Text));
+        Assert.All(Buttons(), button => Assert.Equal(SheetLook.Chip, Of(button)));
+        // Down picks the first, and the next; Up goes back; and round and round. The
+        // one picked is lit in the sheet's orange, and no other.
         Assert.True(hand.Press(Key.Down));
         Assert.Equal(0, entry.Picked);
+        Assert.Equal(SheetLook.Accent, Of(Buttons()[0]));
+        Assert.All(Buttons().Skip(1), button => Assert.Equal(SheetLook.Chip, Of(button)));
         hand.Press(Key.Down);
         Assert.Equal(1, entry.Picked);
         hand.Press(Key.Up);
@@ -552,7 +561,7 @@ public class ChordSheetViewTests
         hand.Click("saved");
         hand.Type("E");
         var wanted = entry.Shown[2];
-        entry.Chosen(wanted);
+        Buttons()[2].RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, Environment.TickCount, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent });
         Assert.False(hand.Sheet.Typing);
         Assert.Equal("5:" + wanted + " 13:" + offered[1] + " 25:D", hand.ChordsOf("wretch"));
         // Backspace in an empty box takes off the chord at that place.
@@ -1295,6 +1304,14 @@ public class ChordSheetViewTests
         Assert.True(view.KeyPressed(Key.D2, ModifierKeys.Control));
         Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
         model.DontRevert();
+        model.ShowEarlierVersions();
+        Assert.NotNull(model.Earlier);
+        Assert.True(view.KeyPressed(Key.D2, ModifierKeys.Control));
+        Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
+        model.CloseEarlierVersions();
+        Assert.True(view.KeyPressed(Key.D2, ModifierKeys.Control));
+        Assert.Equal(LibraryModel.Editor.ChordPro, model.EditorShown);
+        view.KeyPressed(Key.D1, ModifierKeys.Control);
 
         // A song that could not be read has no editor to show, and no switch.
         model.Open(pc.Song("Nonsense"));
@@ -1340,10 +1357,20 @@ public class ChordSheetViewTests
         hand.Drag(hand.PlaceOf("sweet"), hand.PlaceOf("saved"));
         hand.PointAt("Amazing");
         hand.Press(Key.C, ModifierKeys.Control);
+        // (Copying changes no song, and says what it copied in place of what went wrong.)
+        Assert.Equal("4 chords copied from the line" + CopiedSays, model.Notice);
         hand.PointAt("Twas");
         hand.Press(Key.V, ModifierKeys.Control);
         // What the song refused has its own sentence, and nothing more is said.
         Assert.Equal(sentence, model.Notice);
+        // A chord still being typed when another song is asked for is refused too, and
+        // then the song is not left: the sentence would be swept away with it.
+        hand.Click("wretch");
+        hand.Type("C");
+        model.Open(pc.Song("Plain Song"));
+        Assert.Equal("Amazing Grace", model.Shown!.Name);
+        Assert.Equal(sentence, model.Notice);
+        Assert.False(hand.Sheet.Typing);
         Assert.Equal(before, pc.BytesOf("Amazing Grace"));
         Assert.False(model.CanUndo);
         Pictures.LayOut(view, 1280, 800);
@@ -1540,5 +1567,306 @@ public class ChordSheetViewTests
         // At the window's least it has four lines at the most, cut short with dots.
         Pictures.LayOut(view, 640, 480);
         Assert.InRange(quiet.ActualHeight, 3 * 16.0, (4 * 17.0) + 1);
+    });
+
+    // ---- Where the bubble may stand, and what else is the box's
+
+    [Fact]
+    public void TheBubbleIsKeptWithinWhatIsSeen() => OnAMadeUpPC(async pc =>
+    {
+        // (In a window low enough for the sheet to scroll a good way.)
+        var (_, view, hand) = await Open(pc, "Amazing Grace", height: 520);
+        var scroll = Named<ScrollViewer>(view.SongPane.ChordSheet, "Scroll");
+        // The last word of a slide's second line, in the last card of a row: the
+        // bubble, 330 wide, would run out of sight at the right. It is kept 12 in from
+        // the edge of what is seen, and still grows upwards from the row of chords of
+        // its line, where there is room over it.
+        var relieved = hand.PlaceOf("relieved");
+        Assert.True(hand.Grid.XOf(relieved) + SheetLook.EntryWidth > scroll.ViewportWidth);
+        hand.Click(relieved);
+        Pictures.LayOut(view, 1280, 520);
+        var frame = hand.Canvas.EntryFrame;
+        Assert.Equal(scroll.ViewportWidth - 12, frame.Right, 0.5);
+        Assert.True(frame.Left < hand.Grid.XOf(relieved));
+        Assert.Equal(hand.Grid.Lines[relieved.Row].ChordTop + hand.Canvas.Metrics.BubbleHeight + 3, frame.Bottom, 0.01);
+        Assert.True(frame.Top > 4);
+        hand.Press(Key.Escape);
+
+        // A chord on the first line of the first row of slides, with so many offered
+        // that the bubble is taller than the room over the line: it is kept in sight, 4
+        // from the top, and covers what it must.
+        var fear = hand.PlaceOf("fear");
+        hand.Click(fear, onItsChord: true);
+        hand.Type("G");
+        Pictures.LayOut(view, 1280, 520);
+        frame = hand.Canvas.EntryFrame;
+        var chords = hand.Grid.Lines[fear.Row].ChordTop + hand.Canvas.Metrics.BubbleHeight + 3;
+        Assert.True(frame.Height > chords - 4, Said($"the bubble is only {frame.Height} tall, and there is {chords - 4} over the line"));
+        Assert.Equal(4, frame.Top, 0.01);
+        Assert.Equal(scroll.ViewportWidth - 12, frame.Right, 0.5);
+        hand.Press(Key.Escape);
+
+        // A line at the very top of what is seen: there is no room over it, and the
+        // bubble is kept 4 in from the top, covering what it must.
+        var precious = hand.PlaceOf("How precious");
+        scroll.ScrollToVerticalOffset(hand.Grid.Lines[precious.Row].ChordTop + 6);
+        Pictures.LayOut(view, 1280, 520);
+        Assert.True(scroll.VerticalOffset > 200);
+        hand.Click(precious);
+        Pictures.LayOut(view, 1280, 520);
+        Assert.Equal(scroll.VerticalOffset + 4, hand.Canvas.EntryFrame.Top, 0.5);
+        // (In the first card of its row there is room at the right: it stands at its place.)
+        Assert.Equal(hand.Grid.XOf(precious), hand.Canvas.EntryFrame.Left, 0.5);
+        hand.Press(Key.Escape);
+    });
+
+    [Fact]
+    public void ACharacterRefusedInTheMiddleOfTheBoxLeavesTheCaretWhereItWas() => OnAMadeUpPC(async pc =>
+    {
+        var (_, _, hand) = await Open(pc, "Amazing Grace");
+        hand.Click("saved");
+        hand.Type("Am7");
+        // The caret between the A and the m, and a key that could not be on the way to
+        // a chord: the box is as it was, and the caret is still between them.
+        hand.Box.Select(1, 0);
+        hand.Type("!");
+        Assert.Equal("Am7", hand.Box.Text);
+        Assert.Equal((1, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
+        // One that is taken goes in there, and the caret after it.
+        hand.Type("b");
+        Assert.Equal("Abm7", hand.Box.Text);
+        Assert.Equal((2, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
+        // A small letter that is a note is made a capital where it stands, the caret
+        // staying after it.
+        hand.Box.Select(0, 4);
+        hand.Type("c");
+        Assert.Equal("C", hand.Box.Text);
+        Assert.Equal((1, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
+        hand.Press(Key.Escape);
+    });
+
+    [Fact]
+    public void CtrlVAfterAClickPastesOnTheLineThatWasClickedWhereverThePointerHasGoneSince() => OnAMadeUpPC(async pc =>
+    {
+        var (model, _, hand) = await Open(pc, "Amazing Grace");
+        var copiedOnThisPC = 3u;
+        hand.Canvas.WhatWasCopiedLast = () => copiedOnThisPC;
+        // With nothing copied yet, Ctrl+V in the box is the box's own.
+        hand.Click("heart");
+        Assert.False(hand.Press(Key.V, ModifierKeys.Control));
+        Assert.True(hand.Sheet.Typing);
+        hand.Press(Key.Escape);
+
+        hand.PointAt("Amazing");
+        hand.Press(Key.C, ModifierKeys.Control);
+        hand.Click("heart");
+        // The pointer has moved on to another slide, and the spot with it.
+        hand.PointAt("lost");
+        Assert.Equal(hand.PlaceOf("lost"), hand.Sheet.Spot);
+        Assert.True(hand.Press(Key.V, ModifierKeys.Control));
+        // It is the line that was clicked that has the chords, and not the pointer's.
+        Assert.Equal("1:G 5:G7 16:C 26:G 61:D", InTheFile(2, "Amazing Grace", pc));
+        Assert.Equal(SecondSlide, InTheFile(1, "Amazing Grace", pc));
+        Assert.Equal("4 chords put on the line.", model.Notice);
+        // The chord the bubble had opened on is as it was: the bubble closed, changing
+        // nothing of its own. One undo takes the paste back, and there is no more.
+        hand.Press(Key.Z, ModifierKeys.Control);
+        Assert.Equal(ThirdSlide, InTheFile(2, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
+    });
+
+    // ---- What is drawn where
+
+    [Fact]
+    public void TheWordsAndTheChordsOfEveryLineAreDrawnWhereTheGridSaysTheyAre() => OnAMadeUpPC(async pc =>
+    {
+        var (_, view, hand) = await Open(pc, "Amazing Grace", height: 900);
+        var canvas = hand.Canvas;
+        var metrics = canvas.Metrics;
+        var grid = hand.Grid;
+        var sheet = hand.Sheet;
+        var scroll = Named<ScrollViewer>(view.SongPane.ChordSheet, "Scroll");
+        var drawn = Pictures.Drawn(view, 1280, 900);
+
+        // How many dots of a part of the sheet are of some kind.
+        int Dots(Rect ofTheSheet, Func<int, int, int, bool> are)
+        {
+            var corner = canvas.TranslatePoint(ofTheSheet.TopLeft, view);
+            var count = 0;
+            for (var y = (int)Math.Ceiling(corner.Y * Pictures.Scale); y < (int)Math.Floor((corner.Y + ofTheSheet.Height) * Pictures.Scale); y++)
+            {
+                for (var x = (int)Math.Ceiling(corner.X * Pictures.Scale); x < (int)Math.Floor((corner.X + ofTheSheet.Width) * Pictures.Scale); x++)
+                {
+                    var dot = drawn.Dots[(y * drawn.Width) + x];
+                    if (are((dot >> 16) & 0xFF, (dot >> 8) & 0xFF, dot & 0xFF))
+                    {
+                        count++;
+                    }
+                }
+            }
+            return count;
+        }
+
+        // The words are nearly white, and a chord's name the colour of sand.
+        static bool Words(int red, int green, int blue) => red > 190 && green > 190 && blue > 190;
+        static bool Name(int red, int green, int blue) => red > 215 && green is > 170 and < 240 && blue is > 120 and < 200 && red - blue > 40;
+
+        var lines = 0;
+        for (var row = 0; row < sheet.Rows.Count; row++)
+        {
+            if (sheet.Rows[row].Kind != SheetRowKind.Line || sheet.Rows[row].Alone)
+            {
+                continue;
+            }
+            var item = grid.Lines[row];
+            if (item.ChordTop + metrics.LineHeight > scroll.ViewportHeight)
+            {
+                continue;
+            }
+            lines++;
+            var placed = item.Placed!;
+            var card = grid.Cells[item.Cell].Card;
+            var wordsTop = item.ChordTop + metrics.BubbleHeight + metrics.Tail;
+            // The words: in their own room, from the line's left to where they end; and
+            // nothing of their colour beside them, on to the card's edge.
+            var words = Dots(new Rect(item.Left, wordsTop, placed.WordsWidth, metrics.WordHeight), Words);
+            Assert.True(words > placed.WordsWidth * 3, Said($"row {row}: only {words} dots of words in {placed.WordsWidth} of line"));
+            Assert.Equal(0, Dots(new Rect(item.Left + placed.WordsWidth + 1.5, wordsTop, card.Right - item.Left - placed.WordsWidth - 2.5, metrics.WordHeight), Words));
+            Assert.Equal(0, Dots(new Rect(card.Left + 1, wordsTop, item.Left - card.Left - 2, metrics.WordHeight), Words));
+            // No words on the row of chords, and no chord's name among the words.
+            Assert.Equal(0, Dots(new Rect(card.Left + 1, item.ChordTop, card.Width - 2, metrics.BubbleHeight), Words));
+            Assert.Equal(0, Dots(new Rect(card.Left + 1, wordsTop, card.Width - 2, metrics.WordHeight), Name));
+            // Each chord's name: in its bubble, and nothing of its colour between the
+            // bubbles nor before the first.
+            var chords = sheet.Rows[row].Chords;
+            var free = card.Left + 1;
+            for (var n = 0; n < chords.Count; n++)
+            {
+                var bubble = new Rect(item.Left + placed.Xs[n], item.ChordTop, placed.Widths[n], metrics.BubbleHeight);
+                Assert.True(Dots(bubble, Name) > 8, Said($"row {row}: the name of {chords[n].Name} is not in its bubble at {bubble}"));
+                Assert.Equal(0, Dots(new Rect(free, item.ChordTop, Math.Max(0, bubble.Left - 0.5 - free), metrics.BubbleHeight), Name));
+                free = bubble.Right + 0.5;
+            }
+            Assert.Equal(0, Dots(new Rect(free, item.ChordTop, Math.Max(0, card.Right - 1 - free), metrics.BubbleHeight), Name));
+        }
+        // (Every line of the two rows of slides that are in sight: twelve.)
+        Assert.Equal(12, lines);
+
+        // A frame's foot says its slide's number, in white; and the bare sheet between
+        // two frames has nothing on it at all.
+        var first = grid.Cells[0];
+        Assert.True(Dots(new Rect(first.Frame.Left + 6, first.Card.Bottom + 1, 80, SheetLook.Foot - 2), Words) > 30);
+        // (Between the second and the third: the first is picked, and its ring is in
+        // the room beside it.)
+        var between = new Rect(grid.Cells[1].Frame.Right + 1, first.Frame.Top, grid.Cells[2].Frame.Left - grid.Cells[1].Frame.Right - 2, first.Frame.Height);
+        Assert.True(between.Width > 8);
+        Assert.Equal(0, Dots(between, (red, green, blue) => red != 0x1B || green != 0x1C || blue != 0x1F));
+        // The slide that is picked has its ring, in the sheet's orange, just outside its
+        // frame; and the others have none.
+        static bool Orange(int red, int green, int blue) => red > 230 && green is > 110 and < 170 && blue < 80;
+        Assert.True(Dots(new Rect(first.Frame.Left - 6, first.Frame.Top - 6, first.Frame.Width + 12, 5), Orange) > first.Frame.Width);
+        Assert.Equal(0, Dots(new Rect(grid.Cells[1].Frame.Left - 5, grid.Cells[1].Frame.Top - 6, grid.Cells[1].Frame.Width + 10, 5), Orange));
+    });
+
+    [Fact]
+    public void TheKeysBringTheSpotsWholeSlideIntoViewWithAsLittleScrollingAsDoesIt() => OnAMadeUpPC(async pc =>
+    {
+        var (_, view, hand) = await Open(pc, "Amazing Grace", height: 520);
+        var scroll = Named<ScrollViewer>(view.SongPane.ChordSheet, "Scroll");
+        hand.PointAt("That saved");
+        Assert.Equal(0, scroll.VerticalOffset);
+        // Down, to the slide under: more of it is out of sight than in. The sheet scrolls
+        // until the whole of its frame, and the 6 that is kept clear round it, is in
+        // sight, and no further.
+        hand.Press(Key.Down);
+        Pictures.LayOut(view, 1280, 520);
+        var frame = hand.Grid.Cells[3].Frame;
+        Assert.Equal(3, hand.Sheet.Rows[hand.Sheet.Spot.Row].Slide);
+        Assert.True(frame.Height + 12 <= scroll.ViewportHeight);
+        Assert.Equal(frame.Bottom + 6 - scroll.ViewportHeight, scroll.VerticalOffset, 0.5);
+        // The next line of the same slide is in sight already: nothing scrolls.
+        var offset = scroll.VerticalOffset;
+        hand.Press(Key.Down);
+        Pictures.LayOut(view, 1280, 520);
+        Assert.Equal(offset, scroll.VerticalOffset);
+        // Up, to the slide over: back until its frame's top, and the 6 over it, is in sight.
+        hand.Press(Key.Up);
+        hand.Press(Key.Up);
+        Pictures.LayOut(view, 1280, 520);
+        Assert.Equal(0, hand.Sheet.Rows[hand.Sheet.Spot.Row].Slide);
+        Assert.Equal(hand.Grid.Cells[0].Frame.Top - 6, scroll.VerticalOffset, 0.5);
+        // Right and Left bring it into view as well: on from the first slide's last
+        // word, slide by slide, to the fourth, which is under the first.
+        hand.PointAt("me");
+        for (var words = 0; words < 30 && hand.Sheet.Rows[hand.Sheet.Spot.Row].Slide < 3; words++)
+        {
+            hand.Press(Key.Right);
+        }
+        Pictures.LayOut(view, 1280, 520);
+        Assert.Equal(3, hand.Sheet.Rows[hand.Sheet.Spot.Row].Slide);
+        Assert.Equal(frame.Bottom + 6 - scroll.ViewportHeight, scroll.VerticalOffset, 0.5);
+    });
+
+    // ---- The window's menu
+
+    [Fact]
+    public void TheViewMenuHasTheTwoEditorsWithTheOneShownTickedAndTheSizeOfTheWordsOfThatOne() => OnAMadeUpPC(async pc =>
+    {
+        var (model, view, _) = await Open(pc, "Amazing Grace");
+        var chords = Named<MenuItem>(view, "ShowChords");
+        var chordPro = Named<MenuItem>(view, "ShowChordPro");
+        var larger = Named<MenuItem>(view, "LargerWords");
+        var smaller = Named<MenuItem>(view, "SmallerWords");
+        var usual = Named<MenuItem>(view, "UsualWords");
+        void Opened() => ((MenuItem)chords.Parent).RaiseEvent(new RoutedEventArgs(MenuItem.SubmenuOpenedEvent));
+        static void Chosen(MenuItem item) => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+
+        Assert.Equal(("Ctrl+1", "Ctrl+2", "Ctrl+Plus", "Ctrl+Minus", "Ctrl+0"), (chords.InputGestureText, chordPro.InputGestureText, larger.InputGestureText, smaller.InputGestureText, usual.InputGestureText));
+        // The sheet is shown: its name is ticked, and the sizes are the sheet's.
+        Opened();
+        Assert.Equal((true, false), (chords.IsChecked, chordPro.IsChecked));
+        Assert.True(chords.IsEnabled && chordPro.IsEnabled && larger.IsEnabled && smaller.IsEnabled && usual.IsEnabled);
+        Chosen(larger);
+        Assert.Equal((0.9, 1.0), (model.SheetZoom, model.TextZoom));
+        Chosen(smaller);
+        Chosen(smaller);
+        Assert.Equal((0.7, 1.0), (model.SheetZoom, model.TextZoom));
+        Chosen(usual);
+        Assert.Equal((0.8, 1.0), (model.SheetZoom, model.TextZoom));
+        // The other editor, chosen in the menu: ticked, and the sizes are the text's.
+        Chosen(chordPro);
+        Assert.Equal(LibraryModel.Editor.ChordPro, model.EditorShown);
+        Opened();
+        Assert.Equal((false, true), (chords.IsChecked, chordPro.IsChecked));
+        Chosen(larger);
+        Chosen(larger);
+        Assert.Equal((0.8, 1.25), (model.SheetZoom, model.TextZoom));
+        Chosen(usual);
+        Assert.Equal((0.8, 1.0), (model.SheetZoom, model.TextZoom));
+        // At the end of its sizes, the one that would go further is greyed.
+        for (var times = 0; times < 9; times++)
+        {
+            Chosen(smaller);
+        }
+        Opened();
+        Assert.Equal(0.5, model.TextZoom);
+        Assert.False(smaller.IsEnabled);
+        Assert.True(larger.IsEnabled);
+        Chosen(usual);
+        Chosen(chords);
+        Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
+        for (var times = 0; times < 9; times++)
+        {
+            Chosen(larger);
+        }
+        Opened();
+        Assert.Equal((1.5, 1.0), (model.SheetZoom, model.TextZoom));
+        Assert.False(larger.IsEnabled);
+        Assert.True(smaller.IsEnabled);
+        // With a song that could not be read, or none, there is nothing to show or to size.
+        model.Open(pc.Song("Nonsense"));
+        Opened();
+        Assert.False(chords.IsEnabled || chordPro.IsEnabled || larger.IsEnabled || smaller.IsEnabled || usual.IsEnabled);
+        Assert.Equal((false, false), (chords.IsChecked, chordPro.IsChecked));
     });
 }
