@@ -102,12 +102,19 @@ Vectors: `sheet-model.json`, `rows`.
    many to a row as fit, and then the next row under it. Each frame keeps 6 clear all
    round it; the sheet has a margin of 6 at its sides and its foot, and 30 at its top
    (rule 29 says why).
-   - **Every card is one width.** The least it can be is what the widest line of the
-     whole song needs with its chords (a line of chords alone, 50 more, for the next
-     chord; and never less than 160), and 28 more for the room inside the card. As
-     many go to a row as fit across the sheet at that width, and the row's width is
-     then shared out evenly among them, so that the rows fill the sheet from side to
-     side.
+   - **A slide is as wide as it needs, and no wider.** It needs the widest of its
+     lines with its chords (rule 11; a line of chords alone, 44 more, so that the
+     place past its last chord has room to be pointed at; and never less than 40),
+     the 10 inside its card at each side and the frame's 4 at each side; or what the
+     words on its foot need with 8 either side of them, if that is more. **No room is
+     kept for what might be put on a line later**: a line that comes to need more,
+     for a chord at its end, is given it then.
+   - **A column is as wide as the widest slide in it**, and every slide of a column
+     is that wide, so that the columns stand in line.
+   - **As many columns as fit**: the greatest number for which the slides, dealt out
+     along the rows in the order of the song, leave every column on the sheet with
+     the 6 clear round each frame. What is left of the sheet's width is bare, at
+     its right.
    - **The cards of one row are one height**: that of the slide among them with the
      most lines. A slide with fewer has room to spare under its last line.
    - Where even one card is wider than the sheet, there is one to a row, and the sheet
@@ -120,7 +127,10 @@ Vectors: `sheet-model.json`, `rows`.
    asked for after trying cards of differing sizes. Tried on the maintainer's own
    library of 422 songs, a window showed some three lines of words of a song. Each
    card was then made as tall as its own slide; and then, the same day, the column
-   became this grid.)
+   became this grid. In the grid's first hour every card was as wide as the song's
+   widest line, and a row's width was shared out among its cards; the maintainer, on
+   seeing the room that left beside the words: "let's drop that pre-emptive free
+   space and keep the dynamically growing only when needed".)
 9. A group's name is nowhere but on the foot of its first slide's frame (rule 7), and
    a slide's number nowhere but on its own.
 10. **A line** is its words at 21 pixels with a row above them for chords. A chord is a
@@ -157,9 +167,9 @@ of the slides against this page.
 
 ## Zooming
 
-14a. **The sheet zooms**: every size of rules 10 and 11, the 10 inside a card and the
-    other sizes of rule 8's first point, and so the cards and how many go to a row,
-    are so many times what those rules say. The steps are 50, 60, 70, 80, 90, 100,
+14a. **The sheet zooms**: every size of rules 10 and 11, and the 10, the 44 and the 40
+    of rule 8's first point, and so the cards and how many go to a row, are so many
+    times what those rules say. The steps are 50, 60, 70, 80, 90, 100,
     110, 125 and 150 in the hundred; **the usual one is 80**. What does not zoom: a
     frame's 4 and its foot, the words on the foot, the gaps between frames and the
     margins, the ring, and the bubble a chord is typed in.

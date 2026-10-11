@@ -136,9 +136,15 @@ words; dropping a `.pro` file on the window to open it.
     (**known**: `osascript -e 'id of app "ProPresenter"'` says so on the maintainer's
     Mac, and it is the same in each of the versions looked at there, from 7.9.2 to
     21.3).
-18. This is asked when the app starts, when it comes to the front, and **before every
-    save**. The first two are for telling the person early; only the last is the
-    safeguard.
+18. This is asked when the app starts, when it comes to the front, whenever the
+    system says ProPresenter has started or quit, and **before every save**. The
+    first three are for telling the person early; only the last is the safeguard.
+    (**Found**, on the Mac, 2026-10-11: asked only on coming to the front, the band
+    stayed after ProPresenter was quit. Quit from its own window, it is still going
+    when this app comes to the front; quit from its Dock icon, this app was in front
+    all the while. On the Mac the system's news is `NSWorkspace`'s notices that an
+    application has launched or terminated. Where a system gives no such news, a
+    look every second or two while the app's window is open does as well.)
 19. While it is running, everything can be looked at and nothing changed: the text
     cannot be typed in and the keys cannot be set. A band
     across the top of the song says: "ProPresenter is running. Quit it to change

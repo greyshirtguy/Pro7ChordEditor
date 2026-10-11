@@ -187,11 +187,24 @@ And at M6, 2026-10-11:
     with its number, as Simple Presenter's thumbnails have (the maintainer's words
     could be read as the first slide of a group only); the cards of one ROW of the
     grid are one height, so that the feet of a row stand level (decision 36 had each
-    its own); a row's width is shared out among its cards, so that rows fill the
-    sheet; the ring is on the slide that is PICKED, there being no slide that is live
+    its own); the ring is on the slide that is PICKED, there being no slide that is live
     here; the sheet's top margin is 30, for the typing bubble; Down and Up go by the
     screen (`spec/03`, rule 20); and the window opens at 1280 by 800, where it was
     1100 by 680.
+39. **A column of the grid is only as wide as its widest slide needs** (`spec/03`,
+    rule 8). At first every card was as wide as the song's widest line and a row's
+    width was shared out among its cards, which left room beside the words in most
+    of them. The maintainer took it for room kept for chords: "let's drop that
+    pre-emptive free space and keep the dynamically growing only when needed - (this
+    gives a nicer grid with more slides)". So nothing is kept: a slide is as wide as
+    its lines need now; a column as wide as its widest slide, so that columns stand
+    in line; and what is left of the sheet is at its right. (Mine: columns of their
+    own widths and not every card its own, which would pack still more to a row but
+    in no lines up and down; and 44 kept on a line of chords alone, without which
+    the place past its last chord could not be pointed at.)
+40. **Whether ProPresenter is running is asked again whenever the system says it has
+    started or quit** (`spec/06`, rule 18), the maintainer having quit it and seen
+    the band stay.
 
 ## How it is laid out, and why
 
@@ -753,9 +766,21 @@ changing any of it:
   14.1 lines, 58%. In a large window (1450 by 900): 19.2 lines, 80%, and 284 songs
   wholly in sight. Of 22,236 places pointed at, none gave the wrong place. Slowest
   layout 17 ms, slowest drawing 24 ms.
-- **97 of them are one slide to a row at the usual zoom, and 45 scroll sideways**,
-  because every card is as wide as the song's widest line and a line never wraps: a
-  verse written as one line makes every card of its song that wide.
+- **97 of them were one slide to a row at the usual zoom, and 45 scrolled sideways**,
+  every card being as wide as the song's widest line and a line never wrapping.
+- **With a column only as wide as its own slides need** (decision 39), the same
+  measures: in the window as it opens, at the usual zoom, 10.1 lines of words in
+  sight (42%), 122 songs wholly in sight, one slide to a row in 89 songs and two in
+  219; at 60 in the hundred, 15.4 lines (64%); in a large window, 19.8 lines (82%)
+  and 320 songs wholly in sight. Still 45 scroll sideways: a line never wraps, and a
+  verse written as one line is wider than the sheet. None of 22,236 places pointed
+  at gave the wrong place; slowest layout 22 ms.
+- **Asked only when the app came to the front, whether ProPresenter was running was
+  wrong after it was quit** (decision 40): quit from its own window, it is still
+  going when this app is in front again. `LibraryWindow` now listens for
+  `NSWorkspace`'s news of an application launching and terminating, and asks again
+  at once and a second later. That the band then goes has been proved on the model
+  with a made-up Mac, and NOT by quitting ProPresenter: the maintainer's to see.
 - **Thirty more breakages, of the grid's rules**: twenty-eight caught; one was no
   breakage at all (mine, written wrong), and one showed a test that could not fail
   (a frame and its foot being bare sheet), which was mended. All are caught now.
@@ -802,10 +827,13 @@ second of Simple Presenter in so many words.
   0, and a pinch; that Down and Up go where the eye expects with slides side by
   side; whether 80 in the hundred is the right usual size; whether every slide
   should have the foot or only the first of a group.
-- **A song with one long line is one slide to a row**, and a very long one scrolls
-  sideways (97 and 45 of 422 at the usual zoom). What would help: a slide wider than
-  the rest taking the room of two or three in its row; or lines that wrap, which the
-  page forbids and which chords over a wrapped line make hard.
+- **A song of long lines is one slide to a row**, and a very long line scrolls
+  sideways (89 and 45 of 422 at the usual zoom). What would help: lines that wrap,
+  which the page forbids and which chords over a wrapped line make hard.
+- **Nothing may be saved while ProPresenter is running, wherever the file is**, which
+  the maintainer wants looked at again: a file outside the workspace ProPresenter
+  has open (a copy on the Desktop, another workspace) is nothing it can have in its
+  hands. Thoughts were given on 2026-10-11 and nothing is decided or built.
 - **An empty line in the middle of a slide's words takes a whole line's height**,
   chords' row and all, though no chord can go there.
 - **`spec/pictures` are of Simple Presenter's sheet in one column.** Once the
