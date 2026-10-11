@@ -99,6 +99,12 @@ struct StandInsInRTFTests {
         let before = RTFWords.rtf(apple(#"\cf2\uc0\u8193  }"#), withLine: 0, become: standIns(1, space))
         #expect(shown(before) == shown(apple(#"\cf2\uc0  }"#)))
         #expect(before.map { RTFWords.words(ofRTF: $0) } == standIns(1, space))
+        // Where the em quad's word has a space of its own, none is added: the space
+        // put in after it is text as it stands. And where it has none, but the word
+        // before it has, one is added all the same: it is the em quad's own word
+        // that the space would end.
+        #expect(shown(RTFWords.rtf(apple(#"\cf2  \uc0\u8193 }"#), withLine: 0, become: standIns(2, space))) == shown(apple(#"\cf2  \uc0\u8193  }"#)))
+        #expect(shown(RTFWords.rtf(apple(#"\cf2  \uc0 \u8193}"#), withLine: 0, become: standIns(2, space))) == shown(apple(#"\cf2  \uc0 \u8193  }"#)))
         // The same where the em quad is written straight in, as its three bytes of
         // UTF-8: it is no control word, and the word before it still has no space.
         let straightIn = Array(#"{\rtf1\ansi\cf2"#.utf8) + [0xE2, 0x80, 0x81] + Array(" }".utf8)
@@ -173,6 +179,12 @@ struct StandInsInRTFTests {
         #expect(RTFWords.rtf(other, withLine: 0, become: standIns(3)) == nil)
         // Only stand-ins are ever written.
         #expect(RTFWords.rtf(apple(Self.two + "}"), withLine: 0, become: Words("G")) == nil)
+        // A character from beyond the first 65,536, written straight in, is two units
+        // of the text and one stretch of bytes: the two cannot be taken out apart, and
+        // a line that has one is no line of chords alone. It is not done.
+        let note = Array(#"{\rtf1\ansi Made up "#.utf8) + Array("\u{1F3B5}".utf8) + Array("}".utf8)
+        #expect(RTFWords.words(ofRTF: note).units.suffix(2) == [0xD83C, 0xDFB5])
+        #expect(RTFWords.rtf(note, withLine: 0, become: standIns(1)) == nil)
     }
 
     @Test("rtf-text.json, every sample, every line that has a character, to none, one, two and three stand-ins of both kinds: outside the line not a byte changes, and the text reads back as meant")
@@ -238,6 +250,14 @@ struct OpeningOfAnRTFTests {
             == shown(apple(#"\f0\fs160 \cf2 \uc0\uc0\u8203 }"#)))
         #expect(shown(RTFWords.rtf(withTheOpeningOf: apple(#"\f0\fs84 \cf2 \"# + "\n" + "Words}"), then: standIns(1)))
             == shown(apple(#"\f0\fs84 \cf2 \uc0\u8203 }"#)))
+    }
+
+    @Test("Stand-ins on plain spaces after an opening that ends in a control word with no space of its own would lose the first of them: nothing is made. (The apps put zero-width spaces after an opening, and nothing else)")
+    func spacesAfterAnOpenWord() {
+        let model = apple(#"\f0\fs84\cf2\'e9t\'e9}"#)
+        #expect(RTFWords.words(ofRTF: model) == Words("\u{E9}t\u{E9}"))
+        #expect(RTFWords.rtf(withTheOpeningOf: model, then: standIns(2, space)) == nil)
+        #expect(RTFWords.rtf(withTheOpeningOf: model, then: standIns(2)).map { RTFWords.words(ofRTF: $0) } == standIns(2))
     }
 
     @Test("A text box with no character at all, as ProPresenter leaves an empty one, has no opening to give")

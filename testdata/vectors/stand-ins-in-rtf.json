@@ -971,6 +971,222 @@
    "outBase64": null
   },
   {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 0 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 0,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 1 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwfQ=="
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 2 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzICB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 3 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzICBcdWMwXHU4MTkzICB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 4 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 4,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzICBcdWMwXHU4MTkzICBcdWMwXHU4MTkzICB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 0 to 2 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 0,
+   "standIn": 8203,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: line 1, which it has not got",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 1,
+   "outBase64": null
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 0 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 32,
+   "count": 0,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzAgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 1 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 32,
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIH0="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 2 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 32,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5MyAgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 3 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 32,
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5MyAgXHVjMFx1ODE5MyAgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 4 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 32,
+   "count": 4,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5MyAgXHVjMFx1ODE5MyAgXHVjMFx1ODE5MyAgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 0 to 2 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 0,
+   "standIn": 8203,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzAgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: line 1, which it has not got",
+   "rtfBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 1,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 0 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 0,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 1 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 1,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 2 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 2,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 3 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 3,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 4 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 32,
+   "count": 4,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 0 to 2 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 0,
+   "standIn": 8203,
+   "count": 2,
+   "outBase64": null
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 0 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 0,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgfQ=="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 1 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 2 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyB9"
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 3 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyBcdWMwXHU4MTkzIFx1YzBcdTgyMDMgfQ=="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 4 on zero-width spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 8203,
+   "count": 4,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyBcdWMwXHU4MTkzIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIH0="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 1 to 2 on spaces",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 1,
+   "standIn": 32,
+   "count": 2,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgIFx1YzBcdTgxOTMgIH0="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: line 2, which it has not got",
+   "rtfBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "line": 2,
+   "standIn": 8203,
+   "count": 1,
+   "outBase64": null
+  },
+  {
    "name": "an em quad written straight in, straight after a word with no space, and a space: line 0 to 0 on spaces",
    "rtfBase64": "e1xydGYxXGFuc2lcY2Yy4oCBIH0=",
    "line": 0,
@@ -2759,6 +2975,42 @@
    "modelBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyXHVjMFx1ODE5MyAgfQ==",
    "count": 3,
    "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyXHVjMFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyB9"
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: 1",
+   "modelBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgfQ=="
+  },
+  {
+   "name": "a space and an em quad, the em quad's word ending in its own space: 3",
+   "modelBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwXHU4MTkzIH0=",
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyB9"
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: 1",
+   "modelBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgfQ=="
+  },
+  {
+   "name": "a space and an em quad whose word runs up to the bracket, after a word that has its space: 3",
+   "modelBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyICBcdWMwIFx1ODE5M30=",
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcY29jb2FydGYyNzYxClxjb2NvYXRleHRzY2FsaW5nMFxjb2NvYXBsYXRmb3JtMHtcZm9udHRibFxmMFxmc3dpc3NcZmNoYXJzZXQwIEhlbHZldGljYTtcZjFcZm5pbFxmY2hhcnNldDAgTHVjaWRhR3JhbmRlO30Ke1xjb2xvcnRibDtccmVkMjU1XGdyZWVuMjU1XGJsdWUyNTU7XHJlZDI1NVxncmVlbjI1NVxibHVlMjU1O30Ke1wqXGV4cGFuZGVkY29sb3J0Ymw7O1xjc2dlbmVyaWNyZ2JcYzEwMDAwMFxjMTAwMDAwXGMxMDAwMDA7fQpccGFyZFxwYXJkaXJuYXR1cmFsXHFjXHBhcnRpZ2h0ZW5mYWN0b3IwCgpcY2YyIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyB9"
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: 1",
+   "modelBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "count": 1,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIFx1YzBcdTgyMDMgfQ=="
+  },
+  {
+   "name": "a character from beyond the first 65,536 written straight in, which is two units of one stretch of bytes: 3",
+   "modelBase64": "e1xydGYxXGFuc2lcdWMwIE1hZGUgdXAg8J+OtVxwYXIgXHU4MjAzIH0=",
+   "count": 3,
+   "outBase64": "e1xydGYxXGFuc2lcdWMwIFx1YzBcdTgyMDMgXHVjMFx1ODE5MyBcdWMwXHU4MjAzIFx1YzBcdTgxOTMgXHVjMFx1ODIwMyB9"
   },
   {
    "name": "an em quad written straight in, straight after a word with no space, and a space: 1",
