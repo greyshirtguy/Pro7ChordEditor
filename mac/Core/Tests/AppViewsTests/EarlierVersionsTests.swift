@@ -231,6 +231,11 @@ struct EarlierVersionsTests {
         // And reverted once more, it is as opened once more.
         model.revert()
         #expect(try mac.bytes(of: "Plain Song") == opened && !model.canRevert)
+        // Asked again with nothing to revert, nothing is done: no offer to undo, which
+        // would be an offer to put back a copy that has nothing to do with it.
+        model.forgetWhatWasPutBack()
+        model.revert()
+        #expect(model.justPutBack == nil && model.notice != "The song is as it was when it was opened here.")
 
         // While ProPresenter is running it is refused like any save, in the same words.
         model.setKey("A")
