@@ -25,5 +25,6 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Pro7ChordEditor.ChordRules.Tests" />
+    <InternalsVisibleTo Include="Pro7ChordEditor.Song.Tests" />
   </ItemGroup>
 </Project>

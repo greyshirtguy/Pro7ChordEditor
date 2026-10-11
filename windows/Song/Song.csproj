@@ -13,8 +13,11 @@
   window's code").
 
   Its tests are Tests/Song.Tests, on copies of testdata/files in a temporary folder.
+  They may see what is kept inside the project (the lines below), for the few small
+  things worth trying by themselves.
 
-  Empty until milestone M2.
+  Song.cs is the way in, and lists the files. So far it is the song itself (milestone
+  M2); the library, the copies and the checks are to come.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -22,6 +25,9 @@
     <AssemblyName>Pro7ChordEditor.Song</AssemblyName>
     <RootNamespace>Pro7ChordEditor.Song</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Pro7ChordEditor.Song.Tests" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
     <ProjectReference Include="..\ProFormat\ProFormat.csproj" />
