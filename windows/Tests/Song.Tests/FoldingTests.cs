@@ -118,6 +118,12 @@ public sealed class FoldingTests : IDisposable
         var minor = bench.FileOf("A Song - In A Minor Key (Chords).pro", Copy("A Song - In A Minor Key"));
         var minorBare = bench.FileOf("A Song - In A Minor Key.pro", WithNoChords(Clean("A Song - In A Minor Key")));
         Assert.Equal(new FoldPlan(true, 9, 0, "Ab", "F#m", CopysLikelierKey: "F#m"), Folding.Plan(minor, minorBare));
+        // A copy that states no key has none to doubt, whatever its chords look like.
+        // (Holy Holy Holy states none, and its chords look like D.)
+        var keyless = bench.FileOf("Holy Holy Holy (Chords).pro", Clean("Holy Holy Holy"));
+        var keylessBare = bench.FileOf("Holy Holy Holy.pro", WithNoChords(Clean("Holy Holy Holy")));
+        Assert.Equal("D", Checks.Read(keyless).Key.Suggested);
+        Assert.Equal(new FoldPlan(true, 22, 0, "", ""), Folding.Plan(keyless, keylessBare));
         // Another song altogether: not the same words.
         Assert.False(Folding.Plan(copy, bench.FileOf("another.pro", Clean("It Is Well"))).SameWords);
         // And the same words but for one letter.
@@ -127,6 +133,9 @@ public sealed class FoldingTests : IDisposable
         Assert.Contains("One two three four", rtf, StringComparison.Ordinal);
         text.RtfData = ByteString.CopyFromUtf8(rtf.Replace("One two three four", "One two three for", StringComparison.Ordinal));
         Assert.False(Folding.Plan(copy, bench.FileOf("one-letter.pro", presentation.ToByteArray())).SameWords);
+        // And the same words but for a capital.
+        text.RtfData = ByteString.CopyFromUtf8(rtf.Replace("One two three four", "one two three four", StringComparison.Ordinal));
+        Assert.False(Folding.Plan(copy, bench.FileOf("one-capital.pro", presentation.ToByteArray())).SameWords);
         // A file that is no song is refused, and says which.
         var nonsense = bench.FileOf("Nonsense.pro", "This is not a song."u8.ToArray());
         Assert.Equal(Refusal.Why.CannotBeRead, Assert.Throws<Refusal>(() => Folding.Plan(copy, nonsense)).Reason);
@@ -263,6 +272,42 @@ public sealed class FoldingTests : IDisposable
         // And then it is done.
         song.FoldIn(Copy("Plain Song"));
         Assert.True(Same(Clean("Plain Song"), File.ReadAllBytes(path)));
+    }
+
+    // The copy's own file is not the song's to keep a copy of: whoever asks hands in the
+    // keeping of that. It is done once it is known that there is something to save and
+    // that it may be saved, and before anything is; and if it fails, nothing is saved.
+    [Fact]
+    public void TheKeepingOfTheCopysOwnFileIsDoneBeforeAnythingIsSavedAndOnlyIfSomethingMayBe()
+    {
+        var bare = WithNoChords(Clean("Plain Song"));
+        var path = bench.FileOf("Plain Song.pro", bare);
+        var song = bench.OpenAt(path);
+        var kept = new List<byte[]>();
+        void Keep() => kept.Add(File.ReadAllBytes(path));
+
+        // Nothing may be saved: it is not asked for.
+        bench.ProPresenterIsRunning = true;
+        Assert.Equal(Refusal.Why.ProPresenterIsRunning, Assert.Throws<Refusal>(() => song.FoldIn(Copy("Plain Song"), Keep)).Reason);
+        Assert.Empty(kept);
+        bench.ProPresenterIsRunning = false;
+        Assert.Equal(Refusal.Why.WordsDiffer, Assert.Throws<Refusal>(() => song.FoldIn(Copy("It Is Well"), Keep)).Reason);
+        Assert.Empty(kept);
+        // It fails: the folding is refused, saying why, and nothing is changed.
+        var refused = Assert.Throws<Refusal>(() => song.FoldIn(Copy("Plain Song"), () => throw new IOException("There is no room.")));
+        Assert.Equal(Refusal.Why.CopyNotKept, refused.Reason);
+        Assert.Contains("There is no room.", refused.Sentence, StringComparison.Ordinal);
+        Assert.True(Same(bare, File.ReadAllBytes(path)));
+        Assert.Empty(bench.Copies);
+        Assert.False(song.CanUndo);
+        // It is done: once, and while the song's file is still as it was.
+        song.FoldIn(Copy("Plain Song"), Keep);
+        Assert.Single(kept);
+        Assert.True(Same(bare, kept[0]));
+        Assert.True(Same(Clean("Plain Song"), File.ReadAllBytes(path)));
+        // With nothing to put in, it is not asked for again.
+        song.FoldIn(Copy("Plain Song"), Keep);
+        Assert.Single(kept);
     }
 
     // The chords go by the box's place in the file, not by its id or its slide: the old
