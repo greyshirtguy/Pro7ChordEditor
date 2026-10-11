@@ -16,6 +16,99 @@ milestone; put right what has become untrue.
 | **M3** The library | Next | Find ProPresenter's folder; the lists; search; open a song and show it, read only; know when ProPresenter is running. `spec/06`. **Wants first** a look at this PC's ProPresenter: where version 22 on Windows keeps its folder, whether it has workspaces, and what RTF it writes ("Left rough") |
 | **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
 
+## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
+
+**Found 2026-10-12, on this PC, by reading and nothing else.** It is the look `spec/06`
+(rule 3) leaves to the Windows session, and it came out as nobody expected. It is not
+decided, and `spec/` is not changed: both are the maintainer's. The Mac's session needs
+to know of it too.
+
+**What is on this PC** (ProPresenter 22, `ProPresenter.exe` 22.0.0.110, "22
+(369098862)" in its own words; not running while it was looked at):
+
+- **There is no `ProPresenter` in Documents** (Documents is in OneDrive here), and
+  `%APPDATA%\RenewedVision\ProPresenter\PathSettings.proPaths` **is there and is
+  empty**: no bytes at all. `spec/06`, rule 2, says the file is only there if the
+  folder was moved.
+- **It has workspaces**, in `%APPDATA%\RenewedVision\ProPresenter\Workspaces`, each a
+  folder named by an id. Which there are is in a SQLite database beside them,
+  `registry-v1.sqlite3`: a table `workspaces` (`local_uuid`, `root_path`,
+  `display_name`, `cloud_uuid`, `schema_version`, `availability`) and a table `meta`
+  whose `active_local_uuid` is the one in use. Here: one workspace, shown as
+  "ProPresenter", `schema_version` "22.5.0", `availability` "local".
+  (`media-manager.toml`, in the folder above, has the same folder as text under
+  `[[workspaces]]`, `path = '...'`.)
+- **A workspace has no songs as files.** Its `Libraries` folder has one folder, with
+  one `.pro.bak` of 2022 in it, and no `.pro` file is anywhere under ProPresenter's
+  folder in `%APPDATA%`. The songs are rows of another SQLite database,
+  `<workspace>\DocumentStore\workspace-v1.sqlite3` (its `application_id` spells
+  "RVWS"): table `workspace_streams`, one row for each document, with its `kind`
+  ("Presentation", "Theme", "Stage", "Macros", "PlaylistLibrary" and sixteen more),
+  its `core_path` (for a presentation, the library's name, a slash, and the song's
+  name with no ending) and its `snapshot`. Eighteen presentations here: seventeen in
+  three libraries, two of which have no folder on the disk at all, and one in none.
+- **A snapshot is not the bytes of a `.pro` file.** Every one begins with the four
+  letters `loro`, then sixteen bytes and `00 03`: the form in which the Loro library
+  (loro.dev, a library for documents that several people change at once and that are
+  merged afterwards) writes a whole document. Inside are blocks packed with LZ4, in
+  which the names of the `.pro` format's fields can be read as text (`cues`,
+  `base_slide`, `custom_attributes`, `chord`), and RTF. So the song is kept as a
+  tree, a part for each field, with the history that merging needs; and beside it
+  the database keeps a count of its bytes, a SHA-256, a "version vector", and a table
+  of receipts for every change. The names say the files were taken into the
+  database once (`presentation_placement_cutover`, `workspace_cutover_acknowledgements`,
+  `workspace_migration_quarantine`); the workspace's oldest files are of 2026-09-17.
+- Two more folders are in `Workspaces` that the registry does not list: one with a
+  database of the same kind (and an `imprint.cloud`), one named
+  `ProPresenter-` and a long number, with a store of another kind (`.sst`, `.log`).
+  What they are is **not known**; earlier tries of the same thing, at a guess.
+
+**What is not known.** Whether every copy of version 22 is like this or this one is
+ahead of the rest: its settings list "feature flags" (`cloud-v2` among them), and a
+search of the web found nothing said about it. Whether version 22 on a
+Mac is the same (the maintainer's Mac has 21, where songs are files: `spec/06`, rule
+3). Whether 22 still takes a `.pro` put into `Libraries` by hand, or only through its
+own Import; and whether what it exports is still the `.pro` this repository reads.
+Only the maintainer, with ProPresenter open, can say.
+
+**What it means.** Everything in `spec/` is about a file: read whole, changed in one
+place, written back whole, with a copy kept and the bytes compared. On a PC like this
+one there is no file. The app as specified finds no library here and says so (`spec/06`,
+rule 6), and can still work on any folder of `.pro` files that is chosen: an export, a
+copy, the library of a ProPresenter up to 21.
+
+To change a song where version 22 keeps it would be another program: SQLite and Loro
+to read it (two dependencies, on both systems), the tree's layout worked out by
+looking, and to write, a change made as Loro makes one, with the version vector, the
+SHA-256, the count and the receipt that ProPresenter expects beside it, none of which
+is written down anywhere. "Byte for byte what it was" (`AGENTS.md`, the first thing
+that must stay true) has no meaning there, and a mistake is in the one place the
+person's whole library is. **This session will not write there, and advises against
+it** unless Renewed Vision says how it is to be done.
+
+**What this session proposes** (to be agreed, and then written into `spec/06` for both
+apps):
+
+1. The app goes on being about `.pro` files, as specified. Versions up to 21 are found
+   as `spec/06` says.
+2. Where the app finds version 22's workspaces and no folder of songs, it says so in
+   plain words in place of the bare "no library found": that this ProPresenter keeps
+   its songs where the app cannot open them, and that songs exported from it as
+   `.pro` files can be chorded from a folder that is chosen. (Not built: it is a new
+   sentence, and the maintainer's to word.)
+3. The maintainer tries, in ProPresenter 22: export a song; put chords on it with the
+   Mac app or Simple Presenter; import it again. Does it come back with its chords,
+   and does it take the place of the song or stand beside it? That says whether the
+   way round is one anyone would use.
+4. Reading version 22's store, only reading, so that songs can be seen and chorded
+   copies written out as `.pro` files, is possible and is a good deal of work. Not
+   before the answer to 3.
+
+**Meanwhile** M3 is built for folders of `.pro` files, which is needed whatever is
+decided. On this PC the maintainer can try it on `Documents\ProPresenter - Copy`, which
+is laid out as a ProPresenter folder of the old kind (who made it, the maintainer or
+ProPresenter's move to workspaces, is not known).
+
 ## What the maintainer decided, 2026-10-12
 
 1. **The first editor is moved to `windows/old`**, as it was, with its history ("happy
