@@ -313,4 +313,15 @@ struct PictureTests {
         let model = await modelWithASongOpen(mac, song: "Rock Of Ages (Toplady)", editor: .sheet)
         try draw(LibraryWindow(model: model), named: "27 the grid, groups in their colours", size: NSSize(width: 1600, height: 900))
     }
+
+    @Test("The settings: the colours of chords, as they come and with two chosen")
+    func theSettings() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        try draw(ChordColourSettings(model: model), named: "28 settings, the colours of chords", size: NSSize(width: 560, height: 330))
+        model.setSheetChordColour("#7fe3ff")
+        model.setTextChordColour("#c95fff")
+        try draw(ChordColourSettings(model: model), named: "29 settings, two colours chosen", size: NSSize(width: 560, height: 330), dark: true)
+        try draw(LibraryWindow(model: model), named: "30 the sheet, another colour for chords", size: Self.sheetSize)
+    }
 }

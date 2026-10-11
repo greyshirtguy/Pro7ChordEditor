@@ -785,6 +785,100 @@ struct ChordSheetViewTests {
         #expect(try mac.bytes(of: "Amazing Grace") == untouched)
     }
 
+    @Test("A paste says what came of it; and a click on a line and then Command+V pastes there, the box the click opened having nothing typed in it")
+    func pastedAfterAClick() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        let (canvas, window) = view(for: model)
+        defer { window.close() }
+        // (The system's count of what has been copied, kept still for the test.)
+        var copiedElsewhere = 7
+        canvas.whatWasCopiedLast = { copiedElsewhere }
+        let sheet = try #require(model.sheet)
+        let first = try row(Self.first, of: model)
+        let second = try row(Self.second, of: model)
+
+        // Nothing copied yet: Command+V says so.
+        sheet.setSpot(second, 0)
+        #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
+        #expect(model.notice.hasPrefix("Nothing has been copied yet."))
+
+        sheet.setSpot(first, 0)
+        #expect(canvas.performKeyEquivalent(with: try press("c", .command, in: window)))
+        // A click on the second line: the box opens there, empty.
+        let point = try #require(canvas.point(over: Spot(row: second, at: 13)))
+        canvas.pressed(at: point, shift: false)
+        canvas.released(at: point, shift: false, copy: false)
+        #expect(sheet.typing && sheet.entry.text.isEmpty)
+        #expect(window.firstResponder === canvas.entry.field.currentEditor())
+        // Command+V is the sheet's: the box closes, changing nothing of its own, and
+        // the first line's chords are on the second, word for word.
+        #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
+        #expect(!sheet.typing && canvas.entry.isHidden && window.firstResponder === canvas)
+        #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace")
+            == [Chord(at: 1, name: "G"), Chord(at: 5, name: "G7"), Chord(at: 13, name: "C"), Chord(at: 25, name: "G")])
+        #expect(model.notice == "4 chords put on the line.")
+
+        // With something typed in the box, Command+V is the box's own.
+        canvas.pressed(at: point, shift: false)
+        canvas.released(at: point, shift: false, copy: false)
+        try typeInBox("D", of: canvas)
+        #expect(!canvas.performKeyEquivalent(with: try press("v", .command, in: window)) || sheet.typing)
+        #expect(sheet.typing && canvas.entry.field.stringValue.hasPrefix("D"))
+        try pressInBox(#selector(NSResponder.cancelOperation(_:)), of: canvas)
+
+        // And if something has been copied elsewhere since, it is the box's own too:
+        // what would be pasted is no longer the line's chords.
+        copiedElsewhere += 1
+        let other = try #require(canvas.point(over: Spot(row: second, at: 20)))
+        canvas.pressed(at: other, shift: false)
+        canvas.released(at: other, shift: false, copy: false)
+        #expect(sheet.typing && sheet.entry.text.isEmpty)
+        _ = canvas.performKeyEquivalent(with: try press("v", .command, in: window))
+        #expect(sheet.typing)
+        // Command+C in an empty box has nothing of the box's to copy: it copies the
+        // chords of the box's line, and the box stays open.
+        #expect(canvas.performKeyEquivalent(with: try press("c", .command, in: window)))
+        #expect(sheet.typing && model.notice == "4 chords copied from the line: Command+V puts them on the lines from the spot's on, word for word")
+        #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
+        #expect(!sheet.typing)
+        // The keys that zoom are the sheet's whoever has the keyboard.
+        canvas.pressed(at: other, shift: false)
+        canvas.released(at: other, shift: false, copy: false)
+        #expect(canvas.performKeyEquivalent(with: try press("-", .command, in: window)))
+        #expect(model.sheetZoom == 0.7 && sheet.typing)
+        try pressInBox(#selector(NSResponder.cancelOperation(_:)), of: canvas)
+    }
+
+    @Test("What is said of a paste: how many chords went on how many lines, how many had no word to go on, and why a line was passed over")
+    func whatIsSaidOfAPaste() async throws {
+        #expect(LibraryModel.said(of: .init(lines: 1, chords: 4)) == "4 chords put on the line.")
+        #expect(LibraryModel.said(of: .init(lines: 1, chords: 1)) == "1 chord put on the line.")
+        #expect(LibraryModel.said(of: .init(lines: 3, chords: 9)) == "9 chords put on 3 lines.")
+        #expect(LibraryModel.said(of: .init(lines: 1, chords: 3, leftOut: 1)) == "3 chords put on the line. 1 had no word to go on, and was left out.")
+        #expect(LibraryModel.said(of: .init(lines: 2, chords: 2, leftOut: 3)) == "2 chords put on 2 lines. 3 had no word to go on, and were left out.")
+        #expect(LibraryModel.said(of: .init(lines: 1, leftOut: 2)) == "None of the copied chords had a word to go on here.")
+        let other = "chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none"
+        #expect(LibraryModel.said(of: .init(passedOver: 1)) == "Nothing was put here: \(other).")
+        #expect(LibraryModel.said(of: .init(lines: 1, chords: 2, passedOver: 1)) == "2 chords put on the line. 1 line was passed over: \(other).")
+        #expect(LibraryModel.said(of: .init()) == nil)
+
+        // On a blank slide, where a line of words' chords cannot go: said, and nothing
+        // changed.
+        let mac = try MadeUpMac()
+        let model = await open("Blank Slides", on: mac)
+        let before = try mac.bytes(of: "Blank Slides")
+        let sheet = try #require(model.sheet)
+        let words = try #require(sheet.rows.indices.first { sheet.usable($0) && !sheet.rows[$0].alone && !sheet.rows[$0].chords.isEmpty })
+        let blank = try #require(sheet.rows.firstIndex { $0.blank })
+        sheet.setSpot(words, 0)
+        model.copyChords(wholeGroup: false)
+        sheet.setSpot(blank, 0)
+        model.pasteChords()
+        #expect(model.notice == "Nothing was put here: \(other).")
+        #expect(try mac.bytes(of: "Blank Slides") == before)
+    }
+
     @Test("Leaving the sheet keeps the chord that was being typed: for another song, for the other editor, and when the keyboard goes elsewhere")
     func leavingKeepsIt() async throws {
         let mac = try MadeUpMac()

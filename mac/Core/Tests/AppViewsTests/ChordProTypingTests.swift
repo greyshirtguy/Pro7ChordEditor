@@ -366,6 +366,80 @@ struct ChordProTypingTests {
         #expect(again.textZoom == 0.5 && again.sheetZoom == 0.9)
     }
 
+    @Test("The colour of a chord in each editor can be chosen and put back to the usual, is remembered, and is only how this app draws a chord")
+    func theColourOfAChord() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Plain Song", on: mac)
+        let before = try mac.bytes(of: "Plain Song")
+        #expect(model.sheetChordColour == nil && model.textChordColour == nil)
+        let (editor, window) = try textView(for: model)
+        defer { window.close() }
+        let chord = try place(of: "[G]", in: editor)
+        let word = try place(of: "One", in: editor)
+        func ink(at place: Int) -> String? {
+            (editor.text.textStorage?.attribute(.foregroundColor, at: place, effectiveRange: nil) as? NSColor).flatMap(ChordColour.written)
+        }
+        #expect(ink(at: chord) == ChordColour.written(.systemOrange))
+
+        // In the text.
+        model.setTextChordColour("#3FA7FF")
+        #expect(model.textChordColour == "#3fa7ff")
+        editor.setChordColour(try #require(ChordColour.colour(model.textChordColour)))
+        #expect(ink(at: chord) == "#3fa7ff")
+        #expect(ink(at: word) == ChordColour.written(.textColor))
+        // What is typed next is coloured so too.
+        editor.text.setSelectedRange(NSRange(location: word, length: 0))
+        editor.text.insertText("[", replacementRange: editor.text.selectedRange())
+        editor.text.insertText("A", replacementRange: editor.text.selectedRange())
+        #expect(ink(at: word + 1) == "#3fa7ff")
+        model.settle()
+
+        // On the sheet: the name in its bubble, and what is typed in the box.
+        model.show(editor: .sheet)
+        let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 900, height: 600))
+        let sheetWindow = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 900, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
+        sheetWindow.isReleasedWhenClosed = false
+        sheetWindow.contentView = scroll
+        defer { sheetWindow.close() }
+        scroll.canvas.show(model.sheet, scale: model.sheetZoom)
+        #expect(ChordColour.written(scroll.canvas.chordColour) == "#ffd9a8")
+        model.setSheetChordColour("#00ff88")
+        scroll.canvas.chordColour = try #require(ChordColour.colour(model.sheetChordColour))
+        #expect(ChordColour.written(scroll.canvas.entry.field.textColor ?? .black) == "#00ff88")
+        // (Drawn: somewhere in the sheet there is now a dot of that green, which there
+        // was not before.)
+        let picture = try #require(scroll.bitmapImageRepForCachingDisplay(in: scroll.bounds))
+        scroll.cacheDisplay(in: scroll.bounds, to: picture)
+        var greens = 0
+        for x in stride(from: 0, to: picture.pixelsWide, by: 1) {
+            for y in stride(from: 0, to: min(picture.pixelsHigh, 400), by: 1) {
+                if let dot = picture.colorAt(x: x, y: y)?.usingColorSpace(.sRGB), dot.greenComponent > 0.9, dot.redComponent < 0.25, dot.blueComponent > 0.4, dot.blueComponent < 0.65 {
+                    greens += 1
+                }
+            }
+        }
+        #expect(greens > 20)
+
+        // What is no colour is taken as none; the usual is come back to; and what was
+        // chosen is remembered.
+        model.setSheetChordColour("green")
+        #expect(model.sheetChordColour == nil)
+        model.setSheetChordColour("#00ff88")
+        let again = mac.model()
+        await again.start()
+        #expect(again.sheetChordColour == "#00ff88" && again.textChordColour == "#3fa7ff")
+        again.setTextChordColour(nil)
+        again.setSheetChordColour(nil)
+        let third = mac.model()
+        await third.start()
+        #expect(third.sheetChordColour == nil && third.textChordColour == nil)
+        // Nothing of the song was changed by any of it, but the chord that was typed.
+        model.settle()
+        #expect(model.canUndo)
+        model.undo()
+        #expect(try mac.bytes(of: "Plain Song") == before)
+    }
+
     private func place(of string: String, in editor: ChordProText) throws -> Int {
         let range = (editor.text.string as NSString).range(of: string)
         try #require(range.location != NSNotFound)

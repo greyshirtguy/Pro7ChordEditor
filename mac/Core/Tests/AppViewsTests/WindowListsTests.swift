@@ -3,6 +3,7 @@
 // before each name (spec/06-library.md, rules 7 and 8). What they look like is in the
 // pictures (PictureTests); that the bar drags is the maintainer's to try.
 
+import AppKit
 @testable import AppViews
 import CoreGraphics
 import SwiftUI
@@ -52,5 +53,16 @@ struct WindowListsTests {
         let made = PresentationGlyph.path(of: "M0,0 L10,0 10,10 C10,20 0,20 0,10 Z M-5,-5 L-1,-1")
         #expect(made.boundingRect.minX == -5 && made.boundingRect.maxX == 10)
         #expect(made.contains(CGPoint(x: 5, y: 5)) && made.contains(CGPoint(x: 5, y: 14)))
+    }
+
+    @Test("A colour is kept as it is written, #rrggbb, and drawn as that; what is not so written is no colour")
+    func coloursAsTheyAreWritten() {
+        #expect(ChordColour.written(NSColor(srgbRed: 1, green: 0.5, blue: 0, alpha: 1)) == "#ff8000")
+        #expect(ChordColour.written(SheetLook.chordName) == "#ffd9a8")
+        let back = ChordColour.colour("#ffd9a8")?.usingColorSpace(.sRGB)
+        #expect(abs((back?.greenComponent ?? 0) - 217.0 / 255) < 0.001 && back?.redComponent == 1)
+        #expect(ChordColour.colour("ffd9a8") == nil && ChordColour.colour("#ffd9a") == nil && ChordColour.colour("#gggggg") == nil)
+        #expect(ChordColour.colour(nil) == nil)
+        #expect(LibraryModel.colour("#FFD9A8") == "#ffd9a8" && LibraryModel.colour("red") == nil && LibraryModel.colour("#12345") == nil)
     }
 }

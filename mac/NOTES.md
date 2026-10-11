@@ -244,6 +244,19 @@ And at M6, 2026-10-11:
     reposition those buttons to center???". The two pictures are mine, drawn in
     `EditorSwitch.swift`: the sheet's spot over a line of words, and a C in square
     brackets. Command+1 and Command+2 are mine too.
+46. **A paste says what came of it, and a click and then Command+V pastes there**
+    (`spec/03`, rules 52a and 52b). The maintainer: "the copy and paste a lines chords
+    mostly worked - some slides seem to not accept the paste... can you double check
+    that". Checked on copies of their songs: the pasting itself does what the page
+    says every time. What it did not do was say anything when the page has it do
+    nothing; and after a click on a line the typing bubble had the keys.
+47. **The settings are in sections: Chords, with the two colours, and Backups**
+    (`spec/06`, rule 20a). The maintainer: "let's add some more settings (better put
+    backups in its own section).... I want a setting for the Chord colors in the gui
+    chord editor and chordpro editor". (Mine: one colour for each editor and not one
+    for both; "the usual colour" kept as nothing, so that the ChordPro text's goes on
+    following the system's orange; the earlier versions' panels, which only show a
+    song, keep the system's orange.)
 
 ## How it is laid out, and why
 
@@ -447,6 +460,15 @@ changing any of it:
   which folds from one row to two and to three as the pane narrows.
 - **The size of the ChordPro text** is `LibraryModel.textZoom`; `ChordProText.setScale`
   gives the text view its two fonts at that size and colours it again.
+- **The settings** are `SettingsWindow.swift`: the tabs, `ChordColourSettings`, and
+  `ChordColour`, which turns a colour as it is kept ("#rrggbb") into one that is
+  drawn. The two colours are `LibraryModel.sheetChordColour` and `.textChordColour`,
+  nothing where the usual one is kept; the sheet's canvas and the text view are each
+  handed theirs when SwiftUI brings them up to date.
+- **What a paste did** is `ChordSheet.Pasted`, which `paste()` answers with; what is
+  said of it is `LibraryModel.said(of:)`. The keys go canvas -> `Asks.paste` ->
+  `LibraryModel.pasteChords`. `SheetCanvas.answersInTheBox` is the Command keys
+  while the bubble has the keyboard.
 - **The zoom** is `LibraryModel.sheetZoom`, one of `sheetZooms`, kept in the app's
   settings (`AppData.Settings.sheetZoom`, nothing when it is the usual one). A key or
   a pinch goes canvas -> `Asks.zoom` -> `LibraryModel.zoomSheet` -> back as the new
@@ -1059,3 +1081,36 @@ second of Simple Presenter in so many words.
      refusal to save over a file something else has changed. If the second or third
      case were ever allowed, a third net: a look at the file a moment after it was
      saved, to say so if it is no longer what was written.
+
+- **Saving by hand, as a setting beside saving at once** (the maintainer, 2026-10-11:
+  "let's add a setting for auto/live save vs manual save and default - I'm not sure
+  which to default - the old app was a manual save... got any thoughts/feedback ...
+  I lean towards defaulting to auto save (but maybe show the save button in a
+  disabled state with a caption like 'Autosave Enabled'"). **Not built: thoughts
+  were given and the maintainer is to say.** What was said:
+  1. *As the app is built, saving at once is not a habit laid over it but what its
+     safety is made of.* Every change goes through one door (`OpenSong.save`): the
+     safeguards are asked, a copy is kept before the first change, the file is
+     written whole and read back, and only then is the change the song's; a refusal
+     leaves nothing half done. Undo is a walk back through states that were each on
+     the disk. Earlier Versions puts back the file as it was before the sitting.
+  2. *Saving by hand needs a second state that none of that has*: a song changed in
+     memory and not on the disk. `OpenSong` would hold changes until told to write;
+     undo and redo would work in memory; the two editors' own saving would stop at
+     the song. And everything that leaves a song would have to ask first (another
+     song, another library, the window, quitting, a copy put back): Save, Don't
+     Save, Cancel. That asking is most of the work, and all of it is in the part of
+     the app where a mistake costs a song.
+  3. *What it would give that saving at once does not*: changes could be made while
+     ProPresenter is running and saved after it is quit (the rule is about writing,
+     not about thinking); and a sitting could be thrown away whole. The second is
+     already there by another road: the copy kept before the first change is the
+     song as it was opened, and one click puts it back.
+  4. *What it would cost the person*: changes lost if the app is quit by force or
+     crashes; and a file that something else changed meanwhile can no longer be
+     saved over, with a whole sitting in hand and not one chord.
+  5. *My advice*: keep saving at once as the only way, and show it: a quiet mark by
+     the song that says its changes are saved (or the maintainer's disabled Save
+     button with its caption), and a plain "Revert to as opened" beside Earlier
+     Versions. If saving by hand is still wanted after that, it is a piece of work
+     of its own, with `spec/05` changed first for both apps, and its own proofs.

@@ -116,6 +116,17 @@ final class ChordProText: NSObject, NSTextViewDelegate {
     private var shownVersion: Int?
     private var shownSitting: Int?
 
+    /// The colour of a chord in the text: the system's orange, or the one chosen in
+    /// the settings.
+    private(set) var chordColour = NSColor.systemOrange
+
+    /// Colours the text's chords another colour.
+    func setChordColour(_ wanted: NSColor) {
+        guard wanted != chordColour else { return }
+        chordColour = wanted
+        colour()
+    }
+
     /// How many times its usual size the text is, and the size it usually is.
     private(set) var scale = 1.0
     static let usualSize = 14.0
@@ -225,7 +236,7 @@ final class ChordProText: NSObject, NSTextViewDelegate {
             storage.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: NSRange(location: range.lowerBound, length: range.count))
         }
         for range in colouring.chords {
-            storage.addAttributes([.foregroundColor: NSColor.systemOrange, .font: chordFont], range: NSRange(location: range.lowerBound, length: range.count))
+            storage.addAttributes([.foregroundColor: chordColour, .font: chordFont], range: NSRange(location: range.lowerBound, length: range.count))
         }
         storage.endEditing()
         // (What is typed next starts plain, whatever it is typed beside.)
@@ -306,6 +317,8 @@ struct ChordProView: NSViewRepresentable {
     var canType: Bool
     /// How many times its usual size the text is.
     var scale: Double
+    /// The colour of a chord, if another than the usual was chosen: "#rrggbb".
+    var chordColour: String?
 
     private var asks: ChordProText.Asks {
         .init(typed: { [model] in model.textMayBecome($0) }, good: { [model] in model.chordPro?.text }, zoom: { [model] in model.zoomText($0) })
@@ -316,6 +329,7 @@ struct ChordProView: NSViewRepresentable {
     }
 
     func makeNSView(context: Context) -> NSScrollView {
+        context.coordinator.setChordColour(ChordColour.colour(chordColour) ?? .systemOrange)
         context.coordinator.setScale(scale)
         context.coordinator.show(shown, canType: canType)
         return context.coordinator.scroll
@@ -323,6 +337,7 @@ struct ChordProView: NSViewRepresentable {
 
     func updateNSView(_ view: NSScrollView, context: Context) {
         context.coordinator.asks = asks
+        context.coordinator.setChordColour(ChordColour.colour(chordColour) ?? .systemOrange)
         context.coordinator.setScale(scale)
         context.coordinator.show(shown, canType: canType)
     }

@@ -42,6 +42,10 @@ public struct AppData: Sendable {
         /// How many times its usual size the chord sheet is drawn; nothing if it was
         /// never changed.
         public var sheetZoom: Double?
+        /// The colour of a chord's name on the sheet, and of a chord in the ChordPro
+        /// text, each as "#rrggbb"; nothing where the usual colour is kept.
+        public var sheetChordColour: String?
+        public var textChordColour: String?
         /// How many times its usual size the ChordPro text is; nothing if it was never
         /// changed.
         public var textZoom: Double?

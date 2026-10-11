@@ -30,9 +30,10 @@ struct Pro7ChordEditorApp: App {
         }
         .defaultSize(width: 1280, height: 800)
 
-        // Command+comma: the copies kept, all of them (spec/07-backups.md, rule 18).
+        // Command+comma: the settings, in sections. The chords' colours, and the copies
+        // kept, all of them (spec/06-library.md, "Settings"; spec/07-backups.md, rule 18).
         Settings {
-            AllCopiesView(model: copies)
+            SettingsWindow(model: model, copies: copies)
         }
     }
 }

@@ -194,6 +194,23 @@ words; dropping a `.pro` file on the window to open it.
     hold. `mac/NOTES.md`, "Asked for by the maintainer, for later", has what was
     thought. Until it is decided, rules 16 to 19 are the rule.)
 
+## Settings
+
+20a. The settings are in sections, each with its own name:
+    - **Chords**: the colour of a chord's name on the chord sheet (as it comes,
+      `#ffd9a8`) and the colour of a chord in the ChordPro text (as it comes, the
+      system's orange, or `#ff9500` where a system has none). Each is chosen with the
+      system's own colour picker, has a button, "Usual Colour", that puts back the
+      one it came with, and is shown beside it as it will look: a chord in its bubble
+      over a word, and a line of ChordPro. They are only how this app draws a chord:
+      they are kept with the app's own data, and nothing in a song's file says a
+      colour.
+    - **Backups**: the copies that are kept, all of them
+      ([07-backups.md](07-backups.md), rule 18).
+
+    (**New**, 2026-10-11, asked for by the maintainer: until then the settings were
+    the copies and nothing else.)
+
 ## What the app keeps of its own
 
 On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in

@@ -618,10 +618,38 @@ public final class ChordSheet {
             + ": \(pasteKeys) puts them on the lines from the spot's on, word for word"
     }
 
+    /// What a paste did, for saying so: a paste that changes nothing says nothing of
+    /// itself otherwise, and there are three plain reasons it may not.
+    public struct Pasted: Equatable, Sendable {
+        /// The lines whose chords were replaced.
+        public var lines = 0
+        /// The chords that were put on them.
+        public var chords = 0
+        /// The chords that had no word to go on in the line they were for (or the place
+        /// another of them had taken), and were left out.
+        public var leftOut = 0
+        /// The lines passed over, being of the other kind than what was copied for
+        /// them: words, or chords alone.
+        public var passedOver = 0
+        /// The lines the song refused.
+        public var refused = 0
+
+        public init(lines: Int = 0, chords: Int = 0, leftOut: Int = 0, passedOver: Int = 0, refused: Int = 0) {
+            self.lines = lines
+            self.chords = chords
+            self.leftOut = leftOut
+            self.passedOver = passedOver
+            self.refused = refused
+        }
+    }
+
     /// Puts what was copied on the lines from the spot's on, one copied line to each
-    /// line that can take the spot.
-    public func paste() {
-        guard let copied, usable(spot.row) else { return }
+    /// line that can take the spot. Answers with what it did; with nothing, if nothing
+    /// has been copied or there is no spot.
+    @discardableResult
+    public func paste() -> Pasted? {
+        guard let copied, usable(spot.row) else { return nil }
+        var pasted = Pasted()
         var index = spot.row
         // However many lines it changes, a paste undoes as one: each change after the
         // first that was made is joined to it.
@@ -641,7 +669,13 @@ public final class ChordSheet {
                     let joined = made
                     if ask({ try song.setChordsAlone(slide: target.slide, element: target.element, line: target.line, names: names, joined: joined) }) {
                         made = true
+                        pasted.lines += 1
+                        pasted.chords += names.count
+                    } else {
+                        pasted.refused += 1
                     }
+                } else {
+                    pasted.passedOver += 1
                 }
             case .words(let copiedChords):
                 if !target.alone {
@@ -659,11 +693,19 @@ public final class ChordSheet {
                     }
                     if setLine(index, chords, joined: made) {
                         made = true
+                        pasted.lines += 1
+                        pasted.chords += chords.count
+                        pasted.leftOut += copiedChords.count - chords.count
+                    } else {
+                        pasted.refused += 1
                     }
+                } else {
+                    pasted.passedOver += 1
                 }
             }
             index += 1
         }
+        return pasted
     }
 
     // ---- Typing a chord

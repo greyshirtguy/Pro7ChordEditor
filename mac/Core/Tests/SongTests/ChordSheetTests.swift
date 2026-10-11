@@ -602,6 +602,52 @@ struct ChordSheetTests {
         #expect(song.asked.isEmpty)
     }
 
+    @Test("Mine, not a vector. A paste answers with what it did: the lines given chords, the chords put, those left out for want of a word, and the lines passed over")
+    func whatAPasteDid() throws {
+        let (sheet, song) = try vectors.sheet("grace")
+        // Nothing copied yet, and no spot: nothing to say.
+        #expect(sheet.paste() == nil)
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        // Four chords, of the first, second, third and fifth words, onto a line of
+        // seven words: all four.
+        sheet.setSpot(6, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 1, chords: 4))
+        // Onto a line of three ("Amen and amen"): the fifth word's has none to go on.
+        sheet.setSpot(9, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 1, chords: 3, leftOut: 1))
+        // Onto a line of one word ("Amen"): one is put, three are left out.
+        sheet.setSpot(8, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 1, chords: 1, leftOut: 3))
+        // A whole group of four lines from the song's last line but one: it runs out
+        // of lines, and what there are take what they have words for.
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: true)
+        sheet.setSpot(8, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 2, chords: 2, leftOut: 3))
+
+        // The other kind of line is passed over, and says so.
+        let (intro, _) = try vectors.sheet("intro")
+        intro.setSpot(3, 0)
+        intro.copy(whole: false)
+        intro.setSpot(1, 0)
+        #expect(intro.paste() == ChordSheet.Pasted(passedOver: 1))
+        intro.setSpot(1, 0)
+        intro.copy(whole: false)
+        intro.setSpot(3, 0)
+        #expect(intro.paste() == ChordSheet.Pasted(passedOver: 1))
+        intro.setSpot(6, 0)
+        #expect(intro.paste() == ChordSheet.Pasted(lines: 1, chords: 3))
+
+        // What the song refuses is counted so.
+        struct No: Error {}
+        song.refusing = No()
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        sheet.setSpot(6, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(refused: 1))
+    }
+
     @Test("Mine, not a vector. A paste is one step of undo whichever of its lines is the first it changes (rule 52)")
     func pasteIsOneStep() throws {
         // A group of a line of chords alone and a line of words, onto a group of two

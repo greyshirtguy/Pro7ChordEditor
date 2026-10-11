@@ -221,6 +221,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// What the view asks of the window's model, which has the song.
     struct Asks {
         var copy: (_ wholeGroup: Bool) -> Void = { _ in }
+        var paste: () -> Void = {}
         var undo: () -> Void = {}
         var redo: () -> Void = {}
         var canUndo: () -> Bool = { false }
@@ -233,6 +234,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         @MainActor
         static func of(_ model: LibraryModel) -> Asks {
             Asks(copy: { [model] in model.copyChords(wholeGroup: $0) },
+                 paste: { [model] in model.pasteChords() },
                  undo: { [model] in model.undo() },
                  redo: { [model] in model.redo() },
                  canUndo: { [model] in model.canUndo },
@@ -243,6 +245,14 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     private(set) var sheet: ChordSheet?
     var asks = Asks()
+    /// The colour of a chord's name: the usual one, or the one chosen in the settings.
+    var chordColour = SheetLook.chordName {
+        didSet {
+            guard chordColour != oldValue else { return }
+            entry.ink = chordColour
+            needsDisplay = true
+        }
+    }
     private(set) var metrics = SheetMetrics(scale: 1)
     let entry = SheetEntry()
 
@@ -291,6 +301,12 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     private var tracking: NSTrackingArea?
     /// How far two fingers have spread or closed since the zoom last took a step.
     private var pinched = 0.0
+    /// A number that changes whenever anything is copied, anywhere on this Mac: the
+    /// system's count of changes to what is on its pasteboard. And what it was when a
+    /// line's chords were last copied here, which are not put on that pasteboard.
+    /// While the two are the same, a line's chords are the last thing that was copied.
+    var whatWasCopiedLast: () -> Int = { NSPasteboard.general.changeCount }
+    private var copiedWhen: Int?
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -781,8 +797,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         case .open: sheet.startTyping()
         case .number(let number): sheet.putOfKey(number)
         case .letter(let letter): sheet.startTyping(seed: letter.uppercased())
-        case .copy(let wholeGroup): asks.copy(wholeGroup)
-        case .paste: sheet.paste()
+        case .copy(let wholeGroup):
+            asks.copy(wholeGroup)
+            copiedWhen = whatWasCopiedLast()
+        case .paste: asks.paste()
         case .undo: asks.undo()
         case .redo: asks.redo()
         case .zoom(let direction):
@@ -852,12 +870,54 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     // before its menus are. The sheet answers them itself while it has the keyboard, so that they work
     // whatever the menus make of them.
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
-        guard window?.firstResponder === self, event.type == .keyDown, event.modifierFlags.contains(.command),
-              let pressed = Self.key(of: event) else {
+        guard event.type == .keyDown, event.modifierFlags.contains(.command), let pressed = Self.key(of: event) else {
             return super.performKeyEquivalent(with: event)
         }
-        key(pressed.key, shift: pressed.shift)
-        return true
+        if window?.firstResponder === self {
+            key(pressed.key, shift: pressed.shift)
+            return true
+        }
+        if answersInTheBox(pressed.key) {
+            return true
+        }
+        return super.performKeyEquivalent(with: event)
+    }
+
+    /// A Command key pressed while the box a chord is typed in has the keyboard. Most
+    /// are the box's own: it is a box of text, and Command+V pastes text into it. But a
+    /// click on a line opens the box, and the one who clicks a line and presses
+    /// Command+V means the chords just copied to go on that line. So, while NOTHING
+    /// HAS BEEN TYPED in the box:
+    ///
+    ///   - Command+V, if the last thing copied anywhere was a line's chords here,
+    ///     closes the box, changing nothing, and pastes them from the box's line on;
+    ///   - Command+C and Shift+Command+C, if the box is empty and so has nothing of
+    ///     its own to copy, copy the chords of the box's line, or of its group.
+    ///
+    /// The keys that zoom are the sheet's whoever has the keyboard. Answers whether
+    /// the key was answered here.
+    private func answersInTheBox(_ pressed: SheetKey) -> Bool {
+        guard let sheet, sheet.typing, let editor = entry.field.currentEditor(), window?.firstResponder === editor else { return false }
+        if case .zoom = pressed {
+            key(pressed)
+            return true
+        }
+        guard sheet.entry.text == sheet.entry.begun else { return false }
+        let line = sheet.typingAt
+        switch pressed {
+        case .paste where sheet.copied != nil && copiedWhen == whatWasCopiedLast():
+            sheet.finishTyping(nil, onward: false)
+            sheet.setSpot(line.row, line.at)
+            sync()
+            key(.paste)
+            return true
+        case .copy where sheet.entry.text.isEmpty:
+            sheet.setSpot(line.row, line.at)
+            key(pressed)
+            return true
+        default:
+            return false
+        }
     }
 
     // And the same four from the Edit menu, when they are chosen there with the mouse.
@@ -959,7 +1019,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         rounded(NSRect(x: x, y: top, width: width, height: metrics.bubbleHeight), radius: 6 * metrics.scale, fill: lit ? SheetLook.lit : SheetLook.bubble, edge: edge, alpha: alpha)
         let text = metrics.name(name)
         Self.draw(text.line, at: NSPoint(x: x + (width - text.width) / 2, y: top + (metrics.bubbleHeight - metrics.chordHeight) / 2),
-                  font: metrics.chordFont, colour: SheetLook.chordName.withAlphaComponent(alpha), in: context)
+                  font: metrics.chordFont, colour: chordColour.withAlphaComponent(alpha), in: context)
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -1052,6 +1112,13 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 @MainActor
 final class SheetEntry: NSView {
     let field = NSTextField()
+    /// The colour of what is typed: the colour of a chord's name on the sheet.
+    var ink = SheetLook.chordName {
+        didSet {
+            field.textColor = ink
+            (field.currentEditor() as? NSTextView)?.insertionPointColor = ink
+        }
+    }
     /// One that is offered was clicked.
     var chosen: (String) -> Void = { _ in }
     private var chips: [(name: String, line: CTLine, width: Double, rect: NSRect)] = []
@@ -1063,7 +1130,7 @@ final class SheetEntry: NSView {
         field.drawsBackground = false
         field.focusRingType = .none
         field.font = SheetLook.fieldFont
-        field.textColor = SheetLook.chordName
+        field.textColor = ink
         field.cell?.usesSingleLineMode = true
         field.cell?.isScrollable = true
         field.cell?.wraps = false
@@ -1113,7 +1180,7 @@ final class SheetEntry: NSView {
             window.makeFirstResponder(field)
         }
         let editor = field.currentEditor() as? NSTextView
-        editor?.insertionPointColor = SheetLook.chordName
+        editor?.insertionPointColor = ink
         let length = (text as NSString).length
         editor?.setSelectedRange(selected ? NSRange(location: 0, length: length) : NSRange(location: length, length: 0))
     }
@@ -1187,16 +1254,20 @@ struct ChordSheetCanvasView: NSViewRepresentable {
     var version: Int
     /// How many times its usual size the sheet is drawn.
     var scale: Double
+    /// The colour of a chord's name, if another than the usual was chosen: "#rrggbb".
+    var chordColour: String?
 
     func makeNSView(context: Context) -> SheetScroll {
         let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
         scroll.canvas.asks = .of(model)
+        scroll.canvas.chordColour = ChordColour.colour(chordColour) ?? SheetLook.chordName
         scroll.canvas.show(model.sheet, scale: scale)
         return scroll
     }
 
     func updateNSView(_ scroll: SheetScroll, context: Context) {
         scroll.canvas.asks = .of(model)
+        scroll.canvas.chordColour = ChordColour.colour(chordColour) ?? SheetLook.chordName
         scroll.canvas.show(model.sheet, scale: scale)
     }
 }

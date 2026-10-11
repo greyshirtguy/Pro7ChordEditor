@@ -345,6 +345,44 @@ Vectors: `sheet-model.json`, `edits`.
     was done before it, and one undo takes that back too. `sheet-model.json` has no
     such case.)
 
+52a. **A paste says what came of it**, on the line at the bottom of the window, for a
+    few seconds, as a copy does. A paste that changes nothing would otherwise look
+    like a key that did not work, and by rules 50 and 51 it may rightly change
+    nothing. What it says:
+    - "4 chords put on the line." ("9 chords put on 3 lines.");
+    - and after that, where some had no word to go on: " 1 had no word to go on, and
+      was left out." (" 3 had no word to go on, and were left out.");
+    - and after that, where a line was passed over for being of the other kind: " 1
+      line was passed over: chords copied from a line of words go only onto a line of
+      words, and chords with no words only onto a line with none.";
+    - where no chord found a word in the one line: "None of the copied chords had a
+      word to go on here.";
+    - where every line was passed over: "Nothing was put here: chords copied from a
+      line of words go only onto a line of words, and chords with no words only onto
+      a line with none.";
+    - with nothing copied yet: "Nothing has been copied yet. Ctrl+C copies the chords
+      of the line the spot is on." (the key named as the platform names it).
+
+    What the song refused has its own sentence
+    ([05-song-and-saving.md](05-song-and-saving.md)) and nothing more is said.
+    (**New**, 2026-10-11: the maintainer found that "some slides seem to not accept
+    the paste". Tried on copies of their songs, 216 pastes of one line's chords onto
+    another all did what rules 50 and 51 say; 37 of them were onto a blank slide or
+    a line of chords alone and so did nothing, and 67 left chords out for want of a
+    word. None of that was said.)
+52b. **A click on a line and then Ctrl+V pastes there.** The click has opened the
+    typing bubble (rule 27), and Ctrl+V in a box of text is the box's own: it pastes
+    text. But while NOTHING HAS BEEN TYPED in the box, and a line's chords are the
+    last thing that was copied on this computer by any program, Ctrl+V closes the
+    bubble, changing nothing, and pastes from the bubble's line on. Likewise Ctrl+C
+    and Ctrl+Shift+C in a box that is EMPTY, which has nothing of its own to copy,
+    copy the chords of the bubble's line or of its group, and the bubble stays open.
+    With anything typed in the box, or anything copied elsewhere since, the keys are
+    the box's. (**New**, for the same reason: to click the line one means is the
+    natural thing to do before pasting onto it. In the reference the bubble has the
+    keys then, and nothing is pasted.) The keys that zoom (rule 14b) are the sheet's
+    whether or not the bubble is open.
+
 This is how a second verse gets the chords of the first. Vectors: `sheet-model.json`,
 `copyPaste`.
 

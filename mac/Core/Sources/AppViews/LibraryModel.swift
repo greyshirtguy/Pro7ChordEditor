@@ -127,6 +127,11 @@ public final class LibraryModel {
     public private(set) var sheetZoom = LibraryModel.usualSheetZoom
     public static let sheetZooms: [Double] = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5]
     public static let usualSheetZoom = 0.8
+    /// The colour of a chord's name on the sheet, and of a chord in the ChordPro text,
+    /// each as "#rrggbb"; nothing where the usual colour is kept (spec/06, "Settings").
+    /// Only how chords look in this app: nothing in any song's file says a colour.
+    public private(set) var sheetChordColour: String?
+    public private(set) var textChordColour: String?
     /// How many times its usual size the ChordPro text is: one of the same steps, kept
     /// apart from the sheet's, since a size that suits a grid of slides is not the one
     /// that suits a page of text.
@@ -231,6 +236,8 @@ public final class LibraryModel {
         chosenFolders = settings.chosenFolders.map { URL(fileURLWithPath: $0, isDirectory: true) }
         sheetZoom = Self.nearestZoom(to: settings.sheetZoom ?? Self.usualSheetZoom)
         listsSplit = Self.within(settings.listsSplit ?? Self.usualListsSplit)
+        sheetChordColour = Self.colour(settings.sheetChordColour)
+        textChordColour = Self.colour(settings.textChordColour)
         textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -479,6 +486,34 @@ public final class LibraryModel {
         return sheetZoom
     }
 
+    /// Chooses the colour of a chord's name on the sheet: "#rrggbb", or nothing for
+    /// the usual one. What is no colour so written is taken as nothing. It is
+    /// remembered.
+    public func setSheetChordColour(_ colour: String?) {
+        sheetChordColour = Self.colour(colour)
+        sheetVersion += 1
+        if started {
+            remember()
+        }
+    }
+
+    /// The same for a chord in the ChordPro text.
+    public func setTextChordColour(_ colour: String?) {
+        textChordColour = Self.colour(colour)
+        if started {
+            remember()
+        }
+    }
+
+    /// A colour as it is kept: "#" and six of 0 to 9 and a to f, in small letters.
+    /// Nothing for anything else.
+    static func colour(_ written: String?) -> String? {
+        guard let written else { return nil }
+        let small = written.lowercased()
+        guard small.count == 7, small.first == "#", small.dropFirst().allSatisfy({ $0.isASCII && $0.isHexDigit }) else { return nil }
+        return small
+    }
+
     /// The bar between the libraries and the songs was dragged, to where the
     /// libraries have this much of the height; or, with nothing, put back where it
     /// usually is. It is remembered.
@@ -530,6 +565,47 @@ public final class LibraryModel {
     public func copyChords(wholeGroup: Bool) {
         guard let sentence = sheet?.copy(whole: wholeGroup) else { return }
         refusal = nil
+        say(sentence)
+    }
+
+    /// Puts what was copied on the lines from the spot's on, and says what came of
+    /// it: a paste that changed nothing would otherwise look like a key that did not
+    /// work, and there are plain reasons it may change nothing.
+    public func pasteChords() {
+        guard let sheet else { return }
+        guard sheet.copied != nil else {
+            say("Nothing has been copied yet. Command+C copies the chords of the line the spot is on.")
+            return
+        }
+        guard let pasted = sheet.paste() else { return }
+        sheetVersion += 1
+        // (What the song refused has its own sentence on the line already.)
+        if pasted.refused == 0, let sentence = Self.said(of: pasted) {
+            say(sentence)
+        }
+    }
+
+    /// What is said of a paste.
+    static func said(of pasted: ChordSheet.Pasted) -> String? {
+        let otherKind = "chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none"
+        if pasted.lines == 0 {
+            return pasted.passedOver > 0 ? "Nothing was put here: \(otherKind)." : nil
+        }
+        if pasted.chords == 0 {
+            return "None of the copied chords had a word to go on here."
+        }
+        var sentence = "\(pasted.chords) \(pasted.chords == 1 ? "chord" : "chords") put on \(pasted.lines == 1 ? "the line" : "\(pasted.lines) lines")."
+        if pasted.leftOut > 0 {
+            sentence += " \(pasted.leftOut) had no word to go on, and \(pasted.leftOut == 1 ? "was" : "were") left out."
+        }
+        if pasted.passedOver > 0 {
+            sentence += " \(pasted.passedOver == 1 ? "1 line was" : "\(pasted.passedOver) lines were") passed over: \(otherKind)."
+        }
+        return sentence
+    }
+
+    /// Puts a sentence on the quiet line for a few seconds.
+    private func say(_ sentence: String) {
         said = sentence
         saying?.cancel()
         let lasts = sayingLasts
@@ -812,6 +888,8 @@ public final class LibraryModel {
         settings.lastLibrary = libraryID
         settings.sheetZoom = sheetZoom == Self.usualSheetZoom ? nil : sheetZoom
         settings.listsSplit = listsSplit == Self.usualListsSplit ? nil : listsSplit
+        settings.sheetChordColour = sheetChordColour
+        settings.textChordColour = textChordColour
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
         appData.settings = settings
     }
