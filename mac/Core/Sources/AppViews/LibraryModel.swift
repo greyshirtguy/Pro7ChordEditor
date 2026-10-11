@@ -121,6 +121,12 @@ public final class LibraryModel {
     /// Goes up whenever the sheet was changed from outside its own view, which is then
     /// to lay it out and draw it again.
     public private(set) var sheetVersion = 0
+    /// How many times its usual size the sheet is drawn: one of `sheetZooms`. The words
+    /// are smaller or larger by it, and so the slides' cards, and so how many of them
+    /// there are to a row (spec/03, "Zooming").
+    public private(set) var sheetZoom = LibraryModel.usualSheetZoom
+    public static let sheetZooms: [Double] = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5]
+    public static let usualSheetZoom = 0.8
     /// What the sheet just said ("4 chords copied ..."), for a few seconds.
     public private(set) var said: String?
     private var saying: Task<Void, Never>?
@@ -211,6 +217,7 @@ public final class LibraryModel {
         started = true
         let settings = appData.settings
         chosenFolders = settings.chosenFolders.map { URL(fileURLWithPath: $0, isDirectory: true) }
+        sheetZoom = Self.nearestZoom(to: settings.sheetZoom ?? Self.usualSheetZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         let thrownAway = copies.thin()
@@ -421,6 +428,29 @@ public final class LibraryModel {
         guard openSong?.canRedo == true else { return }
         change { try $0.redo() }
         textIsStale = true
+    }
+
+    /// Makes the sheet's words a step larger (1) or smaller (-1), or their usual size
+    /// (0). It is remembered. Answers with the size it now is.
+    @discardableResult
+    public func zoomSheet(_ direction: Int) -> Double {
+        let now = Self.sheetZooms.firstIndex(of: Self.nearestZoom(to: sheetZoom)) ?? 0
+        let wanted = direction == 0 ? Self.usualSheetZoom : Self.sheetZooms[min(max(now + direction, 0), Self.sheetZooms.count - 1)]
+        if wanted != sheetZoom {
+            sheetZoom = wanted
+            sheetVersion += 1
+            if started {
+                remember()
+            }
+        }
+        return sheetZoom
+    }
+
+    public var canZoomSheetIn: Bool { sheetZoom < (Self.sheetZooms.last ?? 1) }
+    public var canZoomSheetOut: Bool { sheetZoom > (Self.sheetZooms.first ?? 1) }
+
+    private static func nearestZoom(to wanted: Double) -> Double {
+        sheetZooms.min { abs($0 - wanted) < abs($1 - wanted) } ?? usualSheetZoom
     }
 
     /// A click on one of the key's seven chords in the strip: on the spot, or where a
@@ -714,6 +744,7 @@ public final class LibraryModel {
         settings.chosenFolders = chosenFolders.map(\.path)
         settings.lastPlace = placeID
         settings.lastLibrary = libraryID
+        settings.sheetZoom = sheetZoom == Self.usualSheetZoom ? nil : sheetZoom
         appData.settings = settings
     }
 }

@@ -287,4 +287,30 @@ struct PictureTests {
         // And as narrow as the window goes.
         try draw(LibraryWindow(model: model), named: "23 the sheet, the window at its narrowest", size: NSSize(width: 860, height: 520))
     }
+
+    @Test("The sheet as a grid in a wide window: at its usual size, with the words small, and with them large")
+    func theGrid() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        sheet.setSpot(try row("That saved a wretch like me", of: sheet), 5)
+        let wide = NSSize(width: 1600, height: 900)
+        try draw(LibraryWindow(model: model), named: "24 the grid, wide", size: wide)
+        model.zoomSheet(-1)
+        model.zoomSheet(-1)
+        try draw(LibraryWindow(model: model), named: "25 the grid, the words small", size: wide)
+        model.zoomSheet(0)
+        model.zoomSheet(1)
+        model.zoomSheet(1)
+        model.zoomSheet(1)
+        try draw(LibraryWindow(model: model), named: "26 the grid, the words large", size: wide)
+        model.zoomSheet(0)
+    }
+
+    @Test("The grid of a song ProPresenter wrote, its slides framed in their groups' colours")
+    func theGridInColours() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "Rock Of Ages (Toplady)", editor: .sheet)
+        try draw(LibraryWindow(model: model), named: "27 the grid, groups in their colours", size: NSSize(width: 1600, height: 900))
+    }
 }

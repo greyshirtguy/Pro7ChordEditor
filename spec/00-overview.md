@@ -116,5 +116,5 @@ matters the page says which:
 | Stand-in | An invisible character such a line's chord hangs on, there being no words to hang it on |
 | Original key | The key the chords in the file are written in |
 | User key | The key ProPresenter is to show them in, moving each chord as it draws it |
-| Sheet | The main editor's view of a song: every line of every slide, one under another |
+| Sheet | The main editor's view of a song: every slide as a card of its lines, in a grid |
 | Spot | The one place on the sheet the next chord will go to |

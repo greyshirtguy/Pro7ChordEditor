@@ -28,7 +28,7 @@ struct Pro7ChordEditorApp: App {
         Window("Pro7 Chord Editor", id: "main") {
             LibraryWindow(model: model)
         }
-        .defaultSize(width: 1100, height: 680)
+        .defaultSize(width: 1280, height: 800)
 
         // Command+comma: the copies kept, all of them (spec/07-backups.md, rule 18).
         Settings {

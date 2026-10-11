@@ -3,6 +3,14 @@
 The main editor: the whole song as one sheet of words, with its chords in bubbles over
 them, to be put on, changed, moved and taken off with the mouse and the keys.
 
+**How the slides are laid out on the sheet is no longer Simple Presenter's** (the
+maintainer, 2026-10-11, on trying its layout with real songs). There each slide's
+lines are a card and the cards are one column, as the picture below shows. Here they
+are a grid, like the slides of a presentation in ProPresenter's own window, and the
+sheet zooms: "How it looks" and "Zooming" say how. Everything else on this page (a
+line and its bubbles, the spot, typing, dragging, copying) is as it was, and the
+maintainer means Simple Presenter to follow.
+
 ![The chord sheet](pictures/chord-editor.png)
 
 This page is the working editor of Simple Presenter written down:
@@ -19,9 +27,13 @@ either delete key: [10-platforms.md](10-platforms.md).
 
 - **One sheet, where the file has slides.** In the file each slide has its own text
   box, and a chord belongs to one box. Working a slide at a time would mean paging
-  through thirty of them to chord one song. So every line of every box is laid out
-  one under another. Nothing is joined underneath: a chord put on a word is written to
-  that word's own text box on its own slide.
+  through thirty of them to chord one song. So every slide of the song is on the one
+  sheet, each with all its lines. Nothing is joined underneath: a chord put on a word
+  is written to that word's own text box on its own slide.
+- **As much of the song in sight as the window has room for.** A song's lines are
+  short and its slides many, so one column of slides leaves most of a window empty
+  and shows a verse at a time. The slides go across as well as down, and the words
+  can be made smaller.
 - **The words cannot be changed here.** Only chords.
 - **Point with one hand, press with the other.** There is one place the next chord
   goes to, the *spot*. It follows the pointer, and the arrow keys move it too. Most
@@ -62,55 +74,102 @@ The sheet is a list of rows made from the song's text boxes
    [01-file-format.md](01-file-format.md), "A slide with no text box".)
 5. Each slide's line rows know how many they are, which is the first and which the
    last: that is what its card is sized by (rule 8). The sheet also knows the greatest
-   number any slide has, which Simple Presenter sizes every card by and `sheet-model.json`
-   records (`mostLines`); these apps draw nothing by it.
+   number any slide has, which Simple Presenter sized every card by and `sheet-model.json`
+   records (`mostLines`); these apps draw nothing by it. Nor is a group row drawn as
+   a row of its own: the group's name is on its first slide's frame (rule 7).
 
 Vectors: `sheet-model.json`, `rows`.
 
 ## How it looks
 
-6. Dark: the sheet `#1b1c1f`, the strip across its top `#202226`, a card `#222428` with
-   a one-pixel edge `#33363c`, words `#e6e6e6`. The accent is orange, `#ff8a1f`.
-7. **A card for each slide**: a rounded rectangle (radius 8) behind the slide's lines,
-   with the slide's number to its left, right-aligned in a gutter 54 wide. The card
-   of the slide that is picked has an edge of `#8a5a22` and its number is orange.
-8. **All cards are one width, and each is as tall as its own slide**: as wide as the
-   widest line of the whole song with its chords, so that the sheet reads as a column
-   of slides and not as a ragged list; and as tall as the lines the slide has, so that
-   a slide of one line, or a blank one, does not take the room of the longest.
-   (**Changed** by the maintainer on 2026-10-11. In Simple Presenter all cards were one
-   size, as tall as the slide with the most lines, which the maintainer had asked for
-   after trying cards of differing sizes. Tried on their own library here, it left
-   too few words in sight: of 422 songs, 291 have slides of differing lengths, and
-   with each card its own height all their sheets together are three quarters as
-   tall. The maintainer is asking the same of Simple Presenter.)
-9. A group's name is over its first card: white bold 12 on a small rounded label in
-   the group's colour (ProPresenter's colour for a group of that name, or a neutral
-   grey).
+6. Dark: the sheet `#1b1c1f`, the strip across its top `#202226`, a card `#222428`,
+   words `#e6e6e6`. The accent is orange, `#ff8a1f`.
+7. **A card for each slide, in a frame of its group's colour.** The card is a plain
+   rectangle that holds the slide's lines (rule 10), with 10 clear inside it all round
+   them. The frame is drawn behind it: 4 thick at the card's sides and top, with a
+   **foot** 22 tall under the card, its corners rounded (radius 4). Its colour is the
+   group's (ProPresenter's colour for a group of that name, as the file gives it), or
+   `#2b2d31` for a slide whose group has none or that is in no group. On the foot,
+   at 12, are the slide's number and, on the first slide of each group that has a
+   name, two spaces and the group's name ("3", "4  Verse 2"); in white, or in black
+   on a light colour (one whose 0.299 red + 0.587 green + 0.114 blue is over 0.6),
+   and cut short with "…" where the frame is too narrow. This is how Simple
+   Presenter's main window frames a slide's thumbnail, and ProPresenter's.
+7a. **The slide that is picked has an orange ring**: 2 wide, outside its frame and set
+   off from it by a little of the sheet, so that it reads against a frame of any
+   colour.
+8. **The slides are a grid.** They go across the sheet in the order of the song, as
+   many to a row as fit, and then the next row under it. Each frame keeps 6 clear all
+   round it; the sheet has a margin of 6 at its sides and its foot, and 30 at its top
+   (rule 29 says why).
+   - **Every card is one width.** The least it can be is what the widest line of the
+     whole song needs with its chords (a line of chords alone, 50 more, for the next
+     chord; and never less than 160), and 28 more for the room inside the card. As
+     many go to a row as fit across the sheet at that width, and the row's width is
+     then shared out evenly among them, so that the rows fill the sheet from side to
+     side.
+   - **The cards of one row are one height**: that of the slide among them with the
+     most lines. A slide with fewer has room to spare under its last line.
+   - Where even one card is wider than the sheet, there is one to a row, and the sheet
+     scrolls sideways.
+   - When the sheet is made wider or narrower the slides are laid out again, fewer or
+     more to a row, with the slide that was at the top of what is seen still there.
+
+   (In Simple Presenter all cards were one column, and one size: as wide as the
+   widest line and as tall as the slide with the most lines, which the maintainer had
+   asked for after trying cards of differing sizes. Tried on the maintainer's own
+   library of 422 songs, a window showed some three lines of words of a song. Each
+   card was then made as tall as its own slide; and then, the same day, the column
+   became this grid.)
+9. A group's name is nowhere but on the foot of its first slide's frame (rule 7), and
+   a slide's number nowhere but on its own.
 10. **A line** is its words at 21 pixels with a row above them for chords. A chord is a
     **bubble**: its name in bold 14, `#ffd9a8`, on a rounded rectangle `#34363c` edged
     `#5c5f66`, with 7 pixels either side of the name, and under it a **tail**, a line 2
-    wide that comes down to the character the chord stands at.
+    wide that comes down to the character the chord stands at. From the top of a line
+    to the top of the next is the bubble's height (its name's and 6), the tail's 6,
+    the words' height and 6 more.
 11. **Where a bubble stands.** Its left edge is where its character starts. If that
     would run into the bubble before it on the line, it is pushed right until it clears
     that one by 4. Its tail still points at its own character. That is all of the
     layout, and it is one small function (`place`) so that everything that draws chords
     puts them in the same spot. Vectors: `layout.json`.
-12. A line never wraps. The sheet scrolls both ways.
+12. A line never wraps. The sheet scrolls down, and sideways only where a card is
+    wider than it (rule 8).
 13. A line of chords alone has no words to show: a thin rule stands where they would
     be, and its bubbles sit side by side.
-14. The strip across the top has the key's seven chords as small buttons, each with
-    its number 1 to 7 in grey before its name. If the song states no key, they are
-    C's, and the right of the strip says "The song names no key: pick the one its
-    chords are in". **The key is not picked here**: it is picked in the song's header
-    over the sheet ([06-library.md](06-library.md), rule 12), which is there for both
-    editors. (In Simple Presenter the strip begins with the word "Key" and the key's
-    picker, and these pages asked for one in both places, so that the sheet showed the
-    key twice. The maintainer, 2026-10-11: "we only need one".)
+14. The strip across the top has, at its left, the key's seven chords as small buttons,
+    each with its number 1 to 7 in grey before its name; and at its right two round
+    buttons, − and +, that zoom (rule 14b). If the song states no key, the chords are
+    C's, and before the two buttons the strip says "The song names no key: pick the
+    one its chords are in", where there is room for it. **The key is not picked
+    here**: it is picked in the song's header over the sheet
+    ([06-library.md](06-library.md), rule 12), which is there for both editors. (In
+    Simple Presenter the strip begins with the word "Key" and the key's picker, and
+    these pages asked for one in both places, so that the sheet showed the key twice.
+    The maintainer, 2026-10-11: "we only need one".)
 
-The sizes above are Simple Presenter's and need not be matched to the pixel. The
-proportions and the look should be: the pictures in `spec/pictures` are what to hold
-your own pictures up against.
+The sizes of a line and its bubbles are Simple Presenter's and need not be matched to
+the pixel; the proportions and the look should be. The pictures in `spec/pictures`
+are of Simple Presenter's sheet as it was, in one column: hold the lines, the bubbles,
+the spot and the typing bubble of your own pictures up against them, and the layout
+of the slides against this page.
+
+## Zooming
+
+14a. **The sheet zooms**: every size of rules 10 and 11, the 10 inside a card and the
+    other sizes of rule 8's first point, and so the cards and how many go to a row,
+    are so many times what those rules say. The steps are 50, 60, 70, 80, 90, 100,
+    110, 125 and 150 in the hundred; **the usual one is 80**. What does not zoom: a
+    frame's 4 and its foot, the words on the foot, the gaps between frames and the
+    margins, the ring, and the bubble a chord is typed in.
+14b. − and + in the strip go a step down and up, and are greyed at the ends. So do
+    **Ctrl+minus** and **Ctrl+plus** (or Ctrl with the equals key, which is plus
+    without Shift), and **Ctrl+0** goes back to the usual size. On a trackpad, two
+    fingers spread or closed go a step for each fair stretch.
+14c. The slides are laid out again at the new size, with the slide that was at the
+    top of what is seen still there. The size is remembered from one start of the
+    app to the next. It is the app's, not the song's: nothing in any file says it.
 
 ## The spot
 
@@ -125,7 +184,9 @@ your own pictures up against.
 17. It follows the pointer only when the pointer itself has moved. A row that is laid
     out again, or scrolls, under a pointer lying still must not take the spot back from
     the keys.
-18. The pointer is followed only over the cards. Beside them is bare sheet.
+18. The pointer is followed only over the cards. Between them is bare sheet, and a
+    frame and its foot are bare sheet too. Every part of a card is one of its lines:
+    the room under a short slide's last line (rule 8) is that line's.
 18a. **A place is never the second half of a character that takes two units** (one from
     beyond the first 65,536): the pointer goes to its first half, and the keys pass
     over the second. And a character that has no width at all (a zero-width space
@@ -138,8 +199,13 @@ your own pictures up against.
     **Shift** they move a character at a time, spaces passed over. Note that this is
     the other way about from the pointer, on purpose: a letter at a time is a long walk
     with the keys, and a word at a time is too coarse for the mouse.
-20. **Down and Up** move it to the next or previous line that can take it, to the stop
-    that is nearest above or below where it was *on the screen*.
+20. **Down and Up** move it to the line under or over it *on the screen* that can take
+    it, to the stop of that line nearest under or over where it was. Under a slide's
+    last line is the first line of the slide below it in the grid: the one in the same
+    place along the next row, or that row's last slide where the row is a short one.
+    Over its first line is the last line of the slide above. From the last row Down
+    goes nowhere, and from the first, Up. (So with slides side by side Down does not
+    go to the next slide of the song, which is beside this one: Right does, rule 19.)
 21. With no spot yet, the first arrow key puts it on the first word of the song.
 22. On a **line of chords alone** the stops are each chord and one more place after the
     last, for a new one. Places there are 0, 2, 4 ... (the stand-ins).
@@ -171,7 +237,10 @@ Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
 ![Typing a chord](pictures/chords-type.png)
 
 29. It is a small panel at the place the chord is for, growing **upwards** from where
-    the chord will stand, so that the word and the rest of its line stay in sight. It
+    the chord will stand, so that the word and the rest of its line stay in sight.
+    (The sheet's top margin of 30 is room for it over the first row of slides. Where
+    there is still not room, at the top of what is seen, it is kept in sight and
+    covers what it must.) It
     has a one-line box to type in, and above that what the chord might be going to be,
     as a row of buttons that wraps: `completions`, the first fourteen.
 30. The box takes only what could be a chord (`couldBecome`). A key press that would
@@ -306,8 +375,9 @@ the sheet shows. A chord there can be renamed, and moved along its line.
 
 - The model: `sheet-model.json` and `layout.json`, every case.
 - The look: draw the sheet for `testdata/files/made-by-simple-presenter/Amazing
-  Grace.pro` into a picture and set it beside `pictures/chord-editor.png`
-  ([10-platforms.md](10-platforms.md)).
+  Grace.pro` into a picture and set its lines beside those of
+  `pictures/chord-editor.png` ([10-platforms.md](10-platforms.md)); and draw it
+  wide, and zoomed down, to see the grid lay itself out.
 - The feel, which only a person can tell: chord a verse of that song by pointing and
   pressing 1 to 7; type a run of chords click, type, click, type; drag one; copy a
   verse onto the next. Ask the maintainer to, and to say what is slower or odder than

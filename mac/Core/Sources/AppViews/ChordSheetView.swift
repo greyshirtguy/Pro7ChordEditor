@@ -9,12 +9,16 @@
 // each thing done it calls `sync`, which lays the rows out again if they have changed,
 // opens or closes the bubble a chord is typed in, and draws.
 //
-// How it is laid out is the reference's (qml/ChordSheet.qml), number for number: a
-// column of rows, and a card behind each slide's lines. The sizes are in `SheetLook`.
-// One thing is not the reference's: there all cards are one size, each as tall as the
-// slide with the most lines. Here they are one WIDTH, and each as tall as its own
-// slide (spec/03, rule 8: the maintainer's, on seeing a real library, where a slide of
-// one line or none had a card with room for the longest).
+// How it is laid out (spec/03, "How it looks"): the slides are a grid, as the slides
+// of a presentation are in Simple Presenter's main window and in ProPresenter's, but
+// each is its words at a size to be read, with room over every line for its chords. A
+// slide is a card in a frame of its group's colour, with the slide's number on the
+// frame's foot and, on the first slide of each group, the group's name. As many go to
+// a row as fit across, so a wider window, or smaller words (the sheet zooms), shows
+// more of the song at once. That is the maintainer's, on trying the reference's layout
+// with real songs: one column of slides left most of a window empty and showed few
+// words. How a LINE is drawn (words, bubbles, tails, the spot) is the reference's
+// (qml/ChordSheet.qml), number for number, times the zoom.
 //
 // The same numbers, for drawing and for pointing. Each line's words are one Core Text
 // line (`SheetMetrics`). That line is what is drawn, and how far along it a character
@@ -37,7 +41,9 @@ import CoreText
 import Song
 import SwiftUI
 
-/// The sheet's colours and sizes: Simple Presenter's (spec/03, rules 6 to 14).
+/// The sheet's colours, and the sizes that do not change with the zoom: Simple
+/// Presenter's (spec/03, "How it looks"). What grows and shrinks with the words is in
+/// `SheetMetrics`.
 enum SheetLook {
     static func colour(_ hex: UInt32, alpha: CGFloat = 1) -> NSColor {
         NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: alpha)
@@ -46,8 +52,6 @@ enum SheetLook {
     static let ground = colour(0x1b1c1f)
     static let strip = colour(0x202226)
     static let card = colour(0x222428)
-    static let cardEdge = colour(0x33363c)
-    static let pickedEdge = colour(0x8a5a22)
     static let words = colour(0xe6e6e6)
     static let accent = colour(0xff8a1f)
     static let chordName = colour(0xffd9a8)
@@ -55,7 +59,7 @@ enum SheetLook {
     static let bubbleEdge = colour(0x5c5f66)
     static let lit = colour(0x4a3a26)
     static let rule = colour(0x3a3c42)
-    static let number = colour(0x5c5f66)
+    /// The frame of a slide whose group has no colour.
     static let group = colour(0x2b2d31)
     static let panel = colour(0x2b2d31)
     static let chip = colour(0x3a3c42)
@@ -63,35 +67,61 @@ enum SheetLook {
     static let quiet = colour(0x9a9da3)
 
     // (A font is never changed once it is made, which the compiler cannot know.)
-    nonisolated(unsafe) static let wordFont = NSFont.systemFont(ofSize: 21)
-    nonisolated(unsafe) static let chordFont = NSFont.boldSystemFont(ofSize: 14)
-    nonisolated(unsafe) static let groupFont = NSFont.boldSystemFont(ofSize: 12)
-    nonisolated(unsafe) static let numberFont = NSFont.systemFont(ofSize: 12)
+    nonisolated(unsafe) static let labelFont = NSFont.systemFont(ofSize: 12)
     nonisolated(unsafe) static let chipFont = NSFont.boldSystemFont(ofSize: 13)
     nonisolated(unsafe) static let fieldFont = NSFont.boldSystemFont(ofSize: 16)
 
-    /// The room at the left of a line for its slide's number.
-    static let gutter = 54.0
-    /// Either side of a chord's name in its bubble.
-    static let bubblePad = 7.0
-    static let tail = 6.0
-    /// The room inside a card round its lines, and the gap between two cards.
-    static let cardPad = 10.0
-    static let cardGap = 10.0
-    /// Where the column of rows starts on the sheet.
-    static let left = 16.0
-    static let top = 14.0
-    static let groupRow = 34.0
+    /// The sizes of the words and of a chord's name where the sheet is not zoomed.
+    static let wordSize = 21.0
+    static let chordSize = 14.0
+    /// How thick a slide's frame is at its sides and its top, and how tall its foot,
+    /// where the slide's number is and its group's name.
+    static let frame = 4.0
+    static let label = 22.0
+    /// The room each frame keeps clear all round it (so two frames are twice this
+    /// apart), and the sheet's own margin outside that.
+    static let around = 6.0
+    static let margin = 6.0
+    /// The sheet's margin at its top, which is more: the bubble a chord is typed in
+    /// grows upwards from the line it is for, and over the first row of slides it
+    /// would otherwise have nowhere to grow to but down over the words.
+    static let top = 30.0
     static let entryWidth = 330.0
 
     static func height(of font: NSFont) -> Double {
         Double(ceil(font.ascender - font.descender + font.leading))
     }
+
+    /// Whether words on a colour are to be black: it is a light one.
+    static func isLight(_ colour: NSColor) -> Bool {
+        guard let plain = colour.usingColorSpace(.sRGB) else { return false }
+        return 0.299 * plain.redComponent + 0.587 * plain.greenComponent + 0.114 * plain.blueComponent > 0.6
+    }
 }
 
-/// How wide things are: each line's words as one Core Text line, and the widths of
-/// chords' names.
+/// How big things are at one zoom: the two fonts, the sizes that go with them, each
+/// line's words as one Core Text line, and the widths of chords' names.
 final class SheetMetrics: SheetMeasure {
+    /// How many times its usual size everything is.
+    let scale: Double
+    let wordFont: NSFont
+    let chordFont: NSFont
+    let wordHeight: Double
+    let chordHeight: Double
+
+    init(scale: Double) {
+        self.scale = scale
+        wordFont = NSFont.systemFont(ofSize: SheetLook.wordSize * scale)
+        chordFont = NSFont.boldSystemFont(ofSize: SheetLook.chordSize * scale)
+        wordHeight = SheetLook.height(of: wordFont)
+        chordHeight = SheetLook.height(of: chordFont)
+    }
+
+    /// Either side of a chord's name in its bubble.
+    var bubblePad: Double { 7 * scale }
+    var tail: Double { 6 * scale }
+    /// The room inside a card round its lines.
+    var cardPad: Double { 10 * scale }
     /// Each row's words as a line of text; nil for a row that is a group's name.
     var lines: [CTLine?] = [] {
         didSet { edges = Array(repeating: nil, count: lines.count) }
@@ -100,12 +130,10 @@ final class SheetMetrics: SheetMeasure {
     /// ends: worked out the first time the row is asked about.
     private var edges: [[Double]?] = []
     private var names: [String: (line: CTLine, width: Double)] = [:]
-    let wordHeight = SheetLook.height(of: SheetLook.wordFont)
-    let chordHeight = SheetLook.height(of: SheetLook.chordFont)
 
-    var bubbleHeight: Double { chordHeight + 6 }
+    var bubbleHeight: Double { chordHeight + 6 * scale }
     /// A line of words with its row of chords over it.
-    var lineHeight: Double { bubbleHeight + SheetLook.tail + wordHeight + 6 }
+    var lineHeight: Double { bubbleHeight + tail + wordHeight + 6 * scale }
 
     /// Text as one line, in a colour that is set when it is drawn.
     static func line(_ text: String, font: NSFont) -> CTLine {
@@ -161,14 +189,14 @@ final class SheetMetrics: SheetMeasure {
 
     func name(_ name: String) -> (line: CTLine, width: Double) {
         if let known = names[name] { return known }
-        let line = Self.line(name, font: SheetLook.chordFont)
+        let line = Self.line(name, font: chordFont)
         let made = (line, Self.width(of: line))
         names[name] = made
         return made
     }
 
     func bubble(_ name: String) -> Double {
-        self.name(name).width + 2 * SheetLook.bubblePad
+        self.name(name).width + 2 * bubblePad
     }
 }
 
@@ -178,6 +206,8 @@ enum SheetKey: Equatable {
     case number(Int)
     case letter(String)
     case copy(wholeGroup: Bool), paste, undo, redo
+    /// The words a step larger (1) or smaller (-1), or their usual size (0).
+    case zoom(Int)
 }
 
 @MainActor
@@ -189,6 +219,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         var redo: () -> Void = {}
         var canUndo: () -> Bool = { false }
         var canRedo: () -> Bool = { false }
+        /// The words a step larger or smaller, or their usual size: answers with how
+        /// many times their usual size they then are.
+        var zoom: (_ direction: Int) -> Double? = { _ in nil }
 
         /// As the window wires them.
         @MainActor
@@ -197,28 +230,47 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                  undo: { [model] in model.undo() },
                  redo: { [model] in model.redo() },
                  canUndo: { [model] in model.canUndo },
-                 canRedo: { [model] in model.canRedo })
+                 canRedo: { [model] in model.canRedo },
+                 zoom: { [model] in model.zoomSheet($0) })
         }
     }
 
     private(set) var sheet: ChordSheet?
     var asks = Asks()
-    let metrics = SheetMetrics()
+    private(set) var metrics = SheetMetrics(scale: 1)
     let entry = SheetEntry()
 
-    /// One row as it is laid out: where it is down the sheet, the room over its line,
-    /// and where its chords stand along it.
-    struct Laid {
-        var top = 0.0
-        var height = 0.0
-        var lead = 0.0
-        var placed = ChordLayout.Placed()
-        var chordTop: Double { top + lead + 2 }
+    /// One slide as it is laid out: its frame in its group's colour, the card inside
+    /// that where its lines are, what its foot says, and where it is in the grid.
+    struct Cell {
+        var slide: Int
+        /// The sheet's rows that are this slide's lines.
+        var rows: Range<Int>
+        var frame: NSRect
+        var card: NSRect
+        var colour: NSColor
+        var label: String
+        var gridRow: Int
+        var column: Int
     }
 
+    /// One line as it is laid out: which slide's card it is in, where its words start,
+    /// where its row of chords is, and where its chords stand along it.
+    struct Laid {
+        var cell = -1
+        var left = 0.0
+        var chordTop = 0.0
+        var placed = ChordLayout.Placed()
+    }
+
+    private(set) var cells: [Cell] = []
     private(set) var laid: [Laid] = []
+    /// How many slides there are to a row of the grid.
+    private(set) var columns = 1
     private var laidRows: [SheetRow] = []
-    private(set) var cardWidth = 0.0
+    /// How wide the view was seen to be when the slides were last laid out.
+    private var laidWidth = -1.0
+    private var layingOut = false
     private var content = NSSize.zero
     /// The typing the bubble is open for: `ChordSheet.typingsBegun` as it was.
     private var typingShown: Int?
@@ -229,6 +281,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// that is not the person leaving the box for something else.
     private var movingTheKeys = false
     private var tracking: NSTrackingArea?
+    /// How far two fingers have spread or closed since the zoom last took a step.
+    private var pinched = 0.0
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -255,12 +309,17 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     override var acceptsFirstResponder: Bool { sheet?.typing != true }
 
     /// Shows a song's sheet: another song's from the top, the same one's where it was.
-    func show(_ shown: ChordSheet?) {
+    /// With a `scale`, at that zoom.
+    func show(_ shown: ChordSheet?, scale: Double? = nil) {
+        if let scale, scale != metrics.scale {
+            setScale(scale)
+        }
         if shown !== sheet {
             sheet = shown
             shown?.reveal = { [weak self] in self?.revealSpot() }
             laidRows = []
             laid = []
+            cells = []
             typingShown = nil
             pressed = nil
             scroll(.zero)
@@ -270,58 +329,129 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     // ---- Laying out
 
-    /// The card of the slide whose first line is this row: as wide as every other,
-    /// and as tall as the slide's own lines.
-    func card(ofSlideStartingAt index: Int) -> NSRect {
-        guard let sheet, laid.indices.contains(index), sheet.rows[index].kind == .line else { return .zero }
-        return NSRect(x: SheetLook.left + SheetLook.gutter - SheetLook.cardPad, y: laid[index].top + SheetLook.cardGap, width: cardWidth,
-                      height: Double(sheet.rows[index].count) * metrics.lineHeight + 2 * SheetLook.cardPad)
+    /// How wide the sheet is seen to be: what the slides are fitted across. (Where the
+    /// system draws its scroll bars beside what they scroll, and not over it, room is
+    /// kept for one always: a bar that came and went with the layout would change the
+    /// width the layout was made for.)
+    private var seenWidth: Double {
+        guard let scroll = enclosingScrollView else { return bounds.width }
+        let bar = scroll.scrollerStyle == .legacy ? NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy) : 0
+        return scroll.bounds.width - bar
     }
 
+    /// Lays the slides out as a grid: as many to a row as fit across, every card as
+    /// wide as the widest line of the song needs (and then as much wider as shares the
+    /// row out evenly), and the cards of one row as tall as the one of them with the
+    /// most lines.
     private func layOut() {
+        laidWidth = seenWidth
         guard let sheet else {
             laid = []
+            cells = []
             content = .zero
+            fit()
             return
         }
         let rows = sheet.rows
-        metrics.lines = rows.map { $0.kind == .line ? SheetMetrics.line($0.text.string, font: SheetLook.wordFont) : nil }
-        var made: [Laid] = []
-        var top = SheetLook.top
-        var widest = 240.0
-        for (index, row) in rows.enumerated() {
-            var item = Laid(top: top)
-            if row.kind == .line {
-                // Room over the first line of a slide, for the gap between two cards
-                // and the top of its own; and under its last, for the foot of the card.
-                item.lead = row.first ? SheetLook.cardGap + SheetLook.cardPad : 0
-                let foot = row.last ? SheetLook.cardPad : 0
-                item.height = item.lead + metrics.lineHeight + foot
-                item.placed = sheet.placed(index, metrics)
-                widest = max(widest, item.placed.width + (row.alone ? 50 : 0))
-            } else {
-                item.height = SheetLook.groupRow
+        metrics.lines = rows.map { $0.kind == .line ? SheetMetrics.line($0.text.string, font: metrics.wordFont) : nil }
+        var lines = Array(repeating: Laid(), count: rows.count)
+        // Each slide: its first line's row, and how many lines it has.
+        var slides: [(first: Int, count: Int)] = []
+        var widest = 160 * metrics.scale
+        for (index, row) in rows.enumerated() where row.kind == .line {
+            lines[index].placed = sheet.placed(index, metrics)
+            // (A line of chords alone wants room past its last for the next.)
+            widest = max(widest, lines[index].placed.width + (row.alone ? 50 * metrics.scale : 0))
+            if row.first {
+                slides.append((index, row.count))
             }
-            made.append(item)
-            top += item.height
         }
-        laid = made
+        let pad = metrics.cardPad
+        let around = SheetLook.around
+        let least = widest + 2 * pad + 8 * metrics.scale + 2 * SheetLook.frame + 2 * around
+        let across = max(least, laidWidth - 2 * SheetLook.margin)
+        columns = max(1, Int(across / least))
+        let cellWidth = (across / Double(columns)).rounded(.down)
+
+        var made: [Cell] = []
+        var top = SheetLook.top
+        var gridRow = 0
+        var from = 0
+        while from < slides.count {
+            let these = slides[from..<min(from + columns, slides.count)]
+            let cardHeight = Double(these.map(\.count).max() ?? 1) * metrics.lineHeight + 2 * pad
+            for (column, slide) in these.enumerated() {
+                let frame = NSRect(x: SheetLook.margin + Double(column) * cellWidth + around, y: top + around,
+                                   width: cellWidth - 2 * around, height: SheetLook.frame + cardHeight + SheetLook.label)
+                let card = NSRect(x: frame.minX + SheetLook.frame, y: frame.minY + SheetLook.frame, width: frame.width - 2 * SheetLook.frame, height: cardHeight)
+                let box = sheet.blocks[rows[slide.first].block]
+                // The slide's number, and on the first slide of each group the group's
+                // name.
+                let label = String(rows[slide.first].slide + 1) + (box.startsItsGroup && !box.group.isEmpty ? "  " + box.group : "")
+                let colour = box.groupColour.map { NSColor(srgbRed: $0.red, green: $0.green, blue: $0.blue, alpha: 1) } ?? SheetLook.group
+                for line in 0..<slide.count {
+                    lines[slide.first + line].cell = made.count
+                    lines[slide.first + line].left = card.minX + pad
+                    lines[slide.first + line].chordTop = card.minY + pad + Double(line) * metrics.lineHeight + 2 * metrics.scale
+                }
+                made.append(Cell(slide: rows[slide.first].slide, rows: slide.first..<(slide.first + slide.count), frame: frame, card: card,
+                                 colour: colour, label: label, gridRow: gridRow, column: column))
+            }
+            top += 2 * around + SheetLook.frame + cardHeight + SheetLook.label
+            gridRow += 1
+            from += columns
+        }
+        cells = made
+        laid = lines
         laidRows = rows
-        // All cards are one width: as wide as the widest line of the song with its
-        // chords. (Each is as tall as its own slide: `card(ofSlideStartingAt:)`.)
-        cardWidth = widest + 2 * SheetLook.cardPad + 8
-        content = NSSize(width: SheetLook.left + SheetLook.gutter + cardWidth + 50, height: top + 60)
+        content = NSSize(width: 2 * SheetLook.margin + Double(columns) * cellWidth, height: top + SheetLook.margin + 40)
         fit()
     }
 
+    /// Lays out again, for another width or another zoom, with the slide that was at
+    /// the top of what is seen still there.
+    private func layOutWhereItWas() {
+        guard !layingOut else { return }
+        layingOut = true
+        defer { layingOut = false }
+        let seen = visibleRect
+        let atTop = cells.first { $0.frame.maxY > seen.minY + 1 }
+        let within = atTop.map { $0.frame.minY - seen.minY } ?? 0
+        layOut()
+        if let atTop, let now = cells.first(where: { $0.rows.lowerBound == atTop.rows.lowerBound }) {
+            scroll(NSPoint(x: 0, y: max(0, min(now.frame.minY - within, bounds.height - seen.height))))
+        }
+        placeEntry()
+        needsDisplay = true
+    }
+
     /// The view is as big as the song, and never smaller than what it is seen through.
+    /// If it is seen through something of another width than the slides were laid out
+    /// for, they are laid out again: fewer or more to a row.
     func fit() {
+        if !layingOut, sheet != nil, laidWidth >= 0, abs(seenWidth - laidWidth) > 0.5 {
+            layOutWhereItWas()
+            return
+        }
         let seen = enclosingScrollView?.contentView.bounds.size ?? .zero
         let wanted = NSSize(width: max(content.width, seen.width), height: max(content.height, seen.height))
         if frame.size != wanted {
             setFrameSize(wanted)
         }
         placeEntry()
+    }
+
+    /// Draws everything so many times its usual size.
+    func setScale(_ scale: Double) {
+        guard scale != metrics.scale else { return }
+        metrics = SheetMetrics(scale: scale)
+        if sheet != nil {
+            layOutWhereItWas()
+            if let sheet, sheet.typing {
+                entry.show(offered: sheet.offered, picked: sheet.entry.pick, metrics: metrics)
+                placeEntry()
+            }
+        }
     }
 
     /// After anything was done: the rows laid out again if they changed, the bubble for
@@ -369,7 +499,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     private func placeEntry() {
         guard let sheet, sheet.typing, laid.indices.contains(sheet.typingAt.row) else { return }
         let item = laid[sheet.typingAt.row]
-        var x = SheetLook.left + SheetLook.gutter + sheet.xOf(sheet.typingAt.row, sheet.typingAt.at, metrics)
+        var x = item.left + sheet.xOf(sheet.typingAt.row, sheet.typingAt.at, metrics)
         var y = item.chordTop + metrics.bubbleHeight + 3 - entry.frame.height
         let seen = visibleRect
         // (Before the view has been given its size there is nothing to keep it within.)
@@ -380,47 +510,43 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         entry.setFrameOrigin(NSPoint(x: x, y: max(4, y)))
     }
 
-    /// Brings the spot into view, when the keys have moved it.
+    /// Brings the spot into view, when the keys have moved it: its slide's whole frame
+    /// if that can be seen whole, and the place itself whatever else.
     private func revealSpot() {
         guard let sheet, laid.indices.contains(sheet.spot.row) else { return }
         if sheet.rows != laidRows {
             layOut()
         }
         let item = laid[sheet.spot.row]
+        guard cells.indices.contains(item.cell) else { return }
+        let frame = cells[item.cell].frame.insetBy(dx: -SheetLook.around, dy: -SheetLook.around)
         let seen = visibleRect
-        var to = seen.origin
-        if item.top < seen.minY + 10 {
-            to.y = max(0, item.top - 30)
-        } else if item.top + item.height > seen.maxY - 10 {
-            to.y = min(max(0, bounds.height - seen.height), item.top + item.height - seen.height + 30)
+        if frame.height <= seen.height, frame.width <= seen.width {
+            scrollToVisible(frame)
         }
-        let x = SheetLook.left + SheetLook.gutter + sheet.xOf(sheet.spot.row, sheet.spot.at, metrics)
-        if x < seen.minX + SheetLook.gutter {
-            to.x = max(0, x - SheetLook.gutter - SheetLook.left)
-        } else if x + 60 > seen.maxX {
-            to.x = min(max(0, bounds.width - seen.width), x + 120 - seen.width)
-        }
-        if to != seen.origin {
-            scroll(to)
-        }
+        let x = item.left + sheet.xOf(sheet.spot.row, sheet.spot.at, metrics)
+        scrollToVisible(NSRect(x: x - 40, y: item.chordTop - 10, width: min(160, max(80, seen.width - 20)), height: metrics.lineHeight + 20))
     }
 
     // ---- What is where
 
-    private func row(atY y: Double) -> Int? {
-        laid.firstIndex { y >= $0.top && y < $0.top + $0.height }
+    /// The line of a card that a point is on. Every part of a card is one of its lines:
+    /// below the last of them, the last.
+    private func line(at point: NSPoint) -> Int? {
+        guard let cell = cells.first(where: { $0.card.contains(point) }) else { return nil }
+        let down = Int(((point.y - cell.card.minY - metrics.cardPad) / metrics.lineHeight).rounded(.down))
+        return cell.rows.lowerBound + min(max(down, 0), cell.rows.count - 1)
     }
 
     /// The place of a line under a point: a chord's, if the point is on its bubble;
-    /// otherwise the character there, or with Shift the word. Nothing beside the cards,
-    /// which is bare sheet, or on a row that can take no chord.
+    /// otherwise the character there, or with Shift the word. Nothing off the cards,
+    /// which is bare sheet (a frame and its foot are too), or on a line that can take
+    /// no chord.
     func place(at point: NSPoint, shift: Bool) -> (row: Int, at: Int, onChord: Bool)? {
-        guard let sheet, let index = row(atY: point.y), sheet.usable(index) else { return nil }
-        let x = point.x - SheetLook.left
-        guard x >= 0, x < SheetLook.gutter + cardWidth - SheetLook.cardPad else { return nil }
+        guard let sheet, let index = line(at: point), sheet.usable(index) else { return nil }
         let item = laid[index]
-        let along = x - SheetLook.gutter
-        if point.y >= item.chordTop, point.y < item.chordTop + metrics.bubbleHeight + SheetLook.tail {
+        let along = point.x - item.left
+        if point.y >= item.chordTop, point.y < item.chordTop + metrics.bubbleHeight + metrics.tail {
             for (n, chord) in sheet.rows[index].chords.enumerated() where along >= item.placed.xs[n] && along < item.placed.xs[n] + item.placed.widths[n] {
                 return (index, chord.at, true)
             }
@@ -435,25 +561,72 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         guard let sheet, laid.indices.contains(spot.row), sheet.usable(spot.row) else { return nil }
         let item = laid[spot.row]
         let row = sheet.rows[spot.row]
-        let lineLeft = SheetLook.left + SheetLook.gutter
         if onItsChord {
             guard let n = row.chords.firstIndex(where: { $0.at == spot.at }) else { return nil }
-            return NSPoint(x: lineLeft + item.placed.xs[n] + item.placed.widths[n] / 2, y: item.chordTop + metrics.bubbleHeight / 2)
+            return NSPoint(x: item.left + item.placed.xs[n] + item.placed.widths[n] / 2, y: item.chordTop + metrics.bubbleHeight / 2)
         }
-        let wordsMiddle = item.chordTop + metrics.bubbleHeight + SheetLook.tail + metrics.wordHeight / 2
+        let wordsMiddle = item.chordTop + metrics.bubbleHeight + metrics.tail + metrics.wordHeight / 2
         if row.alone {
-            return NSPoint(x: lineLeft + sheet.xOf(spot.row, spot.at, metrics) + 2, y: wordsMiddle)
+            return NSPoint(x: item.left + sheet.xOf(spot.row, spot.at, metrics) + 2, y: wordsMiddle)
         }
         let from = metrics.advance(row: spot.row, units: spot.at)
         let to = metrics.advance(row: spot.row, units: min(spot.at + 1, row.text.length))
-        return NSPoint(x: lineLeft + (from + to) / 2, y: wordsMiddle)
+        return NSPoint(x: item.left + (from + to) / 2, y: wordsMiddle)
     }
 
-    /// The same for a chord that is being carried: the line under the pointer wherever
-    /// across the sheet that is, and never another chord's bubble for itself.
+    /// The same for a chord that is being carried: the line under the pointer, and
+    /// never another chord's bubble for itself.
     private func placeCarriedTo(_ point: NSPoint, shift: Bool) -> (row: Int, at: Int)? {
-        guard let sheet, let index = row(atY: point.y), sheet.usable(index) else { return nil }
-        return (index, sheet.placeAt(index, along: point.x - SheetLook.left - SheetLook.gutter, exact: !shift, metrics))
+        guard let sheet, let index = line(at: point), sheet.usable(index) else { return nil }
+        return (index, sheet.placeAt(index, along: point.x - laid[index].left, exact: !shift, metrics))
+    }
+
+    /// The line over or under a line ON THE SCREEN, that can take the spot: the next of
+    /// its own slide; or from a slide's last line the first line of the slide under it
+    /// in the grid, and from its first the last line of the slide over it. The slide
+    /// under or over is the one in the same column of the next row of slides, or that
+    /// row's last where it is a short one.
+    func lineBeside(_ row: Int, _ delta: Int) -> Int? {
+        guard let sheet, laid.indices.contains(row), cells.indices.contains(laid[row].cell) else { return nil }
+        let here = cells[laid[row].cell]
+        var next = row + delta
+        while here.rows.contains(next) {
+            if sheet.usable(next) { return next }
+            next += delta
+        }
+        var gridRow = here.gridRow + delta
+        while true {
+            let inRow = cells.filter { $0.gridRow == gridRow }
+            guard let last = inRow.last else { return nil }
+            let there = inRow.first { $0.column == here.column } ?? last
+            let lines = delta > 0 ? Array(there.rows) : Array(there.rows.reversed())
+            if let found = lines.first(where: sheet.usable) { return found }
+            gridRow += delta
+        }
+    }
+
+    /// Down and Up: the spot goes to the line under or over it on the screen, to the
+    /// stop of it that is nearest under or over where it was.
+    private func stepLine(_ delta: Int) {
+        guard let sheet else { return }
+        guard sheet.usable(sheet.spot.row) else {
+            // With no spot yet, the first arrow key puts it on the first word of the song.
+            sheet.step(1, exact: false)
+            return
+        }
+        guard let next = lineBeside(sheet.spot.row, delta) else { return }
+        let x = laid[sheet.spot.row].left + sheet.xOf(sheet.spot.row, sheet.spot.at, metrics)
+        var best = 0
+        var distance = Double.infinity
+        for stop in sheet.stops(next) {
+            let off = abs(laid[next].left + sheet.xOf(next, stop, metrics) - x)
+            if off < distance {
+                distance = off
+                best = stop
+            }
+        }
+        sheet.setSpot(next, best)
+        sheet.revealSpot()
     }
 
     // ---- The pointer
@@ -573,8 +746,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         switch key {
         case .left: sheet.step(-1, exact: shift)
         case .right: sheet.step(1, exact: shift)
-        case .up: sheet.stepLine(-1, metrics)
-        case .down: sheet.stepLine(1, metrics)
+        case .up: stepLine(-1)
+        case .down: stepLine(1)
         case .delete: sheet.takeAtSpot()
         case .open: sheet.startTyping()
         case .number(let number): sheet.putOfKey(number)
@@ -583,6 +756,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         case .paste: sheet.paste()
         case .undo: asks.undo()
         case .redo: asks.redo()
+        case .zoom(let direction):
+            if let scale = asks.zoom(direction) {
+                setScale(scale)
+            }
         }
         sync()
     }
@@ -598,6 +775,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             case "c": return (.copy(wholeGroup: shift), shift)
             case "v" where !shift: return (.paste, false)
             case "z": return (shift ? .redo : .undo, shift)
+            // (Plus is Shift with the equals key on most keyboards: both are taken.)
+            case "=", "+": return (.zoom(1), false)
+            case "-": return (.zoom(-1), false)
+            case "0" where !shift: return (.zoom(0), false)
             default: return nil
             }
         }
@@ -625,8 +806,21 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         // (Any other key is nothing here, and is let go without a sound.)
     }
 
-    // Command with C, V and Z is asked of the views of a window before its menus are.
-    // The sheet answers them itself while it has the keyboard, so that they work
+    // Two fingers spread or closed on a trackpad: the words a step larger or smaller
+    // for each fair stretch of it.
+    override func magnify(with event: NSEvent) {
+        if event.phase == .began {
+            pinched = 0
+        }
+        pinched += event.magnification
+        if abs(pinched) > 0.2 {
+            key(.zoom(pinched > 0 ? 1 : -1))
+            pinched = 0
+        }
+    }
+
+    // Command with C, V, Z and the keys that zoom is asked of the views of a window
+    // before its menus are. The sheet answers them itself while it has the keyboard, so that they work
     // whatever the menus make of them.
     override func performKeyEquivalent(with event: NSEvent) -> Bool {
         guard window?.firstResponder === self, event.type == .keyDown, event.modifierFlags.contains(.command),
@@ -707,16 +901,16 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     // ---- Drawing
 
-    private func rounded(_ rect: NSRect, radius: Double, fill: NSColor?, edge: NSColor?, alpha: Double = 1) {
-        // (An edge one wide is drawn down the middle of its pixels.)
-        let path = NSBezierPath(roundedRect: rect.insetBy(dx: 0.5, dy: 0.5), xRadius: radius, yRadius: radius)
+    private func rounded(_ rect: NSRect, radius: Double, fill: NSColor?, edge: NSColor?, alpha: Double = 1, width: Double = 1) {
+        // (An edge is drawn down the middle of its own width.)
+        let path = NSBezierPath(roundedRect: rect.insetBy(dx: width / 2, dy: width / 2), xRadius: radius, yRadius: radius)
         if let fill {
             fill.withAlphaComponent(fill.alphaComponent * alpha).setFill()
             path.fill()
         }
         if let edge {
             edge.withAlphaComponent(edge.alphaComponent * alpha).setStroke()
-            path.lineWidth = 1
+            path.lineWidth = width
             path.stroke()
         }
     }
@@ -733,10 +927,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     }
 
     private func bubble(name: String, x: Double, top: Double, width: Double, lit: Bool, edge: NSColor, alpha: Double, in context: CGContext) {
-        rounded(NSRect(x: x, y: top, width: width, height: metrics.bubbleHeight), radius: 6, fill: lit ? SheetLook.lit : SheetLook.bubble, edge: edge, alpha: alpha)
+        rounded(NSRect(x: x, y: top, width: width, height: metrics.bubbleHeight), radius: 6 * metrics.scale, fill: lit ? SheetLook.lit : SheetLook.bubble, edge: edge, alpha: alpha)
         let text = metrics.name(name)
         Self.draw(text.line, at: NSPoint(x: x + (width - text.width) / 2, y: top + (metrics.bubbleHeight - metrics.chordHeight) / 2),
-                  font: SheetLook.chordFont, colour: SheetLook.chordName.withAlphaComponent(alpha), in: context)
+                  font: metrics.chordFont, colour: SheetLook.chordName.withAlphaComponent(alpha), in: context)
     }
 
     override func draw(_ dirtyRect: NSRect) {
@@ -744,60 +938,57 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         dirtyRect.fill()
         guard let sheet, let context = NSGraphicsContext.current?.cgContext, laid.count == sheet.rows.count else { return }
         let rows = sheet.rows
-        let left = SheetLook.left
-        let lineLeft = left + SheetLook.gutter
+        let tailWidth = max(1.5, 2 * metrics.scale)
 
-        // The cards first: each is drawn for its slide's first line and reaches down
-        // behind the rest of them.
-        for (index, row) in rows.enumerated() where row.kind == .line && row.first {
-            let card = card(ofSlideStartingAt: index)
-            guard card.intersects(dirtyRect) else { continue }
-            rounded(card, radius: 8, fill: SheetLook.card, edge: row.slide == sheet.picked ? SheetLook.pickedEdge : SheetLook.cardEdge)
-        }
+        for cell in cells where cell.frame.insetBy(dx: -SheetLook.around, dy: -SheetLook.around).intersects(dirtyRect) {
+            // The slide that is picked has an orange ring, outside its frame and set
+            // off from it by a little of the sheet, so that it reads against a frame
+            // of any colour.
+            if cell.slide == sheet.picked {
+                rounded(cell.frame.insetBy(dx: -4.5, dy: -4.5), radius: 7, fill: nil, edge: SheetLook.accent, width: 2)
+            }
+            // The frame is the colour of the slide's group; the card is laid on it,
+            // and under the card is its foot, with the slide's number and, on the
+            // first slide of each group, the group's name.
+            rounded(cell.frame, radius: 4, fill: cell.colour, edge: nil)
+            rounded(cell.card, radius: 2, fill: SheetLook.card, edge: nil)
+            var label = SheetMetrics.line(cell.label, font: SheetLook.labelFont)
+            let room = cell.frame.width - 16
+            if SheetMetrics.width(of: label) > room, room > 20 {
+                let dots = SheetMetrics.line("\u{2026}", font: SheetLook.labelFont)
+                label = CTLineCreateTruncatedLine(label, room, .end, dots) ?? label
+            }
+            Self.draw(label, at: NSPoint(x: cell.frame.minX + 8, y: cell.card.maxY + (SheetLook.label - SheetLook.height(of: SheetLook.labelFont)) / 2),
+                      font: SheetLook.labelFont, colour: SheetLook.isLight(cell.colour) ? .black : .white, in: context)
 
-        for (index, row) in rows.enumerated() {
-            let item = laid[index]
-            guard NSRect(x: 0, y: item.top - 4, width: bounds.width, height: item.height + 8).intersects(dirtyRect) else { continue }
-            if row.kind == .group {
-                // The name of a group, in its colour
-                let name = SheetMetrics.line(row.name, font: SheetLook.groupFont)
-                let width = SheetMetrics.width(of: name)
-                let colour = row.colour.map { NSColor(srgbRed: $0.red, green: $0.green, blue: $0.blue, alpha: $0.alpha) } ?? SheetLook.group
-                rounded(NSRect(x: left, y: item.top + 10, width: width + 20, height: 22), radius: 4, fill: colour, edge: nil)
-                Self.draw(name, at: NSPoint(x: left + 10, y: item.top + 10 + (22 - SheetLook.height(of: SheetLook.groupFont)) / 2),
-                          font: SheetLook.groupFont, colour: .white, in: context)
-                continue
-            }
-            let wordsTop = item.chordTop + metrics.bubbleHeight + SheetLook.tail
-            if row.first {
-                // The slide's number, beside its card
-                let number = SheetMetrics.line(String(row.slide + 1), font: SheetLook.numberFont)
-                Self.draw(number, at: NSPoint(x: left + SheetLook.gutter - 20 - SheetMetrics.width(of: number), y: wordsTop + 4),
-                          font: SheetLook.numberFont, colour: row.slide == sheet.picked ? SheetLook.accent : SheetLook.number, in: context)
-            }
-            if row.alone {
-                // A line of chords alone has nothing to read: a rule stands where its
-                // words would be.
-                SheetLook.rule.setFill()
-                NSRect(x: lineLeft, y: wordsTop + metrics.wordHeight / 2, width: max(60, item.placed.width + 40), height: 1).fill()
-            } else if let line = metrics.lines[index] {
-                Self.draw(line, at: NSPoint(x: lineLeft, y: wordsTop), font: SheetLook.wordFont, colour: SheetLook.words, in: context)
-            }
-            // The chords, each a bubble with its tail on its character
-            for (n, chord) in row.chords.enumerated() {
-                let x = item.placed.xs[n]
-                let width = item.placed.widths[n]
-                let atSpot = sheet.spot.row == index && sheet.spot.at == chord.at
-                let lifted = sheet.dragged.map { $0.from == Spot(row: index, at: chord.at) } ?? false
-                let alpha = lifted ? 0.35 : 1
-                let edge = atSpot ? SheetLook.accent : SheetLook.bubbleEdge
-                // Where its character is, which is where the tail points even when the
-                // bubble has had to move right of it
-                let character = row.alone ? x + width / 2 : metrics.advance(row: index, units: min(chord.at, row.text.length))
-                edge.withAlphaComponent(alpha).setFill()
-                NSRect(x: lineLeft + x + max(3, min(width - 5, character - x + 1)), y: item.chordTop + metrics.bubbleHeight - 1,
-                       width: 2, height: SheetLook.tail + 3).fill()
-                bubble(name: chord.name, x: lineLeft + x, top: item.chordTop, width: width, lit: atSpot, edge: edge, alpha: alpha, in: context)
+            for index in cell.rows {
+                let row = rows[index]
+                let item = laid[index]
+                let wordsTop = item.chordTop + metrics.bubbleHeight + metrics.tail
+                if row.alone {
+                    // A line of chords alone has nothing to read: a rule stands where
+                    // its words would be.
+                    SheetLook.rule.setFill()
+                    NSRect(x: item.left, y: wordsTop + metrics.wordHeight / 2, width: max(60 * metrics.scale, item.placed.width + 40 * metrics.scale), height: 1).fill()
+                } else if let line = metrics.lines[index] {
+                    Self.draw(line, at: NSPoint(x: item.left, y: wordsTop), font: metrics.wordFont, colour: SheetLook.words, in: context)
+                }
+                // The chords, each a bubble with its tail on its character
+                for (n, chord) in row.chords.enumerated() {
+                    let x = item.placed.xs[n]
+                    let width = item.placed.widths[n]
+                    let atSpot = sheet.spot.row == index && sheet.spot.at == chord.at
+                    let lifted = sheet.dragged.map { $0.from == Spot(row: index, at: chord.at) } ?? false
+                    let alpha = lifted ? 0.35 : 1
+                    let edge = atSpot ? SheetLook.accent : SheetLook.bubbleEdge
+                    // Where its character is, which is where the tail points even when
+                    // the bubble has had to move right of it
+                    let character = row.alone ? x + width / 2 : metrics.advance(row: index, units: min(chord.at, row.text.length))
+                    edge.withAlphaComponent(alpha).setFill()
+                    NSRect(x: item.left + x + max(3 * metrics.scale, min(width - 5 * metrics.scale, character - x + 1)), y: item.chordTop + metrics.bubbleHeight - 1,
+                           width: tailWidth, height: metrics.tail + 3 * metrics.scale).fill()
+                    bubble(name: chord.name, x: item.left + x, top: item.chordTop, width: width, lit: atSpot, edge: edge, alpha: alpha, in: context)
+                }
             }
         }
 
@@ -811,18 +1002,18 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let underTyping = sheet.typing && spot == sheet.typingAt
         guard !underTyping, free || sheet.dragged != nil else { return }
         let item = laid[spot.row]
-        let x = lineLeft + sheet.xOf(spot.row, spot.at, metrics)
+        let x = item.left + sheet.xOf(spot.row, spot.at, metrics)
         let carried = sheet.dragged?.name
-        let width = max(26, carried.map { metrics.bubble($0) } ?? 0)
+        let width = max(26 * metrics.scale, carried.map { metrics.bubble($0) } ?? 0)
         SheetLook.accent.withAlphaComponent(0.75).setFill()
-        NSRect(x: x + 3, y: item.chordTop + metrics.bubbleHeight - 1, width: 2, height: SheetLook.tail + metrics.wordHeight + 3).fill()
+        NSRect(x: x + 3 * metrics.scale, y: item.chordTop + metrics.bubbleHeight - 1, width: tailWidth, height: metrics.tail + metrics.wordHeight + 3 * metrics.scale).fill()
         if let carried {
             bubble(name: carried, x: x, top: item.chordTop, width: width, lit: true, edge: SheetLook.accent, alpha: 1, in: context)
         } else {
-            rounded(NSRect(x: x, y: item.chordTop, width: width, height: metrics.bubbleHeight), radius: 6, fill: nil, edge: SheetLook.accent, alpha: 0.75)
+            rounded(NSRect(x: x, y: item.chordTop, width: width, height: metrics.bubbleHeight), radius: 6 * metrics.scale, fill: nil, edge: SheetLook.accent, alpha: 0.75)
             let plus = metrics.name("+")
             Self.draw(plus.line, at: NSPoint(x: x + (width - plus.width) / 2, y: item.chordTop + (metrics.bubbleHeight - metrics.chordHeight) / 2),
-                      font: SheetLook.chordFont, colour: SheetLook.accent.withAlphaComponent(0.75), in: context)
+                      font: metrics.chordFont, colour: SheetLook.accent.withAlphaComponent(0.75), in: context)
         }
     }
 }
@@ -965,17 +1156,19 @@ struct ChordSheetCanvasView: NSViewRepresentable {
     var model: LibraryModel
     /// Read so that the view is brought up to date whenever it goes up.
     var version: Int
+    /// How many times its usual size the sheet is drawn.
+    var scale: Double
 
     func makeNSView(context: Context) -> SheetScroll {
         let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
         scroll.canvas.asks = .of(model)
-        scroll.canvas.show(model.sheet)
+        scroll.canvas.show(model.sheet, scale: scale)
         return scroll
     }
 
     func updateNSView(_ scroll: SheetScroll, context: Context) {
         scroll.canvas.asks = .of(model)
-        scroll.canvas.show(model.sheet)
+        scroll.canvas.show(model.sheet, scale: scale)
     }
 }
 
@@ -990,19 +1183,32 @@ struct SheetStrip: View {
     var key: String
 
     var body: some View {
-        HStack(spacing: 8) {
-            // (Nothing in the strip is ever squeezed or wrapped. Where the pane is too
-            // narrow for all of it, it scrolls sideways.)
-            ScrollView(.horizontal, showsIndicators: false) {
+        // Nothing in the strip is ever squeezed or wrapped. Where the pane is too narrow
+        // for the chords and what is said of the key, that is left out; and where it is
+        // too narrow for the chords, they scroll sideways.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 8) {
                 chords
+                Spacer(minLength: 12)
+                if key.isEmpty {
+                    Text("The song names no key: pick the one its chords are in")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color(nsColor: SheetLook.caption))
+                        .lineLimit(1)
+                        .fixedSize()
+                }
+                zoom
             }
-            if key.isEmpty {
-                Text("The song names no key: pick the one its chords are in")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color(nsColor: SheetLook.caption))
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .layoutPriority(-1)
+            HStack(spacing: 8) {
+                chords
+                Spacer(minLength: 12)
+                zoom
+            }
+            HStack(spacing: 8) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    chords
+                }
+                zoom
             }
         }
         .padding(.horizontal, 14)
@@ -1010,6 +1216,33 @@ struct SheetStrip: View {
         .frame(maxWidth: .infinity)
         .background(Color(nsColor: SheetLook.strip))
         .environment(\.colorScheme, .dark)
+    }
+
+    /// The size of the words, and so how many slides there are to a row.
+    private var zoom: some View {
+        HStack(spacing: 6) {
+            zoomButton("minus", by: -1, can: model.canZoomSheetOut,
+                       says: "Smaller words, and more slides in view. Command with the minus key does the same.")
+            zoomButton("plus", by: 1, can: model.canZoomSheetIn,
+                       says: "Larger words. Command with the plus key does the same; Command with 0 is the usual size.")
+        }
+        .fixedSize()
+    }
+
+    private func zoomButton(_ picture: String, by direction: Int, can: Bool, says: String) -> some View {
+        Button {
+            model.zoomSheet(direction)
+        } label: {
+            Image(systemName: picture)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(Color(nsColor: SheetLook.words).opacity(can ? 1 : 0.35))
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(Color(nsColor: SheetLook.chip)))
+        }
+        .buttonStyle(.plain)
+        .disabled(!can)
+        .help(says)
+        .accessibilityLabel(direction < 0 ? "Smaller words" : "Larger words")
     }
 
     private var chords: some View {

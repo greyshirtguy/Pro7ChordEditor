@@ -36,7 +36,7 @@ struct SongPane: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 } else if model.editorShown == .sheet, let sheet = model.sheet {
                     SheetStrip(model: model, sheet: sheet, key: shown.key)
-                    ChordSheetCanvasView(model: model, version: model.sheetVersion)
+                    ChordSheetCanvasView(model: model, version: model.sheetVersion, scale: model.sheetZoom)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let chordPro = model.chordPro {
                     // One line of help over the text; or, in a warmer colour, why this

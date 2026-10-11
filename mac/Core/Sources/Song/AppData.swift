@@ -39,6 +39,9 @@ public struct AppData: Sendable {
         /// The place and the library last open, by their ids.
         public var lastPlace: String?
         public var lastLibrary: String?
+        /// How many times its usual size the chord sheet is drawn; nothing if it was
+        /// never changed.
+        public var sheetZoom: Double?
 
         public init() {}
     }

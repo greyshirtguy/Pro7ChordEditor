@@ -13,6 +13,7 @@ the list of those things. Anything not on it is to be the same.
 | --- | --- | --- |
 | The key for shortcuts | Command, where these pages say Ctrl | Ctrl |
 | Copying a chord while dragging | Option held (the Mac's key for "copy as you drag") | Ctrl held |
+| Zooming the sheet | Command with minus, plus (or equals) and 0; a pinch on the trackpad | Ctrl with the same keys; Ctrl with the wheel, if the platform's own views do that |
 | What the quiet line says the keys do | "... Drag moves a chord, with Option copies it ... Command+C and Command+V: a line's chords onto another" | The same with Ctrl for both |
 | Deleting | Either delete key | Delete or Backspace |
 | Open on what is at the spot | Return | Enter, F2 |
@@ -126,7 +127,8 @@ tests that **draw into pictures**:
 - **Windows**: `RenderTargetBitmap` of the element after `Measure` and `Arrange`, to
   a PNG. WPF needs a thread in single-threaded apartment for this; give the test one.
 
-Draw at least: the sheet of `Amazing Grace.pro` as opened; with the spot on a word;
+Draw at least: the sheet of `Amazing Grace.pro` as opened; in a wide window, and
+there with the words small and with them large; with the spot on a word;
 with the typing bubble open and "D/" typed; with a chord being dragged; a song with a
 line of chords alone; the ChordPro editor. Then **open the PNGs and look at them**
 beside `spec/pictures`. Do this after every change to how something is drawn, and say

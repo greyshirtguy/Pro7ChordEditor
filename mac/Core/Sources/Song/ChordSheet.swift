@@ -102,6 +102,13 @@ public protocol SheetMeasure {
     func advance(row: Int, units: Int) -> Double
     /// How wide a chord's bubble is, margins and all.
     func bubble(_ name: String) -> Double
+    /// How many times its usual size everything is drawn (the sheet can be zoomed): the
+    /// few gaps the sheet itself keeps along a line are that many times theirs.
+    var scale: Double { get }
+}
+
+extension SheetMeasure {
+    public var scale: Double { 1 }
 }
 
 public final class ChordSheet {
@@ -403,7 +410,10 @@ public final class ChordSheet {
         revealSpot()
     }
 
-    private func revealSpot() {
+    /// The keys have moved the spot: its slide is the one picked, and it is to be
+    /// brought into view. (Asked from outside too, by a view that works out for itself
+    /// which line is above or below on the screen.)
+    public func revealSpot() {
         if usable(spot.row) {
             picked = rows[spot.row].slide
         }
@@ -416,7 +426,7 @@ public final class ChordSheet {
     public func placed(_ index: Int, _ measure: any SheetMeasure) -> ChordLayout.Placed {
         let line = rows[index]
         return ChordLayout.place(length: line.text.length, chords: line.chords,
-                                 advance: { measure.advance(row: index, units: $0) }, bubble: measure.bubble, gap: Self.gap)
+                                 advance: { measure.advance(row: index, units: $0) }, bubble: measure.bubble, gap: Self.gap * measure.scale)
     }
 
     /// Where a place on a line is, from the line's left edge: a chord's bubble if one
@@ -430,7 +440,7 @@ public final class ChordSheet {
         }
         if line.alone {
             guard let last = line.chords.indices.last else { return 0 }
-            return placed.xs[last] + placed.widths[last] + 10
+            return placed.xs[last] + placed.widths[last] + 10 * measure.scale
         }
         return measure.advance(row: index, units: min(max(at, 0), line.text.length))
     }
@@ -442,7 +452,7 @@ public final class ChordSheet {
         let line = rows[index]
         if line.alone {
             let placed = placed(index, measure)
-            for slot in line.chords.indices where along < placed.xs[slot] + placed.widths[slot] + 5 {
+            for slot in line.chords.indices where along < placed.xs[slot] + placed.widths[slot] + 5 * measure.scale {
                 return slot * 2
             }
             return line.chords.count * 2
