@@ -194,6 +194,21 @@ public class MendingViewTests
         Click((ToggleButton)lists.FindName("All"));
         Assert.Equal((MarkFilter.All, false, Visibility.Collapsed), (model.Filter, choice.IsChecked, mendAll.Visibility));
 
+        // Switched on the system's way, as a program does it for someone who cannot
+        // click: the list is narrowed as by a click. And the one that is chosen, switched
+        // off so, is put back on.
+        static void Toggle(ToggleButton button) =>
+            ((System.Windows.Automation.Provider.IToggleProvider)new System.Windows.Automation.Peers.ToggleButtonAutomationPeer(button)).Toggle();
+        Toggle(choice);
+        Assert.Equal((MarkFilter.WantingMending, true, false), (model.Filter, choice.IsChecked, ((ToggleButton)lists.FindName("All")).IsChecked));
+        Assert.Equal(4, lists.RowsShown.Count);
+        Toggle(choice);
+        Assert.Equal((MarkFilter.WantingMending, true), (model.Filter, choice.IsChecked));
+        Toggle((ToggleButton)lists.FindName("WithChords"));
+        Assert.Equal((MarkFilter.WithChords, false, true), (model.Filter, choice.IsChecked, ((ToggleButton)lists.FindName("WithChords")).IsChecked));
+        Toggle((ToggleButton)lists.FindName("All"));
+        Assert.Equal(MarkFilter.All, model.Filter);
+
         // A library in which nothing wants mending has three choices.
         model.ChooseLibrary(pc.Library("Songs"));
         await model.MarksAreWorkedOutAsync();

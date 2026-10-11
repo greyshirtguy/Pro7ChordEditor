@@ -38,6 +38,29 @@ public partial class ListsPane : UserControl
         InitializeComponent();
         DataContextChanged += (_, _) => Follow(DataContext as LibraryModel);
         SizeChanged += (_, _) => LayOut();
+        // The four choices answer a click, and the space bar, by their `Click`. A
+        // program that works the window for someone (a screen reader) may switch one on
+        // the system's way instead, which changes the button and raises no click: so
+        // that is answered too. (FOUND at M8, on the way to trying Mend All in the real
+        // window as a program can: a choice switched on so looked chosen, and the list
+        // was as it had been.) Switched off so, the one that is chosen is put back on.
+        foreach (var (choice, narrowsTo) in new[] { (All, MarkFilter.All), (WithChords, MarkFilter.WithChords), (Without, MarkFilter.WithoutChords), (Mending, MarkFilter.WantingMending) })
+        {
+            choice.Checked += (_, _) =>
+            {
+                if (!showing)
+                {
+                    Narrow(narrowsTo);
+                }
+            };
+            choice.Unchecked += (_, _) =>
+            {
+                if (!showing)
+                {
+                    Show();
+                }
+            };
+        }
     }
 
     // WHAT A ROW IS CALLED. A screen reader says of a row whatever the thing in the row
