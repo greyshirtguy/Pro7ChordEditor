@@ -161,6 +161,13 @@ And at M6, 2026-10-11:
     the words in the file are never touched. The ChordPro text still has those lines,
     as empty lines, since what may be typed there is held to the song line for line
     (`spec/04`, rule 6).
+36. **Each card is as tall as its own slide; all are one width** (`spec/03`, rule 8).
+    The maintainer's, on the question of the card too tall: "I'd say yes (in fact
+    the GUI 'feels' a little like 'I can't see enough words' (to me)... so let's start
+    by fine tuning that (and I will say the same to [the session] managing simple
+    presenter development on my linux box)". So Simple Presenter is being asked the
+    same, and until it has it the two differ in this. `ChordSheet.mostLines` is still
+    worked out, the vectors holding it, and the view draws nothing by it.
 
 ## How it is laid out, and why
 
@@ -678,7 +685,15 @@ changing any of it:
     the others': that is rule 8, all cards one size, which the maintainer asked for
     in Simple Presenter after trying cards of differing sizes. In 104 of the 422
     songs the tallest slide has more lines than the song's middling one, so most of
-    their cards have room to spare. Asked of the maintainer.
+    their cards have room to spare. Asked of the maintainer, who changed the rule
+    (decision 36).
+  - **With each card its own height**, the sheets of all 422 songs together are 75% as
+    tall as with cards of one size; 291 songs are shorter, the middling one of those
+    to 88%. In the first 480 of a sheet's height, which is about what the window
+    shows at the size it opens at, there are on average 3.4 lines of words where
+    there were 2.7. **That is still few.** A line of words with its row for chords is
+    61 tall, a slide's card adds 30, and a group's name 34: what would show more is
+    smaller sizes, which is the maintainer's to choose for both apps.
   - **49 songs have a line wider than 900 at the sheet's size, 20 of them wider than
     2,000**: whole verses as one line, which ProPresenter wraps and the sheet does
     not (rule 12). Their cards are that wide, and the sheet scrolls sideways.

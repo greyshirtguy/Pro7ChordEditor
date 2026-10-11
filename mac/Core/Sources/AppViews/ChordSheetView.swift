@@ -10,8 +10,11 @@
 // opens or closes the bubble a chord is typed in, and draws.
 //
 // How it is laid out is the reference's (qml/ChordSheet.qml), number for number: a
-// column of rows, a card behind each slide's lines, all cards one size. The sizes are
-// in `SheetLook`.
+// column of rows, and a card behind each slide's lines. The sizes are in `SheetLook`.
+// One thing is not the reference's: there all cards are one size, each as tall as the
+// slide with the most lines. Here they are one WIDTH, and each as tall as its own
+// slide (spec/03, rule 8: the maintainer's, on seeing a real library, where a slide of
+// one line or none had a card with room for the longest).
 //
 // The same numbers, for drawing and for pointing. Each line's words are one Core Text
 // line (`SheetMetrics`). That line is what is drawn, and how far along it a character
@@ -215,7 +218,6 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     private(set) var laid: [Laid] = []
     private var laidRows: [SheetRow] = []
-    private var laidMost = 0
     private(set) var cardWidth = 0.0
     private var content = NSSize.zero
     /// The typing the bubble is open for: `ChordSheet.typingsBegun` as it was.
@@ -268,8 +270,12 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     // ---- Laying out
 
-    private var cardHeight: Double {
-        Double(sheet?.mostLines ?? 1) * metrics.lineHeight + 2 * SheetLook.cardPad
+    /// The card of the slide whose first line is this row: as wide as every other,
+    /// and as tall as the slide's own lines.
+    func card(ofSlideStartingAt index: Int) -> NSRect {
+        guard let sheet, laid.indices.contains(index), sheet.rows[index].kind == .line else { return .zero }
+        return NSRect(x: SheetLook.left + SheetLook.gutter - SheetLook.cardPad, y: laid[index].top + SheetLook.cardGap, width: cardWidth,
+                      height: Double(sheet.rows[index].count) * metrics.lineHeight + 2 * SheetLook.cardPad)
     }
 
     private func layOut() {
@@ -287,10 +293,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             var item = Laid(top: top)
             if row.kind == .line {
                 // Room over the first line of a slide, for the gap between two cards
-                // and the top of its own; and under its last, for the foot of the card
-                // and for the lines it has fewer of than the longest slide.
+                // and the top of its own; and under its last, for the foot of the card.
                 item.lead = row.first ? SheetLook.cardGap + SheetLook.cardPad : 0
-                let foot = row.last ? Double(sheet.mostLines - row.count) * metrics.lineHeight + SheetLook.cardPad : 0
+                let foot = row.last ? SheetLook.cardPad : 0
                 item.height = item.lead + metrics.lineHeight + foot
                 item.placed = sheet.placed(index, metrics)
                 widest = max(widest, item.placed.width + (row.alone ? 50 : 0))
@@ -302,9 +307,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         }
         laid = made
         laidRows = rows
-        laidMost = sheet.mostLines
-        // All cards are one size: as wide as the widest line of the song with its
-        // chords, and as tall as the slide with the most lines.
+        // All cards are one width: as wide as the widest line of the song with its
+        // chords. (Each is as tall as its own slide: `card(ofSlideStartingAt:)`.)
         cardWidth = widest + 2 * SheetLook.cardPad + 8
         content = NSSize(width: SheetLook.left + SheetLook.gutter + cardWidth + 50, height: top + 60)
         fit()
@@ -329,7 +333,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             needsDisplay = true
             return
         }
-        if sheet.rows != laidRows || sheet.mostLines != laidMost {
+        if sheet.rows != laidRows {
             layOut()
         }
         if sheet.typing, laid.indices.contains(sheet.typingAt.row) {
@@ -746,7 +750,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         // The cards first: each is drawn for its slide's first line and reaches down
         // behind the rest of them.
         for (index, row) in rows.enumerated() where row.kind == .line && row.first {
-            let card = NSRect(x: lineLeft - SheetLook.cardPad, y: laid[index].top + SheetLook.cardGap, width: cardWidth, height: cardHeight)
+            let card = card(ofSlideStartingAt: index)
             guard card.intersects(dirtyRect) else { continue }
             rounded(card, radius: 8, fill: SheetLook.card, edge: row.slide == sheet.picked ? SheetLook.pickedEdge : SheetLook.cardEdge)
         }

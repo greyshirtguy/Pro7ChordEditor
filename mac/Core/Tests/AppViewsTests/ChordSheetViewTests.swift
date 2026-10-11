@@ -115,6 +115,43 @@ struct ChordSheetViewTests {
         #expect(zip(more, more.dropFirst()).allSatisfy { $0 <= $1 })
     }
 
+    @Test("All cards are one width, and each is as tall as its own slide's lines, whatever the song's longest slide")
+    func eachCardItsOwnHeight() async throws {
+        let mac = try MadeUpMac()
+        for name in ["It Is Well", "Blank Slides"] {
+            let model = await open(name, on: mac)
+            let (canvas, window) = view(for: model)
+            defer { window.close() }
+            let sheet = try #require(model.sheet)
+            let firsts = sheet.rows.indices.filter { sheet.rows[$0].kind == .line && sheet.rows[$0].first }
+            #expect(firsts.count > 3)
+            let line = canvas.metrics.lineHeight
+            var counts: Set<Int> = []
+            for index in firsts {
+                let card = canvas.card(ofSlideStartingAt: index)
+                #expect(abs(card.height - (Double(sheet.rows[index].count) * line + 2 * SheetLook.cardPad)) < 0.01, "\(name)")
+                #expect(abs(card.width - canvas.cardWidth) < 0.01 && abs(card.minX - (SheetLook.left + SheetLook.gutter - SheetLook.cardPad)) < 0.01)
+                counts.insert(sheet.rows[index].count)
+                // What comes next, the next slide's card or the name of a group, starts
+                // straight after this card and no further down.
+                let after = index + sheet.rows[index].count
+                if canvas.laid.indices.contains(after) {
+                    #expect(abs(canvas.laid[after].top - card.maxY) < 0.01, "\(name)")
+                }
+            }
+            if name == "It Is Well" {
+                // (It has slides of differing numbers of lines, which is the point.)
+                #expect(counts.count > 1 && counts.max() == sheet.mostLines)
+            } else {
+                // The pointer over a blank slide's card is on that slide, down to its foot.
+                let blank = try #require(firsts.first { sheet.rows[$0].blank })
+                let card = canvas.card(ofSlideStartingAt: blank)
+                canvas.pointerMoved(to: NSPoint(x: card.minX + 40, y: card.maxY - 2), shift: false)
+                #expect(sheet.spot == Spot(row: blank, at: 0))
+            }
+        }
+    }
+
     @Test("Point and press: 4 puts the key's fourth chord on the spot, in the file; Delete takes it off; Command+Z and Shift+Command+Z walk the song's history")
     func pointAndPress() async throws {
         let mac = try MadeUpMac()

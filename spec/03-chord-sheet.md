@@ -61,8 +61,9 @@ The sheet is a list of rows made from the song's text boxes
    a slide with no text box, whose row is the same and names no box:
    [01-file-format.md](01-file-format.md), "A slide with no text box".)
 5. Each slide's line rows know how many they are, which is the first and which the
-   last, and the sheet knows the greatest number any slide has. That is what the cards
-   are sized by.
+   last: that is what its card is sized by (rule 8). The sheet also knows the greatest
+   number any slide has, which Simple Presenter sizes every card by and `sheet-model.json`
+   records (`mostLines`); these apps draw nothing by it.
 
 Vectors: `sheet-model.json`, `rows`.
 
@@ -73,10 +74,16 @@ Vectors: `sheet-model.json`, `rows`.
 7. **A card for each slide**: a rounded rectangle (radius 8) behind the slide's lines,
    with the slide's number to its left, right-aligned in a gutter 54 wide. The card
    of the slide that is picked has an edge of `#8a5a22` and its number is orange.
-8. **All cards are one size**: as wide as the widest line of the whole song with its
-   chords, and as tall as the slide with the most lines. So the sheet reads as a column
-   of slides and not as a ragged list. (Asked for by the maintainer after trying cards
-   of differing sizes.)
+8. **All cards are one width, and each is as tall as its own slide**: as wide as the
+   widest line of the whole song with its chords, so that the sheet reads as a column
+   of slides and not as a ragged list; and as tall as the lines the slide has, so that
+   a slide of one line, or a blank one, does not take the room of the longest.
+   (**Changed** by the maintainer on 2026-10-11. In Simple Presenter all cards were one
+   size, as tall as the slide with the most lines, which the maintainer had asked for
+   after trying cards of differing sizes. Tried on their own library here, it left
+   too few words in sight: of 422 songs, 291 have slides of differing lengths, and
+   with each card its own height all their sheets together are three quarters as
+   tall. The maintainer is asking the same of Simple Presenter.)
 9. A group's name is over its first card: white bold 12 on a small rounded label in
    the group's colour (ProPresenter's colour for a group of that name, or a neutral
    grey).
