@@ -1195,11 +1195,17 @@ the About text, a Developer ID, notarizing) is still to come.
   Mac, on one with Intel's chip, or on macOS 15; and the steps in the read-me for
   opening it the first time are as macOS 15 and 26 are known to behave, not as
   seen here.
-- **For the maintainer before anyone is given it**: open
-  `mac/build/Pro7ChordEditor-mac-0.1 (as if downloaded).dmg`, drag the app to
-  Applications and follow the read-me. That copy is marked as a download, so macOS
-  treats the app as it will on someone else's Mac. (It is not for giving out: the
-  mark is this Mac's and does not travel. Give out the other.)
+- **Tried by the maintainer before anyone was given it** (2026-10-12: "that
+  worked"): the image marked as a download
+  (`mac/build/Pro7ChordEditor-mac-0.1 (as if downloaded).dmg`, the same bytes as the
+  one given out, with the mark a browser puts on what it fetches), opened on this
+  Mac by the read-me's steps. So the app in the image does start, and macOS does
+  let it be allowed as the read-me says, on macOS 26 with Apple's chip. Another
+  Mac, Intel's chip and macOS 15 are still untried.
+- **Given out on 2026-10-12** as a pre-release on the Releases page, tagged
+  `mac-v0.1`, the maintainer having said "please publish": that image, of the app
+  as it was at that tag. A pre-release, so that the page's "latest" is still the
+  Windows editor 0.9.5, which `windows/README.md` points people at.
 - **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
   whose, and that they are here at the maintainer's asking). In a repository that
   is one thing; in an app handed to other people it is another, and is the

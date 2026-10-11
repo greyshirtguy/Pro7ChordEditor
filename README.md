@@ -17,7 +17,7 @@ words, and lets them be put on, moved and changed.
 
 | | |
 | --- | --- |
-| **Windows** | The first editor, version 0.9.5, is in [`windows/`](windows/README.md) and on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page. It works by typing chords in square brackets among the words. It has known faults and is to be replaced |
+| **Windows** | The first editor, version 0.9.5, is in [`windows/old/`](windows/old/README.md) and on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page. It works by typing chords in square brackets among the words. It has known faults and is to be replaced |
 | **Mac** | The new editor, being built first: [`mac/`](mac/README.md) says how far it has got. Early builds, when there are any, are on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page, marked as such. They are not yet signed by Apple, so macOS has to be told to open them: the read-me that comes with one says how |
 | **The new editor, for both** | Planned in full in [`spec/`](spec/00-overview.md). Built for the Mac as far as the two ways of putting chords on; begun for Windows |
 
