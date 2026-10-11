@@ -844,6 +844,54 @@ public class ChordSheetViewTests
         Assert.True(hand.Sheet.Typing);
     });
 
+    // More of rule 52b, written after its parts were broken in turn.
+    [Fact]
+    public void CtrlCInTheBoxCopiesTheBubblesLineAndCtrlVChangesNothingOfItsOwnAndOnlyPastesWhatWasCopiedInThisSong() => OnAMadeUpPC(async pc =>
+    {
+        var (model, view, hand) = await Open(pc, "Amazing Grace");
+        hand.Canvas.WhatWasCopiedLast = () => 7u;
+        var third = InTheFile(2, "Amazing Grace", pc);
+
+        // Ctrl+C in an empty box copies the bubble's line, wherever the pointer has gone
+        // meanwhile: "That saved a wretch like me" has one chord, and "Amazing grace how
+        // sweet the sound", which the pointer is then over, has four.
+        hand.Click("saved");
+        Assert.Equal("", hand.Box.Text);
+        hand.PointAt("Amazing");
+        Assert.NotEqual(hand.Sheet.TypingAt.Row, hand.Sheet.Spot.Row);
+        Assert.True(hand.Press(Key.C, ModifierKeys.Control));
+        Assert.Equal("1 chord copied from the line" + CopiedSays, model.Notice);
+        Assert.True(hand.BubbleIsOpen);
+        hand.Press(Key.Escape);
+
+        // Ctrl+V after a click changes nothing of its own: not even where one of the
+        // chords offered was picked with Down first. One undo takes the paste back, and
+        // there is nothing else to take back.
+        hand.PointAt("Amazing");
+        hand.Press(Key.C, ModifierKeys.Control);
+        hand.Click("heart");
+        hand.Press(Key.Down);
+        Assert.Equal(0, hand.Canvas.Entry.Picked);
+        Assert.True(hand.Press(Key.V, ModifierKeys.Control));
+        Assert.False(hand.BubbleIsOpen);
+        Assert.Equal("1:G 5:G7 16:C 26:G 61:D", InTheFile(2, "Amazing Grace", pc));
+        hand.Press(Key.Z, ModifierKeys.Control);
+        Assert.Equal(third, InTheFile(2, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
+
+        // What was copied is the sheet's own, of the song it was copied in. In another
+        // song nothing has been copied yet, and Ctrl+V in the box is the box's own,
+        // though nothing has been copied anywhere else on the PC since.
+        model.Open(pc.Song("It Is Well"));
+        Pictures.LayOut(view, 1280, 800);
+        Assert.Null(hand.Sheet.Copied);
+        hand.Click("peace");
+        Assert.True(hand.BubbleIsOpen);
+        Assert.False(hand.Press(Key.V, ModifierKeys.Control));
+        Assert.True(hand.BubbleIsOpen);
+        Assert.True(hand.Sheet.Typing);
+    });
+
     // ---- Leaving the sheet
 
     [Fact]
