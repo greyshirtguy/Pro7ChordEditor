@@ -211,6 +211,60 @@ struct ChordsWithNoWordsTests {
         #expect(song.usedChords.filter { $0.hasPrefix("F") }.count == 4 + 3 + 1 + 2 + 3 + 4 + 2)
     }
 
+    @Test("A line that has both kinds of stand-in is given zero-width spaces: plain spaces are for a line that has them and no zero-width space")
+    func bothKindsOfStandIn() throws {
+        let bench = try Workbench()
+        var made = try RVData_Presentation(serializedBytes: TestData.file(Self.shaped))
+        let source = TestData.root.appendingPathComponent("files").appendingPathComponent(Self.shaped)
+        let boxes = try OpenSong(opening: source).textBoxes
+        // The fourth slide's line: a zero-width space, a plain space, a zero-width
+        // space, with a chord on each of the two.
+        let four = try rtf(of: boxes[3].element, at: source)
+        let opening = Array(four.prefix(try #require(RTFWords.span(ofLine: 0, of: four)).lowerBound))
+        let z = written(Words(units: [0x200B]))
+        let here = try #require(place(of: boxes[3].element, in: made))
+        made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.rtfData = Data(opening + z.dropFirst(4) + [0x20] + z + Array("}".utf8))
+        var entries = entries(at: here, in: made).filter { !isChord($0) }
+        for (at, name) in [(0, "E"), (2, "B")] {
+            var chord = Entry()
+            chord.range.start = Int32(at)
+            chord.range.end = Int32(at + 1)
+            chord.chord = name
+            entries.append(chord)
+        }
+        setEntries(entries, at: here, in: &made)
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "Both.pro"), safeguards: bench.safeguards)
+        #expect(song.textBoxes[3].words == Words(units: [0x200B, 0x20, 0x200B]))
+        try song.setChordsAlone(slide: 3, element: boxes[3].element, line: 0, names: ["E", "B", "A"])
+        #expect(song.textBoxes[3].words == Chords.placeholders(3))
+        #expect(song.textBoxes[3].chords.map(\.at) == [0, 2, 4])
+    }
+
+    @Test("A chord that stands on the line break that ends a line of chords alone is that line's, and goes with the line's chords")
+    func onTheLinesOwnBreak() throws {
+        let bench = try Workbench()
+        var made = try RVData_Presentation(serializedBytes: TestData.file(Self.shaped))
+        let boxes = try OpenSong(opening: TestData.root.appendingPathComponent("files").appendingPathComponent(Self.shaped)).textBoxes
+        // The ninth slide: three chords on five places, a line break at 5, then two
+        // lines of words with a chord each. One more chord is put on the break.
+        let here = try #require(place(of: boxes[8].element, in: made))
+        var all = entries(at: here, in: made)
+        var chord = Entry()
+        chord.range.start = 5
+        chord.range.end = 6
+        chord.chord = "D"
+        all.insert(chord, at: try #require(all.firstIndex { isChord($0) && $0.range.start > 5 }))
+        setEntries(all, at: here, in: &made)
+        let song = try OpenSong(opening: bench.put(made.serializedData(), named: "On The Break.pro"), safeguards: bench.safeguards)
+        #expect(song.textBoxes[8].chords.map(\.at) == [0, 2, 4, 5, 11, 33])
+
+        // Every chord taken off the line: the one on its break goes too, and is not
+        // left standing on the empty line; the words' two move up by the five places.
+        try song.setChordsAlone(slide: 8, element: boxes[8].element, line: 0, names: [])
+        #expect(song.textBoxes[8].words.lines.map(\.length) == [0, 26, 23])
+        #expect(song.textBoxes[8].chords == [Chord(at: 6, name: "C#m"), Chord(at: 28, name: "A")])
+    }
+
     @Test("Names are tidied, and one that is nothing is left out and gets no stand-in")
     func namesAreTidied() throws {
         let bench = try Workbench()
