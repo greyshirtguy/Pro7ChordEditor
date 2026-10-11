@@ -15,7 +15,7 @@ milestone; put right what has become untrue.
 | **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
 | **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
-| **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. **Until M7** a chord cannot be added to a line of chords alone or a blank slide, nor taken from one |
+| **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom**. **Until M7** a chord cannot be added to a line of chords alone or a blank slide, nor taken from one |
 | **M7** Chords with no words | Next | Wants, before it: a small song made in ProPresenter that has a blank slide in it (the plan, "What the maintainer is asked for") |
 
 ## What the maintainer decided, 2026-10-10
@@ -162,12 +162,36 @@ And at M6, 2026-10-11:
     as empty lines, since what may be typed there is held to the song line for line
     (`spec/04`, rule 6).
 36. **Each card is as tall as its own slide; all are one width** (`spec/03`, rule 8).
+    (As it stood for an hour. Decision 37 made the column a grid, where the cards of
+    a row are one height.)
     The maintainer's, on the question of the card too tall: "I'd say yes (in fact
     the GUI 'feels' a little like 'I can't see enough words' (to me)... so let's start
     by fine tuning that (and I will say the same to [the session] managing simple
     presenter development on my linux box)". So Simple Presenter is being asked the
     same, and until it has it the two differ in this. `ChordSheet.mostLines` is still
     worked out, the vectors holding it, and the view draws nothing by it.
+37. **The sheet's slides are a grid, and the sheet zooms** (`spec/03`, "How it looks"
+    and "Zooming"). The maintainer's, an hour after decision 36: "what if we took a new
+    turn.... Currently the 'slides' are a thin vertical stack..... What if they laid
+    out in a grid - like the slide thumb previews in simple presenter (but nice large
+    plain text with room for inserting chords above) ... flowing like scrollable grid
+    (zooming alters text size and therefore slide size and slides reflow when zoomed)
+    - This method could also draw the group colour border around each slide (with a
+    thicker border at bottom for group label on first slide of each group)", and "if I
+    like this I will def need to back port to simple presenter". Simple Presenter's
+    own grid of thumbnails was read for it (`qml/SlideGrid.qml` in its repository, not
+    in `reference/`): the frame of 4 in the group's colour, the number and the
+    group's name on its foot, the orange ring, and two buttons that step the size.
+38. **What I chose within it, each the maintainer's to change**: the usual zoom is 80
+    in the hundred, of nine steps from 50 to 150; every slide's frame has the foot,
+    with its number, as Simple Presenter's thumbnails have (the maintainer's words
+    could be read as the first slide of a group only); the cards of one ROW of the
+    grid are one height, so that the feet of a row stand level (decision 36 had each
+    its own); a row's width is shared out among its cards, so that rows fill the
+    sheet; the ring is on the slide that is PICKED, there being no slide that is live
+    here; the sheet's top margin is 30, for the typing bubble; Down and Up go by the
+    screen (`spec/03`, rule 20); and the window opens at 1280 by 800, where it was
+    1100 by 680.
 
 ## How it is laid out, and why
 
@@ -332,10 +356,29 @@ changing any of it:
   pointer (`placeAt`), where a place is (`xOf`), Up and Down (`stepLine`). The window
   hands Core Text's widths; the tests hand letters ten wide, as the vectors were made.
 - **In `AppViews`**: `ChordSheetView.swift`. `SheetCanvas` is the one view that draws
-  the song and takes the pointer and the keys; `SheetMetrics` measures; `SheetEntry`
-  is the bubble a chord is typed in, a real `NSTextField` with what is offered drawn
-  over it; `SheetLook` has the reference's colours and sizes; `SheetStrip` is the key
-  and its seven chords, in SwiftUI.
+  the song and takes the pointer and the keys. `SheetMetrics(scale:)` has everything
+  that grows and shrinks with the zoom (the two fonts, a line's height, the room in a
+  card) and measures the lines; `SheetLook` has the colours and what does not zoom (a
+  frame's 4, its foot, the gaps). `SheetEntry` is the bubble a chord is typed in, a
+  real `NSTextField` with what is offered drawn over it; `SheetStrip` is the key's
+  seven chords and the two zoom buttons, in SwiftUI.
+- **The grid** is worked out in `SheetCanvas.layOut`: `cells`, one for each slide (its
+  frame, its card, its colour, what its foot says, its row and column), and `laid`,
+  one for each of the model's rows (which cell, where its words start, where its row
+  of chords is). The model's group rows are given no place: a group's name is on its
+  first slide's frame. A point is turned into a line by `line(at:)` and a line into
+  the one under or over it by `lineBeside`, which is what Down and Up go by: the
+  model's own `stepLine` goes by the order of the song, which is right for one column
+  only, and is kept for the vectors' sake and its test.
+- **Laid out again** when the rows change (`sync`), when the width it is seen through
+  changes (`fit`, which the scroll view calls from `tile`), and when the zoom does
+  (`setScale`); the last two by `layOutWhereItWas`, which keeps the slide at the top
+  of what is seen at the top.
+- **The zoom** is `LibraryModel.sheetZoom`, one of `sheetZooms`, kept in the app's
+  settings (`AppData.Settings.sheetZoom`, nothing when it is the usual one). A key or
+  a pinch goes canvas -> `Asks.zoom` -> `LibraryModel.zoomSheet` -> back as the new
+  size, which the canvas takes at once; a button in the strip goes to the model, and
+  SwiftUI hands the size to the canvas.
 - **How a thing done goes**: an event -> one of the canvas's plain handlers
   (`pointerMoved`, `pressed`, `dragged`, `released`, `key`) -> `ChordSheet` -> the
   song, which saves or refuses -> `ChordSheet.changed` or `.refused`, which
@@ -702,6 +745,25 @@ changing any of it:
     a zero-width space, 18 in 4. A vertical tab is no line's end here (`spec/02`), so
     such a line is one line on the sheet.
 
+- **The grid, on copies of the same 422 songs** (numbers only, deleted after). In the
+  window as it opens, where the sheet has some 810 by 640, at the usual zoom: two
+  slides to a row in 215 songs, three in 31, four in 79, and one in 97; an average
+  of 9.2 lines of words in sight without scrolling, which is 38% of all there are,
+  where the one column had 3.4; 106 songs wholly in sight. At 60 in the hundred,
+  14.1 lines, 58%. In a large window (1450 by 900): 19.2 lines, 80%, and 284 songs
+  wholly in sight. Of 22,236 places pointed at, none gave the wrong place. Slowest
+  layout 17 ms, slowest drawing 24 ms.
+- **97 of them are one slide to a row at the usual zoom, and 45 scroll sideways**,
+  because every card is as wide as the song's widest line and a line never wraps: a
+  verse written as one line makes every card of its song that wide.
+- **Thirty more breakages, of the grid's rules**: twenty-eight caught; one was no
+  breakage at all (mine, written wrong), and one showed a test that could not fail
+  (a frame and its foot being bare sheet), which was mended. All are caught now.
+- **A scroll bar that takes room beside what it scrolls** (the system's choice where
+  a mouse is plugged in) would change the width the slides are fitted across as it
+  came and went with the layout. Room is kept for one always in that case
+  (`SheetCanvas.seenWidth`). Not seen to go wrong; reasoned.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -734,9 +796,24 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Nobody has seen the grid or the zoom with their own eyes but in pictures** (24 to
+  27 are of them). To be tried: that making the window wider and narrower lays the
+  slides out again without a stutter; the two buttons, Command with minus, plus and
+  0, and a pinch; that Down and Up go where the eye expects with slides side by
+  side; whether 80 in the hundred is the right usual size; whether every slide
+  should have the foot or only the first of a group.
+- **A song with one long line is one slide to a row**, and a very long one scrolls
+  sideways (97 and 45 of 422 at the usual zoom). What would help: a slide wider than
+  the rest taking the room of two or three in its row; or lines that wrap, which the
+  page forbids and which chords over a wrapped line make hard.
+- **An empty line in the middle of a slide's words takes a whole line's height**,
+  chords' row and all, though no chord can go there.
+- **`spec/pictures` are of Simple Presenter's sheet in one column.** Once the
+  maintainer likes the grid, pictures of it for the page and the README can be drawn
+  by the picture tests.
 - **Nobody has used the sheet with a hand**, which is what M6 is done by. Everything
   of it has been proved by tests that call the view's handlers and seen in pictures
-  (14 to 23). **To be tried, on a COPY of a library**: chord a verse by pointing and
+  (14 to 27). **To be tried, on a COPY of a library**: chord a verse by pointing and
   pressing 1 to 7; a run of chords click, type, click, type; Tab along a line; drag a
   chord, and with Option; Command+C on a verse's first line and Command+V on the
   next verse's; Command+Z after each. And to be said: what is slower or odder than

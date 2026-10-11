@@ -3,8 +3,9 @@
 The Mac app, being built first of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it finds ProPresenter's libraries on
 the Mac, lists their songs, and shows a song in either of two ways. As a chord sheet:
-all its words on one sheet with the chords in bubbles over them, to be put on, changed,
-moved and taken off with the mouse and the keys. Or as ChordPro text, its chords in
+all its slides on one sheet, as a grid like ProPresenter's own but of words at a size
+to read, with the chords in bubbles over them, to be put on, changed, moved and taken
+off with the mouse and the keys; the sheet zooms, to show more of a song at once. Or as ChordPro text, its chords in
 square brackets among its words, to be typed in. Each change is saved as it is made,
 with a copy of the file as it was kept first, which can be seen and put back. A
 song's key can be set, and the key ProPresenter shows it in. Nothing is saved while
