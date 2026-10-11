@@ -1062,6 +1062,17 @@ more.)
   those sequences are never typed: `StandInsInRTFTests` had them put back by a
   script, and everything since builds them (`"\\uc0\\u" + "\(unit) "`). If a file
   here ever shows a stray character from far up the table, that is what happened.
+- **Each rule broken one small way, 56 ways** (21 of the change to an RTF, 35 of the
+  song's part), after it was committed, the whole of the tests run for each. Six
+  went unnoticed at first, and each has a case now: that a space is given another
+  before it when what it takes the place of is a character written straight in,
+  after a control word with no space; that a character of two units and one stretch
+  of bytes is not taken out by halves; that the same care at the end of a line goes
+  by the last character's own control word and not the one before it; that what is
+  made after an opening is read back; which stand-in a line that has both kinds is
+  given; and that a chord on a line's own break is that line's. Three of the six
+  are in the vectors, for both apps. (A seventh change, one that changes nothing,
+  was put in to see that the tests can also say "unnoticed": they did.)
 - **An emptied line stays a line of the ChordPro text**, and a chord typed on it
   goes to the end of the line before (`tidy`): as for any empty line of a box, and
   as the reference. On the sheet it has no row if it ended its box, and takes the
