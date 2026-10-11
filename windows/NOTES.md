@@ -13,7 +13,8 @@ milestone; put right what has become untrue.
 | **M0** Setting up | Done, 2026-10-12 | The four layers and the app, empty; the reader of a `.pro` made at each build; forty-nine tests; one picture; the app published as one file, and started; the workflow, which passed on GitHub's Windows machine at the first push (its run of the tests, the picture among them, and the app as one file). The first editor moved to `old/` |
 | **M1** The rules | Done, 2026-10-12 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the stand-ins written into one, the key fit and the first editor's shift. Every case of the sixteen vector files M1 is held to passes (some thirty-one thousand answers), with cases of our own for what no vector holds |
 | **M2** The song | Done, 2026-10-12 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files. **And the song's part of M7**: a chord more or fewer on a line of chords alone, chords onto a blank slide, a slide given a box, a change of mind (decision 15) |
-| **M3** The library | Next | Find ProPresenter's folder; the lists; search; open a song and show it, read only; know when ProPresenter is running. `spec/06`. **Wants first** a look at this PC's ProPresenter: where version 22 on Windows keeps its folder, whether it has workspaces, and what RTF it writes ("Left rough") |
+| **M3** The library | Done, 2026-10-12, bar what only the maintainer can try | Where songs are kept as files on a PC, the lists, the search, the marks, a song shown read only, whether ProPresenter is running, the app's own settings and log; and the window, in the look of Windows 11, dark and light. `spec/06`. **Nobody has seen the window itself**: it was drawn into pictures, and started ("Left rough"). **And on this PC it finds no library**, for the reason in the next section |
+| **M4** The copies | Next | Kept before a first change; listed; looked at; put back; taken back. `spec/07`. `OpenSong.PutBack` with it |
 | **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
@@ -105,9 +106,9 @@ apps):
    before the answer to 3.
 
 **Meanwhile** M3 is built for folders of `.pro` files, which is needed whatever is
-decided. On this PC the maintainer can try it on `Documents\ProPresenter - Copy`, which
-is laid out as a ProPresenter folder of the old kind (who made it, the maintainer or
-ProPresenter's move to workspaces, is not known).
+decided. On this PC the maintainer can try it on a ProPresenter folder of the old kind
+that is in their Documents under another name (who made it, the maintainer or
+ProPresenter's move to workspaces, is not known), by Choose Folder.
 
 ## What the maintainer decided, 2026-10-12
 
@@ -192,6 +193,66 @@ And the same day, later:
     reference beside, and not from the reference alone: so that where the Mac's
     session and the maintainer settled something the reference does otherwise, the two
     apps do the same.
+
+And at M3, each this session's, on "push and keep going" with no plan shown first, and
+each the maintainer's to change:
+
+18. **On Windows a place is one of three things**: the folder ProPresenter's own file
+    of paths names (`PathSettings.proPaths`, read as the first editor read it, and
+    only if the folder has `Libraries` in it), `ProPresenter` in Documents, and a
+    folder chosen by hand. There is no workspace among them, as there is on the Mac:
+    the only ProPresenter looked at on Windows that has workspaces keeps their songs
+    in a database (the section above). `spec/06`, rule 3, leaves that to this session
+    to find out, and this is what was found; the page is not changed until the
+    maintainer has decided what is to be done about version 22.
+19. **Hidden is what Windows marks hidden, and also a name that begins with a full
+    stop.** `spec/06` leaves out "what is hidden" and does not say what that is on
+    Windows. A Mac hides a name that begins with a full stop, and writes such files
+    beside songs on a disk that is not its own kind (`._Name.pro`); so one folder
+    lists the same in both apps. **For `spec/06`, if the maintainer agrees.**
+20. **Names are sorted by Windows itself**, by the function File Explorer sorts with
+    (`StrCmpLogicalW`), asked through .NET's way of calling the system. It is the
+    one place the app calls Windows by name, and is no dependency. None of the six
+    rules about text had to be switched off for it.
+21. **Whether ProPresenter is running is in `Song`**, not with the window as on the
+    Mac: on Windows asking needs nothing but .NET. The window asks again every two
+    seconds while it is open, off its own thread, which `spec/06`, rule 18, gives as
+    the way where a system has no news of a program starting. **If the system will
+    not say, it is taken as running**: nothing is to be saved on not knowing.
+22. **The window wears the look of Windows 11 that .NET has had since its ninth
+    version** (WPF calls it Fluent), dark and light as the system is, as `spec/10`
+    asks ("Looks"). It is part of .NET and no dependency. **The one switch that has
+    the app follow the system, `ThemeMode`, .NET still marks as on trial**: the
+    compiler is told so in one place (`Look.cs`), and if a later .NET spells it
+    otherwise that is the one line to change. The pictures do not use it: each is
+    drawn in the dark look or the light one, named by the test.
+23. **The app's own colours follow the look, and nothing reads the system's
+    settings.** A view asks the look what colour a window's ground is, and is dressed
+    in the greys that go with a dark ground or a light one, again whenever that
+    changes (`Look.Follow`). The two lists' greys are the page's (rule 6b).
+24. **The lists give way to the song in a narrow window** (`ListsLook.Width`): made
+    narrower than the lists, the edge and the song's least width together, the window
+    takes the width from the lists, down to their own least, and made wide again
+    gives it back. The Mac's own split view does as much by itself. A picture showed
+    the need: at its smallest the window cut the song's header short.
+25. **The sentences of the lists are in the model**, not in the views ("No
+    ProPresenter library was found on this PC.", "This folder has no libraries in
+    it.", what a mark's tip says), so that a test holds them. They are the Mac's,
+    word for word, with "PC" for "Mac".
+26. **The song is shown as lines that cannot be selected**, in M3 only: it is a
+    stand-in until the ChordPro editor of M5, which is a text box. And its key is
+    words in the header ("Key G", "Shown in A", "No key"), as the Mac's were at its
+    M3; the two pickers are M5's.
+27. **The small marks after a song's name are letters of Windows' own font of signs**
+    (Segoe Fluent Icons on Windows 11, Segoe MDL2 Assets before it), where the Mac
+    uses its system's symbols: a note for chords, a triangle for a file that cannot
+    be read, two pages for the first editor's copy.
+28. **The app's own files are JSON written by .NET itself** (`System.Text.Json`, no
+    dependency), under the names the page gives; the log's times are by the clock at
+    Greenwich with a Z after them. Neither app reads the other's.
+29. **The app says of itself to Windows how it is to be drawn on a fine screen**
+    (`App/app.manifest`): afresh for each screen it comes to, and not stretched.
+    Windows was asked of the running window and says it is so.
 
 ## How it is laid out, and why
 
@@ -311,6 +372,44 @@ names. What to know before changing any of it:
   ever saved into `testdata/`. **A second copy of a test file asked of one workbench
   goes over the first**: a test that wants a song and the same song untouched reads
   the second from `testdata/` itself, or under another name.
+
+### The library and the window (M3)
+
+- **In `Song`, with no window**: `Places.cs` (finding), `Listing.cs` (libraries,
+  songs, search), `Marks.cs`, `AppData.cs` (the app's own folder), `SongText.cs` (a
+  song as lines of text: what is shown now, and what the ChordPro editor will work
+  on at M5), `ProPresenterApp.cs`. They are the Mac's under the same names.
+- **In `AppViews`**: `LibraryModel` is everything the window shows and does, with no
+  drawing in it, and is tested so. The views only show it: `LibraryWindow` frames
+  `LibraryView`, which is `ListsPane` at the left and `SongPane` at the right.
+  `ListsLook` is the arithmetic of the bar and the edge, `Look` the colours,
+  `ListIcons` the two small pictures. `LibraryModel`, the finder and the song are
+  each handed what they would otherwise ask the PC for, so that tests hand them a
+  made-up PC (`Tests/AppViews.Tests/MadeUpPC.cs`).
+- **The model says only that something has changed, never what.** Each view then
+  asks it again for what it shows (`Show`). A view that puts the model's choice into
+  a list is told by the list that its choice changed, as by a click; so while a view
+  is showing, what its lists say is not passed on (`showing`). The songs' list is
+  not made again while it is the same songs in the same order: each row is told what
+  it now is, so that marks coming in do not move the list from where it was scrolled.
+- **One thread.** The model is asked from the window's thread alone. A library's
+  marks are read on another and come back to the window's by its queue. A test of
+  the model, or of a view, is run on a thread with such a queue
+  (`Pictures.OnAThreadOfItsOwn`), one test at a time.
+- **To see the window**: from `windows`, in PowerShell,
+  `$env:PRO7_PICTURES = "C:\some\folder"; dotnet test --project Tests/AppViews.Tests
+  --filter-class "*PictureTests"`, then open the PNGs. Do this after any change to
+  how something is drawn, and say what was seen. Each picture is the whole view on a
+  made-up PC, in the dark look or the light one as its test says.
+- **A view asks the look for a colour by name, as a resource that may change**
+  (`DynamicResource`), never as one fixed when the view is made (`StaticResource`):
+  a test puts the look on a view after the view is made, and the app's look changes
+  when the system's does. For the same reason no style here is built on one of the
+  look's own. Where a control of the look's is wanted otherwise (a list's rows less
+  tall), the look is given another answer where it asks: a resource of the same
+  name, nearer by (`ListsPane.xaml`).
+- **A song is opened with no safeguards at M3**, so it cannot be changed. M5 hands it
+  real ones: `ProPresenterApp.IsRunning`, and the copies of M4.
 
 ## What was found out
 
@@ -517,49 +616,135 @@ names. What to know before changing any of it:
   with a backslash and an "n" in it. Edit such lines with the editing tool, or from a
   script kept in a file.
 
+### At M3
+
+- **ProPresenter 22 on this PC keeps no `.pro` files.** It has a section of its own,
+  near the head of these notes, because it is the maintainer's to decide what
+  follows from it.
+- **On this PC the app finds no place.** There is no `ProPresenter` in Documents and
+  ProPresenter's file of paths is empty. The app says so and offers Choose Folder,
+  as `spec/06`, rule 6, has it. (The first editor, by its code, would look here for
+  `Libraries` beside itself, say it was not found, and quit: it takes an empty file
+  of paths for a folder named nothing. It was not started to see.)
+- **The real `.pro` files on this PC are all in OneDrive and "only in the cloud"**:
+  some eighty, among them a ProPresenter folder of the old kind and a folder of
+  songs with chords. (Which folders, the maintainer was told, and they are not
+  written here: these notes are open to anyone.) Reading one fetches it. The look at their RTF that `spec/01` asks of this session was begun
+  and **stopped by this session's own permissions**, which would not have the files
+  copied to where they could be looked at. So it is still not done, and is the
+  maintainer's to allow or to do ("Left rough").
+- **A folder in OneDrive that is chosen will have every song fetched**, the first
+  time its marks are worked out: a mark needs the file read. Nothing is done about
+  that. It is each song once, and the songs are small.
+- **A freshly built app takes some eighteen seconds to show its window the first
+  time, and one second every time after.** Seen of two builds, 17 and 19 seconds,
+  each with this PC busy at other work; the second and third start of the same
+  file took one second. Why is A GUESS: it is one file of 141 megabytes that nobody
+  has signed, which Windows' own guard reads through before it lets it start, and
+  the app unpacks WPF's libraries the first time. For M10, where the file's size
+  and what the person is told are to be seen to: someone who has just downloaded
+  it may wait so, once, looking at nothing.
+- **WPF's look of Windows 11 draws off the screen**, lists, fields and buttons and
+  all, dark and light, with no window opened and no app made. It is what the
+  pictures are. Three things it needed:
+  - an address that begins `pack:` is not known to .NET until WPF has been asked
+    something. A test may ask for the look first, so `Look.Dictionary` asks;
+  - the dictionary named `Fluent.xaml` has the styles and **no colours**: those are
+    in `Fluent.Light.xaml` and `Fluent.Dark.xaml`, which are whole. A view under
+    the first alone draws nothing where it asks for a colour, and says nothing;
+  - plain words (`TextBlock`) are given no colour by the look, only by the window
+    they are in. A view drawn with no window says the colour itself (`LibraryView`).
+- **Two threads that each make a view at the same moment trip over each other
+  inside WPF**, where a view's description is read out of the program
+  (`PackagePart.GetStream`, with nothing of ours in the way). The tests of three
+  classes run side by side, and the third time all of them were run one failed
+  there. `Pictures.OnAThreadOfItsOwn` now lets one such thread run at a time, and
+  six runs of everything since passed. If a test of a view ever fails with nothing
+  wrong in it, look there first.
+- **The look's own controls are shaped by resources it asks for by name**
+  (`ListBoxItemPadding` and many more), which is how the lists' rows are made less
+  tall with no style of our own. A list of what it sets on a control can be had by
+  loading the dictionary and reading the control's style: that is how these were
+  found.
+- **What the pictures showed, and what was done.** All eleven were opened, in both
+  looks where there are two. Right at the first drawing: the two greys and the bar,
+  the two small pictures, the marks, a song's lines with its chords in orange, the
+  band, each sentence in place of a list or a song. **Put right**: at its smallest
+  the window cut the song's header short (decision 24); and there the middle of
+  the three choices over the songs did not fit its words, so each is now as wide
+  as its words want.
+- **`Get-ChildItem -Filter *.pro` in Windows PowerShell also lists `.proPref` and
+  `.proPaths`.** It made ProPresenter's settings folder look as if it had fifteen
+  songs in it. The app tells a song's ending by itself (`Listing.cs`).
+
 ## Left rough, and what to ask
 
+- **Nobody has seen the window.** Every picture is of the view the window holds,
+  drawn with no window. What only a hand and an eye at the PC can tell, and the
+  maintainer is asked to try:
+  - that it opens, in the dark look or the light as Windows is set, its title bar
+    with it, and turns over when Windows is switched while it is open (decision 22
+    hangs on a switch .NET marks as on trial);
+  - that the bar between the two lists drags up and down, stops before either list
+    is gone, goes back at two clicks, and is where it was left at the next start;
+    and that the edge between the lists and the song drags sideways;
+  - that **Choose Folder...** opens the system's own chooser, and that a folder
+    chosen is listed, and is there again at the next start;
+  - that the band comes within a couple of seconds of ProPresenter starting, and
+    goes within a couple of its quitting, with this app in front all the while;
+  - that a library of some hundreds of songs lists at once and its marks come in
+    after, without the list jumping; the arrow keys in the lists; the tips;
+  - that words are sharp on a screen set to another size than the first one's.
 - **In Visual Studio, only the listing of the tests has been seen.** The maintainer
   opened the solution in Visual Studio 2026 and its Test Explorer listed the
-  forty-nine (2026-10-12), without the two packages named at the foot of
-  `Directory.Packages.props`. Opening it changed no file of the repository. That the
-  tests pass when run from there, and that F5 starts the app (`App` as the startup
-  project), nobody has said. And Visual Studio may one day write the solution file
-  again without its comment.
-- **Neither the rules nor the song have been tried on a real song.** Two checks the
-  Mac's session made on copies of the maintainer's songs, outside the repository,
-  printing numbers only (`mac/NOTES.md`, "At M1" and "At M2"), and neither has been
-  made here:
-  - every text box read with the reader of RTF and with another, and the two set
-    side by side. On Windows the other reader is `tools/look.py`, which has one of
-    its own;
-  - every box given the chords it already has, and everything undone: every file to
-    come back to the byte.
-  They are the checks most worth having, the songs on this PC being where
-  ProPresenter on Windows may have written the RTF. It is the same look that is asked
-  before M3 (below).
+  forty-nine there then were (2026-10-12), without the two packages named at the
+  foot of `Directory.Packages.props`. Opening it changed no file of the repository.
+  That the tests pass when run from there, and that F5 starts the app (`App` as the
+  startup project), nobody has said. And Visual Studio may one day write the
+  solution file again without its comment.
+- **Neither the rules nor the song have been tried on a real song, and the RTF that
+  ProPresenter on Windows writes has still not been looked at.** `spec/01`, "Not
+  known", makes that look the first job of this session, `spec/11` asks it of the
+  maintainer before M3, and the Mac's M7 leans on the answer (`mac/NOTES.md`, "RTF
+  as ProPresenter on Windows writes it is still not known"): if Windows writes a
+  character to stand in after each numbered one, a line of chords alone written
+  there cannot yet be given a chord more or fewer. Three checks are wanted, on
+  copies, outside the repository, printing numbers and the RTF's own words of
+  command and never a word of a song:
+  - what each file says wrote it (Windows or a Mac, and which version), and what
+    its RTF is written with;
+  - every text box read with `RtfWords` and with `tools/look.py`'s reader, which is
+    another, and the two set side by side;
+  - every box given the chords it already has, a chord more, none, and everything
+    undone: every file to come back to the byte. (The Mac's session did this of
+    425 songs: `mac/NOTES.md`, "At M2" and "At M7".)
+  **Where the files are**: some eighty real `.pro` files in the maintainer's
+  OneDrive, all "only in the cloud", in folders the maintainer was told of.
+  **Why it is not done**: this session copied nothing of them. Its own
+  permissions stopped the copying, as the handling of other people's things, and
+  it did not go round that. It wants the maintainer to say it may, or to put
+  copies in a folder outside OneDrive and say where.
+- **A file that could not be fetched is marked as one that cannot be read, and the
+  mark is kept** until the file's size or time changes (`Marks.Read`, as on the
+  Mac). A song in OneDrive that is only in the cloud, opened with no network, would
+  be so marked and stay so. Not seen; it follows from the code.
+- **Where the window is, and how big, is not remembered.** The page says the system
+  keeps the window's size for the app, which is true of a Mac and not of Windows:
+  here the app would have to. It opens at 1280 by 800 in the middle of the screen
+  every time. Small, and not built: for the maintainer to want or not.
+- **There is no menu yet.** `spec/10` asks for the window's own menu with every
+  command in it. There is one command so far, Choose Folder, and it is a button.
+  The menu comes with the commands, from M4.
+- **If the system will not say whether ProPresenter is running, it is taken as
+  running** (decision 21). No test can make the system refuse, so no test holds it.
+- **Marks being worked out for a library that has been left are let go** after the
+  few in hand. Taking that out wastes work and breaks nothing, so no test tells.
 - **Putting a copy back (`PutBack`) is not in `OpenSong` yet**: it is M4's, with the
   copies.
-- **If one of the six rules about text proves wrong for a case** (the list of songs
-  sorted as the system sorts names, at M3), say why where it is switched off, and
-  not for the whole project.
-- **Pictures are of a view that only has to be laid out.** A view that waits for
-  something (a list filled a moment later, a text box that wants the keyboard) will
-  need the thread's queue of work run before it is drawn. `Pictures.cs` does not do
-  that yet: M3's to add.
-- **The app has no version number, no icon, and says nothing to Windows of how it
-  wants to be drawn on a fine screen.** The first is wanted at M4 (a copy's index
-  records it); the rest at M3 and M10.
+- **The app has no version number and no icon.** The first is wanted at M4 (a
+  copy's index records it); the second at M10.
 - **`old/publish.py` must not be run**: it commits, pushes and tags. Its README says
   so now.
-- **Asked of the maintainer before M3** (`spec/11`): a look at the RTF of a song made
-  in ProPresenter on Windows. `spec/01`, "Not known", makes looking the first job of
-  this session, and the Mac's M7 leans on the answer (`mac/NOTES.md`, "RTF as
-  ProPresenter on Windows writes it is still not known"): if Windows writes a
-  character to stand in after each numbered one, a line of chords alone written there
-  cannot yet be given a chord more or fewer. `tools/look.py` is the tool, and works
-  here now ("What was found out"). Reading the maintainer's own library is theirs to
-  allow, and where it is, theirs to say.
 - **Two lines of `reference/README.md` are no longer true**, under "Where this and
   `spec/` differ": that the apps leave out a slide with no text box, and that they
   leave a blank slide's box empty when its chords are taken off again. The

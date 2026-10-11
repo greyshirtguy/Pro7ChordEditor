@@ -1,11 +1,20 @@
 # Pro7 Chord Editor for Windows
 
 The Windows app, being built second of the two, to the plan in
-[`spec/11-plan.md`](../spec/11-plan.md). So far it has what the app will stand on and
-no app: its projects, the reader of ProPresenter's files, the rules of chords, held
-to the same answers as the Mac app's, and the song: a file opened, its chords and its
-keys changed, each change saved safely and undone. It opens one window, which says there is
-nothing to open yet. **There is nothing here to use, and nothing to download.**
+[`spec/11-plan.md`](../spec/11-plan.md). So far it finds the songs on a PC, lists them
+by library, and shows one, with its chords in brackets among its words. **Nothing can
+be changed with it yet**: the copies it keeps before a change, and the two editors,
+are still to be built. **There is nothing here to download.**
+
+Under what is seen it has the rules of chords, held to the same answers as the Mac
+app's, and the song itself: a file opened, its chords and its keys changed, each change
+saved safely and undone.
+
+**It reads songs that are kept as files**, as every ProPresenter 7 looked at up to
+version 21 keeps them. The one copy of version 22 looked at, on Windows, keeps its
+songs in a database and not as `.pro` files, and there the app finds no library; what
+is to be done about that is not decided ([`NOTES.md`](NOTES.md)). A folder of `.pro`
+files, wherever it is, can always be chosen by hand.
 
 The first Windows editor, version 0.9.5, is in [`old/`](old/README.md) as it was, and
 its [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
@@ -48,6 +57,19 @@ dotnet publish App           # the app as the one file it is given out as
 
 `dotnet publish App` leaves `Pro7ChordEditor.exe`, alone, in
 `App\bin\Release\net10.0-windows\win-x64\publish`. It needs nothing installed to run.
+The first time a newly built one is started it may be some seconds before its window
+shows; after that, one.
+
+The app keeps its own things (what was chosen, a log of what it did) in
+`%LOCALAPPDATA%\Pro7ChordEditor`, and nothing anywhere else.
+
+To see the window without starting the app, some tests draw it into pictures (in
+PowerShell):
+
+```
+$env:PRO7_PICTURES = "C:\some\folder"
+dotnet test --project Tests/AppViews.Tests --filter-class "*PictureTests"
+```
 
 Run from anywhere else, `dotnet test` stops with "Testing with VSTest target is no
 longer supported": `global.json` in this folder tells it how these tests are run, and
@@ -64,7 +86,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | --- | --- |
 | `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
-| `Song/` | The song as the editors see it. The library, the copies and the checks are to come. No window in it |
+| `Song/` | The song as the editors see it, and the library: where songs are, the lists, the marks, the app's own settings. The copies and the checks are to come. No window in it |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
 | `App/` | The app itself: the few lines that start it, and how it is built to be given out |
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |
