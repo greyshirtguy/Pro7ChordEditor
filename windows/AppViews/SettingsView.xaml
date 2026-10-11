@@ -1,0 +1,26 @@
+<!--
+  The settings, in sections, each with its own name (spec/06-library.md, "Settings"):
+
+    Chords    the colour of a chord in each of the two editors (ChordColourSettings);
+    Backups   the copies that are kept, all of them (AllCopiesView).
+
+  Each is a tab, as the sections of a settings window are on the Mac. The code beside
+  this puts the two views in.
+
+  It is a view of its own and not written into the settings window, so that a test can
+  draw it into a picture without a window being opened (spec/10-platforms.md). It has a
+  ground of its own and says what colour words are, both the system's.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource ApplicationBackgroundBrush}"
+             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+             FontFamily="Segoe UI Variable Text, Segoe UI"
+             FontSize="13"
+             UseLayoutRounding="True">
+  <TabControl x:Name="Sections" Margin="0,6,0,0">
+    <TabItem x:Name="Chords" Header="Chords" />
+    <TabItem x:Name="Backups" Header="Backups" />
+  </TabControl>
+</UserControl>

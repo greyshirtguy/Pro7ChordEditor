@@ -601,4 +601,67 @@ public class PictureTests
 
     [Fact]
     public void ALongSongOnTheSheet() => DrawSheet("44 a longer song on the sheet", true, "It Is Well", AsItIs);
+
+    [Fact]
+    public void ASongThatProPresenterMadeOnTheSheet() => DrawSheet("45 a song that ProPresenter made, on the sheet", true, "Rock Of Ages (Toplady)", AsItIs);
+
+    // ---- The settings, and the colours of a chord
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheSettingsChords(bool dark) => DrawView(
+        "46 the settings, chords, " + In(dark),
+        dark,
+        async pc =>
+        {
+            var model = pc.Model();
+            await model.StartAsync();
+            // (One as it comes, and one chosen: its button to put it back is then lit.)
+            model.SetTextChordColour("#4f9dff");
+            return new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+        },
+        width: 960,
+        height: 600);
+
+    [Fact]
+    public void TheSettingsBackups() => DrawView(
+        "47 the settings, backups",
+        true,
+        async pc =>
+        {
+            pc.GivePlainSongAHistory();
+            var model = pc.Model();
+            await model.StartAsync();
+            var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+            settings.Show("Backups");
+            return settings;
+        },
+        width: 960,
+        height: 600);
+
+    [Fact]
+    public void TheSheetsChordsInAColourChosen() => DrawSheet(
+        "48 the chords of the sheet in a colour chosen",
+        true,
+        "Amazing Grace",
+        (_, model, hand) =>
+        {
+            model.SetSheetChordColour("#7fd6ff");
+            hand.Click("saved");
+            hand.Type("Em");
+            hand.PointAt(hand.PlaceOf("sweet"), onItsChord: true);
+            return Task.CompletedTask;
+        });
+
+    [Fact]
+    public void TheTextsChordsInAColourChosen() => DrawTyped(
+        "49 the chords of the ChordPro text in a colour chosen",
+        false,
+        "Amazing Grace",
+        (_, model, _) =>
+        {
+            model.SetTextChordColour("#1f7a3d");
+            return Task.CompletedTask;
+        });
 }

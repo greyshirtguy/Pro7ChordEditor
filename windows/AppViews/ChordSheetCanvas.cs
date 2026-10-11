@@ -269,6 +269,11 @@ public sealed class ChordSheetCanvas : FrameworkElement
             if (atTop is not null && Grid?.Cells.FirstOrDefault(cell => cell.FirstRow == atTop.FirstRow) is { } now)
             {
                 Scroll?.ScrollToVerticalOffset(Math.Max(0, now.Frame.Top - within));
+                // (Scrolled now, and not when the window next lays itself out: so that
+                // a second step of zoom straight after this one starts from where the
+                // sheet is, and not from where it was. Asked for in the middle of a
+                // laying out, this does nothing, and the laying out does it.)
+                Scroll?.UpdateLayout();
             }
             PlaceEntry();
             Draw();

@@ -1,0 +1,113 @@
+<!--
+  Chords, in the app's settings: the colour of a chord's name on the chord sheet, and
+  the colour of a chord in the ChordPro text (spec/06-library.md, "Settings").
+
+  Each has a well that shows the colour and opens the system's colour picker when it is
+  clicked; a button, "Usual Colour", that puts back the one the app comes with; and
+  beside them the chord as it will look: its name in a bubble over a word, as the sheet
+  draws one, and a line of ChordPro with its chords in their colour, bold.
+
+  The sheet's sample is on the sheet's own dark card, whatever the system's look is,
+  since the sheet is. The text's is on the window's ground, which is the look's.
+
+  Nothing here touches a song. A colour is only how this app draws a chord: it is kept
+  with the app's own settings, and nothing in a song's file says one.
+
+  What is shown comes from LibraryModel, which this view is handed. It has a ground of
+  its own and says what colour words are, both the system's: a test draws it with no
+  window to have them from.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.ChordColourSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource ApplicationBackgroundBrush}"
+             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+             FontFamily="Segoe UI Variable Text, Segoe UI"
+             FontSize="13"
+             UseLayoutRounding="True">
+  <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <TextBlock Text="Chords" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
+    <TextBlock Text="The colour chords are drawn in, in each of the two editors."
+               TextWrapping="Wrap"
+               Margin="0,4,0,18"
+               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Text="On the chord sheet" FontWeight="SemiBold" />
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <Button x:Name="SheetWell"
+                  Padding="4"
+                  Click="ChooseTheSheets"
+                  ToolTip="Choose the colour of a chord&#x2019;s name on the chord sheet."
+                  AutomationProperties.Name="The colour of a chord on the chord sheet">
+            <Border x:Name="SheetColour" Width="40" Height="20" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" />
+          </Button>
+          <Button x:Name="SheetUsual"
+                  Content="Usual Colour"
+                  Margin="10,0,0,0"
+                  Click="TheSheetsUsual"
+                  ToolTip="Put this colour back to the one the app comes with."
+                  ToolTipService.ShowOnDisabled="True" />
+        </StackPanel>
+      </StackPanel>
+      <!-- A chord as the sheet draws one: its name in a bubble, over a word. -->
+      <Border Grid.Column="1" Width="190" Background="#222428" CornerRadius="4" Padding="10" Margin="12,0,0,0">
+        <StackPanel HorizontalAlignment="Left">
+          <Border Background="#34363C" BorderBrush="#5C5F66" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left">
+            <TextBlock x:Name="SheetSample" Text="Em7" FontSize="13" FontWeight="Bold" />
+          </Border>
+          <TextBlock Text="Amazing grace" FontSize="17" Foreground="#E6E6E6" Margin="0,3,0,0" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <Border Height="1" Margin="0,18,0,18" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Text="In ChordPro text" FontWeight="SemiBold" />
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <Button x:Name="TextWell"
+                  Padding="4"
+                  Click="ChooseTheTexts"
+                  ToolTip="Choose the colour of a chord in ChordPro text."
+                  AutomationProperties.Name="The colour of a chord in ChordPro text">
+            <Border x:Name="TextColour" Width="40" Height="20" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" />
+          </Button>
+          <Button x:Name="TextUsual"
+                  Content="Usual Colour"
+                  Margin="10,0,0,0"
+                  Click="TheTextsUsual"
+                  ToolTip="Put this colour back to the one the app comes with."
+                  ToolTipService.ShowOnDisabled="True" />
+        </StackPanel>
+      </StackPanel>
+      <!-- A line as the text shows one: the chords in their colour, bold, among the words. -->
+      <Border Grid.Column="1"
+              Width="190"
+              CornerRadius="4"
+              Padding="10"
+              Margin="12,0,0,0"
+              BorderThickness="1"
+              BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}">
+        <TextBlock FontFamily="Cascadia Mono, Consolas, Courier New" FontSize="13">
+          <Run x:Name="TextSampleOne" Text="[Em7]" FontWeight="Bold" /><Run Text="Amazing " /><Run x:Name="TextSampleTwo" Text="[D]" FontWeight="Bold" /><Run Text="grace" />
+        </TextBlock>
+      </Border>
+    </Grid>
+
+    <TextBlock Text="These are only how chords look in this app. Nothing in a song&#x2019;s file says a colour, and ProPresenter shows chords in its own."
+               TextWrapping="Wrap"
+               Margin="0,20,0,0"
+               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+  </StackPanel>
+</UserControl>

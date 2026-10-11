@@ -125,7 +125,7 @@ public partial class LibraryView : UserControl
     }
 
     private void OpenTheSettings(object sender, RoutedEventArgs e) =>
-        new SettingsWindow { Owner = Window.GetWindow(this) }.ShowDialog();
+        new SettingsWindow(Model) { Owner = Window.GetWindow(this) }.ShowDialog();
 
     private void CloseTheWindow(object sender, RoutedEventArgs e) => Window.GetWindow(this)?.Close();
 

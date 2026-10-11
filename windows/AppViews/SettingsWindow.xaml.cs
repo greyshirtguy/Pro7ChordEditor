@@ -1,21 +1,22 @@
 // The code beside SettingsWindow.xaml, which says what the window is. Here it is given
-// what it holds: All Copies, of the copies this PC's app keeps.
+// what it holds: the settings' view, of the window's own model and of the copies this
+// PC's app keeps.
 
 using System.Windows;
 
 namespace Pro7ChordEditor.AppViews;
 
-/// <summary>The settings: so far, the copies that are kept.</summary>
+/// <summary>The settings: the chords' colours, and the copies that are kept.</summary>
 public partial class SettingsWindow : Window
 {
-    public SettingsWindow()
-        : this(AllCopiesModel.OnThisPC())
+    public SettingsWindow(LibraryModel model)
+        : this(model, AllCopiesModel.OnThisPC())
     {
     }
 
-    public SettingsWindow(AllCopiesModel copies)
+    public SettingsWindow(LibraryModel model, AllCopiesModel copies)
     {
         InitializeComponent();
-        Content = new AllCopiesView(copies);
+        Content = new SettingsView(model, copies);
     }
 }
