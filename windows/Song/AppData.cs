@@ -5,8 +5,9 @@
 // data (%LOCALAPPDATA%). Nothing of the app's is ever put in ProPresenter's folders, or
 // beside a song.
 //
-//   settings.json   the folders chosen by hand, the place and library last open, and
-//                   where the bar between the two lists was left
+//   settings.json   the folders chosen by hand, the place and library last open,
+//                   where the bar between the two lists was left, and the size of the
+//                   ChordPro text
 //   marks.json      the marks worked out for each song (Marks.cs)
 //   log.txt         a line for each thing the app did
 //
@@ -67,11 +68,17 @@ public sealed class AppData(string folder)
         /// </summary>
         public double? ListsSplit { get; init; }
 
+        /// <summary>
+        /// How many times its usual size the ChordPro text is; nothing if it was never
+        /// changed (spec/04-chordpro-editor.md, rule 25).
+        /// </summary>
+        public double? TextZoom { get; init; }
+
         // (A list is the same as another when it has the same things in it, which is
         // not what a record makes of one by itself.)
         public bool Equals(Settings? other) =>
             other is not null && ChosenFolders.SequenceEqual(other.ChosenFolders) && LastPlace == other.LastPlace
-            && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit;
+            && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom;
 
         public override int GetHashCode() => HashCode.Combine(ChosenFolders.Count, LastPlace, LastLibrary, ListsSplit);
     }

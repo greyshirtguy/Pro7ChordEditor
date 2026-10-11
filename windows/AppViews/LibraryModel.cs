@@ -1,18 +1,26 @@
 // What the window shows, and what a click in it does, with no drawing in it: the places
 // found, the libraries of the one chosen, the songs of the library chosen, the song that
-// is open, and its earlier versions. spec/06-library.md, "The window"; spec/07-backups.md,
-// "Seeing them" and "Getting one back".
+// is open, its text as ChordPro, and its earlier versions. spec/06-library.md, "The
+// window"; spec/04-chordpro-editor.md; spec/07-backups.md, "Seeing them" and "Getting
+// one back".
 //
 // The views only show what is here and pass on what the person does. Everything that is
 // a rule is in the layers below (Song: Places, Listing, Marks, SongText, Copies,
-// OpenSong), which this calls; so that the rules are proved by `dotnet test` with no
-// window, and are the same in the Mac app. The words the person reads in the lists are
-// here too, and not in the views, so that a test can hold them.
+// OpenSong, ChordProEditor), which this calls; so that the rules are proved by
+// `dotnet test` with no window, and are the same in the Mac app. The words the person
+// reads are here too, and not in the views, so that a test can hold them.
 //
 // A song is opened with its real safeguards: nothing is saved while ProPresenter runs,
-// nor before a copy of the file is kept. So far (milestone M4) one thing here changes a
-// song's file: putting an earlier version of it back. The editors of M5 and M6 are to
-// come.
+// nor before a copy of the file is kept. Three things here change a song's file: what
+// is typed in the ChordPro editor (spec/04; the rules of that are in
+// Song/ChordProEditor.cs, and this only says when to save), the two keys in the song's
+// header (spec/05-song-and-saving.md, rules 5 to 7), and putting an earlier version
+// back, or the song as it was opened (spec/07). The chord sheet of M6 is to come.
+//
+// NOTHING IS SAVED BY HAND (spec/06, rule 12a). What is typed is saved a moment after
+// the typing stops, and before anything else is done: `Settle` is asked first by
+// everything here that leaves the song or does something else to it, and if a save is
+// refused, that something is not done (spec/04, rule 19a).
 //
 // It is handed what it would otherwise ask the PC for (where the app keeps its own
 // things, how to find places, whether ProPresenter is running), so that tests can hand
@@ -20,8 +28,9 @@
 //
 // ONE THREAD. Everything here is to be asked from one thread, the window's. A song's
 // marks are worked out on another, since a big library takes a while, and come back to
-// the window's thread to be shown: which they do by themselves where that thread has a
-// queue of its own, as a window's has. (The tests give theirs one:
+// the window's thread to be shown; and so do the waits for the typing to stop and for
+// what was just said to go: which they do by themselves where that thread has a queue
+// of its own, as a window's has. (The tests give theirs one:
 // Pictures.OnAThreadOfItsOwn.)
 //
 // The Mac's is LibraryModel.swift.
@@ -30,6 +39,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using Pro7ChordEditor.ChordRules;
 using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
@@ -38,6 +48,12 @@ public sealed class LibraryModel : INotifyPropertyChanged
 {
     /// <summary>How much of the height of the two lists the libraries have, unless the bar between them was moved.</summary>
     public const double UsualListsSplit = 0.36;
+
+    /// <summary>How many times its usual size the ChordPro text is, unless it was changed.</summary>
+    public const double UsualTextZoom = 1.0;
+
+    /// <summary>The sizes the text can be, each so many times its usual one (spec/03, rule 14a; spec/04, rule 25).</summary>
+    public static readonly IReadOnlyList<double> Zooms = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5];
 
     // How many songs' marks are worked out at a time before they are shown.
     private const int AFew = 20;
@@ -54,8 +70,26 @@ public sealed class LibraryModel : INotifyPropertyChanged
     private Dictionary<string, Marks> marks = new(Paths.ById);
     private IReadOnlySet<string> songsWithCopies = new HashSet<string>();
     private OpenSong? openSong;
+    private ChordProEditor? editor;
+    private int textVersion;
+    private int sitting;
     private string typed = "";
     private MarkFilter filter = MarkFilter.All;
+
+    // The wait for the typing to stop, before what was typed is saved.
+    private Task pause = Task.CompletedTask;
+    private CancellationTokenSource? pauseStop;
+
+    // The wait for what was just said to go from the quiet line.
+    private Task saying = Task.CompletedTask;
+    private CancellationTokenSource? sayingStop;
+
+    // Whether what the quiet line says went wrong is that ProPresenter was running: that
+    // goes from the line when ProPresenter does.
+    private bool refusedForProPresenter;
+
+    // The song's file as it was when the song was opened here: what Revert puts back.
+    private byte[]? asOpened;
 
     /// <param name="appVersion">The app's version, which a copy's index records.</param>
     public LibraryModel(AppData appData, Func<IReadOnlyList<string>, PlaceFinder> finder, Func<bool> proPresenterIsRunning, string appVersion = "")
@@ -140,6 +174,25 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <param name="Before">The copy that was made just before: putting THAT back is the undoing.</param>
     public sealed record PutBack(string Sentence, KeptCopy Before);
 
+    /// <summary>The song as ChordPro text, as the editor shows it.</summary>
+    /// <param name="Text">The text, as it last passed the editor's rule.</param>
+    /// <param name="Version">
+    /// Counted up each time the text is set from here and not typed: the view then puts
+    /// it in place of what it has, and forgets its own undo.
+    /// </param>
+    /// <param name="Sitting">
+    /// Counted up each time a song is opened or put back: the view then starts at the
+    /// top of the text. (Otherwise the caret stays where it was.)
+    /// </param>
+    /// <param name="Barred">Why the song can be read here and not changed, as a sentence; null if it can.</param>
+    public sealed record ChordProShown(string Text, int Version, int Sitting, string? Barred);
+
+    /// <summary>
+    /// A question put to the person before a song is reverted: its two sentences, and
+    /// what the button that says yes says.
+    /// </summary>
+    public sealed record Question(string Title, string Message, string Yes);
+
     // ---- What is shown
 
     public IReadOnlyList<Place> Places { get; private set; } = [];
@@ -159,6 +212,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     public ShownSong? Shown { get; private set; }
 
+    /// <summary>The song as ChordPro text; null if no song is open, or it could not be read.</summary>
+    public ChordProShown? ChordPro { get; private set; }
+
     public bool ProPresenterIsRunning { get; private set; }
 
     /// <summary>The panel of earlier versions, while it is open.</summary>
@@ -175,11 +231,35 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// </summary>
     public bool OffersOpeningAgain { get; private set; }
 
+    /// <summary>What was just said ("Saved. Every change here ..."), for a few seconds.</summary>
+    public string? Said { get; private set; }
+
+    /// <summary>What Revert asks before it does anything, while it is asking.</summary>
+    public Question? RevertQuestion { get; private set; }
+
+    /// <summary>
+    /// Whether the song's file is no longer what it was when the song was opened here:
+    /// something has been changed since, and Revert has something to do.
+    /// </summary>
+    public bool ChangedSinceOpened { get; private set; }
+
     /// <summary>
     /// How much of the height of the two lists at the window's left the libraries have,
     /// the songs having the rest: what the bar between them is dragged to.
     /// </summary>
     public double ListsSplit { get; private set; } = UsualListsSplit;
+
+    /// <summary>
+    /// How many times its usual size the ChordPro text is: one of <see cref="Zooms"/>.
+    /// Only the size changes with it: not a character of the text.
+    /// </summary>
+    public double TextZoom { get; private set; } = UsualTextZoom;
+
+    /// <summary>How long after the typing stops a change is saved (spec/04, rule 13).</summary>
+    public TimeSpan PauseBeforeSaving { get; set; } = TimeSpan.FromMilliseconds(700);
+
+    /// <summary>How long what was just said stays on the quiet line.</summary>
+    public TimeSpan SayingLasts { get; set; } = TimeSpan.FromSeconds(6);
 
     /// <summary>What is typed in the search box.</summary>
     public string Typed
@@ -233,6 +313,47 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>Whether the song that is open has copies kept.</summary>
     public bool HasEarlierVersions => Songs.FirstOrDefault(song => Paths.Same(song.Id, SongId)) is { } song && HasCopies(song);
 
+    /// <summary>
+    /// Whether the song that is open can be changed just now: it was read, and
+    /// ProPresenter is not running.
+    /// </summary>
+    public bool CanChange => openSong is not null && !ProPresenterIsRunning;
+
+    /// <summary>Whether its text can be typed in: that, and the text can say the song exactly (spec/04, rules 20 and 20a).</summary>
+    public bool CanType => CanChange && ChordPro is { Barred: null };
+
+    /// <summary>The keys a song can be said to be in, as the pickers list them: the thirteen major, then the thirteen minor.</summary>
+    public static IReadOnlyList<string> Keys { get; } = [.. Chords.MajorKeys(), .. Chords.MinorKeys()];
+
+    /// <summary>
+    /// The keys a picker lists for a song that says it is in this one: the twenty-six;
+    /// before them the song's own key, if it is one of the other sixteen (C# major,
+    /// say), so that it can always be seen and chosen (spec/02-chord-rules.md); and
+    /// before them all nothing, which a picker shows as "None", if the song states no
+    /// key (spec/06, rule 12).
+    /// </summary>
+    public static IReadOnlyList<string> KeysListedFor(string key) =>
+        key.Length == 0 || !Keys.Contains(key) ? [key, .. Keys] : Keys;
+
+    /// <summary>Whether Revert has something to do, and may do it.</summary>
+    public bool CanRevert => CanChange && ChangedSinceOpened;
+
+    /// <summary>
+    /// What stands at the right of the quiet line, where a Save button would be: there
+    /// is nothing to save by hand, since every change is saved as it is made. While
+    /// ProPresenter is running nothing is saved at all.
+    /// </summary>
+    public string SavingCaption => CanChange ? "Autosave on" : "Autosave paused";
+
+    /// <summary>The tip of those words: why there is no Save button (spec/06, rule 12a).</summary>
+    public string SavingTip => CanChange
+        ? "There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first."
+        : "Nothing is saved while ProPresenter is running.";
+
+    public bool CanZoomTextIn => TextZoom < Zooms[^1];
+
+    public bool CanZoomTextOut => TextZoom > Zooms[0];
+
     /// <summary>What a place is called where one is picked: its name, and how it was found.</summary>
     public static string Describe(Place place) => place.Kind switch
     {
@@ -263,8 +384,8 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     /// <summary>
     /// The quiet line under the song: what went wrong, if something did; what was just
-    /// put back; or what is there to be seen. Nothing here is a promise of what the app
-    /// will do.
+    /// put back, or said; or what is there to be seen. Nothing here is a promise of what
+    /// the app will do.
     /// </summary>
     public string Notice
     {
@@ -284,9 +405,15 @@ public sealed class LibraryModel : INotifyPropertyChanged
                 {
                     return "Nothing was done to this file.";
                 }
+                if (Said is not null)
+                {
+                    return Said;
+                }
                 var slides = Shown.Slides == 1 ? "1 slide" : Number(Shown.Slides) + " slides";
                 var chords = Shown.Chords == 1 ? "1 chord" : Number(Shown.Chords) + " chords";
-                return slides + ", " + chords + ". Nothing can be changed here yet.";
+                // (There is no Save button to look for, so it says there is no need of
+                // one; but only where something can be typed.)
+                return slides + ", " + chords + (CanType ? ". A change is saved a moment after it is typed." : ".");
             }
             if (Library is not null)
             {
@@ -314,6 +441,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         var settings = appData.ReadSettings();
         chosenFolders = [.. settings.ChosenFolders];
         ListsSplit = Within(settings.ListsSplit ?? UsualListsSplit);
+        TextZoom = NearestZoom(settings.TextZoom ?? UsualTextZoom);
         keptMarks = appData.ReadMarks();
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         var thrownAway = copies.Thin();
@@ -338,14 +466,15 @@ public sealed class LibraryModel : INotifyPropertyChanged
         {
             return;
         }
+        Settle();
         var song = SongId;
         FindPlaces(PlaceId, LibraryId);
-        ProPresenterIsRunning = askWhetherProPresenterIsRunning();
-        // The song that is open stays open if its file is still the one that was read.
-        // If something else has changed the file meanwhile, it is read again: nothing
-        // could be saved over it anyway. (Not while the panel of earlier versions is
-        // open over it: that is put away by the person, not by the app coming to the
-        // front.)
+        ProPresenterIs(askWhetherProPresenterIsRunning());
+        // The song that is open stays open, with what was typed in it, if its file is
+        // still the one that was read. If something else has changed the file meanwhile,
+        // it is read again: nothing could be saved over it anyway. (Not while the panel
+        // of earlier versions is open over it: that is put away by the person, not by
+        // the app coming to the front.)
         if (song is not null && Songs.Any(one => Paths.Same(one.Id, song)) && Earlier is null && openSong?.FileIsAsLastRead != true)
         {
             Open(song);
@@ -361,24 +490,45 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// front all the while. Windows gives no news of a program starting or stopping that
     /// an app can have for the asking, so the window asks every second or two.
     /// </summary>
-    public void ProPresenterMayHaveChanged() => ProPresenterIs(askWhetherProPresenterIsRunning());
-
-    /// <summary>The same, with the asking done off the window's thread: the system's list of what is running takes a moment to read.</summary>
-    public async Task LookForProPresenterAsync() => ProPresenterIs(await Task.Run(askWhetherProPresenterIsRunning));
-
-    private void ProPresenterIs(bool running)
+    public void ProPresenterMayHaveChanged()
     {
-        if (running != ProPresenterIsRunning)
+        if (ProPresenterIs(askWhetherProPresenterIsRunning()))
         {
-            ProPresenterIsRunning = running;
-            appData.Log(running ? "ProPresenter is running." : "ProPresenter is no longer running.");
             Changed();
         }
     }
 
+    /// <summary>The same, with the asking done off the window's thread: the system's list of what is running takes a moment to read.</summary>
+    public async Task LookForProPresenterAsync()
+    {
+        if (ProPresenterIs(await Task.Run(askWhetherProPresenterIsRunning)))
+        {
+            Changed();
+        }
+    }
+
+    // Answers whether it is another thing than was known.
+    private bool ProPresenterIs(bool running)
+    {
+        if (running == ProPresenterIsRunning)
+        {
+            return false;
+        }
+        ProPresenterIsRunning = running;
+        appData.Log(running ? "ProPresenter is running." : "ProPresenter is no longer running.");
+        if (!running && refusedForProPresenter)
+        {
+            // What was refused because of it can be done now: the line need not go on
+            // saying otherwise.
+            Refused = null;
+            refusedForProPresenter = false;
+        }
+        return true;
+    }
+
     public void ChoosePlace(string? id)
     {
-        if (Paths.Same(id, PlaceId))
+        if (Paths.Same(id, PlaceId) || !Settle())
         {
             return;
         }
@@ -390,7 +540,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     public void ChooseLibrary(string? id)
     {
-        if (Paths.Same(id, LibraryId))
+        if (Paths.Same(id, LibraryId) || !Settle())
         {
             return;
         }
@@ -402,16 +552,22 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     /// <summary>
     /// A click on a song opens it. One that cannot be read says so, and nothing is done
-    /// to it.
+    /// to it. What was being typed in the song that is left is saved first; if that is
+    /// refused, the song is not left.
     /// </summary>
     public void Open(string? id)
     {
+        if (!Settle())
+        {
+            return;
+        }
         SongId = id;
-        openSong = null;
         Earlier = null;
         JustPutBack = null;
         Refused = null;
+        refusedForProPresenter = false;
         OffersOpeningAgain = false;
+        Close();
         var song = Songs.FirstOrDefault(one => Paths.Same(one.Id, id));
         if (song is null || KeptSongOf(song) is not { } kept)
         {
@@ -427,7 +583,10 @@ public sealed class LibraryModel : INotifyPropertyChanged
             // copy is kept before the first.
             var opened = new OpenSong(song.Path, new Safeguards(askWhetherProPresenterIsRunning, (path, why) => copies.Keep(path, kept, why)));
             openSong = opened;
+            asOpened = opened.Bytes.ToArray();
+            ChangedSinceOpened = false;
             Shown = Show(opened, song.Name);
+            Edit(opened);
             appData.Log("Opened " + file + ".");
         }
         catch (Refusal refusal)
@@ -444,6 +603,10 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>A folder chosen by hand becomes a place, is remembered, and is opened.</summary>
     public void Add(string folder)
     {
+        if (!Settle())
+        {
+            return;
+        }
         if (!chosenFolders.Any(one => Paths.Same(Paths.IdOf(one), Paths.IdOf(folder))))
         {
             chosenFolders.Add(folder);
@@ -472,12 +635,250 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>Waits until the marks of the songs listed have been worked out.</summary>
     public Task MarksAreWorkedOutAsync() => marking;
 
+    // ---- The ChordPro editor (spec/04-chordpro-editor.md)
+
+    /// <summary>
+    /// The text box asks: may the text become this? If it may, it is taken, and saved a
+    /// moment after the typing stops. If it may not, the text is to stay as it was, and
+    /// nothing is said: the caret not moving says it.
+    /// </summary>
+    public bool TextMayBecome(string text)
+    {
+        if (editor is null || !CanType || editor.Take(text) == ChordProEditor.Verdict.NotTheWords)
+        {
+            return false;
+        }
+        Refused = null;
+        refusedForProPresenter = false;
+        OffersOpeningAgain = false;
+        if (ChordPro is not null)
+        {
+            ChordPro = ChordPro with { Text = text };
+        }
+        pauseStop?.Cancel();
+        pauseStop = new CancellationTokenSource();
+        pause = SettleAfterAPauseAsync(pauseStop.Token);
+        Changed();
+        return true;
+    }
+
+    private async Task SettleAfterAPauseAsync(CancellationToken stop)
+    {
+        try
+        {
+            await Task.Delay(PauseBeforeSaving, stop);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        if (!stop.IsCancellationRequested)
+        {
+            Settle();
+        }
+    }
+
+    /// <summary>
+    /// Saves what has been typed, without waiting for the typing to pause: before the
+    /// song is left for another, before anything else is done to it, and when the app is
+    /// left or closed. Answers whether all is saved; false if a save was refused, and
+    /// then whatever was to be done next is not done, so that the sentence is seen and
+    /// not swept away with the song.
+    /// </summary>
+    public bool Settle()
+    {
+        pauseStop?.Cancel();
+        pauseStop = null;
+        if (editor is null || openSong is not { } song)
+        {
+            return true;
+        }
+        var was = song.Bytes;
+        try
+        {
+            if (editor.Save())
+            {
+                NoteAChange();
+                Changed();
+            }
+            return true;
+        }
+        catch (Refusal refusal)
+        {
+            // What was saved before the refusal stays saved. The text is made again
+            // from the song, so that what is seen is what the sentence says: nothing
+            // (more) was changed (spec/04, rule 19a).
+            Refuse(refusal, "");
+            editor.Reload(keepingWhatIsTyped: false);
+            ShowText(editor);
+            NoteAChange(saved: !was.Span.SequenceEqual(song.Bytes.Span));
+            Changed();
+            return false;
+        }
+    }
+
+    /// <summary>Waits until what was typed has been saved, if a save is waiting.</summary>
+    public Task WhatWasTypedIsSavedAsync() => pause;
+
+    /// <summary>
+    /// Makes the ChordPro text a step larger (1) or smaller (-1), or its usual size (0).
+    /// It is remembered. Answers with the size it now is.
+    /// </summary>
+    public double ZoomText(int direction)
+    {
+        var now = Zooms.ToList().IndexOf(NearestZoom(TextZoom));
+        var wanted = direction == 0 ? UsualTextZoom : Zooms[Math.Min(Math.Max(now + Math.Sign(direction), 0), Zooms.Count - 1)];
+        if (wanted != TextZoom)
+        {
+            TextZoom = wanted;
+            if (started)
+            {
+                Remember();
+            }
+            Changed();
+        }
+        return TextZoom;
+    }
+
+    // ---- The two keys (spec/05-song-and-saving.md, rules 5 to 7)
+
+    /// <summary>Says what key the song's chords are written in. It changes no chord.</summary>
+    public void SetKey(string key) => Change(song => song.SetKey(key));
+
+    /// <summary>Says what key ProPresenter is to show the song's chords in, and that alone.</summary>
+    public void SetShownKey(string key) => Change(song => song.SetShownKey(key));
+
+    private void Change(Action<OpenSong> ask)
+    {
+        if (!Settle() || openSong is not { } song)
+        {
+            return;
+        }
+        Refused = null;
+        refusedForProPresenter = false;
+        OffersOpeningAgain = false;
+        try
+        {
+            ask(song);
+            NoteAChange();
+        }
+        catch (Refusal refusal)
+        {
+            Refuse(refusal, "");
+        }
+        Changed();
+    }
+
+    // ---- Saving, which is not done by hand (spec/06, rule 12a; spec/07, rule 22a)
+
+    /// <summary>
+    /// Ctrl+S, pressed out of habit. What has been typed and not yet saved is saved
+    /// without waiting for the pause, and the quiet line says that there was nothing to
+    /// do by hand.
+    /// </summary>
+    public void SaveNow()
+    {
+        if (openSong is null)
+        {
+            return;
+        }
+        if (ProPresenterIsRunning)
+        {
+            Say("ProPresenter is running. Quit it to change chords here.");
+            return;
+        }
+        if (Settle())
+        {
+            Say("Saved. Every change here is saved as it is made: there is nothing to save by hand.");
+        }
+    }
+
+    // Puts a sentence on the quiet line for a few seconds.
+    private void Say(string sentence)
+    {
+        Said = sentence;
+        sayingStop?.Cancel();
+        sayingStop = new CancellationTokenSource();
+        saying = UnsayAfterAWhileAsync(sayingStop.Token);
+        Changed();
+    }
+
+    private async Task UnsayAfterAWhileAsync(CancellationToken stop)
+    {
+        try
+        {
+            await Task.Delay(SayingLasts, stop);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        if (!stop.IsCancellationRequested)
+        {
+            Said = null;
+            Changed();
+        }
+    }
+
+    /// <summary>Waits until what was said has gone from the quiet line again.</summary>
+    public Task WhatWasSaidIsGoneAsync() => saying;
+
+    /// <summary>
+    /// <b>Revert</b> asks first. It takes back everything done to the song since it was
+    /// opened, which may be an hour's work, and its name alone could be read as taking
+    /// back the last change, which is Undo's. So the question says which: all of them.
+    /// (In one sentence, which is the maintainer's: a longer one was not read.)
+    /// </summary>
+    public void AskToRevert()
+    {
+        if (!CanRevert || Shown is null)
+        {
+            return;
+        }
+        RevertQuestion = new Question(
+            "Revert " + (char)0x201C + Shown.Name + (char)0x201D + " to how it was when it was opened?",
+            "This takes back EVERY change made to this song since it was opened in this editor.",
+            "Revert All Changes");
+        Changed();
+    }
+
+    /// <summary>The answer was no.</summary>
+    public void DontRevert()
+    {
+        if (RevertQuestion is not null)
+        {
+            RevertQuestion = null;
+            Changed();
+        }
+    }
+
+    /// <summary>
+    /// The answer was yes: the song is made what it was when it was opened here. It is a
+    /// putting back like that of an earlier version: what the song is now is kept as a
+    /// copy first, and the quiet line offers to undo it.
+    /// </summary>
+    public void Revert()
+    {
+        RevertQuestion = null;
+        if (asOpened is not { } bytes || !ChangedSinceOpened)
+        {
+            Changed();
+            return;
+        }
+        PutBackBytes(
+            () => bytes,
+            undoing: false,
+            said: "The song is as it was when it was opened here.",
+            logged: file => "Reverted " + file + " to as it was opened.",
+            notDone: file => file + " was not reverted.");
+    }
+
     // ---- Earlier versions (spec/07-backups.md, rules 14 to 23)
 
     /// <summary>Opens the panel, with the newest copy picked. A song with no copies has none to show.</summary>
     public void ShowEarlierVersions()
     {
-        if (Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } song || KeptSongOf(song) is not { } kept)
+        if (!Settle() || Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } song || KeptSongOf(song) is not { } kept)
         {
             return;
         }
@@ -586,23 +987,36 @@ public sealed class LibraryModel : INotifyPropertyChanged
         }
     }
 
-    // Makes the song's file a copy again. It is a save like any other, and the file as
-    // it is now is kept as a copy first, so that this can be taken back.
     private void PutBackCopy(KeptCopy copy, bool undoing)
     {
-        if (openSong is not { } song || Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } listed || KeptSongOf(listed) is not { } kept)
+        var when = copies.When(copy.Made);
+        PutBackBytes(
+            () => File.ReadAllBytes(copy.Path),
+            undoing,
+            said: "Put back the version of " + when + ".",
+            logged: file => "Put back an earlier version of " + file + ", the one of " + when + ".",
+            notDone: file => "An earlier version of " + file + " was not put back.");
+    }
+
+    // Makes the song's file these bytes again: an earlier version of it, or the song as
+    // it was when it was opened. It is a save like any other, and the file as it is now
+    // is kept as a copy first, so that this can be taken back.
+    private void PutBackBytes(Func<byte[]> read, bool undoing, string said, Func<string, string> logged, Func<string, string> notDone)
+    {
+        if (!Settle() || openSong is not { } song || Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } listed || KeptSongOf(listed) is not { } kept)
         {
             return;
         }
         var file = Path.GetFileName(listed.Path);
         Refused = null;
+        refusedForProPresenter = false;
         OffersOpeningAgain = false;
         try
         {
             byte[] bytes;
             try
             {
-                bytes = File.ReadAllBytes(copy.Path);
+                bytes = read();
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or NotSupportedException or ArgumentException)
             {
@@ -620,8 +1034,8 @@ public sealed class LibraryModel : INotifyPropertyChanged
         }
         catch (Exception exception) when (exception is Refusal or CopyCannotBeRead)
         {
-            Refuse(exception as Refusal, "The copy could not be read.", file);
-            appData.Log("An earlier version of " + file + " was not put back.");
+            Refuse(exception as Refusal, "The copy could not be read.");
+            appData.Log(notDone(file));
             if (Earlier is not null)
             {
                 Earlier = Earlier with { Question = null };
@@ -629,11 +1043,11 @@ public sealed class LibraryModel : INotifyPropertyChanged
             Changed();
             return;
         }
-        // The song starts afresh from its file. The newest copy now is the file as it
-        // was just before: the one to put back, to take this back.
-        Shown = Show(song, listed.Name);
+        // The song starts afresh from its file, and so does its text. The newest copy
+        // now is the file as it was just before: the one to put back, to take this back.
+        Edit(song);
+        NoteAChange();
         Earlier = null;
-        var when = copies.When(copy.Made);
         if (undoing)
         {
             JustPutBack = null;
@@ -641,10 +1055,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
         }
         else if (copies.CopiesOf(kept).FirstOrDefault() is { } before)
         {
-            JustPutBack = new PutBack("Put back the version of " + when + ".", before);
-            appData.Log("Put back an earlier version of " + file + ", the one of " + when + ".");
+            JustPutBack = new PutBack(said, before);
+            appData.Log(logged(file));
         }
-        NoteAChange(listed);
         Changed();
     }
 
@@ -654,6 +1067,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
     // ---- How
 
     private static double Within(double share) => double.IsNaN(share) ? UsualListsSplit : Math.Min(Math.Max(share, 0.1), 0.9);
+
+    private static double NearestZoom(double wanted) =>
+        double.IsNaN(wanted) ? UsualTextZoom : Zooms.MinBy(zoom => Math.Abs(zoom - wanted));
 
     // A number as it is written in a sentence, the same on every PC.
     private static string Number(int number) => number.ToString(CultureInfo.InvariantCulture);
@@ -676,6 +1092,37 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     private void Changed() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
 
+    // No song is open.
+    private void Close()
+    {
+        pauseStop?.Cancel();
+        pauseStop = null;
+        sayingStop?.Cancel();
+        sayingStop = null;
+        openSong = null;
+        asOpened = null;
+        ChangedSinceOpened = false;
+        RevertQuestion = null;
+        editor = null;
+        ChordPro = null;
+        Said = null;
+    }
+
+    // The song as text, made afresh from it: a new sitting at the editor.
+    private void Edit(OpenSong song)
+    {
+        editor = new ChordProEditor(song);
+        sitting++;
+        ShowText(editor);
+    }
+
+    // Sets the text the view shows from the editor's, in place of whatever was typed.
+    private void ShowText(ChordProEditor from)
+    {
+        textVersion++;
+        ChordPro = new ChordProShown(from.Text, textVersion, sitting, from.Barred);
+    }
+
     // A song as its copies know it: by its place, its library and its name.
     private KeptSong? KeptSongOf(ListedSong song) =>
         Place is { } place && Library is { } library ? new KeptSong(place.Name, library.Name, song.Name) : null;
@@ -687,32 +1134,48 @@ public sealed class LibraryModel : INotifyPropertyChanged
         songsWithCopies = Place is { } place && Library is { } library ? copies.NamesWithCopies(place.Name, library.Name) : new HashSet<string>();
 
     // Something was not done: its sentence, and what follows from why.
-    private void Refuse(Refusal? refusal, string otherwise, string file)
+    private void Refuse(Refusal? refusal, string otherwise)
     {
         Refused = refusal?.Sentence ?? otherwise;
         OffersOpeningAgain = refusal?.Reason == Song.Refusal.Why.ChangedByAnother;
-        if (refusal?.Reason == Song.Refusal.Why.ProPresenterIsRunning)
+        refusedForProPresenter = refusal?.Reason == Song.Refusal.Why.ProPresenterIsRunning;
+        if (refusedForProPresenter)
         {
             // (It was started with this app in front all the while: the band is there
             // from now. spec/06, rule 19.)
             ProPresenterIsRunning = true;
         }
-        appData.Log("A change to " + file + " was refused.");
+        if (Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is { } listed)
+        {
+            appData.Log("A change to " + Path.GetFileName(listed.Path) + " was refused.");
+        }
     }
 
-    // The song's file has been changed from here: its marks in the list, and whether
-    // it has copies, are brought up to date.
-    private void NoteAChange(ListedSong listed)
+    // The song's file has been changed from here, or may have been: what is shown of
+    // it, its marks in the list, and whether it has copies, are brought up to date.
+    // (The log says "Saved" only of a file that was: after a save that was refused
+    // before anything was written, it does not.)
+    private void NoteAChange(bool saved = true)
     {
+        if (openSong is not { } song || Songs.FirstOrDefault(one => Paths.Same(one.Id, SongId)) is not { } listed)
+        {
+            return;
+        }
+        Shown = Show(song, listed.Name);
+        ChangedSinceOpened = asOpened is null || !song.Bytes.Span.SequenceEqual(asOpened);
         if (Listing.AsItIsNow(listed) is { } now)
         {
-            Songs = [.. Songs.Select(song => Paths.Same(song.Id, now.Id) ? now : song)];
+            Songs = [.. Songs.Select(one => Paths.Same(one.Id, now.Id) ? now : one)];
             var found = Song.Marks.Read(now);
             marks[now.Id] = found;
             keptMarks.Keep(found, now);
             appData.Keep(keptMarks);
         }
         NoteCopies();
+        if (saved)
+        {
+            appData.Log("Saved " + Path.GetFileName(listed.Path) + ".");
+        }
     }
 
     private void FindPlaces(string? wanted, string? library)
@@ -736,10 +1199,11 @@ public sealed class LibraryModel : INotifyPropertyChanged
         {
             SongId = null;
             Shown = null;
-            openSong = null;
+            Close();
             Earlier = null;
             JustPutBack = null;
             Refused = null;
+            refusedForProPresenter = false;
             OffersOpeningAgain = false;
         }
         NoteCopies();
@@ -798,5 +1262,6 @@ public sealed class LibraryModel : INotifyPropertyChanged
         LastPlace = PlaceId,
         LastLibrary = LibraryId,
         ListsSplit = ListsSplit == UsualListsSplit ? null : ListsSplit,
+        TextZoom = TextZoom == UsualTextZoom ? null : TextZoom,
     });
 }

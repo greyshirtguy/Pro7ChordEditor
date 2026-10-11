@@ -152,7 +152,7 @@ public class EarlierVersionsTests
         Assert.Equal(history.Now, pc.BytesOf("Plain Song"));
         Assert.Equal(("E", 8), (model.Shown!.Key, model.Shown.Chords));
         Assert.Null(model.JustPutBack);
-        Assert.Equal("4 slides, 8 chords. Nothing can be changed here yet.", model.Notice);
+        Assert.Equal("4 slides, 8 chords. A change is saved a moment after it is typed.", model.Notice);
         Assert.Contains("  Putting back was undone for Plain Song.pro.", pc.Log, StringComparison.Ordinal);
         Assert.Equal(8, model.Marks[pc.Song("Plain Song")].Chords);
         // A put back and its taking back left two copies more than there were.
@@ -203,7 +203,7 @@ public class EarlierVersionsTests
         model.ForgetWhatWasPutBack();
         Assert.Null(model.JustPutBack);
         Assert.Equal(1, changes);
-        Assert.Equal("4 slides, 11 chords. Nothing can be changed here yet.", model.Notice);
+        Assert.Equal("4 slides, 11 chords. A change is saved a moment after it is typed.", model.Notice);
         model.ForgetWhatWasPutBack();
         Assert.Equal(1, changes);
         model.ShowEarlierVersions();

@@ -107,7 +107,7 @@ public class LibraryModelTests
         Assert.Equal((4, 11), (shown.Slides, shown.Chords));
         Assert.Equal("{c: Verse 1}", shown.Lines[0].Text);
         Assert.Equal("[G] [D/F#] [Em]", shown.Lines[^1].Text);
-        Assert.Equal("4 slides, 11 chords. Nothing can be changed here yet.", model.Notice);
+        Assert.Equal("4 slides, 11 chords. A change is saved a moment after it is typed.", model.Notice);
         Assert.Equal("", model.NoSongSentence);
         Assert.Equal(pc.Song("Plain Song"), model.SongId);
 
@@ -163,7 +163,7 @@ public class LibraryModelTests
         await model.StartAsync();
         model.Open(model.Songs.Single().Id);
         Assert.Equal((1, 1), (model.Shown!.Slides, model.Shown.Chords));
-        Assert.Equal("1 slide, 1 chord. Nothing can be changed here yet.", model.Notice);
+        Assert.Equal("1 slide, 1 chord. A change is saved a moment after it is typed.", model.Notice);
         Assert.Equal("Has 1 chord.", model.Rows.Single().ChordsTip);
     });
 
@@ -194,7 +194,7 @@ public class LibraryModelTests
         // Four slides, five boxes; and the first box's three chords twice over.
         Assert.Equal((4, 14), (model.Shown!.Slides, model.Shown.Chords));
         Assert.Equal(14, model.Marks[pc.Song("Two Boxes", "Kids")].Chords);
-        Assert.Equal("4 slides, 14 chords. Nothing can be changed here yet.", model.Notice);
+        Assert.Equal("4 slides, 14 chords. A change is saved a moment after it is typed.", model.Notice);
     });
 
     [Fact]
