@@ -123,6 +123,7 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal("C:" + Backslash + "A;B", PlaceFinder.BaseNamedIn("Base=" + Twice("C:" + Backslash + "A;B") + ";\nOther=1;"));
         // Nothing named, or a line that does not end as such a line ends, names none.
         Assert.Null(PlaceFinder.BaseNamedIn("Base=;"));
+        Assert.Null(PlaceFinder.BaseNamedIn("Base=   ;"));
         Assert.Null(PlaceFinder.BaseNamedIn("Base=" + Twice(folder)));
         Assert.Null(PlaceFinder.BaseNamedIn("Base=" + Twice(folder) + "\nOther=1;"));
         // The first line that names one is taken.
@@ -167,6 +168,19 @@ public sealed class LibraryTests : IDisposable
     }
 
     [Fact]
+    public void ASongsEndingIsOneWhateverItsCapitalsAndItsNameIsWhatStandsBeforeIt()
+    {
+        var folder = Directory.CreateDirectory(Path.Combine(bench.Folder, "Endings")).FullName;
+        foreach (var name in new[] { "Loud.PRO", "quiet.pro", "Mixed.Pro", "Two.endings.pro", "Not one.pro.bak", "Nor this.prox", "Nor.pro this" })
+        {
+            File.WriteAllBytes(Path.Combine(folder, name), [1]);
+        }
+        Assert.Equal(["Loud", "Mixed", "quiet", "Two.endings"], Listing.Songs(new Library("Endings", folder)).Select(song => song.Name));
+        // And such a folder, chosen, is a library for having them.
+        Assert.Equal(["Endings"], Listing.Libraries(new Place(PlaceKind.Chosen, "", folder)).Select(library => library.Name));
+    }
+
+    [Fact]
     public void NamesAreSortedAsTheSystemSortsThem()
     {
         var folder = Directory.CreateDirectory(Path.Combine(bench.Folder, "Numbers")).FullName;
@@ -193,6 +207,9 @@ public sealed class LibraryTests : IDisposable
         var one = Listing.Libraries(new Place(PlaceKind.Chosen, "", Path.Combine(whole, "Libraries", "Songs")));
         Assert.Equal(["Songs"], one.Select(library => library.Name));
         Assert.Equal(SongsOfTheMadeUpPlace.Length, Listing.Songs(one[0]).Count);
+        // (One library, by its own folder's name, whatever the place was called.)
+        Assert.Equal(["Old copies"], LibrariesOf("Libraries", "Old copies"));
+        Assert.Equal(Path.Combine(whole, "Libraries", "Old copies"), Listing.Libraries(new Place(PlaceKind.Chosen, "Called otherwise", Path.Combine(whole, "Libraries", "Old copies") + Backslash)).Single().Id);
         Assert.Empty(LibrariesOf("Media"));
         Assert.Empty(LibrariesOf("Not there"));
     }
@@ -269,6 +286,25 @@ public sealed class LibraryTests : IDisposable
         Assert.True(Marks.Read(new ListedSong("Gone (Chords)", Path.Combine(bench.Folder, "Gone (Chords).pro"), 0, DateTime.UnixEpoch)) is { CannotBeRead: true, IsOldEditorsCopy: true, Chords: 0 });
     }
 
+    // spec/06, rule 9: "it is one of the old editor's "(Chords)" copies: its name ends
+    // ` (Chords)`", a space and then the word in brackets with its capital, as that
+    // editor wrote it (spec/08-repair.md, D).
+    [Fact]
+    public void TheOldEditorsCopyIsASongWhoseNameEndsWithASpaceAndChordsInBracketsAndNoOther()
+    {
+        var path = bench.CopyOf("Plain Song.pro");
+        bool IsACopy(string name) => Marks.Read(new ListedSong(name, path, 0, DateTime.UnixEpoch)).IsOldEditorsCopy;
+
+        Assert.True(IsACopy("Plain Song (Chords)"));
+        Assert.True(IsACopy("Plain Song (Chords) (Chords)"));
+        Assert.False(IsACopy("Plain Song"));
+        Assert.False(IsACopy("Plain Song (Chords) 2"));
+        Assert.False(IsACopy("Plain Song (chords)"));
+        Assert.False(IsACopy("Plain Song(Chords)"));
+        Assert.False(IsACopy("Plain Song (Chords) "));
+        Assert.Equal(" (Chords)", Marks.OldEditorsEnding);
+    }
+
     [Fact]
     public void ChordsOnABoxThatShowsSomethingElsesWordsAreNoneOfTheSongs()
     {
@@ -316,6 +352,11 @@ public sealed class LibraryTests : IDisposable
     [Fact]
     public void TheListCanBeNarrowedToSongsWithChordsOrWithout()
     {
+        // (One chord is chords: it is the first chord that takes a song out of "without".)
+        Assert.True(new Marks(1).HasChords);
+        Assert.False(new Marks(0).HasChords);
+        Assert.True(MarkFilter.WithChords.Lets(new Marks(1)));
+        Assert.False(MarkFilter.WithoutChords.Lets(new Marks(1)));
         Marks with = new(3), without = new(), broken = new(CannotBeRead: true);
         Assert.True(MarkFilter.All.Lets(with) && MarkFilter.All.Lets(without) && MarkFilter.All.Lets(null) && MarkFilter.All.Lets(broken));
         Assert.True(MarkFilter.WithChords.Lets(with));
@@ -361,6 +402,14 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal(new Marks(CannotBeRead: true), read.MarksFor(song with { Path = Path.Combine(bench.Folder, "B.pro") }));
         // What is kept is in the app's own folder, under the names the page gives, and
         // nothing else is left there.
+        Assert.Equal(["marks.json", "settings.json"], Directory.EnumerateFileSystemEntries(data.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
+
+        // Kept again, it is the newer that is read: what is kept takes the place of what was.
+        data.Keep(settings with { LastPlace = Path.Combine(bench.Folder, "Elsewhere"), ListsSplit = null });
+        Assert.Equal(settings with { LastPlace = Path.Combine(bench.Folder, "Elsewhere"), ListsSplit = null }, again.ReadSettings());
+        kept.Keep(new Marks(7), song);
+        data.Keep(kept);
+        Assert.Equal(new Marks(7), again.ReadMarks().MarksFor(song));
         Assert.Equal(["marks.json", "settings.json"], Directory.EnumerateFileSystemEntries(data.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
 
         // A file that cannot be read is taken as not there.

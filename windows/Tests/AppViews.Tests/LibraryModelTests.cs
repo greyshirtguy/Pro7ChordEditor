@@ -72,10 +72,15 @@ public class LibraryModelTests
         Assert.Equal(MadeUpPC.Songs.Length, pc.AppData.ReadMarks().Count);
         Assert.Equal(pc.Library("Songs"), pc.AppData.ReadSettings().LastLibrary);
         Assert.Equal(pc.Place, pc.AppData.ReadSettings().LastPlace);
-        // Started a second time, it does nothing: what is open stays open.
+        // Started a second time, it does nothing: what is open stays open, and nothing
+        // is asked or looked for again.
         again.ChooseLibrary(pc.Library("Kids"));
+        var asked = pc.TimesAsked;
+        var logged = pc.Log;
         await again.StartAsync();
         Assert.Equal("Kids", again.Library?.Name);
+        Assert.Equal(asked, pc.TimesAsked);
+        Assert.Equal(logged, pc.Log);
     });
 
     [Fact]
@@ -160,6 +165,36 @@ public class LibraryModelTests
         Assert.Equal((1, 1), (model.Shown!.Slides, model.Shown.Chords));
         Assert.Equal("1 slide, 1 chord. Nothing can be changed here yet.", model.Notice);
         Assert.Equal("Has 1 chord.", model.Rows.Single().ChordsTip);
+    });
+
+    [Fact]
+    public void WhatIsShownOfASongIsItsOwnKeyTheKeyItIsShownInItsSlidesAndItsChords() => OnAMadeUpPC(async pc =>
+    {
+        // Two songs made from Plain Song, each with what no test file has: one that
+        // ProPresenter is set to show in another key than its own, and one with a slide
+        // that has two text boxes, so that it has more boxes than slides.
+        var kids = Path.Combine(pc.Place, "Libraries", "Kids");
+        var shown = Path.Combine(kids, "Shown Otherwise.pro");
+        File.WriteAllBytes(shown, TestData.InFiles("made-by-simple-presenter/Plain Song.pro"));
+        new OpenSong(shown, new Safeguards(() => false, (_, _) => { })).SetShownKey("A");
+
+        var presentation = Pro.SerializationInterop.RVProtoData.Presentation.Parser.ParseFrom(TestData.InFiles("made-by-simple-presenter/Plain Song.pro"));
+        var first = presentation.CueGroups[0].CueIdentifiers[0].String;
+        var elements = presentation.Cues.Single(cue => cue.Uuid.String == first).Actions.Single(action => action.Slide?.Presentation is not null).Slide.Presentation.BaseSlide.Elements;
+        var second = elements.Single(element => element.Element_?.Text is not null).Clone();
+        second.Element_.Uuid.String = "11111111-2222-3333-4444-555555555555";
+        elements.Add(second);
+        File.WriteAllBytes(Path.Combine(kids, "Two Boxes.pro"), Google.Protobuf.MessageExtensions.ToByteArray(presentation));
+
+        var model = pc.Model();
+        await model.StartAsync();
+        model.Open(pc.Song("Shown Otherwise", "Kids"));
+        Assert.Equal(("G", "A"), (model.Shown!.Key, model.Shown.ShownKey));
+        model.Open(pc.Song("Two Boxes", "Kids"));
+        // Four slides, five boxes; and the first box's three chords twice over.
+        Assert.Equal((4, 14), (model.Shown!.Slides, model.Shown.Chords));
+        Assert.Equal(14, model.Marks[pc.Song("Two Boxes", "Kids")].Chords);
+        Assert.Equal("4 slides, 14 chords. Nothing can be changed here yet.", model.Notice);
     });
 
     [Fact]
@@ -352,9 +387,11 @@ public class LibraryModelTests
         Assert.Equal("", model.NoPlaceSentence);
         Assert.Equal("Songs (chosen folder)", LibraryModel.Describe(model.Place!));
 
-        // Chosen again, it is one place still. Another is another, and is the one open.
+        // Chosen again, it is one place still, and is kept once. Another is another, and
+        // is the one open.
         model.Add(Path.Combine(pc.Place, "Libraries", "Songs") + Path.DirectorySeparatorChar);
         Assert.Single(model.Places);
+        Assert.Single(pc.AppData.ReadSettings().ChosenFolders);
         var empty = Directory.CreateDirectory(Path.Combine(pc.Folder, "Nothing in it")).FullName;
         model.Add(empty);
         Assert.Equal(["Songs", "Nothing in it"], model.Places.Select(place => place.Name));
