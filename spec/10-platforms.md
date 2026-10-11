@@ -158,6 +158,15 @@ seen in a picture and ask the maintainer to try them.
   developer account, which is being renewed. Nothing before that step needs it: Xcode
   builds and runs an unsigned or locally signed app on their own Mac. Give it out as a
   zipped `.app` or a `.dmg` on the Releases page.
+  (As built, 2026-10-12, for an early build the maintainer asked for before the
+  account was renewed: `mac/make-dmg.sh` makes the `.dmg`, of a Release for both
+  kinds of Mac, signed only "to run locally". "Refuse" is then not quite the last
+  word: macOS will not open such an app at a double-click once it has come through a
+  browser, and the person can allow it, once, in System Settings under Privacy &
+  Security. The read-me in the image says how, and that it is to be done only for
+  something whose maker one has reason to trust. Such a build is put on the Releases
+  page as a pre-release, so that the page's "latest" stays the one most people came
+  for.)
 - **Windows**: a self-contained `.exe` in a `.zip` on the Releases page, as the old
   editor was.
 - **Every push** should build both apps and run both sets of tests on GitHub's own

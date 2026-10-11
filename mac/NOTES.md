@@ -1159,6 +1159,52 @@ chord is put there; and, while a song is open, putting a blank slide's file back
 for byte as it was when its last chord is taken off again. The maintainer asked the
 second of Simple Presenter in so many words.
 
+## The disk image, and what was checked of it
+
+Asked for by the maintainer on 2026-10-12, the chords having shown in ProPresenter:
+"Maybe we can do an early release (can you make .dmg with apps? - unsigned for now -
+I'll prob renew dev account soon)". Part of M10 done early; the rest of M10 (the icon,
+the About text, a Developer ID, notarizing) is still to come.
+
+- **`mac/make-dmg.sh`** builds a Release into `mac/build` (which git leaves alone),
+  checks it, and makes `Pro7ChordEditor-mac-<version>.dmg`: the app, a way to
+  Applications, and `mac/dmg/Read Me First.txt`. Its head says the rest.
+- **Signed "to run locally"** (ad hoc), as the project has always been, and not left
+  with no signature at all, which a Mac with Apple's own chip will not run.
+- **Built without `get-task-allow`.** Xcode gives every build it makes for its own
+  use that entitlement, which lets any other program look inside the app as it
+  runs; a Release built by `xcodebuild build` has it too (the first image made here
+  did). The script builds with `CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO` and refuses
+  an app that has it. Apple would refuse to notarize one that did.
+- **The version is the project's**: 0.1, build 1, as it has been since M0. (The tags
+  in the repository, 0.93 to v0.9.5, are the old Windows editor's. A tag for this is
+  the maintainer's to name; `mac-v0.1` would keep the two apart.)
+- **Checked, without the app once being run**: both kinds of Mac are in it (arm64
+  and x86_64); its seal holds, in the build and again in the mounted image, where
+  it is byte for byte the app that was built; it has no entitlement; nothing in it
+  names a path of this Mac; macOS's own judge of downloads (`spctl`) rejects it, as
+  the read-me says it will; and a copy of the image marked as a browser marks a
+  download mounts as one, and an app copied out of it carries the mark.
+- **Every test passes against the optimised code** too (`swift test -c release
+  -Xswiftc -enable-testing`): 304. The tests otherwise run against a build made for
+  debugging, which is not what is in the image.
+- **Not checked.** The app in the image has not been opened by this session: it
+  would have found the maintainer's library, with a build that can write
+  (`AGENTS.md`). So what a Release does at its start, in its menus and its windows
+  is unseen but for the same code's tests. Nor has the image been tried on another
+  Mac, on one with Intel's chip, or on macOS 15; and the steps in the read-me for
+  opening it the first time are as macOS 15 and 26 are known to behave, not as
+  seen here.
+- **For the maintainer before anyone is given it**: open
+  `mac/build/Pro7ChordEditor-mac-0.1 (as if downloaded).dmg`, drag the app to
+  Applications and follow the read-me. That copy is marked as a download, so macOS
+  treats the app as it will on someone else's Mac. (It is not for giving out: the
+  mark is this Mac's and does not travel. Give out the other.)
+- **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
+  whose, and that they are here at the maintainer's asking). In a repository that
+  is one thing; in an app handed to other people it is another, and is the
+  maintainer's to weigh before a build goes on the Releases page.
+
 ## Left rough, and what to ask
 
 - **What M7 writes has been seen in ProPresenter by the maintainer** (2026-10-12:

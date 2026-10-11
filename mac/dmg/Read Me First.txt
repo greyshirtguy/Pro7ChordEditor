@@ -1,0 +1,52 @@
+Pro7 Chord Editor for the Mac
+An early build. It needs macOS 15 or later.
+
+
+WHAT IT IS
+
+It puts chords on the songs of a ProPresenter library, so that ProPresenter
+shows them on a stage screen. It opens the library where it lies and changes
+the songs' own files.
+
+It is one person's hobby. Nobody supports it and nothing is promised. It is not
+ProPresenter and has nothing to do with Renewed Vision, who make ProPresenter.
+
+
+BEFORE YOU USE IT
+
+- Keep a backup of your ProPresenter library.
+- Quit ProPresenter first. Nothing is saved while ProPresenter is running.
+- Try it on a copy first: copy one folder out of ProPresenter's Libraries to
+  somewhere else, and open the copy with Choose Folder.
+
+Every change is saved as it is made. There is no Save. Before the app first
+changes a song's file it keeps a copy of the file as it was; the copies are
+under Earlier Versions, in a song's header, and in Settings under Backups.
+They are kept on this Mac only, in
+~/Library/Application Support/Pro7ChordEditor
+
+
+OPENING IT THE FIRST TIME
+
+This build is not signed with an Apple developer certificate, and Apple has
+not checked it. So macOS will not open it at a double-click. To open it:
+
+1. Drag Pro7 Chord Editor to Applications, and double-click it there.
+   macOS says it could not verify the app. Close that message.
+2. Open System Settings, go to Privacy & Security, and scroll down to
+   Security. It says Pro7 Chord Editor was blocked. Click Open Anyway,
+   and say yes when it asks again.
+
+After that it opens like any other app.
+
+Do this only for something whose maker you have reason to trust. What this
+app is made from can be read at
+https://github.com/greyshirtguy/Pro7ChordEditor
+
+
+NOT IN IT YET
+
+- Finding and mending the songs that the first chord editor, the one for
+  Windows, left wrong.
+- Making a song from a ChordPro file.
+- An icon.
