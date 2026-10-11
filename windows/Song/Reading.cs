@@ -165,9 +165,14 @@ internal static class Reading
     /// (The page asks this of the sheet. It is done here, for both editors, so that a
     /// song has the same chords in the one as in the other: NOTES.md has it, for the
     /// maintainer to say and for the Mac.)
+    ///
+    /// (They are in order of place still, and are not put in order again: a place
+    /// brought onto a character is never brought past one that was after it. Putting
+    /// them in order here was written, and was FOUND to do nothing when it was taken
+    /// out to see what test would say.)
     /// </summary>
     internal static List<Chord> ChordsHanded(string words, RV.Graphics.Types.Text? text) =>
-        ChordsOf(text).Select(chord => chord with { At = Chords.OnACharacter(words, chord.At) }).OrderBy(chord => chord.At).ToList();
+        ChordsOf(text).Select(chord => chord with { At = Chords.OnACharacter(words, chord.At) }).ToList();
 
     internal static bool IsAChord(RV.Graphics.Types.Text.Types.Attributes.Types.CustomAttribute attribute) =>
         attribute.AttributeCase == RV.Graphics.Types.Text.Types.Attributes.Types.CustomAttribute.AttributeOneofCase.Chord;

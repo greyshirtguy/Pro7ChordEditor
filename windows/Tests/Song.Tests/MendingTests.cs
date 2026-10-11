@@ -452,6 +452,65 @@ public sealed class MendingTests : IDisposable
         Assert.True(EntriesOf(InTestData("Plain Song.pro")).SequenceEqual(EntriesOf(song.Path)));
     }
 
+    // A cue may have more actions than one that are slides. The old editor went through
+    // every action of every cue, and so do the checks and the mending.
+    [Fact]
+    public void EveryActionOfACueThatIsASlideIsCheckedAndMended()
+    {
+        var presentation = Workbench.Read(InTestData("Plain Song (Chords).pro"));
+        var firstId = presentation.CueGroups[0].CueIdentifiers[0].String;
+        var cue = presentation.Cues.Single(one => one.Uuid.String == firstId);
+        var slide = cue.Actions.Single(action => action.Slide?.Presentation is not null);
+        cue.Actions.Add(slide.Clone());
+        var song = bench.OpenAt(bench.FileOf("two-slides-to-a-cue.pro", presentation.ToByteArray()));
+        // (The editors show a cue's first slide: four text boxes, as before.)
+        Assert.Equal(4, song.TextBoxes.Count);
+        Assert.Equal(4, song.Findings.ShownTwice);
+        Assert.Equal(4, song.Mend());
+        Assert.Equal(0, song.Findings.ShownTwice);
+        var mended = EntriesOf(song.Path);
+        Assert.Equal(5, mended.Count);
+        Assert.Equal(mended[0], mended[1]);
+        Assert.Equal(EntriesOf(InTestData("Plain Song.pro"))[0], mended[1]);
+    }
+
+    // The key that is doubted is the one the song's chords are written in, whatever key
+    // ProPresenter is to show them in.
+    [Fact]
+    public void TheKeyHeldAgainstTheChordsIsTheOneTheyAreWrittenInNotTheOneTheyAreShownIn()
+    {
+        var song = bench.Open("Plain Song.pro");
+        song.SetShownKey("Ab");
+        Assert.Equal(("G", "Ab"), (song.Key, song.ShownKey));
+        var found = song.Findings;
+        Assert.Equal(("G", false, ""), (found.StatedKey, found.Key.Doubtful, found.Key.Suggested));
+        // And the other way about: written in A flat, as they are not, and shown in G.
+        song.SetKey("Ab");
+        song.SetShownKey("G");
+        found = song.Findings;
+        Assert.Equal(("Ab", true, "G"), (found.StatedKey, found.Key.Doubtful, found.Key.Suggested));
+    }
+
+    // A doubtful key is said to be the old editor's doing only where all three things
+    // are so: it is doubtful, it is A flat, and the song has that editor's mark.
+    [Fact]
+    public void AKeyIsSaidToBeTheOldEditorsDoingOnlyWhereItIsDoubtfulAndAFlatAndTheSongHasItsMark()
+    {
+        static Findings Found(int shownTwice, string stated, bool doubtful) => new(
+            shownTwice,
+            new OldEditor.Shift(0, 0, 0, false),
+            stated,
+            new KeyFit.Answer(new Dictionary<string, double>(), ["G"], doubtful, doubtful ? "G" : ""));
+        Assert.Equal("Ab", Findings.OldEditorsKey);
+        Assert.True(Found(3, "Ab", doubtful: true).KeyIsTheOldEditors);
+        // A flat that fits the chords: the song is in A flat.
+        Assert.False(Found(3, "Ab", doubtful: false).KeyIsTheOldEditors);
+        // Another key that does not fit: someone's mistake, and not that editor's kind.
+        Assert.False(Found(3, "E", doubtful: true).KeyIsTheOldEditors);
+        // A doubtful A flat in a song that editor never saved.
+        Assert.False(Found(0, "Ab", doubtful: true).KeyIsTheOldEditors);
+    }
+
     // A song of more slides than steps of undo are kept: its mending is still one step,
     // all of which one undo takes back.
     [Fact]

@@ -523,6 +523,8 @@ public class MendingModelTests
         }
         Assert.Contains("Mend All: 4 songs.", pc.Log, StringComparison.Ordinal);
         Assert.Contains("Mended " + Grace + ".pro: 6 chords.", pc.Log, StringComparison.Ordinal);
+        // (FOUND in the log of the real window's first Mend All: "1 chords".)
+        Assert.Contains("Mended " + MinorKey + ".pro: 1 chord.", pc.Log, StringComparison.Ordinal);
 
         // What it did is read, and put away.
         model.CloseMendAll();
@@ -592,6 +594,24 @@ public class MendingModelTests
         Assert.Equal(4, new OpenSong(pc.Song(Well, Old)).Findings.ShownTwice);
         Assert.Equal(3, new OpenSong(pc.Song(Plain, Old)).Findings.ShownTwice);
         Assert.Contains("Did not mend " + Well + ".pro.", pc.Log, StringComparison.Ordinal);
+    });
+
+    [Fact]
+    public void TheSongThatIsOpenRefusedByMendAllIsListedAsNotMendedAndSaysWhy() => OnAMadeUpPC(async pc =>
+    {
+        var model = await AtTheOldCopies(pc);
+        model.Filter = MarkFilter.WantingMending;
+        // The first of the list is the song that is open; ProPresenter is started
+        // before it is mended.
+        model.Open(pc.Song(MinorKey, Old));
+        model.AskToMendAll();
+        pc.IsStartedOnceAsked = pc.TimesAsked;
+        await model.MendAllAsync();
+        var run = model.MendingAll!;
+        Assert.Equal([new(MinorKey, 0, "ProPresenter is running. Quit it to change chords here. Nothing was changed.")], run.Outcomes);
+        Assert.Equal("No song was mended. 1 song was not mended, and is as it was. 3 more were not tried.", run.Sentence);
+        Assert.Equal(1, model.Shown!.Found!.ShownTwice);
+        Assert.False(model.CanUndo);
     });
 
     [Fact]

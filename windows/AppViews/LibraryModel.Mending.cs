@@ -93,8 +93,10 @@ public sealed partial class LibraryModel
                 {
                     return "Mending " + Number(Math.Min(Of, Outcomes.Count + 1)) + " of " + Number(Of) + (char)0x2026;
                 }
-                var said = (Mended == 1 ? "1 song was mended: " : Number(Mended) + " songs were mended: ")
-                    + (Chords == 1 ? "1 chord that ProPresenter showed twice." : Number(Chords) + " chords that ProPresenter showed twice.");
+                var said = Mended == 0
+                    ? "No song was mended."
+                    : (Mended == 1 ? "1 song was mended: " : Number(Mended) + " songs were mended: ")
+                        + (Chords == 1 ? "1 chord that ProPresenter showed twice." : Number(Chords) + " chords that ProPresenter showed twice.");
                 var not = Outcomes.Count - Mended;
                 if (not > 0)
                 {
@@ -542,7 +544,7 @@ public sealed partial class LibraryModel
             }
             outcomes.Add(outcome);
             appData.Log(outcome.NotMended is null
-                ? "Mended " + Path.GetFileName(listed.Path) + ": " + Number(outcome.Chords) + " chords."
+                ? "Mended " + Path.GetFileName(listed.Path) + ": " + (outcome.Chords == 1 ? "1 chord." : Number(outcome.Chords) + " chords.")
                 : "Did not mend " + Path.GetFileName(listed.Path) + ".");
             MendingAll = new MendAllRun(songs.Count, [.. outcomes], Finished: false);
             Changed();

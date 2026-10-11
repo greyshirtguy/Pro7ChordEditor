@@ -67,6 +67,14 @@ public class SuggestionsAndBoxesTests
                 Assert.Equal([new Chord(Chords.OnACharacter(text, at), "G")], Chords.Tidy(text, [new Chord(at, "G")]));
             }
         }
+        // And never past a place that was after it: places in order are in order still.
+        foreach (var text in texts)
+        {
+            for (var at = -2; at <= text.Length + 2; at++)
+            {
+                Assert.True(Chords.OnACharacter(text, at) <= Chords.OnACharacter(text, at + 1), text.Length + " long, at " + at);
+            }
+        }
         // By hand. On the break that ends a line: the character before it.
         Assert.Equal(1, Chords.OnACharacter("ab\ncd", 2));
         // Past the end: the last character.
