@@ -132,6 +132,9 @@ public final class LibraryModel {
     private var saying: Task<Void, Never>?
     /// Whether the song refused the last thing the sheet asked of it.
     private var sheetRefused = false
+    /// Whether what the quiet line says went wrong is that ProPresenter was running:
+    /// that goes from the line when ProPresenter does.
+    private var refusedForProPresenter = false
     /// Whether the song has been changed otherwise than by typing in the text, since
     /// the text was made from it: the text is then made again before it is next shown.
     private var textIsStale = false
@@ -228,6 +231,25 @@ public final class LibraryModel {
         proPresenterIsRunning = askWhetherProPresenterIsRunning()
         appData.log("Started. \(places.count) places found, \(libraries.count) libraries in the one open.")
         await marksAreWorkedOut()
+    }
+
+    /// The system says an application has started or quit, or a moment has gone by
+    /// since one did. Whether ProPresenter is running is asked again, so that the band
+    /// comes and goes by itself and not only when the app is next brought to the
+    /// front: ProPresenter can be quit from its Dock icon with this app in front all
+    /// the while, and when it is quit from its own window this app is in front before
+    /// ProPresenter has finished going.
+    public func proPresenterMayHaveChanged() {
+        let running = askWhetherProPresenterIsRunning()
+        guard running != proPresenterIsRunning else { return }
+        proPresenterIsRunning = running
+        if !running, refusedForProPresenter {
+            // What was refused because of it can be done now: the line need not go on
+            // saying otherwise.
+            refusal = nil
+            refusedForProPresenter = false
+        }
+        sheetVersion += 1
     }
 
     /// When the app comes to the front: the lists are read again, since ProPresenter may
@@ -646,7 +668,8 @@ public final class LibraryModel {
         let refused = error as? Refusal
         refusal = refused?.sentence ?? "That could not be done: \(error.localizedDescription)"
         offersOpeningAgain = refused?.reason == .changedByAnother
-        if refused?.reason == .proPresenterIsRunning {
+        refusedForProPresenter = refused?.reason == .proPresenterIsRunning
+        if refusedForProPresenter {
             proPresenterIsRunning = true
         }
         if let song = songs.first(where: { $0.id == songID }) {

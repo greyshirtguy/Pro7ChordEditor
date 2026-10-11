@@ -158,4 +158,46 @@ struct LibraryModelTests {
         }
         #expect(!log.contains("[G"))
     }
+
+    @Test("The band comes and goes by itself: when the system says ProPresenter has started or quit it is asked again, whichever app is in front")
+    func theBandGoesByItself() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        await model.start()
+        model.choose(library: mac.library("Songs"))
+        await model.marksAreWorkedOut()
+        model.open(song: mac.song("Plain Song"))
+        #expect(!model.proPresenterIsRunning && model.canChange)
+
+        // Started, with this app in front all the while.
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        #expect(model.proPresenterIsRunning && !model.canChange)
+        // What is tried meanwhile is refused, and the quiet line says why.
+        model.setKey("E")
+        #expect(model.notice == "ProPresenter is running. Quit it to change chords here. Nothing was changed.")
+        #expect(model.shown?.key == "G")
+
+        // Quit, with this app still in front: the band goes, the line no longer says
+        // what is no longer so, and the song can be changed.
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+        #expect(!model.proPresenterIsRunning && model.canChange)
+        #expect(model.refusal == nil)
+        model.setKey("E")
+        #expect(model.shown?.key == "E")
+
+        // Asked again with nothing changed, nothing changes; and what went wrong for
+        // another reason stays on the line when ProPresenter comes and goes.
+        try mac.change("Plain Song", daysAgo: 0) { try $0.setShownKey("D") }
+        model.setKey("A")
+        let said = try #require(model.refusal)
+        #expect(said.contains("changed by something else"))
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+        model.proPresenterMayHaveChanged()
+        #expect(model.refusal == said && !model.proPresenterIsRunning)
+    }
 }

@@ -15,7 +15,8 @@
 // slide is a card in a frame of its group's colour, with the slide's number on the
 // frame's foot and, on the first slide of each group, the group's name. As many go to
 // a row as fit across, so a wider window, or smaller words (the sheet zooms), shows
-// more of the song at once. That is the maintainer's, on trying the reference's layout
+// more of the song at once. A column of the grid is only as wide as the widest slide
+// in it needs: no room is kept for what might be put on a line later. That is the maintainer's, on trying the reference's layout
 // with real songs: one column of slides left most of a window empty and showed few
 // words. How a LINE is drawn (words, bubbles, tails, the spot) is the reference's
 // (qml/ChordSheet.qml), number for number, times the zoom.
@@ -339,10 +340,18 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         return scroll.bounds.width - bar
     }
 
-    /// Lays the slides out as a grid: as many to a row as fit across, every card as
-    /// wide as the widest line of the song needs (and then as much wider as shares the
-    /// row out evenly), and the cards of one row as tall as the one of them with the
-    /// most lines.
+    /// What one slide needs across, frame and all: the widest of its lines with their
+    /// chords and the room inside the card, or what the words on its foot need if that
+    /// is more. Nothing is added for what might be put there later: a line that comes
+    /// to need more, for a chord at its end, is given it then.
+    private func widthNeeded(byLines lines: Double, label: String) -> Double {
+        let foot = SheetMetrics.width(of: SheetMetrics.line(label, font: SheetLook.labelFont)) + 16
+        return max(max(lines, 40 * metrics.scale) + 2 * metrics.cardPad + 2 * SheetLook.frame, foot)
+    }
+
+    /// Lays the slides out as a grid: in the order of the song, as many to a row as fit
+    /// across. A column is as wide as the widest of its slides needs and no wider, and
+    /// the cards of one row are as tall as the one of them with the most lines.
     private func layOut() {
         laidWidth = seenWidth
         guard let sheet else {
@@ -355,23 +364,49 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let rows = sheet.rows
         metrics.lines = rows.map { $0.kind == .line ? SheetMetrics.line($0.text.string, font: metrics.wordFont) : nil }
         var lines = Array(repeating: Laid(), count: rows.count)
-        // Each slide: its first line's row, and how many lines it has.
-        var slides: [(first: Int, count: Int)] = []
-        var widest = 160 * metrics.scale
-        for (index, row) in rows.enumerated() where row.kind == .line {
-            lines[index].placed = sheet.placed(index, metrics)
-            // (A line of chords alone wants room past its last for the next.)
-            widest = max(widest, lines[index].placed.width + (row.alone ? 50 * metrics.scale : 0))
-            if row.first {
-                slides.append((index, row.count))
+        // Each slide: its first line's row, how many lines it has, what its foot says,
+        // and how wide a cell of the grid it needs.
+        var slides: [(first: Int, count: Int, label: String, needs: Double)] = []
+        for (index, row) in rows.enumerated() where row.kind == .line && row.first {
+            var widest = 0.0
+            for line in index..<(index + row.count) {
+                lines[line].placed = sheet.placed(line, metrics)
+                // (A line of chords alone has a place past its last chord, for the
+                // next: that place needs room to be pointed at.)
+                widest = max(widest, lines[line].placed.width + (rows[line].alone ? 44 * metrics.scale : 0))
             }
+            let box = sheet.blocks[row.block]
+            // The slide's number, and on the first slide of each group the group's name.
+            let label = String(row.slide + 1) + (box.startsItsGroup && !box.group.isEmpty ? "  " + box.group : "")
+            slides.append((index, row.count, label, widthNeeded(byLines: widest, label: label) + 2 * SheetLook.around))
         }
         let pad = metrics.cardPad
         let around = SheetLook.around
-        let least = widest + 2 * pad + 8 * metrics.scale + 2 * SheetLook.frame + 2 * around
-        let across = max(least, laidWidth - 2 * SheetLook.margin)
-        columns = max(1, Int(across / least))
-        let cellWidth = (across / Double(columns)).rounded(.down)
+
+        // As many columns as fit: the most for which the slides, dealt out along the
+        // rows in order, leave every column (as wide as its widest slide) on the sheet.
+        let across = laidWidth - 2 * SheetLook.margin
+        let narrowest = slides.map(\.needs).min() ?? 1
+        var widths = [slides.map(\.needs).max() ?? 0]
+        var most = min(slides.count, max(1, Int(across / max(narrowest, 1))))
+        while most > 1 {
+            var tried = Array(repeating: 0.0, count: most)
+            for (n, slide) in slides.enumerated() {
+                tried[n % most] = max(tried[n % most], slide.needs)
+            }
+            if tried.reduce(0, +) <= across {
+                widths = tried
+                break
+            }
+            most -= 1
+        }
+        columns = widths.count
+        var lefts: [Double] = []
+        var left = SheetLook.margin
+        for width in widths {
+            lefts.append(left)
+            left += width
+        }
 
         var made: [Cell] = []
         var top = SheetLook.top
@@ -381,13 +416,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             let these = slides[from..<min(from + columns, slides.count)]
             let cardHeight = Double(these.map(\.count).max() ?? 1) * metrics.lineHeight + 2 * pad
             for (column, slide) in these.enumerated() {
-                let frame = NSRect(x: SheetLook.margin + Double(column) * cellWidth + around, y: top + around,
-                                   width: cellWidth - 2 * around, height: SheetLook.frame + cardHeight + SheetLook.label)
+                let frame = NSRect(x: lefts[column] + around, y: top + around,
+                                   width: widths[column] - 2 * around, height: SheetLook.frame + cardHeight + SheetLook.label)
                 let card = NSRect(x: frame.minX + SheetLook.frame, y: frame.minY + SheetLook.frame, width: frame.width - 2 * SheetLook.frame, height: cardHeight)
                 let box = sheet.blocks[rows[slide.first].block]
-                // The slide's number, and on the first slide of each group the group's
-                // name.
-                let label = String(rows[slide.first].slide + 1) + (box.startsItsGroup && !box.group.isEmpty ? "  " + box.group : "")
                 let colour = box.groupColour.map { NSColor(srgbRed: $0.red, green: $0.green, blue: $0.blue, alpha: 1) } ?? SheetLook.group
                 for line in 0..<slide.count {
                     lines[slide.first + line].cell = made.count
@@ -395,7 +427,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                     lines[slide.first + line].chordTop = card.minY + pad + Double(line) * metrics.lineHeight + 2 * metrics.scale
                 }
                 made.append(Cell(slide: rows[slide.first].slide, rows: slide.first..<(slide.first + slide.count), frame: frame, card: card,
-                                 colour: colour, label: label, gridRow: gridRow, column: column))
+                                 colour: colour, label: slide.label, gridRow: gridRow, column: column))
             }
             top += 2 * around + SheetLook.frame + cardHeight + SheetLook.label
             gridRow += 1
@@ -404,7 +436,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         cells = made
         laid = lines
         laidRows = rows
-        content = NSSize(width: 2 * SheetLook.margin + Double(columns) * cellWidth, height: top + SheetLook.margin + 40)
+        content = NSSize(width: left + SheetLook.margin, height: top + SheetLook.margin + 40)
         fit()
     }
 
@@ -969,7 +1001,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                     // A line of chords alone has nothing to read: a rule stands where
                     // its words would be.
                     SheetLook.rule.setFill()
-                    NSRect(x: item.left, y: wordsTop + metrics.wordHeight / 2, width: max(60 * metrics.scale, item.placed.width + 40 * metrics.scale), height: 1).fill()
+                    NSRect(x: item.left, y: wordsTop + metrics.wordHeight / 2, width: max(1, cell.card.maxX - metrics.cardPad - item.left), height: 1).fill()
                 } else if let line = metrics.lines[index] {
                     Self.draw(line, at: NSPoint(x: item.left, y: wordsTop), font: metrics.wordFont, colour: SheetLook.words, in: context)
                 }

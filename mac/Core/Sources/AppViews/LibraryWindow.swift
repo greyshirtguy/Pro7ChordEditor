@@ -55,6 +55,27 @@ public struct LibraryWindow: View {
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             Task { await model.refresh() }
         }
+        // And whenever the system says ProPresenter has started or quit, whichever app
+        // is in front: the band comes and goes by itself (spec/06, rules 18 and 19).
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didLaunchApplicationNotification)) { note in
+            proPresenterMayHaveChanged(note)
+        }
+        .onReceive(NSWorkspace.shared.notificationCenter.publisher(for: NSWorkspace.didTerminateApplicationNotification)) { note in
+            proPresenterMayHaveChanged(note)
+        }
+    }
+
+    /// An application has started or quit. If it was ProPresenter, the model asks
+    /// again whether it is running: now, and once more a moment on, in case the
+    /// system's list of what is running is a beat behind its own news.
+    private func proPresenterMayHaveChanged(_ note: Notification) {
+        let app = note.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+        guard app?.bundleIdentifier == PlaceFinder.proPresenter else { return }
+        model.proPresenterMayHaveChanged()
+        Task {
+            try? await Task.sleep(for: .seconds(1))
+            model.proPresenterMayHaveChanged()
+        }
     }
 }
 

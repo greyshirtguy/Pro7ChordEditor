@@ -123,7 +123,7 @@ struct ChordSheetViewTests {
         #expect(zip(more, more.dropFirst()).allSatisfy { $0 <= $1 })
     }
 
-    @Test("The slides are a grid: as many to a row as fit across, all one width, those of a row one height; a narrower window has fewer to a row, and smaller words more")
+    @Test("The slides are a grid: as many to a row as fit across, a column as wide as its widest slide needs and no wider, those of a row one height; a narrower window has fewer to a row, and smaller words more")
     func aGridOfSlides() async throws {
         let mac = try MadeUpMac()
         let model = await open("It Is Well", on: mac)
@@ -133,14 +133,23 @@ struct ChordSheetViewTests {
         let slides = sheet.rows.filter { $0.kind == .line && $0.first }.count
         #expect(slides >= 4)
 
+        /// What a slide's lines need across: the widest of them with its chords (a
+        /// line of chords alone, and room for one more), and the room inside the card.
+        func needed(by cell: SheetCanvas.Cell) -> Double {
+            (cell.rows.map { canvas.laid[$0].placed.width + (sheet.rows[$0].alone ? 44 * canvas.metrics.scale : 0) }.max() ?? 0) + 2 * canvas.metrics.cardPad
+        }
+
         func held(_ what: String) {
             #expect(canvas.cells.count == slides, "\(what)")
             #expect(canvas.cells.map(\.slide) == Array(0..<slides), "\(what)")
-            let width = canvas.cells[0].frame.width
             for (n, cell) in canvas.cells.enumerated() {
                 // In the order of the song: along a row, and then the next row.
                 #expect(cell.gridRow == n / canvas.columns && cell.column == n % canvas.columns, "\(what)")
-                #expect(abs(cell.frame.width - width) < 0.01, "\(what)")
+                // Those of a column stand in line and are one width, which is enough
+                // for each of them.
+                let first = canvas.cells[cell.column]
+                #expect(abs(cell.frame.minX - first.frame.minX) < 0.01 && abs(cell.frame.width - first.frame.width) < 0.01, "\(what)")
+                #expect(cell.card.width >= needed(by: cell) - 0.01, "\(what)")
                 // The card is inside its frame, with the frame's foot under it.
                 #expect(cell.frame.contains(cell.card) && abs(cell.frame.maxY - cell.card.maxY - SheetLook.label) < 0.01, "\(what)")
                 // Every line of the slide is in its card, one under another.
@@ -169,14 +178,21 @@ struct ChordSheetViewTests {
                     #expect(abs(below.frame.minY - inRow[0].frame.maxY - 2 * SheetLook.around) < 0.01, "\(what)")
                 }
             }
-            // Nothing is wider than what it is seen through, while a slide fits it;
-            // and the rows fill it from side to side, but for the margin and a
-            // rounding down.
+            // No column is wider than it need be: its widest slide's lines fill its
+            // card from side to side (or the words on a slide's foot fill its frame).
+            for column in 0..<canvas.columns {
+                let inColumn = canvas.cells.filter { $0.column == column }
+                let spare = inColumn.map { $0.card.width - needed(by: $0) }.min() ?? 0
+                let footFills = inColumn.contains { cell in
+                    abs(cell.frame.width - (SheetMetrics.width(of: SheetMetrics.line(cell.label, font: SheetLook.labelFont)) + 16)) < 0.01
+                }
+                #expect(spare < 0.01 || footFills, "\(what), column \(column)")
+            }
+            // Nothing is wider than what it is seen through, where one slide fits it.
             let right = canvas.cells.map(\.frame.maxX).max() ?? 0
-            #expect(right <= canvas.bounds.width, "\(what)")
-            // (A song with fewer slides than go to a row does not fill its one row.)
-            if canvas.cells.count >= canvas.columns {
-                #expect(canvas.bounds.width - right <= SheetLook.margin + SheetLook.around + Double(canvas.columns) + 16, "\(what)")
+            let seen = Double(window.contentView?.bounds.width ?? 0)
+            if canvas.cells.allSatisfy({ $0.frame.width + 2 * SheetLook.around + 2 * SheetLook.margin <= seen }) {
+                #expect(right + SheetLook.around + SheetLook.margin <= seen + 0.01, "\(what)")
             }
         }
 
@@ -188,15 +204,90 @@ struct ChordSheetViewTests {
         let narrow = canvas.columns
         #expect(narrow < wide && narrow >= 1)
 
-        // Smaller words: more to a row. Larger: fewer.
+        // A chord that sticks out past the end of the widest line of a column makes
+        // that column wider by as much, and no other; taken off, it is as it was.
         widen(window, to: 1500, canvas)
-        #expect(canvas.columns == wide)
+        let before = canvas.cells.map(\.frame.width)
+        let widestOfFirst = try #require(canvas.cells.filter { $0.column == 0 }.max { needed(by: $0) < needed(by: $1) })
+        let line = try #require(widestOfFirst.rows.max { canvas.laid[$0].placed.width < canvas.laid[$1].placed.width })
+        let end = sheet.rows[line].text.length - 1
+        #expect(sheet.put(line, end, "F#m7b5/A"))
+        canvas.sync()
+        if canvas.columns == wide {
+            let after = canvas.cells.map(\.frame.width)
+            #expect(after[0] > before[0] + 20)
+            #expect(zip(after, before).enumerated().allSatisfy { $0.offset % wide == 0 || abs($0.element.0 - $0.element.1) < 0.01 })
+        }
+        held("with a long chord at a line's end")
+        model.undo()
+        canvas.sync()
+        #expect(canvas.cells.map(\.frame.width) == before)
+
+        // Smaller words: more to a row. Larger: fewer. (In a window where not all of
+        // the song's slides go to one row to begin with.)
+        widen(window, to: 760, canvas)
+        let middling = canvas.columns
+        #expect(middling < slides)
         canvas.setScale(0.5)
         held("small")
-        #expect(canvas.columns > wide)
+        #expect(canvas.columns > middling)
         canvas.setScale(1.5)
         held("large")
-        #expect(canvas.columns < wide)
+        #expect(canvas.columns <= middling && (middling == 1 || canvas.columns < middling))
+    }
+
+    /// A song of the test's own making, that can be looked at and not changed.
+    private final class MadeUpSong: SheetSong {
+        let textBoxes: [TextBox]
+        let key = "C"
+        init(_ textBoxes: [TextBox]) { self.textBoxes = textBoxes }
+        var usedChords: [String] { textBoxes.flatMap { $0.chords.map(\.name) } }
+        func setChords(slide: Int, element: String, _ chords: [Chord], joined: Bool) throws {}
+        func setChordsAlone(slide: Int, element: String, line: Int, names: [String], joined: Bool) throws {}
+    }
+
+    @Test("A slide is as wide as its lines need and no wider: a line of chords alone, with room past its last chord for the next to be pointed at; a blank slide, for its one place; and never too narrow for the words on its foot")
+    func asWideAsItNeeds() throws {
+        let boxes = [
+            TextBox(slide: 0, group: "Intro", startsItsGroup: true, element: "A", words: Chords.placeholders(2),
+                    chords: [Chord(at: 0, name: "Dsus4"), Chord(at: 2, name: "G/B")]),
+            TextBox(slide: 1, group: "Intro", element: "B", words: Words(), blank: true),
+            TextBox(slide: 2, group: "A very long name for a group of one small slide", startsItsGroup: true, element: "C", words: "Oh"),
+            TextBox(slide: 3, group: "Verse", startsItsGroup: true, element: "D", words: "One two three four five six", chords: [Chord(at: 24, name: "F#m7b5/A")]),
+            TextBox(slide: 4, group: "Verse", element: "E", words: "Oh"),
+        ]
+        let sheet = ChordSheet(song: MadeUpSong(boxes))
+        let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 2000, height: 600))
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 2000, height: 600), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView = scroll
+        defer { window.close() }
+        let canvas = scroll.canvas
+        canvas.show(sheet, scale: 1)
+        // (Wide enough for each to be a column by itself.)
+        #expect(canvas.columns == 5 && canvas.cells.count == 5)
+        let pad = canvas.metrics.cardPad
+        // Two chords alone: their bubbles, and 44 more for the place past the last.
+        let alone = canvas.laid[canvas.cells[0].rows.lowerBound].placed
+        #expect(abs(canvas.cells[0].card.width - (alone.width + 44 + 2 * pad)) < 0.01)
+        canvas.pointerMoved(to: NSPoint(x: canvas.cells[0].card.maxX - pad - 3, y: canvas.cells[0].card.midY), shift: false)
+        #expect(sheet.spot == Spot(row: canvas.cells[0].rows.lowerBound, at: 4))
+        // A blank slide: its one place, and no more.
+        #expect(abs(canvas.cells[1].card.width - (44 + 2 * pad)) < 0.01)
+        canvas.pointerMoved(to: NSPoint(x: canvas.cells[1].card.midX, y: canvas.cells[1].card.midY), shift: false)
+        #expect(sheet.spot == Spot(row: canvas.cells[1].rows.lowerBound, at: 0))
+        // Two letters under a long name: the frame is as wide as the foot's words need.
+        let foot = SheetMetrics.width(of: SheetMetrics.line(canvas.cells[2].label, font: SheetLook.labelFont))
+        #expect(canvas.cells[2].label == "3  A very long name for a group of one small slide")
+        #expect(abs(canvas.cells[2].frame.width - (foot + 16)) < 0.01)
+        // A chord that sticks out past the end of the words: the card is as wide as
+        // the line WITH it.
+        let words = canvas.laid[canvas.cells[3].rows.lowerBound].placed
+        #expect(words.width > words.wordsWidth + 20)
+        #expect(abs(canvas.cells[3].card.width - (words.width + 2 * pad)) < 0.01)
+        // And the least a card is, for two letters: 40 and the room inside it.
+        #expect(canvas.cells[4].label == "5")
+        #expect(abs(canvas.cells[4].card.width - (40 + 2 * pad)) < 0.01)
     }
 
     @Test("A slide's frame says its number, and on the first slide of each group the group's name; a group with a colour frames its slides in it")
