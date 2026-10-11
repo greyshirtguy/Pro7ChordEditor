@@ -661,6 +661,11 @@ public sealed class ChordSheet
     }
 
     // Gives a line of words these chords in place of its own.
+    //
+    // (An empty line is one place wide here, as it is where the rows are made, and as
+    // the reference has it in both. Nothing gets here with one as things are: the spot
+    // cannot be on an empty line, so its chords are never set. It is for the day one
+    // can be.)
     private bool SetLine(int index, IEnumerable<Chord> chords, bool joined)
     {
         var line = Rows[index];

@@ -539,15 +539,23 @@ public class ChordSheetViewTests
         // gone on with.
         hand.Press(Key.Down);
         var picked = offered[1];
+        // Not at the end of the box, Right is the box's own key, which moves the caret:
+        // nothing is taken, and the one picked stays picked.
+        hand.Box.Select(0, 0);
+        Assert.False(hand.Canvas.KeyInTheBox(Key.Right, ModifierKeys.None));
+        Assert.Equal("D", hand.Box.Text);
+        Assert.Equal(1, entry.Picked);
+        // Nor with what is in the box selected.
+        hand.Box.Select(0, 1);
+        Assert.False(hand.Canvas.KeyInTheBox(Key.Right, ModifierKeys.None));
+        Assert.Equal("D", hand.Box.Text);
+        // At the end of the box, it takes the one picked.
+        hand.Box.Select(1, 0);
         Assert.True(hand.Press(Key.Right));
         Assert.Equal(picked, hand.Box.Text);
         Assert.Equal((picked.Length, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
         Assert.True(hand.Sheet.Typing);
-        // Not at the end of the box, Right is the box's own key.
-        hand.Box.Select(0, 0);
-        hand.Press(Key.Down);
-        Assert.False(hand.Canvas.KeyInTheBox(Key.Right, ModifierKeys.None));
-        Assert.Equal(picked, hand.Box.Text);
+        Assert.Equal(-1, entry.Picked);
 
         // Enter keeps the one picked, and not what is typed.
         hand.Press(Key.Escape);

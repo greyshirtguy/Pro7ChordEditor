@@ -643,6 +643,12 @@ public class ChordSheetTests
         odd.SetSpot(0, 0);
         odd.PutOfKey(4);
         Assert.Equal("F", odd.ChordAt(0, 0));
+        // Each of the seven puts on its own.
+        for (var number = 1; number <= 7; number++)
+        {
+            odd.PutOfKey(number);
+            Assert.Equal(odd.InKey[number - 1], odd.ChordAt(0, 0));
+        }
         // Delete takes off the chord at the spot.
         odd.TakeAtSpot();
         Assert.Equal("", odd.ChordAt(0, 0));
@@ -878,6 +884,285 @@ public class ChordSheetTests
         song.Boxes = [boxes[0] with { Chords = [new Chord(0, "Em")] }];
         sheet.Reload();
         Assert.Null(sheet.Dragged);
+    }
+
+    // ---- Cases written after each rule was broken in turn (NOTES.md, "At M6")
+
+    // A line that begins with spaces has its first stop at its first word: that is
+    // where the first arrow key goes, and what a place before it comes to.
+    [Fact]
+    public void ALineThatBeginsWithSpacesHasItsFirstStopAtItsFirstWord()
+    {
+        var song = new StandInSong([Box(0, "A", "  Holy holy", [new Chord(2, "D")]), Box(1, "B", "Lord God")], "D");
+        var sheet = new ChordSheet(song);
+        Assert.Equal([2, 7], sheet.Stops(0));
+        Assert.Equal(2, sheet.StopAt(0, 0));
+        Assert.Equal(2, sheet.StopAt(0, 1));
+        Assert.Equal(2, sheet.StopAt(0, 5));
+        Assert.Equal(7, sheet.StopAt(0, 7));
+        sheet.Step(1, exact: false);
+        Assert.Equal(new Spot(0, 2), sheet.Spot);
+    }
+
+    // The spot is only ever on a row that can take it.
+    [Fact]
+    public void TheSpotCannotBeSetOnAGroupsNameNorOnAnEmptyLineNorOnARowThereIsNot()
+    {
+        var (sheet, _) = vectors.Sheet("grace");
+        sheet.SetSpot(1, 8);
+        sheet.SetSpot(0, 0);
+        Assert.Equal(new Spot(1, 8), sheet.Spot);
+        sheet.SetSpot(99, 0);
+        sheet.SetSpot(-1, 0);
+        Assert.Equal(new Spot(1, 8), sheet.Spot);
+        var gapped = new ChordSheet(new StandInSong([Box(0, "A", "One\n\nThree")], "D"));
+        gapped.SetSpot(0, 0);
+        gapped.SetSpot(1, 0);
+        Assert.Equal(new Spot(0, 0), gapped.Spot);
+        gapped.SetSpot(2, 0);
+        Assert.Equal(new Spot(2, 0), gapped.Spot);
+    }
+
+    // With Shift the spot goes a character at a time; but on a line of chords alone its
+    // places are its chords and one more, with Shift or without: a stand-in is no
+    // character to stop on.
+    [Fact]
+    public void WithShiftTheSpotOnALineOfChordsAloneStillGoesFromChordToChord()
+    {
+        var song = new StandInSong([Box(0, "A", Chords.Placeholders(3), [new Chord(0, "D"), new Chord(2, "G"), new Chord(4, "A")])], "D");
+        var sheet = new ChordSheet(song);
+        sheet.SetSpot(0, 0);
+        sheet.Step(1, exact: true);
+        Assert.Equal(new Spot(0, 2), sheet.Spot);
+        sheet.Step(1, exact: true);
+        sheet.Step(1, exact: true);
+        Assert.Equal(new Spot(0, 6), sheet.Spot);
+        sheet.Step(-1, exact: true);
+        Assert.Equal(new Spot(0, 4), sheet.Spot);
+    }
+
+    // The keys that move the spot pick its slide and ask for it to be brought into
+    // view (rule 23). The pointer does neither.
+    [Fact]
+    public void MovingTheSpotWithTheKeysPicksItsSlideAndAsksForItToBeBroughtIntoView()
+    {
+        var (sheet, _) = vectors.Sheet("grace");
+        var asked = 0;
+        sheet.Reveal = () => asked++;
+        sheet.PointerOver(6, 0);
+        Assert.Equal((0, 0), (sheet.Picked, asked));
+        // Right, along a line of the first slide.
+        sheet.SetSpot(1, 0);
+        sheet.Step(1, exact: false);
+        Assert.Equal((0, 1), (sheet.Picked, asked));
+        // Right from the slide's last word, on to the next slide.
+        sheet.SetSpot(2, sheet.Stops(2)[^1]);
+        sheet.Step(1, exact: false);
+        Assert.Equal(3, sheet.Spot.Row);
+        Assert.Equal((sheet.Rows[3].Slide, 2), (sheet.Picked, asked));
+        Assert.NotEqual(sheet.Rows[2].Slide, sheet.Rows[3].Slide);
+        // Left, with Shift, back to the slide before.
+        sheet.Step(-1, exact: true);
+        Assert.Equal(2, sheet.Spot.Row);
+        Assert.Equal((sheet.Rows[2].Slide, 3), (sheet.Picked, asked));
+        // Down, and Up.
+        sheet.StepLine(1, new FixedWidths());
+        Assert.Equal((sheet.Rows[3].Slide, 4), (sheet.Picked, asked));
+        sheet.StepLine(-1, new FixedWidths());
+        Assert.Equal((sheet.Rows[2].Slide, 5), (sheet.Picked, asked));
+    }
+
+    // Tab keeps the chord and moves the spot on from the place it was typed for,
+    // wherever the pointer has been meanwhile (rules 33 and 38).
+    [Fact]
+    public void TabMovesTheSpotOnFromWhereTheChordWasTypedNotFromWhereThePointerIs()
+    {
+        var (sheet, _) = vectors.Sheet("grace");
+        sheet.SetSpot(2, 5);
+        sheet.StartTyping("A");
+        // The pointer goes off to another slide, and the spot with it.
+        sheet.PointerOver(6, 0);
+        Assert.Equal((new Spot(6, 0), new Spot(2, 5)), (sheet.Spot, sheet.TypingAt));
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Tab));
+        Assert.Equal("A", sheet.ChordAt(2, 5));
+        // "That saved a wretch like me": the word after "saved" is "a", at 11.
+        Assert.Equal(new Spot(2, 11), sheet.Spot);
+        Assert.False(sheet.Typing);
+    }
+
+    // A click on a place picks its slide (rule 7a), as the keys do, and opens the
+    // bubble there.
+    [Fact]
+    public void AClickOnAPlacePicksItsSlide()
+    {
+        var (sheet, _) = vectors.Sheet("grace");
+        Assert.Equal(0, sheet.Picked);
+        sheet.Pick(6, 0);
+        Assert.Equal(sheet.Rows[6].Slide, sheet.Picked);
+        Assert.NotEqual(0, sheet.Picked);
+        Assert.True(sheet.Typing);
+        Assert.Equal(new Spot(6, 0), sheet.TypingAt);
+        // A click on a row that can take nothing picks nothing, and opens nothing.
+        sheet.Press(ChordSheet.EntryKey.Escape);
+        sheet.Pick(0, 0);
+        Assert.Equal(sheet.Rows[6].Slide, sheet.Picked);
+        Assert.False(sheet.Typing);
+    }
+
+    // Tab in an empty box takes the one that is picked of what is offered, and the
+    // first only where none is (rule 33).
+    [Fact]
+    public void TabInAnEmptyBoxTakesTheOnePickedAndTheFirstOnlyWhereNoneIs()
+    {
+        var (sheet, _) = vectors.Sheet("grace");
+        sheet.SetSpot(2, 5);
+        sheet.StartTyping("");
+        var offered = sheet.Offered;
+        Assert.True(offered.Count > 2);
+        sheet.Press(ChordSheet.EntryKey.Down);
+        sheet.Press(ChordSheet.EntryKey.Down);
+        sheet.Press(ChordSheet.EntryKey.Down);
+        Assert.Equal(2, sheet.Entry.Pick);
+        sheet.Press(ChordSheet.EntryKey.Tab);
+        Assert.Equal(offered[2], sheet.ChordAt(2, 5));
+        Assert.NotEqual(offered[0], offered[2]);
+        // With none picked, the first.
+        sheet.SetSpot(2, 13);
+        sheet.StartTyping("");
+        sheet.Press(ChordSheet.EntryKey.Tab);
+        Assert.Equal(sheet.ChordAt(2, 13), offered[0]);
+    }
+
+    // What parts words is what JavaScript calls white space (the reference's sheet
+    // parts a line with its \S+), unit for unit: so a space that does not break parts
+    // two words as a plain one does, and a zero-width space, which the stand-ins of a
+    // line of chords alone are, parts nothing. The Mac app has the same list.
+    [Fact]
+    public void WhatPartsWordsIsWhatJavaScriptCallsWhiteSpaceUnitForUnit()
+    {
+        int[] spaces =
+        [
+            0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x0020, 0x00A0, 0x1680,
+            0x2000, 0x2001, 0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x2007, 0x2008, 0x2009, 0x200A,
+            0x2028, 0x2029, 0x202F, 0x205F, 0x3000, 0xFEFF,
+        ];
+        for (var unit = 0; unit <= 0xFFFF; unit++)
+        {
+            var parted = ChordSheet.WordStarts(new string(['a', (char)unit, 'b'])).Count == 2;
+            Assert.True(parted == spaces.Contains(unit), "U+" + Convert.ToString(unit, 16));
+        }
+    }
+
+    // Of two stops as near, Down takes the one further left.
+    [Fact]
+    public void OfTwoStopsAsNearDownTakesTheOneFurtherLeft()
+    {
+        // Each character is 10 wide. The spot is 50 along; the line under it has its
+        // stops at 0 and at 100.
+        var sheet = new ChordSheet(new StandInSong([Box(0, "A", "abcde fgh\nabcdefghi jkl")], "D"));
+        Assert.Equal([0, 10], sheet.Stops(1));
+        sheet.SetSpot(0, 5);
+        sheet.StepLine(1, new FixedWidths());
+        Assert.Equal(new Spot(1, 0), sheet.Spot);
+    }
+
+    // A chord's place along its line is where its bubble stands, which is right of its
+    // character where the bubble before it is in the way (rule 11).
+    [Fact]
+    public void WhereAChordIsAlongItsLineIsWhereItsBubbleWasPushedTo()
+    {
+        var sheet = new ChordSheet(new StandInSong([Box(0, "A", "Holy holy holy", [new Chord(0, "D"), new Chord(1, "G")])], "D"));
+        var widths = new FixedWidths();
+        // D's bubble is 22 wide from 0. G's character starts at 10, and its bubble is
+        // pushed to 26, to clear D's by 4.
+        Assert.Equal([0.0, 26.0], sheet.Placed(0, widths).Xs);
+        Assert.Equal(26, sheet.XOf(0, 1, widths));
+        Assert.Equal(0, sheet.XOf(0, 0, widths));
+        // A place with no chord is where its character is.
+        Assert.Equal(20, sheet.XOf(0, 2, widths));
+    }
+
+    // A chord past its line's end, or before its start, stands at the end or the start.
+    [Fact]
+    public void AChordPastItsLinesEndStandsAtTheLinesEnd()
+    {
+        var past = ChordLayout.Place(5, [new Chord(99, "G")], units => 10.0 * units, _ => 22, 4);
+        Assert.Equal([50.0], past.Xs);
+        Assert.Equal((72.0, 50.0), (past.Width, past.WordsWidth));
+        var before = ChordLayout.Place(5, [new Chord(-3, "G")], units => 10.0 * units, _ => 22, 4);
+        Assert.Equal([0.0], before.Xs);
+    }
+
+    // Nothing is put on where there is no name to put.
+    [Fact]
+    public void AChordOfNoNameIsNotPutOnHoweverItIsAsked()
+    {
+        var (sheet, song) = vectors.Sheet("grace");
+        Assert.False(sheet.Put(1, 13, "", typed: false));
+        Assert.False(sheet.Put(1, 13, "", typed: true));
+        Assert.False(sheet.Put(1, 13, "/", typed: true));
+        Assert.Empty(song.Asked);
+        Assert.Equal("", sheet.ChordAt(1, 13));
+    }
+
+    // An empty line among a slide's words is no line of its group when the group is
+    // copied, and a paste goes on past it, and past a group's name, to the next line
+    // that can take chords (rules 47 and 50).
+    [Fact]
+    public void AnEmptyLineAmongTheWordsIsNeitherCopiedNorPastedOntoAndAPasteGoesOnPastAGroupsName()
+    {
+        var song = new StandInSong(
+            [
+                Box(0, "A", "Holy holy\n\nLord God", [new Chord(0, "D"), new Chord(11, "G")], group: "Verse 1", startsItsGroup: true),
+                Box(1, "B", "Early in\n\nOur song", group: "Verse 2", startsItsGroup: true),
+            ],
+            "D");
+        var sheet = new ChordSheet(song);
+        Assert.Equal(["Verse 1", "Holy holy", "", "Lord God", "Verse 2", "Early in", "", "Our song"], sheet.Rows.Select(row => row.Kind == SheetRowKind.Group ? row.Name : row.Text));
+        sheet.SetSpot(1, 0);
+        Assert.Equal("2 chords copied from 2 lines: Ctrl+V puts them on the lines from the spot's on, word for word", sheet.Copy(whole: true));
+        Assert.Equal(["words [\"D\" word 0+0]", "words [\"G\" word 0+0]"], sheet.Copied!.Select(Said));
+        // Pasted from the second verse's first line: the second copied line goes past
+        // the empty line, to the line after it.
+        sheet.SetSpot(5, 0);
+        Assert.Equal(new ChordSheet.Pasted(Lines: 2, Chords: 2), sheet.Paste());
+        Assert.Equal([new Chord(0, "D")], sheet.Rows[5].Chords.ToList());
+        Assert.Empty(sheet.Rows[6].Chords);
+        Assert.Equal([new Chord(0, "G")], sheet.Rows[7].Chords.ToList());
+        // Pasted from the first verse's last line: the second copied line goes past the
+        // second verse's name, to its first line.
+        sheet.SetSpot(3, 0);
+        Assert.Equal(new ChordSheet.Pasted(Lines: 2, Chords: 2), sheet.Paste());
+        Assert.Equal([new Chord(0, "D")], sheet.Rows[3].Chords.ToList());
+        Assert.Equal([new Chord(0, "G")], sheet.Rows[5].Chords.ToList());
+    }
+
+    // Lines of chords alone pasted together are one step of undo, as lines of words are
+    // (rule 52).
+    [Fact]
+    public void LinesOfChordsAlonePastedTogetherAreOneStepOfUndo()
+    {
+        var song = new StandInSong(
+            [
+                Box(0, "A", Chords.Placeholders(2), [new Chord(0, "D"), new Chord(2, "G")], group: "Intro", startsItsGroup: true),
+                Box(1, "B", Chords.Placeholders(1), [new Chord(0, "A")], group: "Intro"),
+                Box(2, "C", Chords.Placeholders(1), [new Chord(0, "E")], group: "Outro", startsItsGroup: true),
+                Box(3, "D", Chords.Placeholders(1), [new Chord(0, "E")], group: "Outro"),
+            ],
+            "D");
+        var sheet = new ChordSheet(song);
+        sheet.SetSpot(1, 0);
+        sheet.Copy(whole: true);
+        Assert.Equal(["alone [\"D\", \"G\"]", "alone [\"A\"]"], sheet.Copied!.Select(Said));
+        sheet.SetSpot(4, 0);
+        song.Asked.Clear();
+        Assert.Equal(new ChordSheet.Pasted(Lines: 2, Chords: 3), sheet.Paste());
+        Assert.Equal(
+            [
+                "setChordsAlone slide 2 box \"C\" line 0 [\"D\", \"G\"] joined false",
+                "setChordsAlone slide 3 box \"D\" line 0 [\"A\"] joined true",
+            ],
+            song.Asked);
     }
 
     // A song whose text boxes a test changes from under the sheet.

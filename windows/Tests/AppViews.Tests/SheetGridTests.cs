@@ -254,6 +254,13 @@ public class SheetGridTests
         var chords = alone.Placed(LinesOf(alone)[0], sizes).Width;
         Assert.True(chords >= 44, "two chords side by side take " + chords);
         Close(chords + 44 + 20 + 8, SheetGrid.LayOut(alone, sizes, 2000).Cells[0].Frame.Width);
+        // At half the size that room is 22, and the card's 5 each side; the frame's 4 is
+        // as it was.
+        // (Of a slide in no group, whose foot says only "1": the words on a foot do not
+        // zoom, and "1  Intro" would be the wider.)
+        var small = new Sizes(0.5);
+        var inNoGroup = new ChordSheet(new Song(new TextBox(0, "", null, false, "box0", StandIns, [new Chord(0, "G"), new Chord(2, "D")], false)));
+        Close(inNoGroup.Placed(0, small).Width + 22 + 10 + 8, SheetGrid.LayOut(inNoGroup, small, 2000).Cells[0].Frame.Width);
         // And a blank slide, which has none yet: the 44, and the card's and the frame's.
         var blank = new ChordSheet(new Song(Slide(0, "")));
         Assert.True(blank.Rows.Single(row => row.Kind == SheetRowKind.Line).Blank);
