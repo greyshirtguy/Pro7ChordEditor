@@ -2,11 +2,14 @@
 
 The Windows app, being built second of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it finds the songs on a PC, lists them
-by library, and shows one, with its chords in brackets among its words. **No chord
-can be changed with it yet**: the two editors are still to be built. What is built
-for them is the copy it keeps of a song's file before the first change to it, the
-list of a song's earlier versions, and putting one back.
-**There is nothing here to download.**
+by library, and opens one as ChordPro text: its words, with each chord in square
+brackets where it is played. **Chords can be typed in, taken out and changed there**;
+the words cannot. Every change is saved a moment after it is typed, with a copy of the
+song's file as it was kept first, and a song's earlier versions can be looked at and
+put back. The chord sheet, where chords are put on with the mouse, is still to be
+built.
+**There is nothing here to download yet, and it has not been tried on a real library:
+do not use it on yours.**
 
 Under what is seen it has the rules of chords, held to the same answers as the Mac
 app's, and the song itself: a file opened, its chords and its keys changed, each change

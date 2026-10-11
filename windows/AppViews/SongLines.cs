@@ -1,7 +1,7 @@
 // A song's lines, one under another, never wrapped: how a song is shown where it is only
-// to be looked at. That is the song itself until the ChordPro editor is built (M5), and
-// an earlier version of it in the panel of those and in All Copies until the chord sheet
-// is (spec/07-backups.md, rule 16).
+// to be looked at. That is an earlier version of it, in the panel of those and in All
+// Copies, until the chord sheet is built (spec/07-backups.md, rule 16). The song that is
+// open is shown as text to be typed in (ChordProText.xaml).
 //
 // The lines are Song/SongText.cs's: a group's name before its first slide, a gap between
 // slides, each line of words with its chords before the characters they stand over.

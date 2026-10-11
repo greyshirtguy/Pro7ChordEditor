@@ -551,8 +551,10 @@ public sealed class ChordProEditor
     // such a song takes no change and says nothing.)
     //
     // (The page's second reason, words with half a character in them, is the Mac's: a
-    // .NET string holds such words as they are, and the text made from them passes.
-    // Whether a WPF text box keeps them as they are is for the window's milestone.)
+    // .NET string holds such words as they are, and the text made from them passes. A
+    // WPF text box keeps them as they are too: tried. So such a song is not barred
+    // here, as the rule is written, and is on the Mac. NOTES.md, "At M5", has it for
+    // the maintainer to say.)
     private static string? WhyBarred(IReadOnlyList<TextBox> boxes, IReadOnlyList<SongLine> lines, string text, IReadOnlySet<string> names)
     {
         if (boxes.Any(box => box.Words.Contains(OpenBracket, StringComparison.Ordinal) || box.Words.Contains(CloseBracket, StringComparison.Ordinal)))

@@ -15,7 +15,8 @@ milestone; put right what has become untrue.
 | **M2** The song | Done, 2026-10-12 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files. **And the song's part of M7**: a chord more or fewer on a line of chords alone, chords onto a blank slide, a slide given a box, a change of mind (decision 15) |
 | **M3** The library | Done, 2026-10-12, bar what only the maintainer can try | Where songs are kept as files on a PC, the lists, the search, the marks, a song shown read only, whether ProPresenter is running, the app's own settings and log; and the window, in the look of Windows 11, dark and light. `spec/06`. **Nobody has seen the window itself**: it was drawn into pictures, and started ("Left rough"). **And on this PC it finds no library**, for the reason in the next section |
 | **M4** The copies | Done, 2026-10-12, bar what only the maintainer can try | A copy of a file kept before it is changed, named for when, with an index beside it; listed, thinned at the start, looked at, put back and that taken back; a mark in the list, Earlier Versions over the window, All Copies in the settings; the window's own menu. The proofs at the foot of `spec/07`. **Nothing in the app makes a copy until there is an editor**, so there is nothing of it for the maintainer to try yet but the menu and the settings ("At M4") |
-| **M5** The ChordPro editor | Next | `spec/04`. The first build that changes a song's chords, and so the first to try on a COPY of a real library |
+| **M5** The ChordPro editor | Done, 2026-10-12, bar what only the maintainer can try | The song as ChordPro text, typed in: what may be typed, the help with brackets, a save a moment after the typing stops, refusals, the box's own undo, colours, the size of the text; the two keys as pickers; Revert, and the words that say why there is no Save button. `spec/04`, and `spec/06` rule 12a. It has been started for real, on a made-up library of the test hymns, and a chord put on a song there ("At M5"). **Nobody has typed into it by hand, and no song chorded with it has been looked at in ProPresenter**: that is the maintainer's, on a COPY of a real library |
+| **M6** The chord sheet | Next | `spec/03`. Its model first, held to `sheet-model.json` and `layout.json` |
 | **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
@@ -297,6 +298,93 @@ And at M4, likewise this session's, and the maintainer's to change:
     asking for where.
 39. **The names of days and months in "when a copy was made" are the person's own
     language's**, as the system has it. On this PC September is "Sept".
+40. **The ChordPro editor is WPF's plain text box, with its colours drawn behind it,
+    and no dependency.** `spec/10` offers a plain text box, or AvalonEdit "if
+    colouring is wanted (a dependency: ask first)"; `spec/04`, rule 4, wants the
+    colouring. A plain box has one colour for all its text. So the box draws its own
+    letters in no colour at all, and behind it the same letters are drawn in theirs,
+    exactly where the box has its own (`ChordProUnderlay`): the box's caret and what
+    is selected are seen over them. AvalonEdit was not asked for, and is not needed.
+    A test draws the two and holds them dot for dot the same, scrolled, larger and
+    smaller.
+41. **A change is held to the rule after it has happened, and put back.** WPF's text
+    box does not ask before it changes, as the Mac's does. So, as the reference
+    does and as `spec/04` rule 7 has it: whatever has just happened to the text (a
+    key, a paste, a cut, a drop) is asked about as the whole text it has left, and
+    what is not the song's words is put back at once, before it is drawn, with the
+    caret where it was. One road for every kind of change (rule 8).
+42. **The box's undo is the app's own, not WPF's** (`TypingHistory`, in
+    `ChordProTyping.cs`). WPF's would remember both a change that was refused and
+    its putting back, and Ctrl+Z would walk back into what was refused. It is
+    switched off, and what was let through is remembered instead: a step for each
+    run of typing where the last left the caret, or of deleting, as WPF's has it; an
+    undo or a redo ends a run; three hundred steps. Ctrl+Z, Ctrl+Y and Ctrl+Shift+Z
+    while the box has the keyboard, and Undo and Redo in the Edit menu.
+43. **The help with a bracket TYPED is given whatever keys typed it.** `spec/04`,
+    rule 12, has the help withheld while Ctrl or Alt is down. But on many keyboards
+    "[" and "]" are typed with AltGr, which Windows reports as Ctrl and Alt together;
+    and a "[" that did not bring its other is a stray bracket, which rule 6 never
+    lets in. Someone with such a keyboard could then type no chord at all. So what
+    arrives as typed text is helped, as the rule's own words for the Mac have it.
+    Backspace and Delete are helped with none of Ctrl, Alt and the Windows key down;
+    and Delete not with Shift, which on Windows is Cut. **For `spec/04`, rule 12, if
+    the maintainer agrees**: its first sentence is true of Backspace and Delete on
+    Windows and not of a bracket typed. Nobody has tried it on such a keyboard.
+44. **The system's sound for "no" is made when a key is not taken**, as on the Mac
+    (`spec/04`, rule 7). Windows' own boxes make it where they will not take a key
+    (a box that is full), and say nothing where a box is only to be read; so this
+    one is silent while nothing can be typed at all. **A guess that it is wanted**:
+    for the maintainer to hear, and say.
+45. **What the box holds is always the text as the song counts it**: a line break is
+    one unit. What is pasted or dropped on Windows has two to a line break; they are
+    made one on the way in, so that the whole text can be copied out, chorded in
+    another program, and pasted back.
+46. **Input methods are switched off in the box.** Only chords are typed there, and
+    their names are plain letters; a character still being composed would be asked
+    about half made, and refused. **A guess**: nobody with such a keyboard has tried
+    it. Keys that only wait for a second key to make an accented letter are another
+    thing, and are not touched.
+47. **Ctrl with the mouse's wheel makes the text larger and smaller**, as it does in
+    Notepad, beside the keys of `spec/04`, rule 25. `spec/10` has it "if the
+    platform's own views do that": WPF's box does not by itself, and Windows' own
+    plain editor does.
+48. **The text is in Cascadia Mono, or Consolas where a PC has not that, at 14**
+    where it is its usual size, as the Mac's is 14. Chords are bold as well as
+    orange, as the Mac draws them: in both fonts a bold letter is as wide as a plain
+    one, so the letters after a chord stay under the caret that is at them (a test
+    holds it, in whichever of them the PC has). The orange is the page's `#ff9500`,
+    Windows having none of its own.
+49. **Why a song cannot be changed as ChordPro is said in the system's own colour for
+    a caution** (`spec/04`, rule 20: "in a warmer colour"): an amber in the light
+    look, a yellow in the dark.
+50. **The song's header lays itself out three ways**, the first that fits
+    (`SongLook`): one row; the name over the keys, with Earlier Versions at the right
+    of the keys' row; and, at the window's least, Earlier Versions beside the name
+    with the keys by themselves. They are the Mac's three, less the switch between
+    the two editors, which comes with the sheet.
+51. **Revert's question is drawn in the window**, as the earlier versions are, and is
+    not the system's own message: that names its buttons itself, and this one's is
+    to say "Revert All Changes". Cancel is what Enter, Esc and a click on the dimmed
+    window give.
+52. **The menu**: File has Save (Ctrl+S) and Revert to as Opened, as the Mac's has;
+    and there is an Edit menu, with Undo, Redo, Cut, Copy, Paste and Select All,
+    each sent to whatever has the keyboard, which a Mac has without being asked.
+53. **The log says "Saved" only of a file that was.** After a save that was refused
+    before anything was written, the Mac's log has "Saved" after "was refused"; this
+    one has not. (Each app's log is its own.)
+54. **What was refused because ProPresenter was running is said no longer once
+    ProPresenter has gone**, whether that is seen by the window's look every two
+    seconds or when the app comes to the front.
+55. **A key that is not one of the twenty-six is listed first in its picker**
+    (`spec/02`: "so that the song's own key can always be seen and chosen"), by
+    `LibraryModel.KeysListedFor`. **For the maintainer to pass on**: the Mac's
+    pickers in the song's header list the twenty-six and "None" only, so a song in
+    C# major would show nothing there.
+56. **Every row of every list says what it shows to a screen reader** ("At M5").
+57. **The settings' Chords section waits for the sheet** (`spec/06`, "Settings": the
+    colour of a chord on the sheet and in the ChordPro text). It shows each "as it
+    will look", one of them a chord in its bubble, which is M6's to draw. The colour
+    of a chord in the text is one place in the code until then.
 
 ## How it is laid out, and why
 
@@ -476,6 +564,37 @@ names. What to know before changing any of it:
 - **The tests' songs have a history made for them** (`MadeUpPC.Change`,
   `GivePlainSongAHistory`): a song changed as the app would change it, some days ago,
   with a copy kept first and dated then.
+
+### The ChordPro editor (M5)
+
+- **In `Song`**: `ChordProEditor.cs`, the Mac's file for file. The song as one piece
+  of text; THE ONE RULE of what may be typed (`Allows`); the help with brackets;
+  what a pause in the typing saves; where the text is coloured. No window in it.
+- **In `LibraryModel`**: when to ask and when to save. `TextMayBecome` asks the
+  editor and starts the wait; `Settle` saves at once, and is asked first by
+  everything that leaves the song or does something else to it, which is then not
+  done if the save was refused. The two keys, Revert, the key that would save, the
+  size of the text. Every sentence the person reads is here.
+- **In `AppViews`, three files for the box**:
+  - `ChordProTyping.cs` has no box in it: the one change between two texts, line
+    breaks as the song counts them, and the box's undo. Tested so.
+  - `ChordProText.xaml` and its code are the box: how WPF's text box is kept to the
+    rule (decisions 41 to 46). Two doors come before the box's own doing, a
+    character typed (`TextTyped`) and a key pressed (`KeyPressed`), and both can be
+    called by a test with whatever keys it says are held.
+  - `ChordProUnderlay.cs` draws the letters in colour behind the box (decision 40).
+    It draws only when the box has finished laying itself out, since only then are
+    the places true; so everything that changes what is to be seen only marks it
+    stale.
+- **`SongPane`** has the header (laid out by `SongLook`), the line of help with the
+  two letters, the box, and the quiet line with Revert and the words about saving.
+  **`RevertQuestionPanel`** is over the window while Revert is asking.
+- **The tests type into the real box**, by the doors a keyboard uses
+  (`Typist.cs`): a character is raised as WPF raises one, a key is told to
+  `KeyPressed` and, if not taken, the command it stands for is given to the box.
+  One test sends real key presses through a window of the system's that is never
+  shown. Nobody's clipboard is touched: what would be pasted is put in place of
+  what is selected.
 
 ## What was found out
 
@@ -818,6 +937,91 @@ names. What to know before changing any of it:
   Each of the sixteen has a case now, and each case was run against the breakage
   it was written for.
 
+### At M5
+
+- **Of what can be typed between brackets, only nothing and spaces are "not yet a
+  chord".** `spec/04`, rule 15, leaves out of what is saved the brackets "that hold
+  what is not yet a chord", and gives someone "half way through typing `[F#`". But
+  `chord-names.json` has no name that could become a chord and is not one, bar the
+  empty one: "F#" is a chord, and so is "F#m7/" with nothing after its stroke. So a
+  name half typed is saved as it stands, a moment after the typing pauses, and
+  saved again when it is finished; as in the reference and on the Mac. The rule is
+  right and its example is not. **Told to the maintainer; `spec/` not changed.**
+- **Half a character among a song's words does not bar it here.** `spec/04`, rule
+  20a, bars a song "if the text as it is made from the song does not itself pass
+  rule 6", and names words with "half a character in them that text cannot hold".
+  A Swift string cannot hold half a character, so on the Mac such a song is barred.
+  A .NET string holds it as it is, and so does WPF's text box (tried): here the
+  text made is the song's words unit for unit, the rule as written does not bar it,
+  and it can be typed in, the half kept (a test). **A difference between the two
+  apps that follows from the rule itself. For the maintainer to say** whether
+  Windows should bar such a song too, to be the same. No song with such words has
+  been seen.
+- **A chord typed on a line of words that has no characters is let through and never
+  saved**, here as on the Mac: with its chords taken out the line is the nothing it
+  was (rule 6), and there is no character to hang the chord on (rule 16). It is in
+  the text, in orange, until the song is next opened. A text box with an empty line
+  between two of words is likely enough in a real song. **For the maintainer to
+  say** whether such a chord should be refused instead; both apps would change. No
+  test file has such a line; the case makes one.
+- **What WPF's text box does, found by trying** (each in a throwaway test, before
+  anything was built on it):
+  - it says its text has changed BEFORE it says the caret has moved, and by then
+    the caret has moved: where the caret was is remembered beforehand;
+  - its text can be changed again from inside that saying;
+  - a character can be typed into it by a test with no window and no keyboard, by
+    raising what WPF raises; Backspace and Delete by giving it their commands;
+    Enter does nothing unless the box really has the keyboard;
+  - with its own undo switched off, a command of Undo given to it reaches whoever
+    else has said they answer it, first;
+  - it keeps a line feed as a line feed, and whatever line breaks it is given, as
+    given; a carriage return, a line separator, and four characters more start a
+    new line in it too (`ChordProTyping.BreaksALineInATextBox`);
+  - it will not put its caret between the two units of a line break of two, nor
+    inside a character of two units; told to select from such a place, it selects
+    from somewhere else, without a word. So a change the box is told to make is
+    looked at afterwards, and if it is not what was wanted the whole text is set;
+  - it hands its padding to what holds its text by itself: said in a template of
+    our own as well, the padding was there twice;
+  - a view that is drawn into a picture with no window is, to WPF, never "seen"
+    (`IsVisible`). The letters behind the box were not drawn at all in the first
+    pictures, for asking that.
+- **The heredoc that trips over an apostrophe** ("At M2") trips over an ODD number of
+  them, and then none of it is run: "unexpected EOF while looking for matching". It
+  bit three times more. A script that changes sources is written as a file.
+- **What the pictures showed.** Nine more of the editor (20 to 28): a chord typed
+  and one still being typed, in both looks; a song that cannot be changed here,
+  with its reason in the caution colour; the header at the window's least; Revert's
+  question in both looks; a song reverted, with the offer to undo; the text at its
+  largest and its smallest; a song that states no key; a save refused because
+  ProPresenter was started unseen; and what Ctrl+S says. All were opened. **Put
+  right by looking**: the letters behind the box were not there (above); the text
+  stood 14 further in than the song's name (the padding twice); at the window's
+  least the second key was cut off (decision 50); and the offer to undo stood at
+  the far end of the line, by Revert, where it now stands just after the words it
+  follows.
+- **The app was started for real and a chord put on a song with it.** The published
+  file, on a made-up library of the test hymns in a folder of this session's own,
+  named to the app as a chosen folder. Its window was spoken to as a program may
+  speak to one (the system's way for screen readers; no key pressed, no pointer
+  moved): a song picked in the list; its text read from the box; the text set with
+  a word changed, which the box put back; the text set with a chord more, which
+  was taken, saved after its pause, a copy of the file kept first, the mark of
+  earlier versions shown in the list and the quiet line saying one chord more.
+  Three pictures were taken of the window itself and looked at: its title bar and
+  menu in the dark look, the chords in orange in a real window. It closed with
+  nothing wrong. Afterwards the settings, the marks and the one copy it left in the
+  app's own folder on this PC were taken away again, each by its exact path; the
+  log there has three lines more.
+- **To a screen reader, a song's row was called "ListsPane+Row".** Found by that
+  asking. A row of a list is called whatever the thing in it calls itself, and a
+  thing that does not say is called by the name of its kind in the program. Every
+  kind of row now says what it shows, and a song's row says its name and what each
+  of its marks says, the marks being only small pictures (M3's and M4's lists were
+  so too). A test asks the lists as a screen reader does.
+- **The first start of a fresh build still takes some eighteen seconds** before
+  there is a window; later starts about one. It is M10's.
+
 ## Left rough, and what to ask
 
 - **Nobody has seen the window.** Every picture is of the view the window holds,
@@ -882,9 +1086,34 @@ names. What to know before changing any of it:
 - **The menu has no keys of its own yet**, bar the letters Windows underlines when
   Alt is held. `spec/10` gives the keys of the editors' commands; none is given for
   Choose Folder, Settings or Earlier Versions, and none was made up.
-- **Revert** (`spec/07`, rule 22a; `spec/06`, rule 12a) is not built: it is a putting
-  back of the song as it was opened, and comes with the editors, when there is
-  something to revert.
+- **Nobody has typed into the ChordPro editor by hand.** What tests and pictures
+  cannot tell, and the maintainer is asked to try, on a COPY of a library:
+  - that typing feels as it should: a letter over a word does nothing and the caret
+    stays; "[" brings "]"; a chord goes in between; "]" steps over; Backspace on a
+    bracket takes the chord; and the sound for "no" (decision 44), whether it is
+    wanted at all;
+  - that the caret, and what is selected, sit exactly on the coloured letters, at
+    every size of the text, and on a screen set to another size than the first;
+  - Ctrl+Z and Ctrl+Y in the box, and what a step of each is (decision 42); the
+    Edit menu;
+  - a paste from Notepad, of a chord and of the whole text; text dragged within the
+    box, and dropped on it from elsewhere;
+  - Ctrl with plus, minus and 0, the two letters, and Ctrl with the wheel;
+  - the two keys, picked with the mouse and with the keyboard;
+  - Revert: that Enter and Esc both cancel, and that the offer to undo follows;
+  - Ctrl+S; and that leaving the app for another program saves what was typed (the
+    window's two lines for that are reached by no test);
+  - on a keyboard that types "[" with AltGr, that a bracket brings its other
+    (decision 43); and with an input method, whether its being off in the box is
+    right (decision 46);
+  - and M5's proof: **a song chorded here, on a copy of a real library, looked at
+    in ProPresenter.** On this PC there is no such library to copy ("ProPresenter
+    22 keeps no `.pro` files", above).
+- **The settings have no Chords section yet** (decision 57), so the colour of a chord
+  in the text cannot be chosen until M6.
+- **A slide picked from elsewhere** (`spec/04`, rule 21) has nowhere to be picked
+  from until there is a sheet. What it will ask is built and tested
+  (`ChordProEditor.SlideAt`, `StartOfSlide`); nothing calls it yet.
 - **A song whose name Windows keeps for itself** (CON, NUL, COM1 and their like)
   cannot have a folder of copies made for it. The copy then cannot be kept, and the
   change that wanted it is refused, which is the safe way to fail; but such a song

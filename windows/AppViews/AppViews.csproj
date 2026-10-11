@@ -16,10 +16,20 @@
     LibraryWindow   the window, which frames LibraryView and tells the model what only
                     a window knows
     LibraryView     what the window holds: its menu, ListsPane at the left, SongPane at
-                    the right, and over them the earlier versions while they are asked for
+                    the right, and over them the earlier versions while they are asked
+                    for, and what Revert asks
     ListsPane       the place and its libraries, over the songs of the library chosen
-    SongPane        the song that is open
-    SongLines       a song's lines, to look at: the song, and an earlier version of it
+    SongPane        the song that is open: its name, its two keys, and its text
+    SongLook        the song's header as far as it is numbers
+    ChordProText    the song as ChordPro text, to be typed in: WPF's text box, kept to
+                    the song's words
+    ChordProUnderlay
+                    the same letters in their colours, drawn behind that box
+    ChordProTyping  what the box works out with no box in it: the one change between
+                    two texts, line breaks as the song counts them, the box's own undo
+    RevertQuestionPanel
+                    what Revert asks before it does anything
+    SongLines       a song's lines, to look at: an earlier version of a song
     EarlierVersionsPanel
                     the copies kept of the song that is open, and putting one back
     AllCopiesModel  every copy the app keeps, with no drawing in it

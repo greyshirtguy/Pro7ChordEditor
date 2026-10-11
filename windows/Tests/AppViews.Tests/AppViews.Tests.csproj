@@ -8,8 +8,14 @@
                         earlier versions in the window, and All Copies, with nothing
                         drawn: the mark, looking at a copy, putting one back, taking
                         that back
+    ChordProModelTests  the ChordPro editor as far as it is the model's: what is done
+                        with what is typed, and when it is saved; the two keys; Revert
+    ChordProTypingTests the text box itself, typed into a key at a time; the letters
+                        drawn behind it; the song's pane; and the box's undo with no box
+    Typist              someone at that box: how a test types with no keyboard
     WindowListsTests    the two lists as far as they are numbers and words; the small
-                        pictures before names; the look
+                        pictures before names; the look; what a row is called to a
+                        screen reader
     PictureTests        pictures of the window, to be looked at
     MadeUpPC            what they stand on: a ProPresenter folder of copies of the test
                         files, in a temporary folder

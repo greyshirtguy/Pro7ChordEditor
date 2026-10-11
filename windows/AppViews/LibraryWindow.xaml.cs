@@ -7,7 +7,10 @@
 //   - that a moment has gone by: whether ProPresenter is running is asked again, every
 //     two seconds while the window is open, so that the band comes and goes by itself
 //     (rule 18). Windows has no news of a program starting or quitting that an app can
-//     have for the asking, as a Mac has; the page gives this as the other way.
+//     have for the asking, as a Mac has; the page gives this as the other way;
+//   - that the app has been left for another program, or the window is being closed:
+//     what was typed in the ChordPro text and is still waiting for its pause is saved
+//     (spec/04-chordpro-editor.md, rule 13).
 //
 // None of that can be tried by a test, which opens no window: it is for the maintainer
 // to try. What the model does when it is told is tried in LibraryModelTests.

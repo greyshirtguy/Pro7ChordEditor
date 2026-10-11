@@ -702,14 +702,42 @@ public sealed class ChordProEditorTests : IDisposable
         Type(editor, "One two", "One [A]two");
         Assert.True(editor.Save());
         var once = File.ReadAllBytes(song.Path);
-        // A second saving, of a line of chords alone and of a box of words: two rounds.
+        // A second saving, of a box of words alone.
+        Type(editor, "Sing it loud", "Sing it [E]loud");
+        Assert.True(editor.Save());
+        var twice = File.ReadAllBytes(song.Path);
+        Assert.NotEqual(once, twice);
+        // A third, of a line of chords alone and of a box of words: two rounds.
         Type(editor, "Thirteen", "[E]Thirteen");
         Type(editor, "[G] [D/F#] [Em]", "[G] [Em]");
         Assert.True(editor.Save());
-        Assert.NotEqual(once, File.ReadAllBytes(song.Path));
+        Assert.NotEqual(twice, File.ReadAllBytes(song.Path));
+        song.Undo();
+        Assert.Equal(twice, File.ReadAllBytes(song.Path));
         song.Undo();
         Assert.Equal(once, File.ReadAllBytes(song.Path));
         Assert.True(song.CanUndo);
+        song.Undo();
+        Assert.Equal(original, File.ReadAllBytes(song.Path));
+        Assert.False(song.CanUndo);
+    }
+
+    [Fact]
+    public void TwoLinesOfChordsAloneSavedTogetherUndoAsOneStep()
+    {
+        // Chords With No Words: a chord typed on its first slide, which is blank and has
+        // a text box, and one on its last, which has none. A round for each.
+        var song = bench.Open("Chords With No Words.pro");
+        var original = File.ReadAllBytes(song.Path);
+        var editor = new ChordProEditor(song);
+        var first = editor.Lines.ToList().FindIndex(line => line.Kind == SongLineKind.BlankSlide);
+        var last = editor.Lines.ToList().FindLastIndex(line => line.Kind == SongLineKind.BlankSlide);
+        Assert.NotEqual(first, last);
+        Assert.Equal(ChordProEditor.Verdict.Taken, TypeOnLine(editor, first, "[E] [A]"));
+        Assert.Equal(ChordProEditor.Verdict.Taken, TypeOnLine(editor, last, "[B]"));
+        Assert.True(editor.Save());
+        Assert.Equal(["E", "A"], song.TextBoxes[0].Chords.Select(chord => chord.Name));
+        Assert.Equal(["B"], song.TextBoxes[^1].Chords.Select(chord => chord.Name));
         song.Undo();
         Assert.Equal(original, File.ReadAllBytes(song.Path));
         Assert.False(song.CanUndo);

@@ -9,7 +9,8 @@
 //
 // Beside the text of each line is kept what the line is: which text box and which line
 // of it, where that line starts in the box, and its words without chords. Nothing is
-// changed here. Reading the text back into chords is the ChordPro editor's, at M5.
+// changed here. Reading the text back into chords is the ChordPro editor's
+// (ChordProEditor.cs).
 //
 // The Mac's is SongText.swift.
 

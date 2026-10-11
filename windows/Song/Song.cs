@@ -42,7 +42,6 @@
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M5  the ChordPro editor's window, which is AppViews' and not here
 //   M6  the chord sheet's model
 //   M8  the checks for what the first Windows editor left, and the mending
 //   M9  a song made from a ChordPro file, and written out as one
