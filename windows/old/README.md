@@ -2,16 +2,20 @@
 
 > [!NOTE]
 > **This is the first Windows editor, version 0.9.5, as it has been since 2024.** It
-> is to be replaced by a new one, built to the plan in [`spec/`](../spec/00-overview.md)
-> alongside a Mac app. Until then this folder holds it unchanged, and its
+> is being replaced by a new one, built in [the folder above](../README.md) to the plan
+> in [`spec/`](../../spec/00-overview.md), alongside a Mac app. This folder holds the
+> first one unchanged, to be read, and its
 > [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
 > still works as it did.
 >
 > It has faults that are known and will not be mended in this version: a chord can be
 > shown twice by ProPresenter after a save, a song's key can be changed to A flat by a
 > save, and it stops on slides with no words.
-> [`spec/08-repair.md`](../spec/08-repair.md) has the whole list, and the new editor is
-> to find and mend what this one left in files. Keep a backup of your library.
+> [`spec/08-repair.md`](../../spec/08-repair.md) has the whole list, and the new editor
+> is to find and mend what this one left in files. Keep a backup of your library.
+>
+> **Do not run `publish.py`**: it was how a release of this editor was made, and it
+> commits, pushes and tags.
 
 What follows is its own README, as it was.
 

@@ -1,0 +1,5 @@
+# A fence, and nothing else. The new Windows app has rules for its code in the folder
+# above (../.editorconfig), some of which stop a build. The first editor's code was
+# never written to them, so they are not to reach it: "root" says to look no higher
+# than this file.
+root = true

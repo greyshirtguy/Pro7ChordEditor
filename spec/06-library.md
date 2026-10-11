@@ -5,8 +5,8 @@ ProPresenter is running.
 
 **New**: Simple Presenter opens a ProPresenter folder as its own workspace and has
 none of this. The old Windows editor had the bones of it
-(`windows/Pro7ChordEditor/MainWindow.xaml.cs` until the Windows app is rewritten), and
-what it learnt is kept here.
+(`windows/old/Pro7ChordEditor/MainWindow.xaml.cs`, where it was moved when the new
+Windows app was begun), and what it learnt is kept here.
 
 ## Where ProPresenter keeps its songs
 

@@ -21,7 +21,7 @@ ChordPro import made of testdata/songs: testdata/README.md says how) and writes
 It is also the REFERENCE for the three checks of spec/08-repair.md: the functions below
 are those rules, and both apps' own versions are held to what this writes.
 
-OLD APP. What that editor did is read from its code (windows/Pro7ChordEditor/
+OLD APP. What that editor did is read from its code (windows/old/Pro7ChordEditor/
 MainWindow.xaml.cs as it was at v0.9.5) and, for the first of these, seen in a file it
 saved:
 

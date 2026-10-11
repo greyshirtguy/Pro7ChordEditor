@@ -1,0 +1,11 @@
+<!--
+  Nothing is set here, on purpose. This file is a fence, as Directory.Build.props
+  beside it is.
+
+  The new Windows app keeps the versions of the packages it uses in one file in the
+  folder above (../Directory.Packages.props). A project that finds that file may not
+  give a version of its own, and the first editor's project does. With this file it
+  finds this one first, and keeps its versions where they always were.
+-->
+<Project>
+</Project>

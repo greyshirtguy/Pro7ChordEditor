@@ -1,0 +1,11 @@
+<!--
+  Nothing is set here, on purpose. This file is a fence.
+
+  MSBuild looks for a file of this name in a project's own folder and then in each
+  folder above it, and uses the first it finds. The new Windows app has one in the
+  folder above (../Directory.Build.props) with settings for its own projects. Without
+  this file those settings would reach the first editor's project too, which was never
+  written for them. With it, that project builds as it did when it was moved here.
+-->
+<Project>
+</Project>
