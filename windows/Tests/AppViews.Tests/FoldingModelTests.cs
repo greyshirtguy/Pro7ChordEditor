@@ -141,6 +141,62 @@ public class FoldingModelTests
         Assert.Equal("It Is Well", model.Shown!.Name);
     });
 
+    // (Two things that nothing else held, found by breaking the rules to see; and a
+    // third while writing them down.)
+    [Fact]
+    public void AnOriginalsOneChordIsSaidAsOneAndAYesThatCanDoNothingByThenPutsTheQuestionAway() => OnAMadeUpPC(async pc =>
+    {
+        GiveTheOriginals(pc);
+        var own = new OpenSong(InOld(pc, Plain), new Safeguards(() => false, (_, _) => { }));
+        var box = own.TextBoxes.First(one => one.Words.Any(char.IsLetter));
+        own.SetChords(box.Slide, box.Element, [new Pro7ChordEditor.ChordRules.Chord(0, "Am")]);
+        var withOne = File.ReadAllBytes(InOld(pc, Plain));
+        var model = await AtTheOldCopies(pc);
+        model.Open(pc.Song(PlainCopy, Old));
+        Assert.Equal(
+            "This is a copy that the old Windows chord editor saved of " + Q(Plain) + ", which has 1 chord of its own. [Put Its Chords into " + Q(Plain) + Dots + "]",
+            Said(model.Offers[^1]));
+        model.Take(OfferAction.Fold);
+        Assert.Equal(
+            Q(Plain) + " is given the 11 chords of " + Q(PlainCopy) + ". Its own chord is replaced by them. The words of the two are the same, and are not changed. A copy of each file is kept first.",
+            model.FoldQuestion!.Message);
+        model.Answer(false);
+
+        // Something is being typed in the copy as the question is asked, and ProPresenter
+        // is started before the answer. Yes can do nothing now, since what was typed
+        // cannot be saved: the question is put away all the same, the copy is still the
+        // song that is open, and why is said.
+        model.Show(LibraryModel.Editor.ChordPro);
+        var text = model.ChordPro!.Text;
+        Assert.True(model.TextMayBecome(ChordProModelTests.With("One two", "One [A]two", model)));
+        model.Take(OfferAction.Fold);
+        Assert.NotNull(model.FoldQuestion);
+        pc.ProPresenterIsRunning = true;
+        model.Answer(true);
+        Assert.Null(model.FoldQuestion);
+        Assert.Null(model.Asked);
+        Assert.Equal(pc.Song(PlainCopy, Old), model.SongId);
+        Assert.Equal("ProPresenter is running. Quit it to change chords here. Nothing was changed.", model.Refused);
+        Assert.True(Same(withOne, File.ReadAllBytes(InOld(pc, Plain))));
+        Assert.True(Same(AsTheOldEditorLeftIt(PlainCopy), File.ReadAllBytes(InOld(pc, PlainCopy))));
+        // (What was typed and could not be saved is not left in the text.)
+        Assert.Equal(text, model.ChordPro!.Text);
+        pc.ProPresenterIsRunning = false;
+
+        // While the question stands, something else makes the other song another
+        // song's words. Yes opens it, and the song itself refuses, and says why.
+        // Nothing is changed, and no copy of either file was kept for it.
+        model.Take(OfferAction.Fold);
+        File.WriteAllBytes(InOld(pc, Plain), Clean("Holy Holy Holy"));
+        model.Answer(true);
+        Assert.Null(model.Asked);
+        Assert.Equal(pc.Song(Plain, Old), model.SongId);
+        Assert.Equal("The two songs have not the same words, so the chords of the one cannot be put into the other. Nothing was changed.", model.Refused);
+        Assert.True(Same(Clean("Holy Holy Holy"), File.ReadAllBytes(InOld(pc, Plain))));
+        Assert.True(Same(AsTheOldEditorLeftIt(PlainCopy), File.ReadAllBytes(InOld(pc, PlainCopy))));
+        Assert.Empty(pc.AppData.Copies().Songs());
+    });
+
     // ---- Putting the chords in
 
     [Fact]
