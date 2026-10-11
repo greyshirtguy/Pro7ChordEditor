@@ -72,8 +72,10 @@ public static class Listing
 
     private static IEnumerable<DirectoryInfo> Folders(string folder) => Contents(folder).OfType<DirectoryInfo>();
 
-    // (A folder named `Something.pro` is no song. And the ending is told by itself:
-    // asking the system for `*.pro` also gives `.pro6` and `.proBundle`.)
+    // (A folder named `Something.pro` is no song. And the ending is told here, by
+    // itself, and not left to a pattern such as `*.pro`: Windows' own matching of that
+    // also lets through `.pro6`, `.proBundle` and `.proPref`, as was seen when
+    // ProPresenter's folder was looked at with Windows PowerShell.)
     private static bool IsSong(FileSystemInfo entry) =>
         entry is FileInfo && string.Equals(entry.Extension, Ending, StringComparison.OrdinalIgnoreCase);
 

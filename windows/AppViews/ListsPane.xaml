@@ -20,8 +20,9 @@
   (Segoe Fluent Icons on Windows 11, Segoe MDL2 Assets before it), written here by
   their numbers.
 
-  Nothing here is a rule, and no sentence the person reads is made here but those that
-  only name a thing: the rest come from LibraryModel.
+  Nothing here is a rule. The sentences that stand in place of a list, and what a mark
+  says of a song, come from LibraryModel, where a test holds them; what a button or
+  the bar says of itself is written here, as the Mac app's views have it.
 -->
 <UserControl x:Class="Pro7ChordEditor.AppViews.ListsPane"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"

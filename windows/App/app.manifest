@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  What the app says of itself to Windows before it starts. Two things, and no more:
+
+    How it is to be drawn on a fine screen. Without this Windows draws the window for
+    the first screen's fineness and stretches the picture of it on any screen that
+    differs, which blurs the words; with it the app is told whenever its window comes
+    to a screen of another fineness, and WPF draws it afresh for that one. ("Per
+    monitor, second version" is Windows 10's and later; the plainer word after it is
+    for a Windows before that.)
+
+    That it is made for Windows 10 and 11, so that Windows treats it as such and not
+    as a program from before them.
+
+  It asks for no rights: the app runs as whoever started it, and needs nothing more to
+  read and write a song in that person's own folders.
+
+  The app's name, its version and its icon are milestone M10's.
+-->
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="Pro7ChordEditor.app" />
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2, PerMonitor</dpiAwareness>
+    </windowsSettings>
+  </application>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 and Windows 11 (they answer to one id). -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}" />
+    </application>
+  </compatibility>
+</assembly>
