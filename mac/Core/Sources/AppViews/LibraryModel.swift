@@ -127,6 +127,10 @@ public final class LibraryModel {
     public private(set) var sheetZoom = LibraryModel.usualSheetZoom
     public static let sheetZooms: [Double] = [0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.25, 1.5]
     public static let usualSheetZoom = 0.8
+    /// How much of the height of the two lists at the window's left the libraries have,
+    /// the songs having the rest: what the bar between them is dragged to.
+    public private(set) var listsSplit = LibraryModel.usualListsSplit
+    public static let usualListsSplit = 0.36
     /// What the sheet just said ("4 chords copied ..."), for a few seconds.
     public private(set) var said: String?
     private var saying: Task<Void, Never>?
@@ -221,6 +225,7 @@ public final class LibraryModel {
         let settings = appData.settings
         chosenFolders = settings.chosenFolders.map { URL(fileURLWithPath: $0, isDirectory: true) }
         sheetZoom = Self.nearestZoom(to: settings.sheetZoom ?? Self.usualSheetZoom)
+        listsSplit = Self.within(settings.listsSplit ?? Self.usualListsSplit)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         let thrownAway = copies.thin()
@@ -466,6 +471,20 @@ public final class LibraryModel {
             }
         }
         return sheetZoom
+    }
+
+    /// The bar between the libraries and the songs was dragged, to where the
+    /// libraries have this much of the height; or, with nothing, put back where it
+    /// usually is. It is remembered.
+    public func setListsSplit(_ share: Double?) {
+        listsSplit = Self.within(share ?? Self.usualListsSplit)
+        if started {
+            remember()
+        }
+    }
+
+    private static func within(_ share: Double) -> Double {
+        min(max(share, 0.1), 0.9)
     }
 
     public var canZoomSheetIn: Bool { sheetZoom < (Self.sheetZooms.last ?? 1) }
@@ -768,6 +787,7 @@ public final class LibraryModel {
         settings.lastPlace = placeID
         settings.lastLibrary = libraryID
         settings.sheetZoom = sheetZoom == Self.usualSheetZoom ? nil : sheetZoom
+        settings.listsSplit = listsSplit == Self.usualListsSplit ? nil : listsSplit
         appData.settings = settings
     }
 }

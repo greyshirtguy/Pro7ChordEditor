@@ -285,7 +285,7 @@ struct PictureTests {
         model.copyChords(wholeGroup: true)
         try draw(LibraryWindow(model: model), named: "22 the sheet, after a copy")
         // And as narrow as the window goes.
-        try draw(LibraryWindow(model: model), named: "23 the sheet, the window at its narrowest", size: NSSize(width: 860, height: 520))
+        try draw(LibraryWindow(model: model), named: "23 the sheet, the window at its narrowest", size: NSSize(width: 620, height: 520))
     }
 
     @Test("The sheet as a grid in a wide window: at its usual size, with the words small, and with them large")

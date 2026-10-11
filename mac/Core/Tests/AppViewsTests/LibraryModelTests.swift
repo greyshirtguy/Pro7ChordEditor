@@ -200,4 +200,34 @@ struct LibraryModelTests {
         model.proPresenterMayHaveChanged()
         #expect(model.refusal == said && !model.proPresenterIsRunning)
     }
+
+    @Test("The bar between the libraries and the songs: where it was dragged to is kept, within bounds, and remembered; with nothing, it goes back to where it usually is")
+    func theBarBetweenTheLists() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        await model.start()
+        #expect(model.listsSplit == LibraryModel.usualListsSplit)
+        model.setListsSplit(0.55)
+        #expect(model.listsSplit == 0.55)
+        // Neither list can be dragged away altogether.
+        model.setListsSplit(0.99)
+        #expect(model.listsSplit == 0.9)
+        model.setListsSplit(-3)
+        #expect(model.listsSplit == 0.1)
+        model.setListsSplit(0.4)
+        let again = mac.model()
+        #expect(again.listsSplit == LibraryModel.usualListsSplit)
+        await again.start()
+        #expect(again.listsSplit == 0.4)
+        again.setListsSplit(nil)
+        let third = mac.model()
+        await third.start()
+        #expect(third.listsSplit == LibraryModel.usualListsSplit)
+        // (And the size of the sheet's words, kept beside it, is not lost with it.)
+        third.zoomSheet(-1)
+        third.setListsSplit(0.6)
+        let fourth = mac.model()
+        await fourth.start()
+        #expect(fourth.listsSplit == 0.6 && fourth.sheetZoom == 0.7)
+    }
 }

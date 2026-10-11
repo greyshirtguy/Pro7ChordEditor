@@ -42,6 +42,9 @@ public struct AppData: Sendable {
         /// How many times its usual size the chord sheet is drawn; nothing if it was
         /// never changed.
         public var sheetZoom: Double?
+        /// How much of the height of the two lists at the window's left the libraries
+        /// have, from nought to one; nothing if the bar between them was never moved.
+        public var listsSplit: Double?
 
         public init() {}
     }

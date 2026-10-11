@@ -205,6 +205,21 @@ And at M6, 2026-10-11:
 40. **Whether ProPresenter is running is asked again whenever the system says it has
     started or quit** (`spec/06`, rule 18), the maintainer having quit it and seen
     the band stay.
+41. **The window is two parts, as ProPresenter's is: the songs are under the
+    libraries, at the left** (`spec/06`, rules 6a to 8). The maintainer's: "Let's
+    mimic the Pro/Simple Presenter UI and move the list of docs ... to the left side
+    below the list of library (with a pretty divider that is draggable vertically ...)
+    - let's make the background color of those two different - like propresenter ...
+    (library is light grey, presentations is darker grey) ... and still keep the left
+    pane draggable horizontally. Also let's use orange icons for the libraries ...
+    and the grey icons for the presentations". The greys in the dark are
+    ProPresenter's own, read off the picture of its window the maintainer pointed to.
+42. **The two icons are ProPresenter's own pictures**, at the maintainer's asking: its
+    mark for a library, and the outline it draws before a presentation, from a file
+    the maintainer supplied. They are drawn in code from the outline's path
+    (`ListIcons.swift`), and the mark's orange from three colours read off a picture
+    of it: no picture file of either is in the repository. They are Renewed Vision's,
+    which the file and `spec/06`, rule 6c, say; the maintainer was told so.
 
 ## How it is laid out, and why
 
@@ -314,6 +329,18 @@ changing any of it:
   `Pro7ChordEditorPictures` in the system's temporary folder.
 - **A song is opened with no safeguards at M3**, so it cannot be changed. M5 hands it
   real ones: `ProPresenterApp.isRunning`, and the copies of M4.
+
+### The window's two lists (after M6)
+
+- `LibraryWindow.swift`: `ListsPane` is the left of the window, `PlacesPane` (the
+  place and its libraries) over `SongsPane` (the search, the choice by mark, the
+  songs), with the bar between them drawn and dragged by `ListsPane` itself; and
+  `ListsLook` has the three greys and `top(share:of:)`, which is all the arithmetic
+  of the bar. The share is `LibraryModel.listsSplit`, kept in the app's settings.
+- SwiftUI's own `VSplitView` was not used for the bar: its divider cannot be drawn
+  on, and where it is left is not ours to keep or to put back.
+- `ListIcons.swift`: the outline is one path, read once from the picture file's own
+  words for it (`PresentationGlyph.path(of:)`), and both icons are made of it.
 
 ### The copies (M4)
 
@@ -821,6 +848,10 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **The bar between the two lists has been dragged by nobody**: its arithmetic is
+  tested and it is seen in the pictures, and that is all. To be tried: that it
+  follows the pointer, that the cursor changes over it, that two clicks put it back,
+  and that the edge between the lists and the song still drags sideways.
 - **Nobody has seen the grid or the zoom with their own eyes but in pictures** (24 to
   27 are of them). To be tried: that making the window wider and narrower lays the
   slides out again without a stutter; the two buttons, Command with minus, plus and

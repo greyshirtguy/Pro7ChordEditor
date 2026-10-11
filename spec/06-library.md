@@ -59,27 +59,55 @@ what it learnt is kept here.
 
 ## The window
 
-One window, in three parts. This is a proposal, to be tried and changed with the
-maintainer; the old editor's two lists beside an editing area are its bones.
+One window, in two parts: at the left the libraries and, under them, the songs of the
+one chosen; at the right the song. It is laid out as ProPresenter's own window is (and
+Simple Presenter's), so that someone who knows that one knows this one. (At first it
+was three parts side by side, the songs between the libraries and the song; the
+maintainer moved the songs under the libraries on 2026-10-11, which also gives the
+song the width they took.)
 
 ```
-+----------------+---------------------------+----------------------------------------+
-| LIBRARIES      | Search                    |  Song name          Key [G]  Shown in [G]  [Chords|ChordPro]
-|  Songs         | ------------------------- | --------------------------------------- |
-|  Kids          | Amazing Grace        ♪ ↺  |                                        |
-|  Christmas     | Be Thou My Vision    ♪    |        the chord sheet, or the         |
-|                | Holy Holy Holy            |        ChordPro text                   |
-|                | It Is Well           ♪ !  |                                        |
-|                |                           | --------------------------------------- |
-|                |                           |  a line that says what just happened   |
-+----------------+---------------------------+----------------------------------------+
++--------------------------+----------------------------------------------------------+
+| [place]  Choose Folder…  |  Song name      Key [G]  Shown in [G]  [Chords|ChordPro] |
+| LIBRARIES                | -------------------------------------------------------- |
+|  ▣ Songs                 |                                                          |
+|  ▣ Kids                  |                                                          |
+|  ▣ Christmas             |           the chord sheet, or the ChordPro text          |
+|== 4 SONGS ====----=======|                                                          |
+| Search                   |                                                          |
+| [All|With chords|Without]|                                                          |
+|  ▫ Amazing Grace     ♪ ↺ |                                                          |
+|  ▫ Be Thou My Vision ♪   | -------------------------------------------------------- |
+|  ▫ Holy Holy Holy        |  a line that says what just happened                     |
+|  ▫ It Is Well        ♪ ! |                                                          |
++--------------------------+----------------------------------------------------------+
 ```
 
-7. **Libraries** at the left: each folder under `Libraries`, by name, whether or not it
-   has songs in it yet. The one last used is opened at the start. Over them, where
-   there is more than one place (rule 3), a choice of place, and **Choose Folder…**.
-   What is not a folder, or is hidden, is no library.
-8. **Songs** in the middle: the library's `.pro` files by name (those directly in it,
+6a. **The edge between the left and the right is dragged sideways**, to give the lists
+   or the song more width. **The bar between the libraries and the songs is dragged
+   up and down**, to give one of them more height and the other less; neither can be
+   dragged away altogether; clicked twice, it goes back to where it usually is (the
+   libraries with a little over a third of the height). Where it was left is
+   remembered. The bar says how many songs the list under it has ("8 SONGS", or "3 OF
+   8 SONGS" where the list is narrowed), and has a small grip in its middle to show
+   that it can be dragged.
+6b. **The two lists have grounds of different greys**, as in ProPresenter: the
+   libraries' the lighter, the songs' the darker, and the bar between them darker
+   still. With the system dark they are ProPresenter's own three (`#585858`, `#3e3e3e`
+   and `#2f2f2f`, read off a picture of its window); with the system light, their
+   like (`#ececec`, `#d5d5d5`, `#bdbdbd`).
+6c. **A small picture stands before each name**: before a library, the orange square
+   that is ProPresenter's mark; before a song, the grey outline ProPresenter draws
+   before a presentation. Both are ProPresenter's own pictures, used at the
+   maintainer's asking to show what is a ProPresenter library and what a
+   presentation; they are Renewed Vision's, and nothing in this repository's licence
+   makes them anyone else's. On the Mac they are drawn from the outline's path and
+   are in one file (`ListIcons.swift`), so that they can be taken out in one place.
+7. **Libraries** at the top left: each folder under `Libraries`, by name, whether or
+   not it has songs in it yet. The one last used is opened at the start. Over them,
+   where there is more than one place (rule 3), a choice of place, and **Choose
+   Folder…**. What is not a folder, or is hidden, is no library.
+8. **Songs** under the libraries: the library's `.pro` files by name (those directly in it,
    not hidden, and not folders), sorted as the system sorts names, with a search box
    over them that narrows the list as it is typed in: to the names that have what is
    typed in them, capitals and accents apart.

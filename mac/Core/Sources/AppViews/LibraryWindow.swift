@@ -1,21 +1,27 @@
-// The window: one, in three parts. spec/06-library.md, "The window".
+// The window: one, in two parts. spec/06-library.md, "The window".
 //
-//   at the left    where the songs are (a place: a workspace, ProPresenter's folder, a
-//                  folder chosen by hand) and that place's libraries;
-//   in the middle  the songs of the library chosen, with a search box over them and a
-//                  choice that narrows them by mark;
+//   at the left    two lists, one over the other, as ProPresenter has them: where the
+//                  songs are (a place: a workspace, ProPresenter's folder, a folder
+//                  chosen by hand) and that place's libraries; and under them the
+//                  songs of the library chosen, with a search box over them and a
+//                  choice that narrows them by mark. The bar between the two is
+//                  dragged up and down, and the two have grounds of different greys,
+//                  the libraries' the lighter;
 //   at the right   the song that is open.
+//
+// The edge between the left and the right is dragged too, sideways.
 //
 // Nothing here is a rule. What is shown comes from LibraryModel, and what the person
 // does is passed on to it.
 //
-// The three parts are plain panes side by side, each with a ground of its own, and not
-// the system's sidebar with its see-through material. The reason is the tests that draw
-// this into a picture file to be looked at (AppViewsTests): drawn off the screen, that
-// material comes out blank. The lists, fields and buttons are the system's own.
+// The parts are plain panes, each with a ground of its own, and not the system's
+// sidebar with its see-through material. One reason is the tests that draw this into
+// a picture file to be looked at (AppViewsTests): drawn off the screen, that material
+// comes out blank. The other is the two greys. The lists, fields and buttons are the
+// system's own.
 //
-// The song is SongView.swift: its header, and the ChordPro editor. What is being typed
-// is saved when the app is left, when it quits and when the window goes, as well as a
+// The song is SongView.swift: its header, and its two editors. What is being typed is
+// saved when the app is left, when it quits and when the window goes, as well as a
 // moment after the typing stops.
 
 import AppKit
@@ -31,14 +37,12 @@ public struct LibraryWindow: View {
 
     public var body: some View {
         HSplitView {
-            PlacesPane(model: model)
-                .frame(minWidth: 170, idealWidth: 200, maxWidth: 300)
-            SongsPane(model: model)
-                .frame(minWidth: 220, idealWidth: 270, maxWidth: 420)
+            ListsPane(model: model)
+                .frame(minWidth: 210, idealWidth: 270, maxWidth: 480)
             SongPane(model: model)
                 .frame(minWidth: 380, maxWidth: .infinity)
         }
-        .frame(minWidth: 860, minHeight: 440)
+        .frame(minWidth: 620, minHeight: 440)
         .sheet(isPresented: Binding(get: { model.earlier != nil }, set: { if !$0 { model.closeEarlierVersions() } })) {
             EarlierVersionsPanel(model: model)
         }
@@ -79,7 +83,119 @@ public struct LibraryWindow: View {
     }
 }
 
-/// At the left: the place, and its libraries.
+/// The greys of the two lists at the left, and of the bar between them: ProPresenter's
+/// own in the dark (read off a picture of its window), and their like in the light.
+/// The libraries' ground is the lighter of the two, as there.
+enum ListsLook {
+    static func grey(light: Double, dark: Double) -> Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+            return NSColor(white: isDark ? dark : light, alpha: 1)
+        })
+    }
+
+    static let libraries = grey(light: 0.925, dark: 0.345)
+    static let songs = grey(light: 0.835, dark: 0.243)
+    static let bar = grey(light: 0.74, dark: 0.184)
+    /// What the bar says of the list under it: how many songs the library has, and
+    /// how many of them are listed where the list is narrowed.
+    static func count(shown: Int, of all: Int) -> String {
+        if shown != all { return "\(shown) OF \(all) SONGS" }
+        return all == 1 ? "1 SONG" : "\(all) SONGS"
+    }
+
+    /// How tall the bar is, and the least height each list is left with: for the
+    /// libraries, room for what is over them and three of them; for the songs, for
+    /// the search box and the choice over them and a few of them.
+    static let barHeight = 22.0
+    static let leastLibraries = 170.0
+    static let leastSongs = 150.0
+
+    /// How tall the libraries' part is, given this share of a height that also holds
+    /// the bar and the songs' part: the share of it, but never so much or so little
+    /// that either is left with less than its least. (In a window too short for both,
+    /// the libraries have theirs.)
+    static func top(share: Double, of height: Double) -> Double {
+        let most = max(leastLibraries, height - barHeight - leastSongs)
+        return min(max(share * height, leastLibraries), most)
+    }
+}
+
+/// At the left: the libraries over the songs, with a bar between them that is dragged
+/// up and down to give one more room and the other less.
+struct ListsPane: View {
+    @Bindable var model: LibraryModel
+    /// While the bar is being dragged: how tall the libraries' list was when the drag
+    /// began, and how tall the drag has made it.
+    @State private var began: Double?
+    @State private var dragged: Double?
+    @State private var over = false
+
+    private var count: String {
+        model.library == nil ? "" : ListsLook.count(shown: model.listedSongs.count, of: model.songs.count)
+    }
+
+    var body: some View {
+        GeometryReader { given in
+            let height = given.size.height
+            let top = dragged ?? ListsLook.top(share: model.listsSplit, of: height)
+            VStack(spacing: 0) {
+                PlacesPane(model: model)
+                    .frame(height: top)
+                bar
+                    .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global)
+                        .onChanged { drag in
+                            let start = began ?? top
+                            began = start
+                            dragged = ListsLook.top(share: (start + drag.translation.height) / max(height, 1), of: height)
+                        }
+                        .onEnded { _ in
+                            if let dragged {
+                                model.setListsSplit(dragged / max(height, 1))
+                            }
+                            began = nil
+                            dragged = nil
+                        })
+                    // (Twice clicked, it goes back to where it usually is.)
+                    .onTapGesture(count: 2) { model.setListsSplit(nil) }
+                SongsPane(model: model)
+            }
+        }
+    }
+
+    /// The bar between the two lists: how many songs the list under it has, and in its
+    /// middle a small grip to say that it can be dragged.
+    private var bar: some View {
+        ZStack {
+            ListsLook.bar
+            Capsule()
+                .fill(Color.primary.opacity(over || dragged != nil ? 0.55 : 0.28))
+                .frame(width: 30, height: 4)
+            HStack {
+                Text(count)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+        }
+        .frame(height: ListsLook.barHeight)
+        .contentShape(Rectangle())
+        .onHover { inside in
+            over = inside
+            if inside {
+                NSCursor.resizeUpDown.push()
+            } else {
+                NSCursor.pop()
+            }
+        }
+        .help("Drag up or down to give the libraries or the songs more room.")
+        .accessibilityLabel("The bar between the libraries and the songs")
+    }
+}
+
+/// At the top left: the place, and its libraries.
 struct PlacesPane: View {
     @Bindable var model: LibraryModel
 
@@ -140,19 +256,27 @@ struct PlacesPane: View {
             } else {
                 List(selection: Binding(get: { model.libraryID }, set: { model.choose(library: $0) })) {
                     ForEach(model.libraries) { library in
-                        Text(library.name).tag(Optional(library.id))
+                        HStack(spacing: 7) {
+                            LibraryIcon()
+                                .frame(width: 16, height: 16)
+                            Text(library.name)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                        }
+                        .tag(Optional(library.id))
                     }
                 }
                 .listStyle(.inset)
                 .scrollContentBackground(.hidden)
             }
         }
-        .frame(maxHeight: .infinity, alignment: .top)
-        .background(Color(nsColor: .controlBackgroundColor))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(ListsLook.libraries)
+        .clipped()
     }
 }
 
-/// In the middle: the songs of the library, a search box over them, and the marks.
+/// Under the libraries: the songs of the library, a search box over them, and the marks.
 struct SongsPane: View {
     @Bindable var model: LibraryModel
 
@@ -196,11 +320,14 @@ struct SongsPane: View {
             .listStyle(.inset)
             .scrollContentBackground(.hidden)
         }
-        .background(Color(nsColor: .controlBackgroundColor))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(ListsLook.songs)
+        .clipped()
     }
 }
 
-/// A song's name, and beside it its marks, each with a tip that says what it means.
+/// A song's name, with the grey mark of a presentation before it, and after it its
+/// marks, each with a tip that says what it means.
 struct SongRow: View {
     var name: String
     var marks: Marks?
@@ -208,6 +335,8 @@ struct SongRow: View {
 
     var body: some View {
         HStack(spacing: 6) {
+            PresentationIcon()
+                .frame(width: 15, height: 15)
             Text(name)
                 .lineLimit(1)
                 .truncationMode(.middle)
