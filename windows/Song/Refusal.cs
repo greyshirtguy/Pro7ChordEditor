@@ -63,6 +63,9 @@ public sealed class Refusal : Exception
 
         /// <summary>A copy's chords were to be put into the song, and the two have not the same words.</summary>
         WordsDiffer,
+
+        /// <summary>A file that was to be read as a ChordPro song is not one: it cannot be read, is too large, or has no words in it.</summary>
+        NotASong,
     }
 
     private Refusal(Why reason, string sentence)
@@ -87,6 +90,16 @@ public sealed class Refusal : Exception
     internal static Refusal ShownAsItWouldBe => new(
         Why.OnlyForReading,
         "This is the song as it would be with its chords moved, shown to be looked at. Nothing was changed.");
+
+    // (Of a ChordPro file: ChordProFile.cs. The reference's three sentences, with the
+    // file's name first as this app's others have it.)
+    internal static Refusal FileCannotBeRead(string name, string why) => new(Why.NotASong, name + " could not be read: " + why);
+
+    internal static Refusal TooLargeToBeASong(string name) => new(Why.NotASong, name + " is too large to be a song.");
+
+    internal static Refusal NoWordsInIt(string name) => new(Why.NotASong, name + " has no words in it.");
+
+    internal static Refusal FileNotWritten(string name, string why) => new(Why.NotSaved, name + " could not be written: " + why);
 
     internal static Refusal WordsDiffer => new(
         Why.WordsDiffer,
