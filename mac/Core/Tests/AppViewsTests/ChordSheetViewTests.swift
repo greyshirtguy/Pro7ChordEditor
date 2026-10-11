@@ -169,8 +169,15 @@ struct ChordSheetViewTests {
                     #expect(abs(below.frame.minY - inRow[0].frame.maxY - 2 * SheetLook.around) < 0.01, "\(what)")
                 }
             }
-            // Nothing is wider than what it is seen through, while a slide fits it.
-            #expect(canvas.cells.map(\.frame.maxX).max() ?? 0 <= canvas.bounds.width)
+            // Nothing is wider than what it is seen through, while a slide fits it;
+            // and the rows fill it from side to side, but for the margin and a
+            // rounding down.
+            let right = canvas.cells.map(\.frame.maxX).max() ?? 0
+            #expect(right <= canvas.bounds.width, "\(what)")
+            // (A song with fewer slides than go to a row does not fill its one row.)
+            if canvas.cells.count >= canvas.columns {
+                #expect(canvas.bounds.width - right <= SheetLook.margin + SheetLook.around + Double(canvas.columns) + 16, "\(what)")
+            }
         }
 
         held("wide")
@@ -246,6 +253,12 @@ struct ChordSheetViewTests {
         sheet.setSpot(lastLine, try #require(stops.last))
         canvas.keyDown(with: try press(special(NSRightArrowFunctionKey), in: window))
         #expect(sheet.spot.row == canvas.cells[1].rows.lowerBound)
+        // From the second slide of a row, Down goes to the second of the row under it.
+        if canvas.cells.count > columns + 1 {
+            sheet.setSpot(canvas.cells[1].rows.upperBound - 1, 0)
+            canvas.keyDown(with: try press(special(NSDownArrowFunctionKey), in: window))
+            #expect(sheet.spot.row == canvas.cells[columns + 1].rows.lowerBound)
+        }
         // From the last row of slides, Down goes nowhere; and where the row under is a
         // short one, to its last slide.
         let last = try #require(canvas.cells.last)
@@ -258,6 +271,23 @@ struct ChordSheetViewTests {
             canvas.keyDown(with: try press(special(NSDownArrowFunctionKey), in: window))
             #expect(sheet.spot.row == last.rows.lowerBound)
         }
+    }
+
+    @Test("Laid out again, for another size of words, the slide that was at the top of what is seen is still there")
+    func staysWhereItWas() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        let (canvas, window) = view(for: model, width: 620)
+        defer { window.close() }
+        #expect(canvas.columns == 1 && canvas.cells.count > 5)
+        #expect(canvas.bounds.height > 900)
+        let fourth = canvas.cells[3]
+        canvas.scroll(NSPoint(x: 0, y: fourth.frame.minY - 10))
+        #expect(abs(canvas.visibleRect.minY - (fourth.frame.minY - 10)) < 1)
+        canvas.setScale(0.9)
+        #expect(canvas.metrics.scale == 0.9 && canvas.columns == 1)
+        #expect(canvas.cells[3].frame.minY != fourth.frame.minY)
+        #expect(abs(canvas.visibleRect.minY - (canvas.cells[3].frame.minY - 10)) < 1)
     }
 
     @Test("The room under a short slide's lines, in a row with a taller one, is its last line's; a frame and its foot are bare sheet")

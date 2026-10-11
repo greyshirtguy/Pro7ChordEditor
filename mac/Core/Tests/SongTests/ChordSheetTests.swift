@@ -393,6 +393,25 @@ struct ChordSheetTests {
         #expect(song.asked == ["setChords slide 1 box \"B\" [\"G\"@0, \"D\"@3, \"C\"@8, \"G\"@14, \"C\"@16] joined false"])
     }
 
+    @Test("Mine, not a vector. Drawn twice the size, the gaps the sheet keeps along a line are twice theirs")
+    func twiceTheSize() throws {
+        struct Twice: SheetMeasure {
+            var scale: Double { 2 }
+            func advance(row: Int, units: Int) -> Double { 20 * Double(units) }
+            func bubble(_ name: String) -> Double { 16 * Double(name.utf16.count) + 28 }
+        }
+        let (intro, _) = try vectors.sheet("intro")
+        // Three chords on a line of chords alone, each one letter: 44 wide, and 8 apart
+        // where at the usual size they are 22 wide and 4 apart.
+        #expect(intro.placed(1, Twice()).xs == [0, 52, 104])
+        #expect(intro.placed(1, FixedWidths()).xs == [0, 26, 52])
+        // The place for a new one is 20 past the last, where it was 10; and a bubble
+        // is pointed at from 10 past its right edge, where it was 5.
+        #expect(intro.xOf(1, 6, Twice()) == 104 + 44 + 20)
+        #expect(intro.placeAt(1, along: 105, exact: true, Twice()) == 2)
+        #expect(intro.placeAt(1, along: 107, exact: true, Twice()) == 4)
+    }
+
     @Test("Mine, not a vector. A place is never the second half of a character that takes two units")
     func neverHalfACharacter() {
         // "a", a musical sharp sign from beyond the first 65,536 (two units), "b".
