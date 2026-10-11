@@ -476,6 +476,20 @@ public class MendingModelTests
         ShownMoved();
         model.Open(pc.Song(Plain, Old));
         Assert.Null(model.Judging);
+        // The song is put away and none is opened: another library is chosen.
+        model.Open(pc.Song(Grace, Old));
+        ShownMoved();
+        model.ChooseLibrary(pc.Library("Songs"));
+        Assert.Null(model.Shown);
+        Assert.Null(model.Judging);
+        model.ChooseLibrary(pc.Library(Old));
+        // And so it is where the song opened next cannot be read: there is no song.
+        model.Open(pc.Song(Grace, Old));
+        ShownMoved();
+        File.WriteAllBytes(pc.Song(Plain, Old), [0x0A, 0xFF, 0xFF]);
+        model.Open(pc.Song(Plain, Old));
+        Assert.NotNull(model.Shown!.Problem);
+        Assert.Null(model.Judging);
         // And in all of it the chords were never moved.
         Assert.Equal(12, new OpenSong(pc.Song(Grace, Old)).Findings.Shift.ChordsBelowTheFirstLine);
         Assert.True(new OpenSong(pc.Song(Grace, Old)).Findings.Shift.Likely);

@@ -295,8 +295,14 @@ public class MendingViewTests
         Click(panel.Buttons.Other);
 
         // The rest, with ProPresenter started when one more is done.
+        // (Asked again after a mending, it is the question again: with its button
+        // that says yes, which the mending had put away, and Cancel to be clicked.)
         Click(mendAll);
         Assert.Equal("Mend 3 songs?", panel.Says.Heading);
+        Assert.Equal(
+            ("Mend 3 Songs", Visibility.Visible, "Cancel", true),
+            (Label(panel.Buttons.Yes), panel.Buttons.Yes.Visibility, Label(panel.Buttons.Other), panel.Buttons.Other.IsEnabled));
+        Assert.Empty(panel.Lines);
         pc.IsStartedOnceAsked = pc.TimesAsked + 1;
         Click(panel.Buttons.Yes);
         await panel.AtWork;
