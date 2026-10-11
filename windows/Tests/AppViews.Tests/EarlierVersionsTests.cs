@@ -85,6 +85,22 @@ public class EarlierVersionsTests
     });
 
     [Fact]
+    public void ASongThatStatesNoKeyIsSaidToHaveNoneInTheLineThatSetsACopyAgainstIt() => Pictures.OnAThreadOfItsOwn(async () =>
+    {
+        using var pc = new MadeUpPC();
+        // Holy Holy Holy states no key. Yesterday the chords of its first slide were
+        // taken off.
+        pc.Change("Holy Holy Holy", 1, song => song.SetChords(song.TextBoxes[0].Slide, song.TextBoxes[0].Element, []));
+        var model = await ModelOn(pc, "Holy Holy Holy");
+        var now = model.Shown!.Chords;
+        Assert.True(now < 22);
+
+        model.ShowEarlierVersions();
+        Assert.Equal("22 chords, no key.  Now: " + now + " chords, no key.", model.Earlier!.Comparison);
+        Assert.Equal("", model.Earlier.Picked!.Key);
+    });
+
+    [Fact]
     public void WhatTheListSaysOfWhyACopyWasMade()
     {
         static KeptCopy Copy(CopyReason? why, bool first = false) => new("x", DateTime.UnixEpoch, why, "", "", "", 0, "", 0) { IsTheFirst = first };
@@ -114,9 +130,12 @@ public class EarlierVersionsTests
         Assert.Equal(("G", 11), (model.Shown!.Key, model.Shown.Chords));
         Assert.Equal("Put back the version of " + model.When(first) + ".", model.JustPutBack!.Sentence);
         Assert.Equal(model.JustPutBack.Sentence, model.Notice);
+        Assert.Contains("  Put back an earlier version of Plain Song.pro, the one of " + model.When(first) + ".", pc.Log, StringComparison.Ordinal);
         // Its mark in the list is the file's as it now is.
         Assert.Equal(11, model.Marks[pc.Song("Plain Song")].Chords);
         Assert.Equal("Has 11 chords.", model.Rows.Single(row => row.Name == "Plain Song").ChordsTip);
+        // And is kept so for the next start, by the file as it now is.
+        Assert.Equal(11, pc.AppData.ReadMarks().MarksFor(model.Songs.Single(song => song.Name == "Plain Song"))?.Chords);
 
         // The file as it was just before is the newest copy now, and says why.
         model.ShowEarlierVersions();
@@ -134,6 +153,7 @@ public class EarlierVersionsTests
         Assert.Equal(("E", 8), (model.Shown!.Key, model.Shown.Chords));
         Assert.Null(model.JustPutBack);
         Assert.Equal("4 slides, 8 chords. Nothing can be changed here yet.", model.Notice);
+        Assert.Contains("  Putting back was undone for Plain Song.pro.", pc.Log, StringComparison.Ordinal);
         Assert.Equal(8, model.Marks[pc.Song("Plain Song")].Chords);
         // A put back and its taking back left two copies more than there were.
         Assert.Equal(4, pc.AppData.Copies().CopiesOf(PlainSong).Count);
@@ -141,6 +161,32 @@ public class EarlierVersionsTests
         model.TakeBack();
         Assert.Equal(history.Now, pc.BytesOf("Plain Song"));
         Assert.Equal(4, pc.AppData.Copies().CopiesOf(PlainSong).Count);
+    });
+
+    [Fact]
+    public void TheOfferToUndoAndWhatWentWrongGoWithTheSongWhenItsLibraryIsLeft() => WithHistory(async history =>
+    {
+        var pc = history.PC;
+        var model = await ModelOn(pc);
+        model.ShowEarlierVersions();
+        model.PutBackPicked();
+        Assert.NotNull(model.JustPutBack);
+        model.ChooseLibrary(pc.Library("Old copies"));
+        Assert.Null(model.Shown);
+        Assert.Null(model.JustPutBack);
+
+        // And so does what went wrong: a putting back that was refused.
+        model.ChooseLibrary(pc.Library("Songs"));
+        model.Open(pc.Song("Plain Song"));
+        model.ShowEarlierVersions();
+        pc.ProPresenterIsRunning = true;
+        model.PutBackPicked();
+        Assert.NotNull(model.Refused);
+        Assert.NotNull(model.Earlier);
+        model.ChooseLibrary(pc.Library("Old copies"));
+        Assert.Null(model.Refused);
+        Assert.Null(model.Earlier);
+        Assert.False(model.OffersOpeningAgain);
     });
 
     [Fact]
@@ -195,6 +241,7 @@ public class EarlierVersionsTests
         // The band is there from then (spec/06, rule 19).
         Assert.True(model.ProPresenterIsRunning);
         Assert.Contains("  An earlier version of Plain Song.pro was not put back.", pc.Log, StringComparison.Ordinal);
+        Assert.Contains("  A change to Plain Song.pro was refused.", pc.Log, StringComparison.Ordinal);
 
         pc.ProPresenterIsRunning = false;
         model.PutBackPicked();
@@ -289,6 +336,28 @@ public class EarlierVersionsTests
             model.Earlier!.Question);
         // (And nothing was put back for the asking.)
         Assert.Equal(grace, pc.BytesOf("Plain Song"));
+    });
+
+    [Fact]
+    public void AQuestionAnsweredYesAndThenRefusedIsAskedNoMoreAndWhatWentWrongIsSaid() => WithHistory(async history =>
+    {
+        var pc = history.PC;
+        var elsewhere = Path.Combine(pc.Folder, "Was there once.pro");
+        File.WriteAllBytes(elsewhere, pc.BytesOf("Amazing Grace"));
+        pc.AppData.Copies().Keep(elsewhere, PlainSong, CopyReason.BeforeAChange, DateTime.UtcNow.AddDays(-1));
+        var model = await ModelOn(pc);
+        model.ShowEarlierVersions();
+        model.PickCopy(model.Earlier!.Copies.Single(copy => copy.SongName == "Amazing Grace").Id);
+        model.PutBackPicked();
+        Assert.NotNull(model.Earlier!.Question);
+
+        // Yes, it says; and ProPresenter has been started meanwhile.
+        pc.ProPresenterIsRunning = true;
+        model.PutBackPicked(sure: true);
+        Assert.Equal("ProPresenter is running. Quit it to change chords here. Nothing was changed.", model.Refused);
+        Assert.NotNull(model.Earlier);
+        Assert.Null(model.Earlier!.Question);
+        Assert.Equal(history.Now, pc.BytesOf("Plain Song"));
     });
 
     [Fact]
@@ -390,6 +459,12 @@ public class EarlierVersionsTests
     public void AllCopiesEverySongThatHasCopiesWhetherItsSongIsStillThereACopyLookedAtAndSavedAsAFile() => WithHistory(history =>
     {
         var pc = history.PC;
+        // Five days ago Holy Holy Holy was a file somewhere else, which is there still;
+        // yesterday it was in the library, where it no longer is.
+        var elsewhere = Path.Combine(pc.Folder, "Elsewhere.pro");
+        File.Copy(pc.Song("Holy Holy Holy"), elsewhere);
+        new OpenSong(elsewhere, new Safeguards(() => false, (_, _) => { })).SetKey("C");
+        Assert.NotNull(pc.AppData.Copies().Keep(elsewhere, new KeptSong(MadeUpPC.PlaceName, "Songs", "Holy Holy Holy"), CopyReason.BeforeAChange, DateTime.UtcNow.AddDays(-5)));
         pc.Change("Holy Holy Holy", 1, song => song.SetKey("D"));
         pc.Change("Amazing Grace (Chords)", 3, song => song.SetKey("A"), "Old copies");
         File.Delete(pc.Song("Holy Holy Holy"));
@@ -399,8 +474,9 @@ public class EarlierVersionsTests
         Assert.Equal("", model.Notice);
         model.Read();
         Assert.Equal(["Documents/Old copies/Amazing Grace (Chords)", "Documents/Songs/Holy Holy Holy", "Documents/Songs/Plain Song"], model.Rows.Select(row => row.Id));
+        // (Where a song was is what its NEWEST copy says.)
         Assert.Equal([true, false, true], model.Rows.Select(row => row.SongIsStillThere));
-        Assert.Equal([1, 1, 2], model.Rows.Select(row => row.Copies.Count));
+        Assert.Equal([1, 2, 2], model.Rows.Select(row => row.Copies.Count));
         Assert.Equal(["Old copies, in Documents", "Songs, in Documents. The song is no longer there.", "Songs, in Documents"], model.Rows.Select(row => row.Where));
         Assert.Equal("The copies take " + model.Size + ".", model.Notice);
         Assert.Equal(AllCopiesModel.InWords(model.Rows.Sum(row => row.Copies.Sum(copy => copy.Size))), model.Size);
@@ -409,14 +485,17 @@ public class EarlierVersionsTests
         Assert.Equal("Amazing Grace (Chords)", model.PickedRow?.Song.Name);
         Assert.Equal("G", model.Looked?.Key);
 
+        // A song picked has its newest copy picked with it.
         model.PickSong("Documents/Songs/Plain Song");
+        Assert.Equal(model.PickedRow!.Copies[0].Id, model.PickedCopy);
+        Assert.Equal(("E", 11), (model.Looked!.Key, model.Looked.Chords));
         model.PickCopy(model.PickedRow!.Copies[^1].Id);
         Assert.Equal(("G", 11), (model.Looked!.Key, model.Looked.Chords));
         Assert.Equal("Plain Song (" + model.When(model.Copy!) + ").pro", model.NameToSaveAs(model.Copy!));
         var saved = Path.Combine(pc.Folder, "Saved.pro");
         Assert.Null(model.SavePicked(saved));
         Assert.Equal(history.Original, File.ReadAllBytes(saved));
-        Assert.Equal(["Documents", "Own", "Saved.pro"], Directory.EnumerateFileSystemEntries(pc.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
+        Assert.Equal(["Documents", "Elsewhere.pro", "Own", "Saved.pro"], Directory.EnumerateFileSystemEntries(pc.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
         // Saved again over what is there, it is that copy again.
         model.PickCopy(model.PickedRow.Copies[0].Id);
         Assert.Null(model.SavePicked(saved));
@@ -426,6 +505,14 @@ public class EarlierVersionsTests
         Assert.StartsWith("The copy could not be saved there: ", problem, StringComparison.Ordinal);
         Assert.Equal(problem, model.Notice);
         Assert.Null(model.SavePicked(saved));
+        Assert.Equal("The copies take " + model.Size + ".", model.Notice);
+        // Where a folder is in the way, nothing is left beside it of what was being
+        // written; and what went wrong is said no longer once the copies are read again.
+        var inTheWay = Path.Combine(pc.Folder, "Own");
+        Assert.StartsWith("The copy could not be saved there: ", model.SavePicked(inTheWay), StringComparison.Ordinal);
+        Assert.Equal(["Documents", "Elsewhere.pro", "Own", "Saved.pro"], Directory.EnumerateFileSystemEntries(pc.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
+        Assert.True(Directory.Exists(inTheWay));
+        model.Read();
         Assert.Equal("The copies take " + model.Size + ".", model.Notice);
         // Nothing here changed a song, or a copy.
         Assert.Equal(history.Now, pc.BytesOf("Plain Song"));

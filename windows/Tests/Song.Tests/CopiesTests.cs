@@ -134,6 +134,34 @@ public sealed class CopiesTests : IDisposable
     }
 
     [Fact]
+    public void ACopysChordsAreThoseTheEditorsWouldBeShownAsTheMarkInTheListCountsThem()
+    {
+        // A song with a text box that shows something else's words (a ticker's): its
+        // chords are none of the song's (Reading.cs), in a copy's count as in the mark.
+        var path = bench.CopyOf(PlainSong);
+        var presentation = Workbench.Read(path);
+        var first = new OpenSong(path).TextBoxes[0];
+        var element = (from cue in presentation.Cues
+                       from action in cue.Actions
+                       from one in action.Slide?.Presentation?.BaseSlide?.Elements ?? []
+                       where one.Element_?.Uuid?.String == first.Element
+                       select one).Single();
+        element.DataLinks.Add(new Pro.SerializationInterop.RVProtoData.Slide.Types.Element.Types.DataLink
+        {
+            Ticker = new Pro.SerializationInterop.RVProtoData.Slide.Types.Element.Types.DataLink.Types.Ticker(),
+        });
+        var changed = bench.FileOf("A box that shows a ticker.pro", Google.Protobuf.MessageExtensions.ToByteArray(presentation));
+        Assert.Equal(3, first.Chords.Count);
+
+        var copy = Keeper.Keep(changed, Kept, CopyReason.BeforeAChange, Time())!;
+        Assert.Equal(8, copy.Chords);
+        Assert.Equal(Marks.Read(new ListedSong("x", changed, 0, DateTime.UnixEpoch)).Chords, copy.Chords);
+        // And so with the index gone, read from the copy itself.
+        File.Delete(Path.Combine(Keeper.FolderOf(Kept), "index.json"));
+        Assert.Equal(8, Keeper.CopiesOf(Kept).Single().Chords);
+    }
+
+    [Fact]
     public void WithTheIndexGoneTheCopiesAreStillListedFromTheFolderAndFromThemselves()
     {
         var path = bench.CopyOf(PlainSong);
@@ -291,7 +319,11 @@ public sealed class CopiesTests : IDisposable
         song.SetChords(box.Slide, box.Element, [new Chord(0, "Em")]);
         song.SetKey("E");
         var changed = File.ReadAllBytes(path);
-        Assert.True(song.CanUndo);
+        // (And something done and undone, so that there is something to redo.)
+        song.SetKey("D");
+        song.Undo();
+        Assert.Equal(changed, File.ReadAllBytes(path));
+        Assert.True(song.CanUndo && song.CanRedo);
 
         // The one copy there is, is the file as it was. Put back:
         now = Time(seconds: 600);
@@ -381,6 +413,31 @@ public sealed class CopiesTests : IDisposable
         Assert.Equal(byAnother, File.ReadAllBytes(path));
         Assert.Equal("E", song.Key);
         Assert.True(song.CanUndo);
+    }
+
+    [Fact]
+    public void WhatIsPutBackIsTheSongFromThenOnItsSlidesAndItsBoxesWhateverTheSongWasBefore()
+    {
+        // Put in Plain Song's place, of four slides, the bytes of a song of seven: the
+        // song is then that one, slide for slide, as if it had been opened afresh.
+        var path = bench.CopyOf(PlainSong);
+        var song = Open(path, () => Time());
+        Assert.Equal(4, song.SlideCount);
+        var grace = TestData.InFiles("made-by-simple-presenter/Amazing Grace.pro");
+
+        song.PutBack(grace);
+
+        var afresh = new OpenSong(path);
+        Assert.Equal(7, song.SlideCount);
+        Assert.Equal(afresh.SlideCount, song.SlideCount);
+        Assert.Equal(afresh.TextBoxes.Select(box => (box.Slide, box.Group, box.Element, box.Words)), song.TextBoxes.Select(box => (box.Slide, box.Group, box.Element, box.Words)));
+        Assert.Equal(afresh.TextBoxes.SelectMany(box => box.Chords), song.TextBoxes.SelectMany(box => box.Chords));
+        Assert.Equal((afresh.Name, afresh.Id, afresh.Key), (song.Name, song.Id, song.Key));
+        // And it can be changed on from there: its last slide's chords, which Plain Song
+        // has no slide for.
+        var last = song.TextBoxes[^1];
+        song.SetChords(last.Slide, last.Element, []);
+        Assert.Empty(new OpenSong(path).TextBoxes[^1].Chords);
     }
 
     [Fact]
@@ -499,6 +556,12 @@ public sealed class CopiesTests : IDisposable
         Assert.Empty(keeper.NamesWithCopies("Sunday", "Kids"));
         Assert.Contains("plain song", keeper.NamesWithCopies("Sunday", "Songs"));
         Assert.Equal((new FileInfo(plain).Length * 3) + new FileInfo(grace).Length, keeper.Size);
+        // Every copy of a song is counted, not its newest alone.
+        var before = keeper.Size;
+        new OpenSong(plain, bench.Safeguards).SetKey("E");
+        keeper.Keep(plain, Kept, CopyReason.BeforeAChange, Time(seconds: 60));
+        Assert.Equal(before + new FileInfo(plain).Length, keeper.Size);
+        Assert.Equal(2, keeper.CopiesOf(Kept).Count);
         // Nothing kept yet is nothing found, and no folder made to look.
         var none = new Copies(Path.Combine(bench.Folder, "Nowhere", "Backups"));
         Assert.Empty(none.Songs());
@@ -522,6 +585,10 @@ public sealed class CopiesTests : IDisposable
         Assert.Equal("1 Jan", keeper.When(new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc), Time(), british));
         Assert.Equal("31 Dec 2025", keeper.When(new DateTime(2025, 12, 31, 23, 59, 59, DateTimeKind.Utc), Time(), british));
         Assert.Equal("15 Dec 2025", keeper.When(Time(days: -300), Time(), british));
+        // A copy that says it was made after now (the clock has been put back since)
+        // is not of today: it is said by its date.
+        Assert.Equal("12 Oct", keeper.When(Time(days: 1), Time(), british));
+        Assert.Equal("1 Jan 2027", keeper.When(new DateTime(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc), Time(), british));
         // The day is the computer's own: what is still Saturday at Greenwich is Sunday
         // already where the clocks are eleven hours on, and so is today there.
         var sydney = new Copies(Path.Combine(bench.Folder, "Nowhere"), "", TimeZoneInfo.FindSystemTimeZoneById("AUS Eastern Standard Time"));

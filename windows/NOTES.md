@@ -14,7 +14,8 @@ milestone; put right what has become untrue.
 | **M1** The rules | Done, 2026-10-12 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the stand-ins written into one, the key fit and the first editor's shift. Every case of the sixteen vector files M1 is held to passes (some thirty-one thousand answers), with cases of our own for what no vector holds |
 | **M2** The song | Done, 2026-10-12 | `Song`: a song opened and read (blank slides among its boxes), its chords and its two keys set, every change saved at once and safely, refusals, undo and redo. The proofs at the foot of `spec/05`, on copies of the test files. **And the song's part of M7**: a chord more or fewer on a line of chords alone, chords onto a blank slide, a slide given a box, a change of mind (decision 15) |
 | **M3** The library | Done, 2026-10-12, bar what only the maintainer can try | Where songs are kept as files on a PC, the lists, the search, the marks, a song shown read only, whether ProPresenter is running, the app's own settings and log; and the window, in the look of Windows 11, dark and light. `spec/06`. **Nobody has seen the window itself**: it was drawn into pictures, and started ("Left rough"). **And on this PC it finds no library**, for the reason in the next section |
-| **M4** The copies | Next | Kept before a first change; listed; looked at; put back; taken back. `spec/07`. `OpenSong.PutBack` with it |
+| **M4** The copies | Done, 2026-10-12, bar what only the maintainer can try | A copy of a file kept before it is changed, named for when, with an index beside it; listed, thinned at the start, looked at, put back and that taken back; a mark in the list, Earlier Versions over the window, All Copies in the settings; the window's own menu. The proofs at the foot of `spec/07`. **Nothing in the app makes a copy until there is an editor**, so there is nothing of it for the maintainer to try yet but the menu and the settings ("At M4") |
+| **M5** The ChordPro editor | Next | `spec/04`. The first build that changes a song's chords, and so the first to try on a COPY of a real library |
 | **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
@@ -254,6 +255,49 @@ each the maintainer's to change:
     (`App/app.manifest`): afresh for each screen it comes to, and not stretched.
     Windows was asked of the running window and says it is so.
 
+And at M4, likewise this session's, and the maintainer's to change:
+
+30. **The copies are ported from the Mac's `Copies.swift`**, and a copy's index is
+    written with the Mac's names for things (`file`, `made`, `why`, `copyOf`,
+    `songID`, `songName`, `chords`, `key`, `size`, `appVersion`), the three reasons in
+    the page's words. Neither app reads the other's, but someone who looks into both
+    finds one thing.
+31. **A name is made fit to be a folder's by Windows' rules as well as the page's.**
+    `spec/07`, rule 7, turns a slash either way, a colon and a line end into a
+    hyphen. On Windows a name may not have `< > " | ? *` in it either, and Windows
+    drops a full stop or a space from the end of one, so that two songs' names could
+    come to one folder. Those become hyphens too (`Copies.FolderName`). **For
+    `spec/07`, if the maintainer agrees**: it is Windows' own, and the Mac need do
+    nothing about it.
+32. **When a copy was made is kept to the second, by the clock at Greenwich**; its
+    name is that in the computer's own time, as the page asks. A name that says an
+    hour the clocks skip in spring (no copy is made in one, but a name can be typed)
+    is read as the hour after, and not as no copy.
+33. **The app's version is 0.1.0**, said once (`Directory.Build.props`), as the Mac's
+    first build is 0.1. A copy's index records it. What it is when there is a build
+    worth giving anyone, the maintainer says.
+34. **Earlier Versions is a panel over the window, not a window of its own**: the
+    window is dimmed behind it, and Esc, Done or a click on the dimmed part puts it
+    away (`spec/07`, rule 17). So a test draws it as it draws the rest, and it cannot
+    be lost behind the window. The button for it is in the song's header, where the
+    page has it (rule 15).
+35. **The window has its own menu**, as `spec/10` asks: File (Choose Folder, Settings,
+    Exit) and Song (Earlier Versions). **The settings are a window opened over the
+    app's**, to be closed before the app is gone back to; it has one section so far,
+    Backups, which is All Copies.
+36. **Putting back a copy that is already what the file is, is nothing to do and
+    offers nothing to undo** (`spec/07`, rule 21). The Mac's model goes on to offer
+    Undo all the same, and Undo would then put back whatever copy happened to be the
+    newest. **For the maintainer to pass on to the Mac's session.**
+37. **A song's marks in the list are worked out again as soon as a copy is put back**,
+    and whether it has copies: the list is never a file behind.
+38. **How much room the copies take is said as Windows counts it** (1024 to the
+    kilobyte: "23 KB", "1.2 MB"), by a few lines of our own, the same on every PC.
+    Their folder is shown in File Explorer; a copy is saved with the system's own
+    asking for where.
+39. **The names of days and months in "when a copy was made" are the person's own
+    language's**, as the system has it. On this PC September is "Sept".
+
 ## How it is laid out, and why
 
 ```
@@ -408,8 +452,30 @@ names. What to know before changing any of it:
   look's own. Where a control of the look's is wanted otherwise (a list's rows less
   tall), the look is given another answer where it asks: a resource of the same
   name, nearer by (`ListsPane.xaml`).
-- **A song is opened with no safeguards at M3**, so it cannot be changed. M5 hands it
-  real ones: `ProPresenterApp.IsRunning`, and the copies of M4.
+- **A song was opened with no safeguards at M3**, so that it could not be changed.
+  From M4 it has its real ones (below).
+
+### The copies (M4)
+
+- **In `Song`**: `Copies.cs`, which keeps, lists and thins; and `OpenSong.PutBack`,
+  which is a save like any other and is the only way a copy gets back into a song's
+  place. `AppData.Copies()` says where they are: `Backups` in the app's own folder.
+- **`LibraryModel` opens a song with its real safeguards**: whether ProPresenter is
+  running is asked before every save, and `Copies.Keep` is asked for a copy before the
+  first. A song is known to its copies by the place's NAME, the library's and its own
+  (`KeptSongOf`).
+- **In `AppViews`**: `EarlierVersionsPanel` shows what `LibraryModel.Earlier` has;
+  `AllCopiesModel` is All Copies with no drawing in it, `AllCopiesView` shows it, and
+  `SettingsWindow` frames that. `SongLines` draws a song's lines wherever a song is
+  only looked at: the song itself, a copy in the panel, a copy in All Copies.
+- **Nothing in All Copies changes a song.** A copy is looked at there, or saved as a
+  file of its own. Putting one back is done from the song, where it is open and its
+  safeguards are asked.
+- **Only `Copies.Thin` deletes anything of the person's**, and only what is named as
+  a copy, in one song's folder of copies. Keep it so.
+- **The tests' songs have a history made for them** (`MadeUpPC.Change`,
+  `GivePlainSongAHistory`): a song changed as the app would change it, some days ago,
+  with a copy kept first and dated then.
 
 ## What was found out
 
@@ -637,9 +703,9 @@ names. What to know before changing any of it:
   time its marks are worked out: a mark needs the file read. Nothing is done about
   that. It is each song once, and the songs are small.
 - **A freshly built app takes some eighteen seconds to show its window the first
-  time, and one second every time after.** Seen of two builds, 17 and 19 seconds,
-  each with this PC busy at other work; the second and third start of the same
-  file took one second. Why is A GUESS: it is one file of 141 megabytes that nobody
+  time, and one second every time after.** Seen of three builds, 17, 19 and 18
+  seconds, each with this PC busy at other work; the second and third start of the
+  same file took one second. Why is A GUESS: it is one file of 141 megabytes that nobody
   has signed, which Windows' own guard reads through before it lets it start, and
   the app unpacks WPF's libraries the first time. For M10, where the file's size
   and what the person is told are to be seen to: someone who has just downloaded
@@ -699,6 +765,59 @@ names. What to know before changing any of it:
   `.proPaths`.** It made ProPresenter's settings folder look as if it had fifteen
   songs in it. The app tells a song's ending by itself (`Listing.cs`).
 
+### At M4
+
+- **Until there is an editor, nothing in the app makes a copy.** A copy is kept
+  before a song's first change, and so far nothing changes a song but putting a copy
+  back. So on the maintainer's PC the mark, Earlier Versions and All Copies have
+  nothing to show until M5, and M4 is proved as `spec/11` says it is to be: with the
+  song's own functions, on copies of the test files, and in pictures.
+- **One case of mine expected wrongly, and the code was right.** With another song's
+  bytes put in a song's place, the song there now IS the other, inside. So a copy of
+  the song that was there is then "of another song", and is asked about, with the
+  two names the other way round. The case had expected it to be put back unasked.
+- **A comment in a view's file may not have two hyphens together**, as in a
+  project's file (M0). The page's drawing of the panel is in a frame of hyphens: in
+  `EarlierVersionsPanel.xaml` it is drawn without.
+- **A name in a class may not be both a thing it has and a kind of thing it uses.**
+  What went wrong, as a sentence, is `Refused` in the model and not `Refusal`, which
+  is the kind of thing a song throws. (A list named `Copies` in a view beside the
+  kind `Copies` is let be, where the kind is not named in that file.)
+- **What the pictures showed.** Eight more, of the mark and the button, the panel in
+  both looks, the question, the offer to undo, what went wrong said in the panel and
+  on the quiet line with the offer to open again, and All Copies with copies and with
+  none. All were opened, and all were right at the first drawing.
+- **How the proofs were shown to bite**, as before: each rule broken in one small
+  way in turn, in the two clones, with the tests run after each.
+  - Of the copies' plain code (`Copies`, and `OpenSong.PutBack`): seventy-three
+    breakages, one of which changed nothing. Sixty-four were caught at once. **Five
+    were rules no test held**: that a copy's chords are counted as the mark in the
+    list counts them, and not those of a box that shows something else's words;
+    that every copy of a song is counted in the room they take, and not its newest
+    alone; that a copy which says it was made after now is not said to be of
+    today; that after a putting back the slides and boxes are the song's as it then
+    is; and that what was undone before a putting back cannot be redone after it.
+    One cannot be told from the rule by any input (a copy written over one that is
+    there: the naming apart already keeps it from that). Two cannot be reached
+    ("Left rough").
+  - Of the window's part (earlier versions in `LibraryModel`, and
+    `AllCopiesModel`): seventy-two, one of which changed nothing. Fifty-eight were
+    caught at once. **Eleven were rules no test held**: a copy of a song that
+    states no key, in the line that sets it against the song now; that a question
+    answered yes and then refused is asked no more; the three lines of the log (a
+    putting back, its taking back, a refusal); that the marks of a song put back
+    are kept for the next start; that the offer to undo and what went wrong go
+    with the song when its library is left; and, of All Copies, that where a song
+    was is what its newest copy says, that a song picked has its newest copy
+    picked with it, that what went wrong is said no longer once the copies are
+    read again, and that nothing is left beside a place a copy could not be saved
+    to. One is the same to look at (putting away a panel that is not there). One
+    could not be told at M4: that the mark of copies comes with a song's first
+    copy, which is made before its first change, and nothing changed a song before
+    M5. M5's tests of typing hold it.
+  Each of the sixteen has a case now, and each case was run against the breakage
+  it was written for.
+
 ## Left rough, and what to ask
 
 - **Nobody has seen the window.** Every picture is of the view the window holds,
@@ -716,6 +835,12 @@ names. What to know before changing any of it:
     goes within a couple of its quitting, with this app in front all the while;
   - that a library of some hundreds of songs lists at once and its marks come in
     after, without the list jumping; the arrow keys in the lists; the tips;
+  - the menu, and that File > Settings opens the settings over the window, where
+    **Show Their Folder** opens File Explorer and **Save This Copy As...** asks
+    where (both greyed until there is a copy, which is not before M5);
+  - once there are copies: that Earlier Versions opens over the window, that the
+    arrow keys go through the versions, that Esc and a click on the dimmed part put
+    it away, and that the offer to undo a putting back goes after eight seconds;
   - that words are sharp on a screen set to another size than the first one's.
 - **In Visual Studio, only the listing of the tests has been seen.** The maintainer
   opened the solution in Visual Studio 2026 and its Test Explorer listed the
@@ -754,17 +879,28 @@ names. What to know before changing any of it:
   keeps the window's size for the app, which is true of a Mac and not of Windows:
   here the app would have to. It opens at 1280 by 800 in the middle of the screen
   every time. Small, and not built: for the maintainer to want or not.
-- **There is no menu yet.** `spec/10` asks for the window's own menu with every
-  command in it. There is one command so far, Choose Folder, and it is a button.
-  The menu comes with the commands, from M4.
+- **The menu has no keys of its own yet**, bar the letters Windows underlines when
+  Alt is held. `spec/10` gives the keys of the editors' commands; none is given for
+  Choose Folder, Settings or Earlier Versions, and none was made up.
+- **Revert** (`spec/07`, rule 22a; `spec/06`, rule 12a) is not built: it is a putting
+  back of the song as it was opened, and comes with the editors, when there is
+  something to revert.
+- **A song whose name Windows keeps for itself** (CON, NUL, COM1 and their like)
+  cannot have a folder of copies made for it. The copy then cannot be kept, and the
+  change that wanted it is refused, which is the safe way to fail; but such a song
+  could not be chorded at all. Not seen, and nothing is done about it.
 - **If the system will not say whether ProPresenter is running, it is taken as
   running** (decision 21). No test can make the system refuse, so no test holds it.
 - **Marks being worked out for a library that has been left are let go** after the
   few in hand. Taking that out wastes work and breaks nothing, so no test tells.
-- **Putting a copy back (`PutBack`) is not in `OpenSong` yet**: it is M4's, with the
-  copies.
-- **The app has no version number and no icon.** The first is wanted at M4 (a
-  copy's index records it); the second at M10.
+- **Two cares of the copies that no test can reach.** A copy is read back after it
+  is written, and the change it was for is refused if what is on the disk is not
+  what was written: only a disk that does not keep what it is given would show it.
+  And before a copy that is kept no longer is thrown away, it is looked at: it must
+  be in its song's own folder and named as a copy is. Every copy the list hands
+  over is both, so nothing can be made to fail there; the care is kept because it
+  stands before a deletion (AGENTS.md, "The person's files").
+- **The app has no icon.** It is M10's.
 - **`old/publish.py` must not be run**: it commits, pushes and tags. Its README says
   so now.
 - **Two lines of `reference/README.md` are no longer true**, under "Where this and

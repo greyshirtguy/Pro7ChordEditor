@@ -2,9 +2,11 @@
 
 The Windows app, being built second of the two, to the plan in
 [`spec/11-plan.md`](../spec/11-plan.md). So far it finds the songs on a PC, lists them
-by library, and shows one, with its chords in brackets among its words. **Nothing can
-be changed with it yet**: the copies it keeps before a change, and the two editors,
-are still to be built. **There is nothing here to download.**
+by library, and shows one, with its chords in brackets among its words. **No chord
+can be changed with it yet**: the two editors are still to be built. What is built
+for them is the copy it keeps of a song's file before the first change to it, the
+list of a song's earlier versions, and putting one back.
+**There is nothing here to download.**
 
 Under what is seen it has the rules of chords, held to the same answers as the Mac
 app's, and the song itself: a file opened, its chords and its keys changed, each change
@@ -60,8 +62,8 @@ dotnet publish App           # the app as the one file it is given out as
 The first time a newly built one is started it may be some seconds before its window
 shows; after that, one.
 
-The app keeps its own things (what was chosen, a log of what it did) in
-`%LOCALAPPDATA%\Pro7ChordEditor`, and nothing anywhere else.
+The app keeps its own things (what was chosen, a log of what it did, the copies of
+songs' files) in `%LOCALAPPDATA%\Pro7ChordEditor`, and nothing anywhere else.
 
 To see the window without starting the app, some tests draw it into pictures (in
 PowerShell):
@@ -86,7 +88,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | --- | --- |
 | `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
-| `Song/` | The song as the editors see it, and the library: where songs are, the lists, the marks, the app's own settings. The copies and the checks are to come. No window in it |
+| `Song/` | The song as the editors see it; the library: where songs are, the lists, the marks, the app's own settings; and the copies kept before a change. The checks are to come. No window in it |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
 | `App/` | The app itself: the few lines that start it, and how it is built to be given out |
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |
