@@ -220,6 +220,30 @@ And at M6, 2026-10-11:
     (`ListIcons.swift`), and the mark's orange from three colours read off a picture
     of it: no picture file of either is in the repository. They are Renewed Vision's,
     which the file and `spec/06`, rule 6c, say; the maintainer was told so.
+43. **Every card of a song is one size, and the shape of a screen** (`spec/03`, rule
+    8). The maintainer, with the grid before them: "now it looks so good I am
+    tempted to sacrifice some space efficiency to get the slides more uniform and
+    more closer to 16:9 (currently a bit too wide - which is awesome for fitting more
+    text! ..but now I am getting fickle about the looks - chasing a balance)". So:
+    one width, the widest slide's (decision 39's columns of their own widths are
+    gone); 16 by 9, but never taller for that than four lines need; a row taller
+    only where a slide of it has more lines than the shape holds; and a slide's
+    lines in the middle of its card. (Mine: the limit of four lines, without which a
+    song of long lines has cards mostly empty; and the lines standing in the middle
+    up and down, and at the left along. Lines in the middle along as well, as a
+    slide has them, was thought of and not done: they are read down their left edge
+    when chords are put on.)
+44. **The ChordPro text has a size of its own** (`spec/04`, rule 25), the maintainer
+    having looked for a zoom there: "I could not see a zoom for ChordPro (I suppose
+    it should really be a text + - or something)". Kept apart from the sheet's zoom,
+    in the same steps.
+45. **The switch between the two editors is in the middle of the header, large, with
+    a picture on each button** (`spec/06`, rule 12). The maintainer: "the whole dual
+    mode editor needs to be a bit more front and centre obvious ... perhaps icons in
+    the two buttons ... surprise me with some delightful icons... and perhaps we
+    reposition those buttons to center???". The two pictures are mine, drawn in
+    `EditorSwitch.swift`: the sheet's spot over a line of words, and a C in square
+    brackets. Command+1 and Command+2 are mine too.
 
 ## How it is laid out, and why
 
@@ -414,6 +438,15 @@ changing any of it:
   changes (`fit`, which the scroll view calls from `tile`), and when the zoom does
   (`setScale`); the last two by `layOutWhereItWas`, which keeps the slide at the top
   of what is seen at the top.
+- **The shape of a card** is in `SheetLook` (`shape`, 9 to 16, and `shapedUpTo`, the
+  four lines) and is worked out once for the song in `layOut`; a cell remembers
+  where its lines start (`linesTop`), since they stand in the middle of it and not
+  at its top, and `line(at:)` goes by that.
+- **The switch** between the two editors is `EditorSwitch.swift`, with its two
+  pictures; the header that holds it, the name and the keys is `SongPane.header`,
+  which folds from one row to two and to three as the pane narrows.
+- **The size of the ChordPro text** is `LibraryModel.textZoom`; `ChordProText.setScale`
+  gives the text view its two fonts at that size and colours it again.
 - **The zoom** is `LibraryModel.sheetZoom`, one of `sheetZooms`, kept in the app's
   settings (`AppData.Settings.sheetZoom`, nothing when it is the usual one). A key or
   a pinch goes canvas -> `Asks.zoom` -> `LibraryModel.zoomSheet` -> back as the new
@@ -802,6 +835,15 @@ changing any of it:
   and 320 songs wholly in sight. Still 45 scroll sideways: a line never wraps, and a
   verse written as one line is wider than the sheet. None of 22,236 places pointed
   at gave the wrong place; slowest layout 22 ms.
+- **Cards of one size and a screen's shape** (decision 43), on copies of the 422
+  songs, in the window as it opens (the sheet now some 1,010 by 640, the songs' list
+  having gone under the libraries): 9.0 lines of words in sight on average (37%),
+  113 songs wholly in sight; two slides to a row in 132 songs, three in 141, one in
+  80; 39 scroll sideways. At 60 in the hundred, 13.6 lines (56%). In a large window
+  (1,650 by 900), 17.5 lines (72%), 227 songs wholly in sight. 325 songs have cards
+  of 16 by 9 and 97 are held to four lines; 261 rows of 3,566 are taller than the
+  shape, for a slide of more lines than it holds. None of 22,236 places pointed at
+  gave the wrong place.
 - **Asked only when the app came to the front, whether ProPresenter was running was
   wrong after it was quit** (decision 40): quit from its own window, it is still
   going when this app is in front again. `LibraryWindow` now listens for
@@ -848,6 +890,11 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Nobody has pressed the new switch, or Command+1 and Command+2, or the keys that
+  size the ChordPro text**: the switch is in the pictures and its model is tested;
+  the text's keys are tested by handing the text view a key. To be seen by a hand:
+  that the orange slides from one button to the other, and that the keys reach them
+  whichever of the lists, the sheet or the text has the keyboard.
 - **The bar between the two lists has been dragged by nobody**: its arithmetic is
   tested and it is seen in the pictures, and that is all. To be tried: that it
   follows the pointer, that the cursor changes over it, that two clicks put it back,

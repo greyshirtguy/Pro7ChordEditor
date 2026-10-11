@@ -131,7 +131,16 @@ song the width they took.)
     out again when it is saved.
 12. **The song** at the right: its name, its two keys
     ([05-song-and-saving.md](05-song-and-saving.md)), and a switch between the chord
-    sheet and ChordPro. Under the editor, one quiet line says what the keys do, or for
+    sheet and ChordPro. **The switch is in the middle of the song's header and is
+    not small**: two buttons side by side, "Chords" and "ChordPro", each some 30 tall
+    with a small picture before its name, the one that is shown filled with the
+    sheet's orange (`#ff8a1f`) and its words dark. The name is at the header's left
+    and the keys at its right. **Ctrl+1** shows the sheet and **Ctrl+2** the text.
+    The two pictures are this app's own: for the sheet, a chord's bubble in outline
+    with a plus in it and its tail coming down to a line of words (the sheet's spot);
+    for the text, a C in square brackets. (**Changed** on 2026-10-11: it was the
+    system's small switch at the header's right, and the maintainer found that the
+    song can be worked on in two ways too easy to miss.) Under the editor, one quiet line says what the keys do, or for
     a few seconds what just happened ("4 chords copied…", or what went wrong).
     Each key is a picker of the twenty-six keys ([02-chord-rules.md](02-chord-rules.md));
     a song that states no key shows "None" in the first, and its second cannot be set

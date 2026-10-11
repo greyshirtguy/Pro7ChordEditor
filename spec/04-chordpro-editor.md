@@ -148,6 +148,20 @@ Since brackets are all there is to type:
     a slide is picked from elsewhere, the caret goes to the start of its first line and
     the text scrolls to it. (Until there is an elsewhere, M6, nothing shows it.)
 
+## The size of the text
+
+25. **The text can be made larger and smaller**, in the steps the sheet zooms by
+    ([03-chord-sheet.md](03-chord-sheet.md), rule 14a: 50 to 150 in the hundred), the
+    usual one here being 100. Two small buttons at the right of the line of help, a
+    small letter A and a large one, go a step down and up, and are greyed at the
+    ends; so do **Ctrl+minus** and **Ctrl+plus** (or Ctrl with the equals key), and
+    **Ctrl+0** goes back to the usual size. Only the size changes: not a character
+    of the text, nor where the caret is, nor what can be undone. The size is
+    remembered from one start of the app to the next, apart from the sheet's: a size
+    that suits a grid of slides is not the one that suits a page of text. (**New**,
+    asked for by the maintainer on 2026-10-11, the sheet having a zoom and the text
+    none.)
+
 ## Until chords with no words are built (M7)
 
 The ChordPro editor is built before the app can add a stand-in to a line of chords
