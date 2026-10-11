@@ -27,7 +27,11 @@ public partial class EarlierVersionsPanel : UserControl
     }
 
     /// <summary>A copy as the list has it: when it was made, and why.</summary>
-    public sealed record CopyRow(string Id, string When, string Why);
+    public sealed record CopyRow(string Id, string When, string Why)
+    {
+        // (What a screen reader says of the row: ListsPane.xaml.cs.)
+        public override string ToString() => Why.Length == 0 ? When : When + ", " + Why;
+    }
 
     private void Follow(LibraryModel? now)
     {

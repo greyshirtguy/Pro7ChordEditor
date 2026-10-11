@@ -149,6 +149,37 @@ public sealed class LibraryModel : INotifyPropertyChanged
         public static string HasCopiesTip => "Earlier versions of this song are kept.";
 
         public string ChordsTip => Marks is null ? "" : Marks.Chords == 1 ? "Has 1 chord." : "Has " + Number(Marks.Chords) + " chords.";
+
+        /// <summary>
+        /// The row in words: the song's name, and what each of its marks says. It is
+        /// what a screen reader says of the row, which has the marks only as small
+        /// pictures.
+        /// </summary>
+        public string Said
+        {
+            get
+            {
+                var said = new List<string> { Name + "." };
+                if (CannotBeRead)
+                {
+                    said.Add(CannotBeReadTip);
+                    return string.Join(' ', said);
+                }
+                if (HasChords)
+                {
+                    said.Add(ChordsTip);
+                }
+                if (HasCopies)
+                {
+                    said.Add(HasCopiesTip);
+                }
+                if (IsOldEditorsCopy)
+                {
+                    said.Add(OldEditorsCopyTip);
+                }
+                return string.Join(' ', said);
+            }
+        }
     }
 
     /// <summary>The copies of the song that is open, and the one picked to be looked at.</summary>

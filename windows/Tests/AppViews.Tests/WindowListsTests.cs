@@ -200,6 +200,77 @@ public class WindowListsTests
         Assert.Same(model, view.DataContext);
     });
 
+    // FOUND at M5, by asking the real window as a screen reader would: a song's row was
+    // called "ListsPane+Row", the name of its kind in the program.
+    [Fact]
+    public void EveryRowOfEveryListSaysWhatItShowsToAScreenReader() => Pictures.OnAThreadOfItsOwn(async () =>
+    {
+        using var pc = new MadeUpPC();
+        pc.GivePlainSongAHistory();
+        var model = pc.Model();
+        var view = new LibraryView(model);
+        await model.StartAsync();
+        model.ChooseLibrary(pc.Library("Songs"));
+        await model.MarksAreWorkedOutAsync();
+        model.Open(pc.Song("Plain Song"));
+        Look.Wear(view, dark: true);
+        Pictures.LayOut(view, 1280, 800);
+
+        // As a screen reader asks: each row of a list, by what the list's own account
+        // of itself calls it.
+        IReadOnlyList<string> Rows(string list) =>
+            [.. System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(Found<FrameworkElement>(view, list)).GetChildren()
+                .Where(row => row.GetAutomationControlType() == System.Windows.Automation.Peers.AutomationControlType.ListItem)
+                .Select(row => row.GetName())];
+
+        Assert.Equal(["Kids", "Old copies", "Songs"], Rows("Libraries"));
+        var songs = Rows("Songs");
+        Assert.Equal(MadeUpPC.Songs.Length, songs.Count);
+        Assert.Contains("Amazing Grace. Has 40 chords.", songs);
+        Assert.Contains("Plain Song. Has 8 chords. Earlier versions of this song are kept.", songs);
+        Assert.Contains("Nonsense. This file could not be read as a ProPresenter presentation.", songs);
+        Assert.Contains("Rock Of Ages (Toplady).", songs);
+        Assert.DoesNotContain(songs, row => row.Contains("Pro7ChordEditor", StringComparison.Ordinal) || row.Contains('{', StringComparison.Ordinal));
+
+        // The rows that are not in a list a test can lay out: each by what it calls itself.
+        Assert.Equal("ProPresenter in Documents", new ListsPane.PlaceChoice("id", "ProPresenter in Documents").ToString());
+        Assert.Equal("None", new SongPane.KeyRow("").ToString());
+        Assert.Equal("F#m", new SongPane.KeyRow("F#m").ToString());
+        Assert.Equal("Today 09:14, before a change", new EarlierVersionsPanel.CopyRow("id", "Today 09:14", "before a change").ToString());
+        Assert.Equal("4 Oct", new EarlierVersionsPanel.CopyRow("id", "4 Oct", "").ToString());
+        var kept = new AllCopiesModel.Row(new KeptSong("Documents", "Songs", "Plain Song"), [], SongIsStillThere: false);
+        Assert.Equal("Plain Song. Songs, in Documents. The song is no longer there.", kept.ToString());
+        // A copy of the first editor's, which has chords and says what it is.
+        var old = new LibraryModel.SongRow("id", "Amazing Grace (Chords)", new Marks(Chords: 1, IsOldEditorsCopy: true));
+        Assert.StartsWith("Amazing Grace (Chords). Has 1 chord. A copy saved by the first Windows chord editor", old.Said, StringComparison.Ordinal);
+        // One whose marks are not worked out yet says its name.
+        Assert.Equal("Holy Holy Holy.", new LibraryModel.SongRow("id", "Holy Holy Holy", null).Said);
+    });
+
+    // A thing of a view's, by the name the view gives it.
+    private static T Found<T>(FrameworkElement view, string name)
+        where T : FrameworkElement
+    {
+        T? Look(DependencyObject at)
+        {
+            for (var child = 0; child < VisualTreeHelper.GetChildrenCount(at); child++)
+            {
+                var one = VisualTreeHelper.GetChild(at, child);
+                if (one is T found && found.Name == name)
+                {
+                    return found;
+                }
+                if (Look(one) is { } deeper)
+                {
+                    return deeper;
+                }
+            }
+            return null;
+        }
+
+        return Assert.IsAssignableFrom<T>(Look(view));
+    }
+
     [Fact]
     public void TheMarkFilterHasTheThreeChoicesTheWindowOffers()
     {

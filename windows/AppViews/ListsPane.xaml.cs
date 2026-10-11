@@ -40,8 +40,23 @@ public partial class ListsPane : UserControl
         SizeChanged += (_, _) => LayOut();
     }
 
+    // WHAT A ROW IS CALLED. A screen reader says of a row whatever the thing in the row
+    // calls itself (`ToString`), unless told otherwise; and a thing that does not say
+    // is called by the name of its kind in the program, which is no name at all. So
+    // each kind of row here says what it shows. (FOUND at M5, by asking the real window
+    // as a screen reader would: a song's row was called "ListsPane+Row".)
+
     /// <summary>A place where one is picked: its id, and what it is called there.</summary>
-    public sealed record PlaceChoice(string Id, string Label);
+    public sealed record PlaceChoice(string Id, string Label)
+    {
+        public override string ToString() => Label;
+    }
+
+    /// <summary>A library's row in the list.</summary>
+    public sealed record LibraryRow(string Id, string Name)
+    {
+        public override string ToString() => Name;
+    }
 
     /// <summary>A song's row in the list. It is told when its marks have been worked out, and the row is drawn again by itself.</summary>
     public sealed class Row(LibraryModel.SongRow song) : INotifyPropertyChanged
@@ -72,6 +87,8 @@ public partial class ListsPane : UserControl
 
         /// <summary>How strongly the row is drawn: a file that cannot be read is fainter.</summary>
         public double Strength => song.CannotBeRead ? 0.55 : 1;
+
+        public override string ToString() => song.Said;
 
         public void Is(LibraryModel.SongRow now)
         {
@@ -125,7 +142,7 @@ public partial class ListsPane : UserControl
             if (!ReferenceEquals(shownLibraries, model.Libraries))
             {
                 shownLibraries = model.Libraries;
-                Libraries.ItemsSource = model.Libraries;
+                Libraries.ItemsSource = model.Libraries.Select(library => new LibraryRow(library.Id, library.Name)).ToList();
             }
             Libraries.SelectedValue = model.Library?.Id;
 

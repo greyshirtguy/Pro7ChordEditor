@@ -59,6 +59,9 @@ public partial class SongPane : UserControl
     public sealed record KeyRow(string Key)
     {
         public string Name => Key.Length == 0 ? "None" : Key;
+
+        // (What a screen reader says of the row: ListsPane.xaml.cs.)
+        public override string ToString() => Name;
     }
 
     /// <summary>The ChordPro text: for the window to give the keyboard to, and for a test to type into.</summary>

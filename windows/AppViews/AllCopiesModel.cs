@@ -28,6 +28,9 @@ public sealed class AllCopiesModel(Copies copies) : INotifyPropertyChanged
 
         /// <summary>Under the song's name: its library and place, and that it is gone if it is.</summary>
         public string Where => Song.Library + ", in " + Song.Place + (SongIsStillThere == false ? ". The song is no longer there." : "");
+
+        // (What a screen reader says of the row: ListsPane.xaml.cs.)
+        public override string ToString() => Song.Name + ". " + Where;
     }
 
     public static AllCopiesModel OnThisPC() => new(AppData.OnThisPC().Copies());
