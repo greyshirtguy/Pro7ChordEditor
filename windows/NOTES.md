@@ -22,7 +22,8 @@ milestone; put right what has become untrue.
    would use it anyway"). Nothing here needs it: everything is built, tested and
    published with `dotnet` from the command line, which is also all that GitHub's
    machine has. But the maintainer may open the solution in it, so it has to open and
-   run there. **Nobody has tried that yet** ("Left rough").
+   run there. The maintainer opened it there the same day, and its Test Explorer
+   listed the forty-nine tests ("Left rough" has what was not said).
 
 And what I chose, each the maintainer's to change:
 
@@ -55,8 +56,8 @@ And what I chose, each the maintainer's to change:
 10. **The commits are in the name on the Mac's commits**, "Dan Owen", with the
     maintainer's address. Git on this PC has no name or address set, and I set none:
     each commit was given them for itself (`git -c user.name=… -c user.email=… commit`).
-    **To be asked**: whether to set them on this PC, and whether that name is the one
-    wanted.
+    Asked, the maintainer said "that git name is fine". Nothing was said of setting it
+    on this PC, so each commit is still given it for itself.
 11. **The commits are on `master`**, as the Mac's are, and are not pushed.
 
 ## How it is laid out, and why
@@ -192,6 +193,29 @@ windows/
   because `.gitattributes` says it is not text; looked at with
   `git ls-files --eol testdata`. The one test song with Windows line ends still has
   them, and the others still have none.
+- **`tools/look.py` read nothing from a song on Windows, and does now.** It said of
+  Amazing Grace, which has forty chords, that it had no text boxes, no chords and no
+  key. On Windows `protoc` ends each line of its text with a carriage return and a
+  line feed, and `tools/proread.py` found its way about that text by line feeds
+  alone. `proread.decode` now takes the one for the other, which changes nothing
+  where there are none (the Mac, Linux). With it, **every one of the twelve test
+  files is read on this PC exactly as `testdata/files/expected` says**, to the last
+  chord's range: held against each other by a throwaway script, the one key apart
+  that another tool adds (`folder`). Only the reading was tried. `make-fixtures.py`
+  and `standins.py` write into `testdata/` and were not run here: whether they work
+  on Windows is **not known**.
+- **Python 3.14 and `protoc` 36.0 are on this PC** (the maintainer's, by `winget`,
+  2026-10-12), and a new terminal finds both: Windows has Python's folder before the
+  placeholder of its own that opens the Store. A session started before they were
+  installed does not find them by name, but can run them where they are:
+
+  ```
+  PB="/c/Users/greys/AppData/Local/Microsoft/WinGet/Packages/Google.Protobuf_Microsoft.Winget.Source_8wekyb3d8bbwe/bin"
+  PATH="$PB:$PATH" "/c/Users/greys/AppData/Local/Programs/Python/Python314/python.exe" tools/look.py --chords "Some Song.pro"
+  ```
+
+  (in Git Bash, from the top of the repository; `look.py` runs `protoc` by name, so
+  its folder has to be on the path for that one command).
 - **Pushing is over SSH here too**, and GitHub knows this PC's key. `gh` is signed
   in; its token may not change a workflow, which matters only over https
   (`mac/NOTES.md` has the same).
@@ -209,11 +233,13 @@ windows/
   here, and GitHub's machine may differ: it has no screen, and whether a view draws
   into a picture there is not known until it is tried. Ask for a push; then read the
   run (`gh run list`), and put right what it shows.
-- **Nobody has opened the solution in Visual Studio.** That it opens, builds, runs
-  with F5 (`App` as the startup project) and lists the tests in its Test Explorer
-  are each **a guess**. If the tests are not listed, the two packages named at the
-  foot of `Directory.Packages.props` are the first thing to look at. And Visual
-  Studio may write the solution file again without its comment.
+- **In Visual Studio, only the listing of the tests has been seen.** The maintainer
+  opened the solution in Visual Studio 2026 and its Test Explorer listed the
+  forty-nine (2026-10-12), without the two packages named at the foot of
+  `Directory.Packages.props`. Opening it changed no file of the repository. That the
+  tests pass when run from there, and that F5 starts the app (`App` as the startup
+  project), nobody has said. And Visual Studio may one day write the solution file
+  again without its comment.
 - **The six rules about text have been tried on a scratch file only.** M1 is where
   they meet real code. If one proves wrong for a case, say why where it is switched
   off, and not for the whole project.
@@ -231,11 +257,9 @@ windows/
   this session, and the Mac's M7 leans on the answer (`mac/NOTES.md`, "RTF as
   ProPresenter on Windows writes it is still not known"): if Windows writes a
   character to stand in after each numbered one, a line of chords alone written there
-  cannot yet be given a chord more or fewer. `tools/look.py` is the tool. Python and
-  `protoc` are installed on this PC for it (2026-10-12, by `winget`), **but a session
-  started before they were installed does not see them**: start a new one, and try
-  `python --version` and `protoc --version` first. Reading the maintainer's own
-  library is theirs to allow, and where it is, theirs to say.
+  cannot yet be given a chord more or fewer. `tools/look.py` is the tool, and works
+  here now ("What was found out"). Reading the maintainer's own library is theirs to
+  allow, and where it is, theirs to say.
 - **Two lines of `reference/README.md` are no longer true**, under "Where this and
   `spec/` differ": that the apps leave out a slide with no text box, and that they
   leave a blank slide's box empty when its chords are taken off again. The

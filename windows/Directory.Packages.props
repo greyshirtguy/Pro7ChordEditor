@@ -20,9 +20,10 @@
   2.84.0 has protoc 35.1, which is Google.Protobuf 3.35.1's.)
 
   Not here, and not needed by `dotnet test`: xunit.runner.visualstudio and
-  Microsoft.NET.Test.Sdk, which are for the older way of running tests. If Visual
-  Studio's own Test Explorer ever fails to list these tests, those two are the first
-  thing to look at, and adding them is a new dependency to ask about.
+  Microsoft.NET.Test.Sdk, which are for the older way of running tests. Visual Studio
+  2026's Test Explorer lists these tests without them (the maintainer, 2026-10-12). If
+  it ever fails to, those two are the first thing to look at, and adding them is a new
+  dependency to ask about.
 -->
 <Project>
   <PropertyGroup>
