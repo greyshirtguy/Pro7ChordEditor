@@ -92,8 +92,10 @@ struct SongPane: View {
         .background(Color(nsColor: .textBackgroundColor))
     }
 
-    /// The song's name, and its keys: on one row where the pane is wide enough for the
-    /// name to be read, and otherwise the keys on a row of their own under it.
+    /// The song's name, its keys, and the switch between its two editors: on one row
+    /// where the pane is wide enough for the name to be read; otherwise the keys on a
+    /// row of their own under it; and where even that is too wide, the switch on a
+    /// third. Nothing is ever cut short to fit but the name.
     private func header(_ shown: LibraryModel.ShownSong) -> some View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
@@ -102,6 +104,23 @@ struct SongPane: View {
                 earlierVersions
                 if shown.problem == nil {
                     keys(shown)
+                    editorSwitch
+                }
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    name(shown, whole: false)
+                    Spacer(minLength: 8)
+                    earlierVersions
+                    if shown.problem == nil {
+                        editorSwitch
+                    }
+                }
+                if shown.problem == nil {
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        keys(shown)
+                        Spacer(minLength: 0)
+                    }
                 }
             }
             VStack(alignment: .leading, spacing: 6) {
@@ -115,6 +134,7 @@ struct SongPane: View {
                         keys(shown)
                         Spacer(minLength: 0)
                     }
+                    editorSwitch
                 }
             }
         }
@@ -166,7 +186,10 @@ struct SongPane: View {
         .disabled(!model.canChange || shown.key.isEmpty)
         .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
                                 : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
-        // The switch between the song's two editors.
+    }
+
+    /// The switch between the song's two editors.
+    private var editorSwitch: some View {
         Picker("Editor", selection: Binding(get: { model.editorShown }, set: { model.show(editor: $0) })) {
             Text("Chords").tag(LibraryModel.Editor.sheet)
             Text("ChordPro").tag(LibraryModel.Editor.chordPro)

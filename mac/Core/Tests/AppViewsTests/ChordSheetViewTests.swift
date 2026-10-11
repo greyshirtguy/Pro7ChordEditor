@@ -10,6 +10,7 @@
 import AppKit
 @testable import AppViews
 import ChordRules
+import CoreText
 import Song
 import Testing
 
@@ -94,6 +95,24 @@ struct ChordSheetViewTests {
         // Beside the cards is bare sheet: the spot stays where it was.
         canvas.pointerMoved(to: NSPoint(x: canvas.bounds.maxX - 3, y: 200), shift: false)
         #expect(sheet.spot == Spot(row: line, at: chord.at))
+    }
+
+    @Test("A place along a line never goes backwards: a zero-width space that ends a line is where the line ends, whatever Core Text says of it")
+    func neverBackwards() {
+        // (Made-up words. Real songs have such lines: a zero-width space after the
+        // last word, for a chord to hang on.)
+        let units = Array("sing forever".utf16) + [0x200B]
+        let line = SheetMetrics.line(String(decoding: units, as: UTF16.self), font: SheetLook.wordFont)
+        let edges = SheetMetrics.edges(of: line)
+        #expect(edges.count == units.count + 1)
+        #expect(zip(edges, edges.dropFirst()).allSatisfy { $0 <= $1 })
+        #expect(edges[units.count - 1] == edges[units.count] && edges[units.count - 1] > edges[units.count - 2])
+        // So a pointer over the last letter is over the last letter.
+        let overTheLastLetter = (edges[units.count - 2] + edges[units.count - 1]) / 2
+        #expect(ChordLayout.characterAt(length: units.count, x: overTheLastLetter) { edges[$0] } == units.count - 2)
+        // And two of them with a space between, as some lines end.
+        let more = SheetMetrics.edges(of: SheetMetrics.line(String(decoding: units + [0x20, 0x200B], as: UTF16.self), font: SheetLook.wordFont))
+        #expect(zip(more, more.dropFirst()).allSatisfy { $0 <= $1 })
     }
 
     @Test("Point and press: 4 puts the key's fourth chord on the spot, in the file; Delete takes it off; Command+Z and Shift+Command+Z walk the song's history")
@@ -238,6 +257,15 @@ struct ChordSheetViewTests {
         canvas.released(at: bare, shift: false, copy: false)
         #expect(!sheet.typing)
         #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace").contains(Chord(at: 11, name: "Bm")))
+
+        // A click is where the button is let go: pressed on one word and let go on
+        // another of the line, the bubble opens on the second.
+        let down = try #require(canvas.point(over: Spot(row: line, at: 20)))
+        let up = try #require(canvas.point(over: Spot(row: line, at: 25)))
+        canvas.pressed(at: down, shift: false)
+        canvas.released(at: up, shift: false, copy: false)
+        #expect(sheet.typing && sheet.typingAt == Spot(row: line, at: 25))
+        try pressInBox(#selector(NSResponder.cancelOperation(_:)), of: canvas)
 
         // A click on what is offered keeps that one.
         try click(13)

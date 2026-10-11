@@ -276,13 +276,15 @@ struct PictureTests {
                  named: "21 the sheet, a song ProPresenter wrote", size: Self.sheetSize)
     }
 
-    @Test("The sheet in a narrow window, and what it said after a copy")
-    func theSheetNarrow() async throws {
+    @Test("The sheet in the window at its usual size, and what it said after a copy")
+    func theSheetAfterACopy() async throws {
         let mac = try MadeUpMac()
         let model = await modelWithASongOpen(mac, song: "It Is Well", editor: .sheet)
         let sheet = try #require(model.sheet)
         sheet.setSpot(try #require(sheet.rows.indices.first(where: sheet.usable)), 0)
         model.copyChords(wholeGroup: true)
-        try draw(LibraryWindow(model: model), named: "22 the sheet, narrow, after a copy", size: NSSize(width: 820, height: 520))
+        try draw(LibraryWindow(model: model), named: "22 the sheet, after a copy")
+        // And as narrow as the window goes.
+        try draw(LibraryWindow(model: model), named: "23 the sheet, the window at its narrowest", size: NSSize(width: 860, height: 520))
     }
 }

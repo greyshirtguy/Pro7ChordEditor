@@ -89,7 +89,13 @@ enum SheetLook {
 /// How wide things are: each line's words as one Core Text line, and the widths of
 /// chords' names.
 final class SheetMetrics: SheetMeasure {
-    var lines: [CTLine?] = []
+    /// Each row's words as a line of text; nil for a row that is a group's name.
+    var lines: [CTLine?] = [] {
+        didSet { edges = Array(repeating: nil, count: lines.count) }
+    }
+    /// Where each unit of a row's words starts along its line, and where the line
+    /// ends: worked out the first time the row is asked about.
+    private var edges: [[Double]?] = []
     private var names: [String: (line: CTLine, width: Double)] = [:]
     let wordHeight = SheetLook.height(of: SheetLook.wordFont)
     let chordHeight = SheetLook.height(of: SheetLook.chordFont)
@@ -112,7 +118,42 @@ final class SheetMetrics: SheetMeasure {
 
     func advance(row: Int, units: Int) -> Double {
         guard lines.indices.contains(row), let line = lines[row] else { return 0 }
-        return Double(CTLineGetOffsetForStringIndex(line, units, nil))
+        let known = edges[row] ?? Self.edges(of: line)
+        edges[row] = known
+        return known[min(max(units, 0), known.count - 1)]
+    }
+
+    /// Where each unit of a line starts, and at the end where the line ends: never
+    /// less than the one before.
+    ///
+    /// Core Text is asked for each, and is not believed where what it says is left of
+    /// something earlier in the line. SEEN: for a zero-width space that ends a line
+    /// (which real songs have, after their last word, for a chord to hang on) it says
+    /// nought, the line's left edge. Such a unit is put where the next one that is
+    /// believed starts, which for that one is the end of the line. The halving that
+    /// finds the character under the pointer (ChordLayout.characterAt) counts on this
+    /// never going backwards.
+    static func edges(of line: CTLine) -> [Double] {
+        let length = CTLineGetStringRange(line).length
+        var edges = (0...length).map { Double(CTLineGetOffsetForStringIndex(line, $0, nil)) }
+        var furthest = 0.0
+        var believed = edges.map { _ in true }
+        for index in edges.indices {
+            if edges[index] < furthest {
+                believed[index] = false
+            } else {
+                furthest = edges[index]
+            }
+        }
+        var next = max(furthest, CTLineGetTypographicBounds(line, nil, nil, nil))
+        for index in edges.indices.reversed() {
+            if believed[index] {
+                next = edges[index]
+            } else {
+                edges[index] = next
+            }
+        }
+        return edges
     }
 
     func name(_ name: String) -> (line: CTLine, width: Double) {

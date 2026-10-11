@@ -338,6 +338,29 @@ struct ChordSheetTests {
         #expect(sheet.rows[1].chords == [Chord(at: 0, name: "D")] && sheet.rows[2].chords == [Chord(at: 0, name: "C")])
     }
 
+    @Test("Mine, not a vector. A group with no name has no row; a chord of a line of chords alone can be moved to its front; two pasted chords that land on one place leave the first")
+    func threeSmallThings() throws {
+        let boxes = [
+            TextBox(slide: 0, group: "", startsItsGroup: true, element: "A", words: Chords.placeholders(3),
+                    chords: [Chord(at: 0, name: "D"), Chord(at: 2, name: "G"), Chord(at: 4, name: "A")]),
+            TextBox(slide: 1, group: "", element: "B", words: "Amazing grace\nI am", chords: [Chord(at: 0, name: "G"), Chord(at: 3, name: "D"), Chord(at: 8, name: "C")]),
+        ]
+        let song = StandInSong(boxes, key: "D")
+        let sheet = ChordSheet(song: song)
+        #expect(sheet.rows.map(\.kind) == [.line, .line, .line])
+        // The last of three, to the front: it changes places, and the rest close up.
+        sheet.move(from: Spot(row: 0, at: 4), to: Spot(row: 0, at: 0), copy: false)
+        #expect(sheet.rows[0].chords.map(\.name) == ["A", "D", "G"])
+        // "Amazing" has a chord at its start and one three letters in; "I" has one
+        // letter, so both would land on it: the first is the one that is put.
+        song.asked = []
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        sheet.setSpot(2, 0)
+        sheet.paste()
+        #expect(song.asked == ["setChords slide 1 box \"B\" [\"G\"@0, \"D\"@3, \"C\"@8, \"G\"@14, \"C\"@16] joined false"])
+    }
+
     @Test("Mine, not a vector. A place is never the second half of a character that takes two units")
     func neverHalfACharacter() {
         // "a", a musical sharp sign from beyond the first 65,536 (two units), "b".
