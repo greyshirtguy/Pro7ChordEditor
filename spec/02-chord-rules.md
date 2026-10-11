@@ -227,6 +227,13 @@ app, the first not written with Qt, had to pin down. Both apps do them as said h
   not `char.IsLetterOrDigit`, which leaves two kinds of number out.)
 - **A note's letter** is one of A to G or a to g, and no other character.
 - **A line** ends at U+000A and nowhere else.
+- **A word**, on the chord sheet ([03-chord-sheet.md](03-chord-sheet.md), `wordStarts`),
+  is a run of units none of which is white space as JavaScript counts it, since the
+  reference's sheet is JavaScript: U+0009 to U+000D, U+0020, U+00A0, U+1680, U+2000 to
+  U+200A, U+2028, U+2029, U+202F, U+205F, U+3000 and U+FEFF. So a zero-width space
+  (U+200B) is not white space and is a word by itself, and an em quad (U+2001) is
+  white space. (Not quite the white space of the other rules, which is Qt's: that
+  has U+0085 and not U+FEFF. In .NET, `char.IsWhiteSpace` is not this list either.)
 - **Sorting keeps those that are equal in the order they came in.** Not every
   platform's own sort promises that.
 - **A directive in a ChordPro file** is a line that starts `{` and ends `}`, with a

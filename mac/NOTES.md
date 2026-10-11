@@ -15,7 +15,8 @@ milestone; put right what has become untrue.
 | **M3** The library | Done, 2026-10-10 | Places found (workspaces from ProPresenter's settings, Documents, folders chosen), their libraries and songs listed, searched and narrowed by mark; a song shown to be looked at; whether ProPresenter is running; the app's own folder. The window, drawn into pictures by the tests. **The maintainer has not yet tried it** |
 | **M4** The copies | Done, 2026-10-10 | A copy kept before a file's first change, listed (with or without its index), thinned at the start, put back and taken back. In the window: the mark, Earlier Versions on a song, All Copies in the settings. The proofs at the foot of `spec/07`. **Nothing in the window can make a copy yet**, so on a real Mac there are none to see until M5 |
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
-| **M6** The chord sheet | Next | |
+| **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. **Until M7** a chord cannot be added to a line of chords alone or a blank slide, nor taken from one |
+| **M7** Chords with no words | Next | Wants, before it: a small song made in ProPresenter that has a blank slide in it (the plan, "What the maintainer is asked for") |
 
 ## What the maintainer decided, 2026-10-10
 
@@ -129,6 +130,29 @@ And at M5, 2026-10-11:
 28. **Until M7** a line of chords alone keeps as many chords as it has and a blank
     slide takes none; what would change that is not let through, and says why
     (`spec/04`, "Until chords with no words are built").
+
+And at M6, 2026-10-11:
+
+29. **M6 was begun on "for now let's keep going"**: the plan was shown as the building
+    started and not waited on, the first stage (the model, to the vectors) having no
+    choice of the maintainer's in it.
+30. **A song opens on the sheet**, the main editor, with the switch `Chords | ChordPro`
+    in its header, as `spec/06` draws it. Which was last shown is not remembered from
+    one start of the app to the next.
+31. **Three things the model does that the reference does not**, each in `spec/03`
+    now: a name the song already has is moved, copied and pasted as it is, chord or
+    not (the page asked this); the changes of one paste are joined to each other and
+    never to what came before it (rule 52); a place is never the second half of a
+    character that takes two units (rule 18a).
+32. **The sheet takes the keyboard when the pointer moves over it** (rule 23a), not
+    only when clicked, unless a box of text is being typed in. Mine, so that pointing
+    and pressing needs no click first. The maintainer's to keep or not.
+33. **The key is shown twice while the sheet is**, in the song's header and in the
+    sheet's strip: both pages ask for a picker. Built as written, and asked of the
+    maintainer.
+34. **What is copied with Command+C is the sheet's own**, as in the reference: it is
+    not put on the system's pasteboard, and so does not replace what the person had
+    copied elsewhere.
 
 ## How it is laid out, and why
 
@@ -278,9 +302,49 @@ changing any of it:
 - **When M7 is built**: `ChordProEditor.canBeSavedYet` goes, with the one place that
   asks it and the one line in `save` marked UNTIL M7; and `OpenSong.setChordsAlone`
   loses its two refusals.
-- **When M6 is built**: the sentence for a song whose words have brackets gets its
-  last words back ("The chord sheet can still be used."), and `slide(at:)` and
-  `start(ofSlide:)`, which nothing shows yet, are what ties the caret to the sheet.
+- **Still to do from M6**: `slide(at:)` and `start(ofSlide:)`, which nothing uses yet,
+  are what would tie the caret to the sheet's picked slide (`spec/04`, rule 21).
+
+### The chord sheet (M6)
+
+- **In `Song`, with no window**: `ChordSheet.swift` is the sheet's model, the
+  reference's functions under their own names: the rows, the spot, `step`, `put`,
+  `take`, `move`, `copy`, `paste`, the typing (`startTyping`, `type`, `press`,
+  `finishTyping`, `settle`, `pick`). It asks the song through `SheetSong`, which an
+  `OpenSong` is, and reads the song again after every ask. `ChordLayout.swift` is
+  where the bubbles of a line stand.
+- **What goes by the screen is handed a `SheetMeasure`**: which place is under the
+  pointer (`placeAt`), where a place is (`xOf`), Up and Down (`stepLine`). The window
+  hands Core Text's widths; the tests hand letters ten wide, as the vectors were made.
+- **In `AppViews`**: `ChordSheetView.swift`. `SheetCanvas` is the one view that draws
+  the song and takes the pointer and the keys; `SheetMetrics` measures; `SheetEntry`
+  is the bubble a chord is typed in, a real `NSTextField` with what is offered drawn
+  over it; `SheetLook` has the reference's colours and sizes; `SheetStrip` is the key
+  and its seven chords, in SwiftUI.
+- **How a thing done goes**: an event -> one of the canvas's plain handlers
+  (`pointerMoved`, `pressed`, `dragged`, `released`, `key`) -> `ChordSheet` -> the
+  song, which saves or refuses -> `ChordSheet.changed` or `.refused`, which
+  `LibraryModel` set (`sheetChanged`, `refuse`) -> back in the handler,
+  `SheetCanvas.sync()`: lay out again if the rows changed, open, move or close the
+  bubble, draw. What changes the sheet from outside its view (the strip, the keys'
+  pickers, undo, another song) puts `LibraryModel.sheetVersion` up, and SwiftUI then
+  has the canvas `show` and `sync`.
+- **`LibraryModel.settle()` keeps a chord being typed on the sheet** before anything
+  else is done to the song, as it saves what was typed in the text; and answers
+  false if the song refused it.
+- **The two editors keep to one song.** Going to the sheet reads the song again; going
+  to the text makes the text again if anything but the text changed the song
+  (`textIsStale`). Undo on the sheet is the song's own history, so it walks back
+  through what the text saved too.
+- **Tests**: `SheetVectors.swift` has the shape of the vector file and `StandInSong`,
+  the document's stand-in written from `tools/make-vectors/sheet.js`.
+  `ChordSheetTests` runs every case; `ChordSheetOnAFileTests` does the same things to
+  copies of the test files and reads the files; `ChordSheetViewTests` calls the
+  canvas's handlers with points from `SheetCanvas.point(over:)`, hands it real key
+  events, and types into the bubble's box through its field editor.
+- **When M7 is built**: nothing in the sheet changes. It asks already; the song stops
+  refusing. The two tests named UNTIL M7 (`ChordSheetOnAFileTests`,
+  `ChordSheetViewTests`) are then to say the other thing.
 
 ## What was found out
 
@@ -543,6 +607,69 @@ changing any of it:
   have runs of two empty lines in them. It reads well enough in the pictures; whether
   it does in the hand is for the maintainer to say (`spec/04`, rule 3).
 
+### At M6
+
+- **Every case of `sheet-model.json` and `layout.json` passed the first time they were
+  run**, the model having been written from the reference's functions line by line.
+  Then seventy-two of its rules, and the view's and the window's, were broken one at
+  a time: sixty-six were caught, and the six that were not got tests (which line a
+  chord is on at a line break and on an empty line; a group with no name; a chord of
+  a line of chords alone moved to its front; two pasted chords landing on one place;
+  a click let go on another word than it was pressed on). All seventy-two are caught
+  now. The vectors hold none of those six: `testdata/README.md` could ask for them.
+- **Breaking the rules one at a time is done after a commit, and in the foreground, a
+  dozen or two at a go.** The script puts each file back when it is done or stopped
+  with an interrupt, but not if it is killed; and a file left broken among changes
+  not yet committed cannot be told from the real one. (It was started once in the
+  background before the commit, and stopped by hand to do it the other way.)
+- **Core Text says a zero-width space that ends a line is at the line's left edge**
+  (`CTLineGetOffsetForStringIndex` answers 0). `SheetMetrics.edges` puts it right
+  (`spec/10`). Found on copies of real songs, where 18 lines of words in 4 songs have
+  one.
+- **A view that is hidden gives the keyboard up to its window.** So the bubble asks
+  who has the keyboard before it hides, and gives it back to the sheet after.
+- **Making a box of text the first responder when it already is ends its editing
+  first**, which reads as the person having left it. `SheetEntry.begin` does not ask
+  again; and what the canvas does to the keyboard itself is marked (`movingTheKeys`)
+  so that it is not taken for that.
+- **A click on a view that accepts the keyboard takes it from a box being typed in**,
+  before the click is heard of. The canvas does not accept it while a chord is being
+  typed, so that the click is worked out with the song as it was (`ChordSheet.pick`).
+- **A row that cannot be made narrower is not cut at its end: its whole pane is drawn
+  too wide and centred, cut at BOTH sides.** The song's header with the switch added
+  did that at the window's usual width, taking the left of the sheet with it. Seen in
+  a picture and nowhere else. The header now folds onto two rows and then three
+  (`SongPane.header`), and picture 23 is the window at its narrowest.
+- **A row of SwiftUI buttons squeezes and wraps their names** when the pane is narrow
+  ("Am" on two lines). The strip's chords are fixed in size and the strip scrolls
+  sideways instead.
+- **The sheet on copies of 422 real songs** (numbered copies outside the repository,
+  numbers only, deleted after; the M5 check had 331, of fewer libraries):
+  - All 422 opened: 13,868 rows, 12,015 of them lines, 138 lines of chords alone,
+    1,583 lines of blank slides. The longest song is 521 rows.
+  - Of 296,291 places, pointing at each gave that place for all but 18, every one
+    of which is a character with no width (a soft hyphen, a vertical tab, a zero-width
+    space beside another): `spec/03`, rule 18a.
+  - A chord put with a key on the first word of the first free line of words, in
+    360 songs: in the file at that place every time, no other text box touched, and
+    one undo left the file's bytes as they were.
+  - Sixteen lines of chords alone took a rename and refused one more, the file
+    untouched.
+  - Slowest of all the songs: laying out 16 ms, drawing a window's worth 25 ms, two
+    hundred moves of the pointer 2 ms.
+  - **One slide in one song has 104 lines**, and since every card is as tall as the
+    slide with the most (rule 8), every card of that song is. Six songs have a slide
+    of more than 6 lines; in ten the tallest slide is more than three times the
+    song's middling one. The maintainer asked for cards of one size; whether that is
+    to have a limit is theirs to say.
+  - **49 songs have a line wider than 900 at the sheet's size, 20 of them wider than
+    2,000**: whole verses as one line, which ProPresenter wraps and the sheet does
+    not (rule 12). Their cards are that wide, and the sheet scrolls sideways.
+  - Lines of words that have in them: a tab, 81 lines in 5 songs; a no-break space,
+    53 in 9; a vertical tab (a line break that does not end the paragraph), 26 in 3;
+    a zero-width space, 18 in 4. A vertical tab is no line's end here (`spec/02`), so
+    such a line is one line on the sheet.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -575,6 +702,29 @@ second of Simple Presenter in so many words.
 
 ## Left rough, and what to ask
 
+- **Nobody has used the sheet with a hand**, which is what M6 is done by. Everything
+  of it has been proved by tests that call the view's handlers and seen in pictures
+  (14 to 23). **To be tried, on a COPY of a library**: chord a verse by pointing and
+  pressing 1 to 7; a run of chords click, type, click, type; Tab along a line; drag a
+  chord, and with Option; Command+C on a verse's first line and Command+V on the
+  next verse's; Command+Z after each. And to be said: what is slower or odder than
+  in Simple Presenter; whether the keyboard going to the sheet under the pointer is
+  welcome (decision 32); whether a click on a chord in the strip, or on the key's
+  picker, takes the keyboard from the box a chord is being typed in (it must not:
+  rule 39; no test can tell, since it is the system's doing).
+- **The sheet's commands are not in the menu bar** (`spec/10` asks for every command
+  there). Undo, Redo, Copy and Paste in the Edit menu reach the sheet; copying a whole
+  group (Shift+Command+C) has only its keys.
+- **The caret of the ChordPro text and the sheet's picked slide do not know of each
+  other** (`spec/04`, rule 21): going from one editor to the other starts at the top.
+- **The sheet is dark whatever the system is**, as `spec/10` says, in a window that
+  is otherwise the system's. Whether it should have a light form is the
+  maintainer's to say now that it exists.
+- **"The song names no key: pick the one its chords are in"** is cut short or gone
+  where the pane is narrow: the strip's chords come first.
+- **The sheet is one thing to VoiceOver**, with a name and nothing inside it.
+- **While a chord is carried the sheet scrolls only when the pointer is moved at its
+  edge**, as any view does; it does not go on scrolling under a pointer held still.
 - **Nobody has typed a chord into this app with a hand.** Everything of M5 has been
   proved by tests on made-up Macs and seen in pictures; the app itself has not been
   run by the session that built it, since on this Mac it would open the maintainer's

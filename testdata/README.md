@@ -177,6 +177,22 @@ not say the same, the vector is what the reference answers.
   when the spaces were taken off; so the rule can still be got wrong unnoticed. (Found
   by breaking it, after the vectors were made again: of the twenty breakages that
   only the Mac app's own cases caught before, the vectors now catch nineteen.)
+- In `sheet-model.json`, six things that no case holds, each found by breaking the
+  Mac app's sheet one rule at a time (2026-10-11; it has cases of its own for them,
+  `ChordSheetTests`):
+  - in `rows`, a text box with a chord ON an empty line of it, and one on a line
+    break: the first is on that line's row, an empty line being one place wide, and
+    the second on no row;
+  - in `rows`, a slide that starts a group whose name is empty: no row for the name;
+  - in `edits`, a chord of a line of chords alone moved to the line's FRONT (the one
+    case there moves the first to the end, which adding it at the end also gives);
+  - in `copyPaste`, a line with two chords on one word, pasted onto a line whose
+    word there is one letter long: both land on it, and the first is the one put;
+  - in `copyPaste`, a whole group whose first line is a line of chords alone, pasted
+    onto lines of words. (The reference joins the first change it then makes to
+    whatever was done before the paste; [`spec/03`](../spec/03-chord-sheet.md), rule
+    52, says what these apps do instead. So this one is first Simple Presenter's to
+    put right, if the maintainer agrees it is wrong.)
 
 ## What must not come in here
 

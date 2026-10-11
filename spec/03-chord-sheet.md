@@ -107,6 +107,12 @@ your own pictures up against.
     out again, or scrolls, under a pointer lying still must not take the spot back from
     the keys.
 18. The pointer is followed only over the cards. Beside them is bare sheet.
+18a. **A place is never the second half of a character that takes two units** (one from
+    beyond the first 65,536): the pointer goes to its first half, and the keys pass
+    over the second. And a character that has no width at all (a zero-width space
+    beside another, a soft hyphen) cannot be pointed at: the place is the next one
+    along. The keys still reach it, with Shift. (**New**: the page was silent, and the
+    reference stops on both halves.)
 19. **Right and Left** move it a word at a time: to the next or the previous start of a
     word on the line, and from the end of a line to the first word of the next line
     that can take it (from the start, to the last word of the one before). With
@@ -120,6 +126,12 @@ your own pictures up against.
     last, for a new one. Places there are 0, 2, 4 ... (the stand-ins).
 23. Moving the spot with the keys scrolls the sheet to keep it in view, and picks its
     slide (rule 7).
+23a. **The keys go where the pointer is.** The sheet takes the keyboard when it is
+    clicked, and also when the pointer moves over it, unless a box of text elsewhere
+    in the window is being typed in. Pointing and pressing 4 then needs no click
+    first. (**New**, on the Mac, where a view does not have the keyboard until it is
+    given it: to be tried by the maintainer. In the reference the sheet has the
+    keyboard whenever its page is open.)
 
 Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
 
@@ -204,7 +216,9 @@ Vectors: `sheet-model.json`, `edits`.
     the word before. A line of chords alone is copied as its chords' names.
 49. A line at the bottom of the window says what was copied, for a few seconds: "4
     chords copied from the line: Ctrl+V puts them on the lines from the spot's on, word
-    for word".
+    for word". The key is named as the platform names it: on the Mac, "Command+V".
+    What was copied is the sheet's own, and is not put where the system keeps what
+    was copied for other apps.
 50. **Ctrl+V** puts them on the lines from the spot's line on, one copied line to each
     line that can take the spot. For a line of words: each chord goes on the same
     numbered word, as far into it as it was but not past the word's last letter; a
@@ -213,7 +227,12 @@ Vectors: `sheet-model.json`, `edits`.
 51. A copied line of chords alone goes only onto a line of chords alone, and replaces
     its chords; a copied line of words goes only onto a line of words. Where the kinds
     differ, that line is passed over, and the next copied line goes to the next line.
-52. However many lines it changes, a paste undoes as one.
+52. However many lines it changes, a paste undoes as one: each change after the first
+    that is *made* is joined to the one before. (**Unlike the reference**, which joins
+    every copied line but the first, whether or not the first changed anything. Where
+    the first copied line is passed over by rule 51, its paste is joined to whatever
+    was done before it, and one undo takes that back too. `sheet-model.json` has no
+    such case.)
 
 This is how a second verse gets the chords of the first. Vectors: `sheet-model.json`,
 `copyPaste`.
@@ -251,8 +270,18 @@ Some files have chord names that are not chords: `C /// | Am ///`, `N.C.`. They 
 shown as they are and kept as they are. **Unlike Simple Presenter's sheet**, which
 refuses to put on anything that is not a chord and so cannot move or copy one of
 these, this app holds only *newly typed* names to `isChord` (rule 37). A name the song
-already has may be dragged, copied and pasted like any other. To change one, it is
-typed over.
+already has may be dragged, copied and pasted like any other, and is put as it is: a
+slash on its end is not left off either (rule 36 is for what is typed). To change
+one, it is typed over.
+
+## Until chords with no words are built (M7)
+
+The sheet is built before the app can add a stand-in to a line of chords alone or take
+one away ([11-plan.md](11-plan.md)). Until it can, such a line and a blank slide's are
+drawn and take the spot like any other; the sheet asks the song as rules 22 and 45
+say; and the song refuses what would change how many chords the line has, in its own
+sentence ([05-song-and-saving.md](05-song-and-saving.md)), which the quiet line under
+the sheet shows. A chord there can be renamed, and moved along its line.
 
 ## What to hold your build to
 

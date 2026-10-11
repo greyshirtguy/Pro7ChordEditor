@@ -13,6 +13,7 @@ the list of those things. Anything not on it is to be the same.
 | --- | --- | --- |
 | The key for shortcuts | Command, where these pages say Ctrl | Ctrl |
 | Copying a chord while dragging | Option held (the Mac's key for "copy as you drag") | Ctrl held |
+| What the quiet line says the keys do | "... Drag moves a chord, with Option copies it ... Command+C and Command+V: a line's chords onto another" | The same with Ctrl for both |
 | Deleting | Either delete key | Delete or Backspace |
 | Open on what is at the spot | Return | Enter, F2 |
 | Redo | Shift+Command+Z | Ctrl+Y, Ctrl+Shift+Z |
@@ -65,7 +66,15 @@ A place in a song's words is a number of **UTF-16 units**
   wrapped: SwiftUI's own text editor cannot colour as it is typed in or refuse a
   change.
 - Keys: the sheet must take the keyboard without a text field in it. That is fiddly
-  in SwiftUI; an `NSView` that accepts first responder is the sure way.
+  in SwiftUI; an `NSView` that accepts first responder is the sure way. (As built: it
+  is, and it answers Command with C, V and Z in `performKeyEquivalent`, which a
+  window's views are asked before its menus are.)
+- **Found, measuring with Core Text**: for a zero-width space that ends a line,
+  `CTLineGetOffsetForStringIndex` says nought, the line's left edge. Real songs have
+  such lines. A chord there would be drawn at the start of its line, and the search
+  for the character under the pointer, which counts on places never going backwards,
+  goes wrong for the letters before it. So the places of a line are asked for once,
+  and one that is left of an earlier one is put where the next believable one is.
 - macOS will ask the person, the first time, whether the app may read Documents. Say
   why in `Info.plist` (`NSDocumentsFolderUsageDescription`): "to open the songs in
   your ProPresenter library".
