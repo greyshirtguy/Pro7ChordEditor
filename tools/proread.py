@@ -36,9 +36,16 @@ def _protoc(how, data):
 
 
 def decode(path):
-    """The file as protoc's text."""
+    """The file as protoc's text, its lines ended by a line feed alone.
+
+    On Windows protoc ends each line of its text with a carriage return and a line
+    feed, and everything below finds its way about that text by line feeds: left as
+    they came, a file's name was still found and not one of its text boxes. (Found on
+    Windows, 2026-10-12, where look.py said of a song with chords that it had none.)
+    A carriage return inside a string is written by protoc as a backslash and an "r",
+    so none that is taken out here was ever part of a file."""
     with open(path, "rb") as file:
-        return _protoc("--decode", file.read()).decode("utf-8")
+        return _protoc("--decode", file.read()).decode("utf-8").replace("\r\n", "\n")
 
 
 def encode(text, path):
