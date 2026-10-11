@@ -446,6 +446,16 @@ struct ChordSheetViewTests {
         #expect(sheet.spot.row == cell.rows.lowerBound)
         canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.maxY - 2), shift: true)
         #expect(sheet.spot.row == cell.rows.upperBound - 1)
+        // And between the two, each line's own height is its own: from the top of its
+        // row of chords to the foot of its words.
+        for row in cell.rows where sheet.usable(row) {
+            let top = canvas.laid[row].chordTop
+            canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: top + 1), shift: true)
+            #expect(sheet.spot.row == row)
+            canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: top + canvas.metrics.lineHeight - 4), shift: true)
+            #expect(sheet.spot.row == row)
+        }
+        canvas.pointerMoved(to: NSPoint(x: cell.card.minX + 30, y: cell.card.maxY - 2), shift: true)
         // Its frame's foot, and the strip of frame over the card, are bare sheet: the
         // spot stays where it was, though a place of the line would be another.
         let was = sheet.spot
