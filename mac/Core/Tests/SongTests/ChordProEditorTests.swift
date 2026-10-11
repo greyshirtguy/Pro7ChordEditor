@@ -221,30 +221,94 @@ struct ChordProEditorTests {
         #expect(try type(editor, "[G]   [D]", as: "[G] [x] [D]") == .notTheWords)
     }
 
-    @Test("UNTIL M7: a line of chords alone keeps as many chords as it has, and a blank slide takes none; each says why")
-    func notYet() throws {
-        let sentence = "A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed."
+    @Test("A line of chords alone takes one more chord and one fewer, and a blank slide's line takes its first; what is not a chord there is still not let through")
+    func chordsWithNoWords() throws {
         let editor = ChordProEditor(song: try Workbench().open(Self.plain))
-        let before = editor.text
-        #expect(try type(editor, "[G] [D/F#] [Em]", as: "[G] [D/F#] [Em] [C]") == .notYet(sentence))
-        #expect(try type(editor, "[G] [D/F#] [Em]", as: "[G] [Em]") == .notYet(sentence))
-        #expect(try type(editor, "[G] [D/F#] [Em]", as: "[G] [D/F#] [Em] []") == .notYet(sentence))
-        #expect(editor.text == before)
+        #expect(try type(editor, "[G] [D/F#] [Em]", as: "[G] [D/F#] [Em] [C]") == .taken)
+        #expect(try type(editor, "[G] [D/F#] [Em] [C]", as: "[G] [Em] [C]") == .taken)
+        #expect(try type(editor, "[G] [Em] [C]", as: "[G] [Em] [C] []") == .taken)
+        #expect(try type(editor, "[G] [Em] [C] []", as: "") == .taken)
+        #expect(try type(editor, "three [D]four", as: "three [D]four x") == .notTheWords)
 
         // Blank Slides: line 1 is its intro, a blank slide; line 2 the gap after it.
         let blank = ChordProEditor(song: try Workbench().open(Self.blank))
         #expect(blank.lines[1].kind == .blankSlide && blank.lines[2].kind == .gap)
         var lines = blank.text.components(separatedBy: "\n")
-        lines[1] = "[A]"
-        #expect(blank.take(lines.joined(separator: "\n")) == .notYet(sentence))
         lines[1] = "A"
         #expect(blank.take(lines.joined(separator: "\n")) == .notTheWords)
+        lines[1] = "[A]"
+        #expect(blank.take(lines.joined(separator: "\n")) == .taken)
+        lines[1] = ""
+        #expect(blank.take(lines.joined(separator: "\n")) == .taken)
         // The line after it is the gap, and takes nothing whatever is built.
         lines[1] = ""
         lines[2] = "[A]"
         #expect(blank.take(lines.joined(separator: "\n")) == .notTheWords)
         // The last slide has no text box at all, and is a line of the text all the same.
         #expect(blank.lines.last?.kind == .blankSlide && blank.lines.last?.element == "")
+    }
+
+    @Test("Chords With No Words, typed in: one more chord on a line as Multitracks writes it, the last chords taken off a line under words, and a first chord on a blank slide of each kind. After each saving the text is what the song then reads as, and all of it is taken back to the byte")
+    func theShapesOfRealSongs() throws {
+        let bench = try Workbench()
+        let song = try bench.open(ChordsWithNoWordsTests.shaped)
+        let original = try Data(contentsOf: song.url)
+        let editor = ChordProEditor(song: song)
+        #expect(editor.barred == nil)
+        func typeOnLine(_ number: Int, _ text: String) -> ChordProEditor.Verdict {
+            var lines = editor.text.components(separatedBy: "\n")
+            lines[number] = text
+            return editor.take(lines.joined(separator: "\n"))
+        }
+
+        // The fourth slide: four chords, each on a stand-in of its own.
+        #expect(try type(editor, "[E] [B] [C#m] [A]", as: "[E] [B] [C#m] [A] [F#m]") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[3].words == Chords.placeholders(5))
+        #expect(song.textBoxes[3].chords.map(\.name) == ["E", "B", "C#m", "A", "F#m"])
+        #expect(editor.text == ChordProEditor(song: song).text)
+
+        // The eighth: two chords on plain spaces, under a line of words that has two
+        // of its own. Both taken off: the line is empty, and the words keep theirs.
+        let under = try #require(editor.lines.firstIndex { $0.slide == 7 && $0.kind == .chordsAlone })
+        #expect(editor.text.components(separatedBy: "\n")[under] == "[B] [E]")
+        #expect(typeOnLine(under, "") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Words()])
+        #expect(song.textBoxes[7].chords == [Chord(at: 0, name: "E"), Chord(at: 11, name: "A")])
+        #expect(editor.text == ChordProEditor(song: song).text)
+
+        // The ninth: three chords over two lines of words, each of which has one. One
+        // more over them, and the two below it have moved on with their words.
+        #expect(try type(editor, "[A] [B] [E]", as: "[A] [B] [E] [B7]") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[8].chords == [Chord(at: 0, name: "A"), Chord(at: 2, name: "B"), Chord(at: 4, name: "E"), Chord(at: 6, name: "B7"),
+                                             Chord(at: 13, name: "C#m"), Chord(at: 35, name: "A")])
+
+        // The first slide is blank and has a text box; the last has none.
+        let first = try #require(editor.lines.firstIndex { $0.kind == .blankSlide })
+        let last = try #require(editor.lines.lastIndex { $0.kind == .blankSlide })
+        #expect(editor.lines[first].slide == 0 && editor.lines[last].slide == 11 && editor.lines[last].element.isEmpty)
+        #expect(typeOnLine(first, "[E] [A]") == .taken)
+        #expect(typeOnLine(last, "[B]") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[0].words == Chords.placeholders(2) && song.textBoxes[0].chords.map(\.name) == ["E", "A"])
+        #expect(song.textBoxes[11].words == Chords.placeholders(1) && song.textBoxes[11].chords.map(\.name) == ["B"] && !song.textBoxes[11].element.isEmpty)
+        #expect(editor.lines[first].kind == .chordsAlone && editor.lines[last].kind == .chordsAlone)
+        #expect(editor.text == ChordProEditor(song: song).text)
+        #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
+
+        // A change of mind about the last slide: its line emptied, the text box that
+        // was added for it goes too.
+        #expect(typeOnLine(last, "") == .taken)
+        #expect(try editor.save())
+        #expect(song.textBoxes[11].blank && song.textBoxes[11].element.isEmpty)
+        #expect(editor.lines[last].kind == .blankSlide)
+
+        while song.canUndo {
+            try song.undo()
+        }
+        #expect(try Data(contentsOf: song.url) == original)
     }
 
     // ---- Different from the reference, on purpose (rule 22)
@@ -393,7 +457,7 @@ struct ChordProEditorTests {
         #expect(try Data(contentsOf: here.url) == Data(contentsOf: there.url))
     }
 
-    @Test("A line of chords alone is saved as its names in order; one with a bracket still empty waits")
+    @Test("A line of chords alone is saved as its names in order; a bracket still empty is left out of what is saved and left in the text, and the line has a stand-in for each chord it then has")
     func savingChordsAlone() throws {
         let bench = try Workbench()
         let song = try bench.open(Self.plain)
@@ -401,9 +465,11 @@ struct ChordProEditorTests {
         try type(editor, "[G] [D/F#] [Em]", as: "[G] [] [Em]")
         try type(editor, "Thirteen", as: "[A]Thirteen")
         #expect(try editor.save())
-        // The other box is saved; the line waits, as it was in the file.
+        // Both boxes are saved, in one step of undo: the line with the two chords it
+        // has for now, on two stand-ins.
         #expect(try chords(of: 1, at: song.url) == ["0:C", "10:G/B", "23:A"])
-        #expect(try chords(of: 3, at: song.url) == ["0:G", "2:D/F#", "4:Em"])
+        #expect(try chords(of: 3, at: song.url) == ["0:G", "2:Em"])
+        #expect(try OpenSong(opening: song.url).textBoxes[3].words == Chords.placeholders(2))
         #expect(editor.text.contains("[G] [] [Em]"))
         try type(editor, "[G] [] [Em]", as: "[G] [d] [Em]")
         #expect(try editor.save())
@@ -595,16 +661,16 @@ struct ChordProEditorTests {
         let caret = editor.text.utf16.distance(from: editor.text.utf16.startIndex, to: among.lowerBound.samePosition(in: editor.text.utf16)!)
         #expect(apply(try #require(ChordProEditor.helpWithTyping("[", in: editor.text, selection: caret..<caret))) == .taken)
         #expect(apply(try #require(ChordProEditor.helpWithTyping("[", in: editor.text, selection: 3..<3))) == .notTheWords)
-        // Backspace on the bracket of a chord among the words takes it; on one of a
-        // line of chords alone it would take a chord from the line, which is M7's.
+        // Backspace on the bracket of a chord among the words takes it; so it does on
+        // one of a line of chords alone, which then has a chord fewer.
         let d = try #require(editor.text.range(of: "[D]four"))
         let afterOpen = editor.text.utf16.distance(from: editor.text.utf16.startIndex, to: d.lowerBound.samePosition(in: editor.text.utf16)!) + 1
         #expect(apply(try #require(ChordProEditor.helpWithBackspace(in: editor.text, selection: afterOpen..<afterOpen))) == .taken)
         #expect(editor.text.contains("three four"))
         let end = editor.text.utf16.count
-        if case .notYet = apply(try #require(ChordProEditor.helpWithBackspace(in: editor.text, selection: end..<end))) {} else {
-            Issue.record("Taking a chord from a line of chords alone should be refused until M7.")
-        }
+        #expect(editor.text.hasSuffix("[G] [D/F#] [Em]"))
+        #expect(apply(try #require(ChordProEditor.helpWithBackspace(in: editor.text, selection: end..<end))) == .taken)
+        #expect(editor.text.hasSuffix("[G] [D/F#] "))
     }
 
     // ---- Which slide, and the colours

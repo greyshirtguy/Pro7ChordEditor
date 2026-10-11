@@ -97,18 +97,42 @@ struct ChordProTypingTests {
         #expect(try mac.bytes(of: "Plain Song") == original && model.songsWithCopies.isEmpty)
     }
 
-    @Test("UNTIL M7: one more chord on a line with no words is not let through, and the line under the song says why")
-    func notYet() async throws {
+    @Test("One more chord on a line with no words is let through and saved, and so is one fewer; a chord typed on a blank slide's line gives the slide its words, and Command+Z takes it all back")
+    func chordsWithNoWords() async throws {
         let mac = try MadeUpMac()
         let model = await open("Plain Song", on: mac)
-        #expect(model.textMayBecome(try with("[G] [D/F#] [Em]", as: "[G] [D/F#] [Em] []", in: model)) == false)
-        #expect(model.refusal == "A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed.")
-        #expect(model.notice == model.refusal)
-        // The next thing that is let through takes the sentence away. A rename is.
-        #expect(model.textMayBecome(try with("[G] [D/F#] [Em]", as: "[G] [D] [Em]", in: model)))
-        #expect(model.refusal == nil)
+        // A bracket still empty is let through, and is not saved as a chord.
+        #expect(model.textMayBecome(try with("[G] [D/F#] [Em]", as: "[G] [D/F#] [Em] []", in: model)))
         await model.whatWasTypedIsSaved()
-        #expect(try chords(of: 3, in: "Plain Song", on: mac) == ["0:G", "2:D", "4:Em"])
+        #expect(try chords(of: 3, in: "Plain Song", on: mac) == ["0:G", "2:D/F#", "4:Em"])
+        #expect(model.textMayBecome(try with("[G] [D/F#] [Em] []", as: "[G] [D/F#] [Em] [C]", in: model)))
+        await model.whatWasTypedIsSaved()
+        #expect(try chords(of: 3, in: "Plain Song", on: mac) == ["0:G", "2:D/F#", "4:Em", "6:C"])
+        #expect(model.textMayBecome(try with("[G] [D/F#] [Em] [C]", as: "[D/F#] [C]", in: model)))
+        await model.whatWasTypedIsSaved()
+        #expect(try chords(of: 3, in: "Plain Song", on: mac) == ["0:D/F#", "2:C"])
+        #expect(model.refusal == nil)
+
+        // Blank Slides begins with a blank slide: the second line of the text, after
+        // its group's name.
+        let blank = await open("Blank Slides", on: mac)
+        let original = try mac.bytes(of: "Blank Slides")
+        var lines = try #require(blank.chordPro?.text).components(separatedBy: "\n")
+        #expect(lines[1].isEmpty)
+        lines[1] = "[G] [C]"
+        #expect(blank.textMayBecome(lines.joined(separator: "\n")))
+        await blank.whatWasTypedIsSaved()
+        #expect(try chords(of: 0, in: "Blank Slides", on: mac) == ["0:G", "2:C"])
+        #expect(blank.refusal == nil)
+        // The song's own history is walked from the sheet. There, the saving is one
+        // step, and taking it back leaves the file as it was; and the text, come back
+        // to, is the song again.
+        blank.show(editor: .sheet)
+        #expect(blank.sheet?.rows.first { $0.kind == .line }?.chords.map(\.name) == ["G", "C"])
+        blank.undo()
+        #expect(try mac.bytes(of: "Blank Slides") == original && !blank.canUndo)
+        blank.show(editor: .chordPro)
+        #expect(blank.chordPro?.text.components(separatedBy: "\n")[1] == "")
     }
 
     @Test("Opening another song saves what was being typed in the one that is left")

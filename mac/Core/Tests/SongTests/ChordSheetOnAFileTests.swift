@@ -85,34 +85,80 @@ struct ChordSheetOnAFileTests {
         #expect(try Data(contentsOf: song.url) == bytes)
     }
 
-    @Test("UNTIL M7. On a line of chords alone a chord can be renamed; one more, or one fewer, is refused in a sentence and changes nothing. So is the first chord of a blank slide")
-    func untilM7() throws {
+    @Test("The last chord taken off a line of chords alone that has words over it: the line is then empty, has no row and takes the spot no more; and undo brings it back")
+    func theLastChordOfALineUnderWords() throws {
         let bench = try Workbench()
-        var tried = 0
-        for path in try TestData.presentationPaths() where path.hasPrefix("made-by-simple-presenter/") {
+        let song = try bench.open(ChordsWithNoWordsTests.shaped)
+        let bytes = try Data(contentsOf: song.url)
+        let sheet = ChordSheet(song: song)
+        var said: [String] = []
+        sheet.refused = { said.append("\($0)") }
+        let rows = sheet.rows.count
+        let row = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 7 && sheet.rows[$0].alone })
+        #expect(sheet.rows[row].chords.map(\.name) == ["B", "E"])
+        sheet.setSpot(row, 0)
+        sheet.takeAtSpot()
+        #expect(sheet.rows[row].chords == [Chord(at: 0, name: "E")] && sheet.rows[row].text == Words(" "))
+        sheet.setSpot(row, 0)
+        sheet.takeAtSpot()
+        // (An empty line a text box ends with has no row: spec/03, rule 2a.)
+        #expect(sheet.rows.count == rows - 1)
+        #expect(!sheet.rows.contains { $0.slide == 7 && $0.alone })
+        #expect(sheet.usable(sheet.spot.row))
+        #expect(song.textBoxes[7].words.lines == [Words("Naked come to thee for dress"), Words()])
+        #expect(song.textBoxes[7].chords.map(\.name) == ["E", "A"])
+        #expect(said.isEmpty)
+        try song.undo()
+        try song.undo()
+        sheet.reload()
+        #expect(sheet.rows.count == rows && sheet.rows[row].chords.map(\.name) == ["B", "E"])
+        #expect(try Data(contentsOf: song.url) == bytes)
+    }
+
+    @Test("On a line of chords alone a chord is renamed, one more is put at its end and one is taken off, and each is in the file; so is the first chord of a blank slide, which Delete takes off again leaving the file's bytes as they were")
+    func chordsWithNoWords() throws {
+        let bench = try Workbench()
+        var lines = 0, blanks = 0
+        let paths = try TestData.presentationPaths().filter { $0.hasPrefix("made-by-simple-presenter/") } + [ChordsWithNoWordsTests.shaped]
+        for path in paths {
             let song = try bench.open(path)
             let sheet = ChordSheet(song: song)
             var said: [String] = []
             sheet.refused = { said.append("\($0)") }
-            guard let row = sheet.rows.indices.first(where: { sheet.usable($0) && sheet.rows[$0].alone }) else { continue }
-            let bytes = try Data(contentsOf: song.url)
-            let chords = sheet.rows[row].chords
-            // One more at its end (on a blank slide, its first).
-            #expect(!sheet.put(row, chords.count * 2, "Em"))
-            #expect(said.count == 1 && said[0].contains("cannot yet be added"), "\(path)")
-            if let firstChord = chords.first {
-                #expect(!sheet.take(row, firstChord.at))
-                #expect(said.count == 2, "\(path)")
+            for row in sheet.rows.indices where sheet.usable(row) && sheet.rows[row].alone {
+                let bytes = try Data(contentsOf: song.url)
+                let chords = sheet.rows[row].chords
+                let names = chords.map(\.name)
+                // One more at its end (on a blank slide, its first).
+                #expect(sheet.put(row, chords.count * 2, "Em"), "\(path), row \(row)")
+                #expect(sheet.rows[row].chords.map(\.name) == names + ["Em"], "\(path), row \(row)")
+                #expect(sheet.rows[row].chords.map(\.at) == Array(0...chords.count).map { $0 * 2 }, "\(path), row \(row)")
+                #expect(sheet.rows[row].alone && !sheet.rows[row].blank)
+                #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes, "\(path), row \(row)")
+                if chords.isEmpty {
+                    // A blank slide's first chord, taken off again.
+                    blanks += 1
+                    #expect(sheet.take(row, 0), "\(path), row \(row)")
+                    #expect(sheet.rows[row].blank && sheet.rows[row].chords.isEmpty, "\(path), row \(row)")
+                    #expect(try Data(contentsOf: song.url) == bytes, "\(path), row \(row)")
+                } else {
+                    lines += 1
+                    // Its first renamed, and then taken off: the rest move up.
+                    #expect(sheet.put(row, 0, "Bm7"), "\(path), row \(row)")
+                    #expect(sheet.rows[row].chords.map(\.name) == ["Bm7"] + names.dropFirst() + ["Em"], "\(path), row \(row)")
+                    #expect(sheet.take(row, 0), "\(path), row \(row)")
+                    #expect(sheet.rows[row].chords.map(\.name) == Array(names.dropFirst()) + ["Em"], "\(path), row \(row)")
+                    #expect(sheet.rows[row].chords.map(\.at) == chords.indices.map { $0 * 2 }, "\(path), row \(row)")
+                    #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes, "\(path), row \(row)")
+                    // And every step of it taken back.
+                    while song.canUndo { try song.undo() }
+                    sheet.reload()
+                    #expect(sheet.rows[row].chords == chords, "\(path), row \(row)")
+                    #expect(try Data(contentsOf: song.url) == bytes, "\(path), row \(row)")
+                }
             }
-            #expect(try Data(contentsOf: song.url) == bytes, "\(path)")
-            #expect(sheet.rows[row].chords == chords, "\(path)")
-            if !chords.isEmpty {
-                #expect(sheet.put(row, 0, "Bm7"), "\(path)")
-                #expect(sheet.rows[row].chords.map(\.name) == ["Bm7"] + chords.dropFirst().map(\.name), "\(path)")
-                #expect(try OpenSong(opening: song.url).textBoxes == song.textBoxes)
-            }
-            tried += 1
+            #expect(said.isEmpty, "\(path): \(said)")
         }
-        #expect(tried >= 2, "the test files were to have a line of chords alone and a blank slide among them")
+        #expect(lines >= 9 && blanks >= 6, "\(lines) lines of chords alone and \(blanks) blank slides were tried")
     }
 }

@@ -25,8 +25,6 @@
 //     write every such box of the song.
 //   - The rounds of one saving follow each other at once and are one step of undo
 //     (rules 17 and 18). There the second round waits for the next pause.
-//   - UNTIL M7, a line of chords alone keeps as many chords as it has, and a blank
-//     slide takes none: `canBeSavedYet`.
 
 import ChordRules
 import Foundation
@@ -39,9 +37,6 @@ public final class ChordProEditor {
         /// It is not the song's words with only chords changed. The text stays as it
         /// was, and nothing is said: the caret not moving says it.
         case notTheWords
-        /// It is the song's words still, and cannot be saved by this build. The text
-        /// stays as it was, and the sentence says why.
-        case notYet(String)
     }
 
     /// A change to the text: these units are to be replaced with this, and the caret
@@ -100,7 +95,6 @@ public final class ChordProEditor {
         guard barred == nil else { return .notTheWords }
         let units = Array(typed.utf16)
         guard Self.allows(units, lines: lines, names: namesAtOpening) else { return .notTheWords }
-        guard Self.canBeSavedYet(units, lines: lines) else { return .notYet(Refusal.notBuiltYet.sentence) }
         text = typed
         return .taken
     }
@@ -142,29 +136,6 @@ public final class ChordProEditor {
         return true
     }
 
-    /// UNTIL M7. Putting a chord on a line of chords alone, or taking one off, changes
-    /// how many stand-ins the line needs, and so the text box's RTF, which is not built
-    /// yet; and a blank slide's line has no stand-ins at all. So a line of chords alone
-    /// that is changed must still have exactly the chords its stand-ins can take (the
-    /// song's own condition, `OpenSong.setChordsAlone`): its chords can be renamed, and
-    /// that is all. With this held, the text never shows a chord that cannot be saved.
-    ///
-    /// When M7 is built this function goes, with the one place that asks it.
-    static func canBeSavedYet(_ typed: [UInt16], lines: [SongLine]) -> Bool {
-        for (line, want) in zip(split(typed), lines) where line != Array(want.text.utf16) {
-            switch want.kind {
-            case .blankSlide:
-                return false
-            case .chordsAlone:
-                let spaces = !want.words.contains(0x200B) && want.words.contains(0x0020)
-                if Chords.placeholders(pairs(in: line).count, standIn: spaces ? 0x0020 : 0x200B) != want.words { return false }
-            case .group, .gap, .words:
-                break
-            }
-        }
-        return true
-    }
-
     // ---- Saving
 
     /// Saves the chords the text has, wherever they are not what the song has (rules 13
@@ -199,9 +170,6 @@ public final class ChordProEditor {
             for (n, want) in lines.enumerated() where want.kind == .chordsAlone || want.kind == .blankSlide {
                 let names = chordsSaid(by: typedLines[n]).map(\.name)
                 if names == chordsSaid(by: madeLines[n]).map(\.name) { continue }
-                // UNTIL M7: a line with a bracket still empty, or half typed, has fewer
-                // names than stand-ins, and waits until it has them all.
-                if names.count != Self.pairs(in: typedLines[n]).count { continue }
                 try song.setChordsAlone(slide: want.slide, element: want.element, line: want.line, names: names, joined: saved)
                 saved = true
                 reload(keepingWhatIsTyped: true)

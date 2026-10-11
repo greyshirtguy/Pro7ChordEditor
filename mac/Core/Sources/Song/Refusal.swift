@@ -26,9 +26,16 @@ public struct Refusal: Error, Equatable, Sendable, CustomStringConvertible {
         case notAKey
         /// The song states no key, so it cannot be shown in another.
         case noKeyToShowAnother
-        /// A change that needs a line of chords alone to have more or fewer stand-ins,
-        /// which is milestone M7.
-        case notBuiltYet
+        /// The line asked for is not a line of chords alone: it has words, or is empty.
+        case notChordsAlone
+        /// The stand-ins a chord with no words hangs on could not be written into the
+        /// box's RTF and read back as meant.
+        case cannotBeWritten
+        /// A blank slide was to be given chords, and the song has no text box with
+        /// words to model its own on.
+        case noBoxToModelOn
+        /// A slide that was to be given a text box for its chords has one by now.
+        case noLongerBlank
         case proPresenterIsRunning
         /// The file on disk is no longer the one that was read.
         case changedByAnother
@@ -61,8 +68,12 @@ public struct Refusal: Error, Equatable, Sendable, CustomStringConvertible {
     }
     static let noKeyToShowAnother = Refusal(.noKeyToShowAnother,
         "This song does not say what key it is in. Set its key first, and then the key ProPresenter is to show it in.")
-    static let notBuiltYet = Refusal(.notBuiltYet,
-        "A chord cannot yet be added to a line that has no words, or taken from one. Its chords can be renamed. Nothing was changed.")
+    static let notChordsAlone = Refusal(.notChordsAlone, "That is not a line of chords with no words. Nothing was changed.")
+    static let cannotBeWritten = Refusal(.cannotBeWritten,
+        "A chord could not be added to this line, or taken from it: its text box is written in a way that cannot be changed here safely. Nothing was changed.")
+    static let noBoxToModelOn = Refusal(.noBoxToModelOn,
+        "This song has no text box with words in it to model one on, so chords cannot be put on a slide that has none. Nothing was changed.")
+    static let noLongerBlank = Refusal(.noLongerBlank, "That slide is no longer blank. Nothing was changed.")
     static let proPresenterIsRunning = Refusal(.proPresenterIsRunning, "ProPresenter is running. Quit it to change chords here. Nothing was changed.")
     static let changedByAnother = Refusal(.changedByAnother,
         "This song's file has been changed by something else since it was opened here. Nothing was changed. Open the song again to see it as it is now.")

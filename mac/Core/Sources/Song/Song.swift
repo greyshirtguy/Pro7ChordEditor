@@ -12,15 +12,20 @@
 //   Safeguards.swift   what a song must be given before it may save anything
 //   Refusal.swift      why a thing was not done, as a sentence for the person
 //
+// and, round the song, what the window is made of with no window in it:
+//
+//   Places.swift, Listing.swift, Marks.swift   where songs are kept, and the lists
+//   Copies.swift, AppData.swift                the copies kept, and what the app keeps
+//   SongText.swift, ChordProEditor.swift       the song as ChordPro text
+//   ChordSheet.swift, ChordLayout.swift        the chord sheet
+//
 // The type is `OpenSong`, not `Song`: a type named as its module is cannot be told from
 // it in code that imports it. "The song that is open" is what the page calls it.
 //
 // What is to come here, and when (spec/11-plan.md):
 //
-//   M3  finding ProPresenter's library and listing it; whether ProPresenter is running
-//   M4  the copies kept before a first change           (spec/07-backups.md)
-//   M7  adding to and taking from a line of chords alone, and chords onto a blank slide
 //   M8  the checks for what the old Windows editor left, and the mending
+//   M9  a song made from a ChordPro file, and written out as one
 //
 // What holds for every line written here (AGENTS.md, "What must stay true"):
 //

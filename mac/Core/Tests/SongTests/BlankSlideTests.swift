@@ -2,8 +2,11 @@
 // some telling: a blank slide's box, and boxes with links. spec/01-file-format.md, "A
 // blank slide", and "From the presentation down to a text box".
 //
-// No test file has a blank slide or a link in it, so they are made here, from Plain
-// Song, in a temporary folder. NEW, and so held by these cases and by no vector.
+// They are made here, from Plain Song, in a temporary folder: a blank box as Apple's
+// text system leaves one, a slide with nothing on it, boxes with links of each kind.
+// NEW, and so held by these cases and by no vector. (Two test files have blank slides
+// of their own since: Blank Slides, and Chords With No Words. What putting chords on
+// one does is in ChordsWithNoWordsTests.)
 
 import ChordRules
 import Foundation
@@ -55,13 +58,21 @@ struct BlankSlideTests {
         #expect([now[0], now[2], now[3]] == [boxes[0], boxes[2], boxes[3]])
         #expect(song.usedChords == (boxes[0].chords + boxes[2].chords + boxes[3].chords).map(\.name))
 
-        // It cannot be given chords yet: that writes the box's RTF, which is M7.
+        // No chords on it is what it has already: nothing is written.
         let saved = try Data(contentsOf: song.url)
-        #expect { try song.setChordsAlone(slide: now[1].slide, element: now[1].element, line: 0, names: ["G"]) } throws: { ($0 as? Refusal)?.reason == .notBuiltYet }
-        // (No chords on it is what it has already.)
         try song.setChordsAlone(slide: now[1].slide, element: now[1].element, line: 0, names: [])
         #expect(try Data(contentsOf: song.url) == saved)
         #expect(!song.canUndo)
+        // A chord gives it words: a stand-in, with the chord on it. Taken off again
+        // in the same sitting, the file is what it was to the byte.
+        try song.setChordsAlone(slide: now[1].slide, element: now[1].element, line: 0, names: ["g"])
+        let given = try OpenSong(opening: song.url).textBoxes
+        #expect(given[1].element == now[1].element && !given[1].blank)
+        #expect(given[1].words == Chords.placeholders(1) && given[1].chords == [Chord(at: 0, name: "G")])
+        #expect([given[0], given[2], given[3]] == [boxes[0], boxes[2], boxes[3]])
+        try song.setChordsAlone(slide: now[1].slide, element: now[1].element, line: 0, names: [])
+        #expect(try Data(contentsOf: song.url) == saved)
+        #expect(song.textBoxes == now)
     }
 
     @Test("A box with only spaces in it is blank too; one with a stand-in is a line of chords alone")
@@ -126,12 +137,19 @@ struct BlankSlideTests {
         #expect(now[2].blank && now[2].words.isEmpty && now[2].chords.isEmpty)
         #expect(now[2].slide == 2 && now[2].group == boxes[2].group && now[2].startsItsGroup == boxes[2].startsItsGroup)
 
-        // It cannot be given chords yet: that gives the slide a text box, which is M7.
-        #expect { try song.setChordsAlone(slide: 2, element: "", line: 0, names: ["G"]) } throws: { ($0 as? Refusal)?.reason == .notBuiltYet }
-        // (No chords on it is what it has already: nothing is made for it.)
+        // No chords on it is what it has already: nothing is made for it.
         try song.setChordsAlone(slide: 2, element: "", line: 0, names: [])
         #expect(try Data(contentsOf: song.url) == saved)
         #expect(!song.canUndo && bench.copiesKept.isEmpty)
+        // A chord gives the slide a text box, and the chord is on it. Taken off again
+        // in the same sitting, the box goes with it and the file is what it was.
+        try song.setChordsAlone(slide: 2, element: "", line: 0, names: ["G"])
+        let given = try OpenSong(opening: song.url).textBoxes
+        #expect(given.count == 4 && !given[2].blank && !given[2].element.isEmpty)
+        #expect(given[2].words == Chords.placeholders(1) && given[2].chords == [Chord(at: 0, name: "G")])
+        try song.setChordsAlone(slide: 2, element: given[2].element, line: 0, names: [])
+        #expect(try Data(contentsOf: song.url) == saved)
+        #expect(song.textBoxes == now)
     }
 
     @Test("A blank box beside a box with words is not handed over")

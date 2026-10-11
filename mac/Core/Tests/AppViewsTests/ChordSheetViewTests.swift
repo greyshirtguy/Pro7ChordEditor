@@ -951,8 +951,8 @@ struct ChordSheetViewTests {
         #expect(try mac.bytes(of: "Plain Song") == before)
     }
 
-    @Test("While ProPresenter is running nothing is changed, and the quiet line says why. UNTIL M7: nor is a chord put on a blank slide, in its own sentence")
-    func refusedInASentence() async throws {
+    @Test("A chord is put on a blank slide by pointing and pressing, like any other, and Delete takes it off again leaving the file as it was. While ProPresenter is running nothing is changed, and the quiet line says why")
+    func aBlankSlideAndARefusal() async throws {
         let mac = try MadeUpMac()
         let model = await open("Blank Slides", on: mac)
         let (canvas, window) = view(for: model)
@@ -963,7 +963,17 @@ struct ChordSheetViewTests {
         canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: blank, at: 0))), shift: false)
         #expect(sheet.spot == Spot(row: blank, at: 0))
         canvas.keyDown(with: try press("1", in: window))
-        #expect(model.notice.contains("cannot yet be added to a line that has no words"))
+        canvas.show(model.sheet)
+        #expect(model.refusal == nil)
+        #expect(sheet.rows[blank].alone && !sheet.rows[blank].blank)
+        #expect(sheet.rows[blank].chords == [Chord(at: 0, name: try #require(sheet.inKey.first))])
+        #expect(try mac.bytes(of: "Blank Slides") != before)
+        // The spot has gone on to where the next would go. Back on the chord, Delete
+        // takes it off, and the slide is blank again: in the file, to the byte.
+        sheet.setSpot(blank, 0)
+        canvas.keyDown(with: try press(special(NSDeleteCharacter), in: window))
+        canvas.show(model.sheet)
+        #expect(sheet.rows[blank].blank && sheet.rows[blank].chords.isEmpty)
         #expect(try mac.bytes(of: "Blank Slides") == before)
 
         let words = try #require(sheet.rows.indices.first { sheet.usable($0) && !sheet.rows[$0].alone })

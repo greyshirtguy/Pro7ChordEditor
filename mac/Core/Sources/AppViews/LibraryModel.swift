@@ -362,8 +362,7 @@ public final class LibraryModel {
 
     /// The text view asks before it lets a change through: may the text become this?
     /// If it may, it is taken, and saved a moment after the typing stops. If it may
-    /// not, the text stays as it was; and where that is for want of something not built
-    /// yet, the line under the song says so.
+    /// not, the text stays as it was, and nothing is said: the caret not moving says it.
     public func textMayBecome(_ text: String) -> Bool {
         guard let editor, canType else { return false }
         switch editor.take(text) {
@@ -380,9 +379,6 @@ public final class LibraryModel {
             }
             return true
         case .notTheWords:
-            return false
-        case .notYet(let sentence):
-            refusal = sentence
             return false
         }
     }

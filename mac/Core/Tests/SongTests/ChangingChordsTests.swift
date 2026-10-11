@@ -296,7 +296,7 @@ struct ChangingChordsTests {
 
     // ---- A line of chords alone
 
-    @Test("The chords of a line of chords alone can be renamed; one more or one fewer is refused until M7")
+    @Test("The chords of a line of chords alone are renamed with only the chord entries changed; a line that is not there is refused, and so is a line of words, which is never made stand-ins")
     func aLineOfChordsAlone() throws {
         let bench = try Workbench()
         let song = try bench.open("made-by-simple-presenter/Plain Song.pro")
@@ -318,10 +318,19 @@ struct ChangingChordsTests {
                 == before.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.rtfData)
 
         let saved = try Data(contentsOf: song.url)
-        #expect { try song.setChordsAlone(slide: box.slide, element: box.element, line: line, names: ["Am", "F"]) } throws: { ($0 as? Refusal)?.reason == .notBuiltYet }
-        #expect { try song.setChordsAlone(slide: box.slide, element: box.element, line: line, names: ["Am", "F", "C", "G"]) } throws: { ($0 as? Refusal)?.reason == .notBuiltYet }
         #expect { try song.setChordsAlone(slide: box.slide, element: box.element, line: 7, names: ["Am"]) } throws: { ($0 as? Refusal)?.reason == .lineGone }
+        #expect { try song.setChordsAlone(slide: box.slide, element: box.element, line: -1, names: ["Am"]) } throws: { ($0 as? Refusal)?.reason == .lineGone }
+        // The words of a song are not this app's to change: a line that has words is
+        // refused whatever is asked of it, and so is one more chord or none.
+        let words = try #require(song.textBoxes.first { !$0.blank && !Chords.isPlaceholders($0.words.lines[0]) })
+        for names in [["Am"], [], ["Am", "F", "C"]] {
+            let refused = #expect(throws: Refusal.self) { try song.setChordsAlone(slide: words.slide, element: words.element, line: 0, names: names) }
+            #expect(refused?.reason == .notChordsAlone)
+            #expect(refused?.sentence == "That is not a line of chords with no words. Nothing was changed.")
+        }
         #expect(try Data(contentsOf: song.url) == saved)
+        #expect(song.textBoxes.first { $0.element == words.element } == words)
+        // (One more and one fewer are done: ChordsWithNoWordsTests has what they do.)
 
         try song.undo()
         #expect(try Data(contentsOf: song.url) == original)

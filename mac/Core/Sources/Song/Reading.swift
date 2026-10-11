@@ -148,7 +148,8 @@ func readTextBoxes(ofSlide number: Int, of presentation: RVData_Presentation, ro
     //   - If it has a text box to put chords in, that is the box: its first that shows
     //     its own words, whatever stray space that may hold.
     //   - If it has none, the box has no id yet. Nothing is made for it here: a text
-    //     box is added to the slide only when a chord is put on it, which is M7.
+    //     box is added to the slide only when a chord is put on it
+    //     (OpenSong.setChordsAlone).
     if shown.isEmpty {
         let empty = elements.first { $0.element.hasText && showsItsOwnWords($0) }
         shown.append(box(empty?.element.uuid.string ?? "", words: Words(), chords: [], blank: true))

@@ -20,6 +20,7 @@ import AppKit
 import Song
 import SwiftUI
 import Testing
+import TestData
 
 @MainActor
 @Suite("Pictures of the window")
@@ -333,5 +334,32 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "31 Revert, something changed", size: Self.sheetSize)
         model.revert()
         try draw(LibraryWindow(model: model), named: "32 just reverted", size: NSSize(width: 1000, height: 560), dark: true)
+    }
+
+    @Test("Chords with no words: the song in the shapes real ones have, as it is; with chords put on its three blank slides and on its lines of chords alone; and that as ChordPro text")
+    func chordsWithNoWords() async throws {
+        let mac = try MadeUpMac()
+        // (The song is not among those every made-up Mac has: TestData says why.)
+        try TestData.file("shaped-as-real-ones/Chords With No Words.pro")
+            .write(to: mac.place.appendingPathComponent("Libraries/Songs/Chords With No Words.pro"))
+        let model = await modelWithASongOpen(mac, song: "Chords With No Words", editor: .sheet)
+        let sheet = try #require(model.sheet)
+        let wide = NSSize(width: 1500, height: 900)
+        sheet.setSpot(try #require(sheet.rows.firstIndex { $0.blank }), 0)
+        try draw(LibraryWindow(model: model), named: "33 chords with no words, as the song is", size: wide)
+
+        // A chord on each blank slide, two on the last; and one more on every line
+        // of chords alone that had some.
+        for row in sheet.rows.indices where sheet.usable(row) && sheet.rows[row].alone {
+            let has = sheet.rows[row].chords.count
+            #expect(sheet.put(row, has * 2, has == 0 ? "E" : "F#m"))
+        }
+        let last = try #require(sheet.rows.indices.last { sheet.rows[$0].slide == 11 })
+        #expect(sheet.put(last, 2, "B7"))
+        sheet.setSpot(last, 4)
+        #expect(model.refusal == nil)
+        try draw(LibraryWindow(model: model), named: "34 chords with no words, chords put on", size: wide)
+        model.show(editor: .chordPro)
+        try draw(LibraryWindow(model: model), named: "35 chords with no words, as ChordPro text", size: NSSize(width: 1100, height: 900))
     }
 }

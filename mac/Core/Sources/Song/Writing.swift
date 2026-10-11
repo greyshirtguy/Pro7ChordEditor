@@ -14,8 +14,10 @@
 //     place of the old one in one step. Then it is read back, and must be byte for byte
 //     what was meant.
 //
-// The RTF of a box is not written here, nor anywhere yet: a line of chords alone that
-// needs more or fewer stand-ins is milestone M7.
+// The RTF of a box is not written here. The one case in which it is written at all,
+// the stand-ins of chords that have no words, is OpenSong's to ask and RTFWords' to do
+// (spec/01-file-format.md, "Chords with no words"): bytes changed in place, and read
+// back before anything is saved.
 
 import ChordRules
 import Foundation

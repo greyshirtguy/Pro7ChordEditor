@@ -19,6 +19,14 @@
 //   - There is a second request, for the key ProPresenter shows it in (rule 7).
 //   - A save is refused while ProPresenter is running, and when the file on disk is no
 //     longer the one that was read (rule 10). There neither is asked.
+//   - A line of chords alone is given more or fewer stand-ins by changing the bytes of
+//     that line in the box's RTF and no others (spec/01, "Chords with no words").
+//     There the whole RTF is read into a model and written again.
+//   - A blank slide's box is given its stand-ins after the opening of a neighbour's
+//     RTF, and a slide with no box is given a copy of a neighbour's and never one of
+//     this app's devising (spec/01, "Chords onto a blank slide").
+//   - Only a line of chords alone is ever made stand-ins. There, any line asked for
+//     is, its words with it; nothing there asks for one.
 //
 // Not safe to use from two threads at once, and not meant to be: the app keeps a song
 // where its window is.
@@ -46,6 +54,10 @@ public final class OpenSong {
     private var copyKept = false
     private var undoSteps: [Step] = []
     private var redoSteps: [Step] = []
+    /// What was made for the chords of blank slides while the song has been open here,
+    /// so that taking the chords off again leaves no trace (spec/01, "A change of
+    /// mind"). It is forgotten when the song is closed, and when a copy is put back.
+    private var madeForChords: [Made.Of: Made] = [:]
 
     /// The part of the file a change changed, as it was before and as it was after
     /// (rule 13). A change to chords is within one cue; a change of key is `music`,
@@ -59,6 +71,25 @@ public final class OpenSong {
         var unit: Unit
         /// One step of undo with the change before it.
         var joined: Bool
+    }
+
+    /// What a blank slide's first chords had made for them.
+    private enum Made {
+        /// Which text box: its cue, and its id on that cue's slide.
+        struct Of: Hashable {
+            var cue: Int
+            var element: String
+        }
+
+        /// The slide's own box was given words: this is its `text`, whole, as the file
+        /// had it before.
+        case words(was: RVData_Graphics.Text)
+        /// The slide had no box and was given one: the cue as the file had it before,
+        /// and as it was just after, less the box. (While the second is what the cue
+        /// still is without the box, nothing else in it has changed, and the first can
+        /// be put back whole: the file is then what it was to the last byte, down to
+        /// which of its empty parts were written and which were left out.)
+        case box(cueBefore: RVData_Cue, cueWithoutIt: RVData_Cue)
     }
 
     /// Opens a song's file. With no safeguards it can be read and nothing else: every
@@ -147,40 +178,233 @@ public final class OpenSong {
         }
     }
 
-    /// "This line of chords alone now has these": the names in order.
+    /// "This line of chords alone now has these": the names in order. The line's text
+    /// becomes that many stand-ins and its chords go on them, every other place; the
+    /// chords of the lines after it move with their words.
     ///
-    /// SO FAR only where the line has as many stand-ins as there are names: its chords
-    /// can be renamed and put in another order. One more or one fewer means writing the
-    /// line's stand-ins into the box's RTF, which is milestone M7, as is the first chord
-    /// on a blank slide (and the text box it needs, if the slide has none); until then
-    /// both are refused.
+    ///   - Where the line has those stand-ins already (its chords renamed, or put in
+    ///     another order), only the chord entries change.
+    ///   - Otherwise the line's characters are changed in the box's RTF, in place, and
+    ///     not another byte of it (RTFWords). This is the one case in which the app
+    ///     writes words.
+    ///   - A blank slide's line: its first chords give its box words, or give the slide
+    ///     a box if it has none (an empty `element`). No chords for a blank slide is
+    ///     nothing to do, and nothing is made for it.
+    ///   - The last chord taken off a blank slide that was given its chords while the
+    ///     song has been open here unmakes what was made for them: the file is then
+    ///     byte for byte what it was before the first.
+    ///
+    /// Only a line of chords alone is ever made stand-ins: a line that has words, or is
+    /// empty, is refused, whatever asks. (The words of a song are not this app's to
+    /// change. The reference would make stand-ins of any line it was asked for; nothing
+    /// there asks.) A name that is nothing, or nothing but spaces, is left out, as it
+    /// would be when the box's chords are written.
     public func setChordsAlone(slide: Int, element: String, line: Int, names: [String], joined: Bool = false) throws {
         guard rows.indices.contains(slide) else { throw Refusal.slideGone }
-        // A blank slide: its box, or no box at all (an empty `element`). No chords for
-        // one that has none is nothing to do, and the box is left exactly as it is.
-        if let blank = readTextBoxes(ofSlide: slide, of: presentation, rows: rows).first, blank.blank, blank.element == element {
+        let names = names.map(Chords.tidied).filter { !$0.utf16.isEmpty }
+        // A blank slide is handed over as one box with no words: its own, or one with
+        // no id if it has none.
+        let handed = readTextBoxes(ofSlide: slide, of: presentation, rows: rows)
+        let blank = handed.count == 1 && handed[0].blank ? handed[0] : nil
+        if element.isEmpty {
             if names.isEmpty { return }
-            throw Refusal.notBuiltYet
+            guard let blank, blank.element.isEmpty else { throw Refusal.noLongerBlank }
+            try giveABox(toSlide: slide, names: names, joined: joined)
+        } else if let blank, blank.element == element {
+            if names.isEmpty { return }
+            try giveWords(toBlankBox: element, slide: slide, names: names, joined: joined)
+        } else {
+            try change(line: line, ofBox: element, slide: slide, names: names, joined: joined)
         }
-        try changeText(slide: slide, element: element, joined: joined) { text in
-            let lines = readWords(text).lines
+    }
+
+    /// A line of chords alone that has words already, of a kind: its stand-ins.
+    private func change(line: Int, ofBox element: String, slide: Int, names: [String], joined: Bool) throws {
+        let made = Made.Of(cue: rows[slide].cue, element: element)
+        try changeCue(slide: slide, joined: joined) { cue, action in
+            var elements = cue.actions[action].slide.presentation.baseSlide.elements
+            let index = try Self.index(ofBox: element, in: elements)
+            var text = elements[index].element.text
+            let words = readWords(text)
+            let lines = words.lines
             guard lines.indices.contains(line) else { throw Refusal.lineGone }
             let old = lines[line]
-            // The stand-in the line has now: a plain space if it has spaces and no
-            // zero-width space, else a zero-width space.
+            guard Chords.isPlaceholders(old) else { throw Refusal.notChordsAlone }
+            // In the character the line hangs its chords on now: a plain space if it
+            // has spaces and no zero-width space, else a zero-width space.
             let spaces = !old.contains(0x200B) && old.contains(0x0020)
-            guard Chords.placeholders(names.count, standIn: spaces ? 0x0020 : 0x200B) == old else {
-                throw Refusal.notBuiltYet
-            }
-            // The chords of the other lines keep their places. This line's go on its
-            // stand-ins, every other place.
+            let new = Chords.placeholders(names.count, standIn: spaces ? 0x0020 : 0x200B)
+            // The chords of the other lines keep their characters; those after this
+            // line move by as much as it grows or shrinks. This line's are replaced.
             let start = lines[..<line].reduce(0) { $0 + $1.length + 1 }
-            var kept = readChords(text).filter { $0.at < start || $0.at > start + old.length }
+            var kept: [Chord] = []
+            for chord in readChords(text) {
+                if chord.at < start {
+                    kept.append(chord)
+                } else if chord.at > start + old.length {
+                    kept.append(Chord(at: chord.at + new.length - old.length, name: chord.name))
+                }
+            }
+
+            // A change of mind: the last chord taken off a blank slide that was given
+            // its chords here. What was made for them is unmade.
+            if names.isEmpty, kept.isEmpty, let was = madeForChords[made] {
+                var after = lines
+                after[line] = new
+                if after.allSatisfy({ $0.isBlank && !$0.contains(0x200B) && !$0.contains(0x2001) }) {
+                    switch was {
+                    case .words(let whole):
+                        elements[index].element.text = whole
+                        cue.actions[action].slide.presentation.baseSlide.elements = elements
+                    case .box(let cueBefore, let cueWithoutIt):
+                        elements.remove(at: index)
+                        cue.actions[action].slide.presentation.baseSlide.elements = elements
+                        if cue == cueWithoutIt { cue = cueBefore }
+                    }
+                    return
+                }
+            }
+
+            if new != old {
+                guard let rtf = RTFWords.rtf(text.rtfData, withLine: line, become: new) else { throw Refusal.cannotBeWritten }
+                text.rtfData = Data(rtf)
+            }
             for (n, name) in names.enumerated() {
-                kept.append(Chord(at: start + n * 2, name: Chords.tidied(name)))
+                kept.append(Chord(at: start + n * 2, name: name))
             }
             write(chords: kept, into: &text)
+            elements[index].element.text = text
+            cue.actions[action].slide.presentation.baseSlide.elements = elements
         }
+    }
+
+    /// The first chords of a blank slide that has a text box: the box is given words,
+    /// one stand-in for each chord. Only its RTF and its chord entries change.
+    ///
+    /// The RTF is made, not changed in place: as Apple's text system writes a text box
+    /// with no text, there is no font in it, no size and no colour for a stand-in to
+    /// be in. So it is the opening of the nearest text box of the song that has
+    /// words, and the stand-ins after it. Zero-width spaces, whatever stray space the
+    /// box held.
+    private func giveWords(toBlankBox element: String, slide: Int, names: [String], joined: Bool) throws {
+        let made = Made.Of(cue: rows[slide].cue, element: element)
+        var was = RVData_Graphics.Text()
+        let changed = try changeCue(slide: slide, joined: joined) { cue, action in
+            var elements = cue.actions[action].slide.presentation.baseSlide.elements
+            let index = try Self.index(ofBox: element, in: elements)
+            was = elements[index].element.text
+            guard let model = boxToModelOn(near: slide) else { throw Refusal.noBoxToModelOn }
+            var text = was
+            try Self.put(names, into: &text, afterTheOpeningOf: model.element.text)
+            elements[index].element.text = text
+            cue.actions[action].slide.presentation.baseSlide.elements = elements
+        }
+        // (Remembered once it has been saved, and only the first time: what the file
+        // had before its first chord here is what is to be gone back to.)
+        if changed && madeForChords[made] == nil {
+            madeForChords[made] = .words(was: was)
+        }
+    }
+
+    /// The first chords of a blank slide that has no text box: it is given one. NEW to
+    /// these apps as decided on 2026-10-11, and as the reference does it but for one
+    /// thing: the box is always a copy of the song's own, the nearest that has words,
+    /// placed, sized and set as that is. If the song has none, the change is refused;
+    /// the apps do not devise a text box.
+    ///
+    /// Of the copy: its id is a new one; its name is the copied name, or that with a
+    /// number after it until no other element of the slide has it; what tied the other
+    /// box to things on its own slide is cleared (how it comes on and goes off, and its
+    /// links); its chords are taken off; and its words are the stand-ins. It goes after
+    /// the slide's other elements, so that it is drawn over them.
+    ///
+    /// A GUESS, until it has been seen in ProPresenter: that the settings the copied
+    /// box keeps for stretches of its words (how they are capitalised, a first font),
+    /// whose stretches were over words that are not in the copy, do no harm left as
+    /// they are (spec/01, "A change of mind", the last paragraph).
+    private func giveABox(toSlide slide: Int, names: [String], joined: Bool) throws {
+        var id = ""
+        var cueBefore = RVData_Cue()
+        var cueWithoutIt = RVData_Cue()
+        let changed = try changeCue(slide: slide, joined: joined) { cue, action in
+            guard let model = boxToModelOn(near: slide) else { throw Refusal.noBoxToModelOn }
+            var elements = cue.actions[action].slide.presentation.baseSlide.elements
+            var added = model
+            id = Self.newID(writtenAs: model.element.uuid.string)
+            added.element.uuid.string = id
+            added.element.name = Self.name(model.element.name, notAmong: elements.map(\.element.name))
+            added.clearBuildIn()
+            added.clearBuildOut()
+            added.childBuilds = []
+            added.dataLinks = []
+            try Self.put(names, into: &added.element.text, afterTheOpeningOf: model.element.text)
+            cueBefore = cue
+            // (As the cue will be with the box taken off again: made the way it will
+            // be made then, so that the two can be held against each other.)
+            cue.actions[action].slide.presentation.baseSlide.elements = elements
+            cueWithoutIt = cue
+            elements.append(added)
+            cue.actions[action].slide.presentation.baseSlide.elements = elements
+        }
+        if changed {
+            madeForChords[Made.Of(cue: rows[slide].cue, element: id)] = .box(cueBefore: cueBefore, cueWithoutIt: cueWithoutIt)
+        }
+    }
+
+    /// Makes a text's words one stand-in for each of these chords, after the opening of
+    /// another text's RTF, and puts the chords on them.
+    private static func put(_ names: [String], into text: inout RVData_Graphics.Text, afterTheOpeningOf model: RVData_Graphics.Text) throws {
+        guard let rtf = RTFWords.rtf(withTheOpeningOf: model.rtfData, then: Chords.placeholders(names.count)) else {
+            throw Refusal.cannotBeWritten
+        }
+        text.rtfData = Data(rtf)
+        write(chords: names.enumerated().map { Chord(at: $0.offset * 2, name: $0.element) }, into: &text)
+    }
+
+    /// The text box a blank slide's is modelled on: the nearest of the song that is
+    /// shown and is not blank, on a slide before this one if there is one (the nearest
+    /// first), else on one after. Its first such box, if a slide has two.
+    ///
+    /// (A box that is shown for its chords and has no character at all is passed over:
+    /// it has no words to say where words begin, and so no opening to give.)
+    private func boxToModelOn(near slide: Int) -> RVData_Slide.Element? {
+        let others = Array((0..<slide).reversed()) + Array((slide + 1)..<max(slide + 1, rows.count))
+        for other in others where rows.indices.contains(other) {
+            let elements = Song.slide(of: rows[other], in: presentation).elements
+            for box in readTextBoxes(ofSlide: other, of: presentation, rows: rows) where !box.blank && !box.words.isEmpty {
+                if let found = elements.first(where: { $0.element.uuid.string == box.element && $0.element.hasText }) {
+                    return found
+                }
+            }
+        }
+        return nil
+    }
+
+    /// (Only a box that has text: chords are not put on a shape.)
+    private static func index(ofBox element: String, in elements: [RVData_Slide.Element]) throws -> Int {
+        guard let index = elements.firstIndex(where: { $0.element.uuid.string == element && $0.element.hasText }) else {
+            throw Refusal.textBoxGone
+        }
+        return index
+    }
+
+    /// A new id, written as the file's others are: in capitals, as ProPresenter on the
+    /// Mac writes them, unless the id it is modelled on has a small letter in it.
+    static func newID(writtenAs model: String) -> String {
+        let id = UUID().uuidString
+        return model.contains(where: { ("a"..."f").contains($0) }) ? id.lowercased() : id
+    }
+
+    /// A name for an element that no other element of the slide has: the name, or the
+    /// name with " 2", " 3" ... after it.
+    static func name(_ base: String, notAmong taken: [String]) -> String {
+        var name = base
+        var n = 2
+        while taken.contains(where: { Array($0.utf16) == Array(name.utf16) }) {
+            name = "\(base) \(n)"
+            n += 1
+        }
+        return name
     }
 
     /// Sets the key the chords are written in. It changes no chord: it says what key
@@ -263,6 +487,9 @@ public final class OpenSong {
         rows = slideRows(of: copy)
         undoSteps.removeAll()
         redoSteps.removeAll()
+        // (And nothing is remembered of what was made for a blank slide's chords: that
+        // was of the file as it was, and this is another.)
+        madeForChords.removeAll()
         // (A new sitting with the song: its next change asks for a copy again, and none
         // is made if the newest kept is already what the file is.)
         copyKept = false
@@ -276,22 +503,29 @@ public final class OpenSong {
     }
 
     private func changeText(slide: Int, element: String, joined: Bool, _ apply: (inout RVData_Graphics.Text) throws -> Void) throws {
+        try changeCue(slide: slide, joined: joined) { cue, action in
+            var elements = cue.actions[action].slide.presentation.baseSlide.elements
+            let index = try Self.index(ofBox: element, in: elements)
+            try apply(&elements[index].element.text)
+            cue.actions[action].slide.presentation.baseSlide.elements = elements
+        }
+    }
+
+    /// Changes a slide's cue: what is handed over is the cue, and which of its actions
+    /// is the slide. Answers whether anything was changed, and so saved.
+    @discardableResult
+    private func changeCue(slide: Int, joined: Bool, _ apply: (inout RVData_Cue, _ action: Int) throws -> Void) throws -> Bool {
         guard rows.indices.contains(slide) else { throw Refusal.slideGone }
         let row = rows[slide]
         let before = presentation.cues[row.cue]
         var after = before
-        var elements = after.actions[row.action].slide.presentation.baseSlide.elements
-        // (Only a box that has text: chords are not put on a shape.)
-        guard let index = elements.firstIndex(where: { $0.element.uuid.string == element && $0.element.hasText }) else {
-            throw Refusal.textBoxGone
-        }
-        try apply(&elements[index].element.text)
-        after.actions[row.action].slide.presentation.baseSlide.elements = elements
-        guard after != before else { return }
+        try apply(&after, row.action)
+        guard after != before else { return false }
         var changed = presentation
         changed.cues[row.cue] = after
         try save(changed)
         record(.cue(index: row.cue, before: before, after: after), joined: joined)
+        return true
     }
 
     private func changeMusic(joined: Bool, _ apply: (inout RVData_Presentation.Music, _ hadMusic: Bool) -> Void) throws {
