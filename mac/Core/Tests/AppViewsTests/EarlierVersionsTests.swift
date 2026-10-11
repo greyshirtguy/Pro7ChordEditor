@@ -199,7 +199,10 @@ struct EarlierVersionsTests {
         let model = await modelOn(mac)
         let opened = try mac.bytes(of: "Plain Song")
         #expect(!model.canRevert && !model.changedSinceOpened && model.savingCaption == "Autosave on")
-        // With nothing changed there is nothing to revert, and nothing is done.
+        // With nothing changed there is nothing to revert: nothing is asked, and
+        // nothing is done.
+        model.askToRevert()
+        #expect(model.revertQuestion == nil)
         model.revert()
         #expect(model.justPutBack == nil && !model.hasEarlierVersions)
 
@@ -217,7 +220,23 @@ struct EarlierVersionsTests {
         let changed = try mac.bytes(of: "Plain Song")
         #expect(changed != opened && model.canRevert && model.canUndo)
 
+        // It asks first, in words that say it is every change and not the last one.
+        model.askToRevert()
+        let question = try #require(model.revertQuestion)
+        #expect(question.title == "Revert \u{201C}Plain Song\u{201D} to how it was when it was opened?")
+        #expect(question.message.hasPrefix("This takes back EVERY change made to this song since it was opened here (Today "))
+        #expect(question.message.contains("all of them, not only the last one. To take back only the last change, cancel this and use Undo."))
+        #expect(question.message.hasSuffix("The song as it is now is kept as an earlier version first, so a revert can itself be undone."))
+        #expect(question.yes == "Revert All Changes")
+        #expect(try mac.bytes(of: "Plain Song") == changed)
+        // No: nothing is done, and it can be asked again.
+        model.dontRevert()
+        #expect(model.revertQuestion == nil && model.canRevert && model.justPutBack == nil)
+        #expect(try mac.bytes(of: "Plain Song") == changed)
+        // Yes.
+        model.askToRevert()
         model.revert()
+        #expect(model.revertQuestion == nil)
         #expect(try mac.bytes(of: "Plain Song") == opened)
         #expect(!model.canRevert && model.shown?.key == "G" && !model.canUndo)
         #expect(model.notice == "The song is as it was when it was opened here.")
@@ -243,6 +262,8 @@ struct EarlierVersionsTests {
         mac.proPresenterIsRunning = true
         model.proPresenterMayHaveChanged()
         #expect(model.savingCaption == "Autosave paused" && !model.canRevert)
+        model.askToRevert()
+        #expect(model.revertQuestion == nil)
         mac.proPresenterIsRunning = false
         model.proPresenterMayHaveChanged()
         #expect(model.canRevert && model.savingCaption == "Autosave on")
@@ -253,9 +274,12 @@ struct EarlierVersionsTests {
         mac.proPresenterIsRunning = false
         model.proPresenterMayHaveChanged()
 
-        // The song left and come back to: as opened is what it is now.
+        // The song left with the question still up: the question goes with it. And
+        // come back to, as opened is what the song is now.
+        model.askToRevert()
+        #expect(model.revertQuestion != nil)
         model.open(song: mac.song("Amazing Grace"))
-        #expect(!model.canRevert)
+        #expect(!model.canRevert && model.revertQuestion == nil)
         model.open(song: mac.song("Plain Song"))
         #expect(!model.canRevert && model.shown?.key == "A")
         let log = try String(contentsOf: mac.appData.folder.appendingPathComponent("log.txt"), encoding: .utf8)

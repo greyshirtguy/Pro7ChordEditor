@@ -46,6 +46,15 @@ public struct LibraryWindow: View {
         .sheet(isPresented: Binding(get: { model.earlier != nil }, set: { if !$0 { model.closeEarlierVersions() } })) {
             EarlierVersionsPanel(model: model)
         }
+        // Revert asks first, in words that say it is every change and not the last.
+        .alert(model.revertQuestion?.title ?? "", isPresented: Binding(get: { model.revertQuestion != nil }, set: { if !$0 { model.dontRevert() } })) {
+            Button(model.revertQuestion?.yes ?? "Revert All Changes", role: .destructive) { model.revert() }
+            // (Return is not to be what throws an hour's work away: it cancels.)
+            Button("Cancel", role: .cancel) { model.dontRevert() }
+                .keyboardShortcut(.defaultAction)
+        } message: {
+            Text(model.revertQuestion?.message ?? "")
+        }
         .task { await model.start() }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willResignActiveNotification)) { _ in
             model.settle()

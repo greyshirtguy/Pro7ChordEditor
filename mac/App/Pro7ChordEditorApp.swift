@@ -36,7 +36,7 @@ struct Pro7ChordEditorApp: App {
             CommandGroup(replacing: .saveItem) {
                 Button("Save") { model.saveNow() }
                     .keyboardShortcut("s", modifiers: .command)
-                Button("Revert to as Opened") { model.revert() }
+                Button("Revert to as Opened\u{2026}") { model.askToRevert() }
                     .disabled(!model.canRevert)
             }
         }

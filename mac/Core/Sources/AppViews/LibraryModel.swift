@@ -150,7 +150,19 @@ public final class LibraryModel {
     /// that goes from the line when ProPresenter does.
     private var refusedForProPresenter = false
     /// The song's file as it was when the song was opened here: what Revert puts back.
+    /// And when that was, for saying so.
     private var asOpened: Data?
+    private var openedWhen = Date()
+    /// What Revert asks before it does anything, while it is asking.
+    public private(set) var revertQuestion: RevertQuestion?
+
+    /// A question put to the person before a song is reverted: its two sentences, and
+    /// what the button that says yes says.
+    public struct RevertQuestion: Equatable, Sendable {
+        public var title: String
+        public var message: String
+        public var yes: String
+    }
     /// Whether the song's file is no longer that: something has been changed here
     /// since the song was opened, and Revert has something to do.
     public private(set) var changedSinceOpened = false
@@ -333,6 +345,7 @@ public final class LibraryModel {
                 keepCopy: { file, why in try copies.keep(file, of: kept, why: why) }))
             openSong = opened
             asOpened = opened.bytes
+            openedWhen = Date()
             changedSinceOpened = false
             shown = Self.show(opened, named: song.name)
             edit(opened)
@@ -753,10 +766,29 @@ public final class LibraryModel {
 
     // ---- Saving, which is not done by hand (spec/06, rule 12a; spec/07, rule 22a)
 
-    /// **Revert**: the song is made what it was when it was opened here. It is a
-    /// putting back like that of an earlier version: what the song is now is kept as a
-    /// copy first, and the quiet line offers to undo it.
+    /// **Revert** asks first. It takes back everything done to the song since it was
+    /// opened, which may be an hour's work, and its name alone could be read as taking
+    /// back the last change, which is Undo's. So the question says which: all of them.
+    public func askToRevert() {
+        guard canRevert, let shown else { return }
+        revertQuestion = RevertQuestion(
+            title: "Revert \u{201C}\(shown.name)\u{201D} to how it was when it was opened?",
+            message: "This takes back EVERY change made to this song since it was opened here (\(copies.when(openedWhen))): all of them, "
+                + "not only the last one. To take back only the last change, cancel this and use Undo.\n\n"
+                + "The song as it is now is kept as an earlier version first, so a revert can itself be undone.",
+            yes: "Revert All Changes")
+    }
+
+    /// The answer was no.
+    public func dontRevert() {
+        revertQuestion = nil
+    }
+
+    /// The answer was yes: the song is made what it was when it was opened here. It is
+    /// a putting back like that of an earlier version: what the song is now is kept as
+    /// a copy first, and the quiet line offers to undo it.
     public func revert() {
+        revertQuestion = nil
         guard let asOpened, changedSinceOpened else { return }
         putBack(bytes: { asOpened }, undoing: false, said: "The song is as it was when it was opened here.",
                 logged: { "Reverted \($0) to as it was opened." }, notDone: { "\($0) was not reverted." })
@@ -764,9 +796,9 @@ public final class LibraryModel {
 
     public var canRevert: Bool { canChange && changedSinceOpened }
 
-    /// What stands beside the Save button, which is always greyed: there is nothing
-    /// to save by hand, since every change is saved as it is made. While ProPresenter
-    /// is running nothing is saved at all.
+    /// What stands at the right of the quiet line, where a Save button would be:
+    /// there is nothing to save by hand, since every change is saved as it is made.
+    /// While ProPresenter is running nothing is saved at all.
     public var savingCaption: String {
         canChange ? "Autosave on" : "Autosave paused"
     }
@@ -812,6 +844,7 @@ public final class LibraryModel {
         openSong = nil
         asOpened = nil
         changedSinceOpened = false
+        revertQuestion = nil
         editor = nil
         chordPro = nil
         sheet = nil

@@ -103,24 +103,22 @@ struct SongPane: View {
         .background(Color(nsColor: .textBackgroundColor))
     }
 
-    /// At the right of the quiet line: Revert, and where a Save button would be, one
-    /// that is always greyed, with why beside it. Nothing is saved by hand here: every
-    /// change is saved as it is made (spec/06, rule 12a).
+    /// At the right of the quiet line: Revert, which asks before it does anything, and
+    /// where a Save button would be, the words that say why there is none. Nothing is
+    /// saved by hand here: every change is saved as it is made (spec/06, rule 12a).
     @ViewBuilder
     private var saving: some View {
-        Button("Revert") { model.revert() }
+        Button("Revert\u{2026}") { model.askToRevert() }
             .controlSize(.small)
             .disabled(!model.canRevert)
-            .help("Put the song back as it was when it was opened here. What it is now is kept as an earlier version first, so this can be undone.")
-        Button("Save") {}
-            .controlSize(.small)
-            .disabled(true)
-            .help("There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first.")
+            .help("Take back every change made to this song since it was opened here, after asking. What the song is now is kept as an earlier version first.")
         Text(model.savingCaption)
             .font(.caption)
             .foregroundStyle(.secondary)
             .fixedSize()
-            .help(model.canChange ? "Every change is saved as it is made." : "Nothing is saved while ProPresenter is running.")
+            .help(model.canChange
+                  ? "There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first."
+                  : "Nothing is saved while ProPresenter is running.")
     }
 
     /// One of the two buttons that make the ChordPro text smaller and larger: a small

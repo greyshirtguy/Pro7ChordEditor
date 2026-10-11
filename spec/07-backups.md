@@ -115,8 +115,9 @@ back. This is that idea finished. Nothing here has been built or tried.
     same copy is at the top of Earlier Versions, marked "before putting back a copy".
     There is no second mechanism, and nothing that can be lost by putting the wrong
     one back.
-22a. **Revert** ([06-library.md](06-library.md), rule 12a) is a putting back like any
-    other, of the song as it was when it was opened here: the bytes its file had when
+22a. **Revert** ([06-library.md](06-library.md), rule 12a, which has the question it
+    asks first) is a putting back like any other, of the song as it was when it was
+    opened here: the bytes its file had when
     the app read it, which the app keeps in memory for as long as the song is open.
     Rules 19 to 22 hold for it as they do for a copy: it is a save, refused as one;
     the file as it is now is copied first; the song is opened afresh, with no

@@ -257,13 +257,21 @@ And at M6, 2026-10-11:
     for both; "the usual colour" kept as nothing, so that the ChordPro text's goes on
     following the system's orange; the earlier versions' panels, which only show a
     song, keep the system's orange.)
-48. **Nothing is saved by hand, and the window says so: Revert, and a Save button
-    that is always greyed** (`spec/06`, rule 12a; `spec/07`, rule 22a). The
-    maintainer asked for saving at once or by hand as a setting, and for thoughts;
-    was given them ("Asked for by the maintainer, for later" has them still); and
-    chose: "autosave indicator and Revert". (Mine: where they stand, at the right
-    of the quiet line; "Autosave paused" while ProPresenter runs; Command+S saying
-    there is nothing to do; and both in the File menu.)
+48. **Nothing is saved by hand, and the window says so: Revert, and the words
+    "Autosave on"** (`spec/06`, rule 12a; `spec/07`, rule 22a). The maintainer asked
+    for saving at once or by hand as a setting, and for thoughts; was given them
+    ("Asked for by the maintainer, for later" has them still); and chose: "autosave
+    indicator and Revert". A Save button that was always greyed stood beside the
+    words at first, as the maintainer had thought of; on seeing it: "you can leave
+    out the save button". (Mine: where they stand, at the right of the quiet line;
+    "Autosave paused" while ProPresenter runs; and Command+S, kept as File > Save,
+    saying there is nothing to do: without it the key would only make the system's
+    sound for a key that is nobody's.)
+49. **Revert asks first, and says it is every change** (`spec/06`, rule 12a). The
+    maintainer: "let's popup a confirmation about reverting - some wording that
+    makes it clear it will revert ALL changes the user just made (not just reverting
+    the last step/change)". The question is the model's (`askToRevert`,
+    `revertQuestion`), so that its words are tested; the window only shows it.
 
 ## How it is laid out, and why
 
@@ -471,9 +479,10 @@ changing any of it:
   opened (`asOpened`, from `OpenSong.bytes`), and put back through the same
   `putBack` an earlier version goes through, so that it is refused, copied before
   and undone as that is. `changedSinceOpened` is brought up to date wherever a
-  change is noted. The greyed Save and its words are `SongPane.saving`; Command+S
-  and the File menu's two items are in `App/Pro7ChordEditorApp.swift` and call
-  `LibraryModel.saveNow` and `.revert`.
+  change is noted. The button and the words "Autosave on" are `SongPane.saving`;
+  the question is put by `LibraryModel.askToRevert` and shown by `LibraryWindow` as
+  an alert; Command+S and the File menu's two items are in
+  `App/Pro7ChordEditorApp.swift` and call `LibraryModel.saveNow` and `.askToRevert`.
 - **The settings** are `SettingsWindow.swift`: the tabs, `ChordColourSettings`, and
   `ChordColour`, which turns a colour as it is kept ("#rrggbb") into one that is
   drawn. The two colours are `LibraryModel.sheetChordColour` and `.textChordColour`,
@@ -930,6 +939,10 @@ second of Simple Presenter in so many words.
   few lines**, which no test of the package reaches: they are built, and that is
   all. To be pressed by a hand; and that Revert in the menu greys and ungreys as
   the button does.
+- **The question Revert asks has been seen by nobody**: its words are tested, and
+  an alert cannot be drawn into a picture off the screen. To be seen: that it is
+  over the window, that Cancel is what Return gives, and that the button that
+  reverts is marked as the one that destroys.
 - **Nobody has pressed the new switch, or Command+1 and Command+2, or the keys that
   size the ChordPro text**: the switch is in the pictures and its model is tested;
   the text's keys are tested by handing the text view a key. To be seen by a hand:
