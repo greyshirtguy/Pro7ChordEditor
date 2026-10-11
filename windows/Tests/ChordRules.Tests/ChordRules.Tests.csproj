@@ -15,6 +15,7 @@
     ChordProSongTests         parse-song
     RtfWordsTests             rtf-text, stand-ins-in-rtf
     NewRulesTests             key-fit, line-break-shift
+    NotHeldByVectorsTests     the rules no vector holds, each by a case of its own
     TextTests                 what white space and a letter are, against .NET's own
 
   It is an .exe because xUnit, from its third version, makes every project of tests a

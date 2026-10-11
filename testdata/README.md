@@ -262,6 +262,37 @@ vectors made on that machine should come out as these are.
     end with three with a chord on the second: once Simple Presenter leaves such
     lines off its sheet as these apps do ([`spec/03`](../spec/03-chord-sheet.md),
     rule 2a).
+- Rules that no case holds, each found by breaking the Windows app's port of the
+  rules one rule at a time (2026-10-12: 162 breakages, of which a vector caught 129;
+  it has cases of its own for these, `NotHeldByVectorsTests`, their answers read from
+  the reference's code):
+  - in `chord-names.json`, a letter and a number from outside ASCII after a note
+    (`C` and a Greek alpha; `C` and a superscript two), which `couldBecome` lets
+    through, and a letter from beyond the first 65,536 characters, which it does not;
+  - in `notated.json`, a note six semitones from the note its letter has in the
+    scale (`F######` in C, as numbers): written sharp, `######4`;
+  - in `songs/`, for `parse-song.json`: an empty line inside a part that a
+    `{comment: Verse 1}` named, with a line after it (only a gap); a line `Verse a`
+    (words, and no heading: the letter wants a number before it); a file whose line
+    ends are carriage returns alone; and a directive's value with a no-break space
+    at its ends (taken off);
+  - in `rtf-text.json`: a numbered character followed at once by an opening brace
+    and a letter, with nothing said of how many to pass over (the brace ends the
+    passing over, and the letter is words); a group for each of `pict`, `listtable`
+    and `listoverridetable` with text in it (not words); and a backslash at the end
+    of a line inside the font table (no line break in the words);
+  - in `stand-ins-in-rtf.json`, `fromAnOpening`: a model whose first character
+    follows a control word with no space, asked for a stand-in on a PLAIN space
+    (refused: it does not read back). The apps never ask for one there;
+  - in `key-fit.json`: a song of exactly three chords, all of one key (nothing
+    suggested), and the same with a fourth; a song whose best key fits exactly
+    three of its four chords; a chord's name with a line break inside it; `C#b5`
+    four times (D flat, a note's sharps not being followed by flats); and a name
+    with U+001C before it;
+  - in `line-break-shift.json`, `songs`: one where moving puts exactly four more
+    chords of sixteen on the starts of words (likely), one with four of seventeen
+    and one with three of twelve (not); and a song whose text boxes have one line
+    each (no chord is below a first line).
 
 ## What must not come in here
 
