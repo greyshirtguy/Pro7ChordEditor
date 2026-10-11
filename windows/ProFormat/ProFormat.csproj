@@ -21,10 +21,11 @@
   google/protobuf/descriptor.proto, is Google's own: protoc reads it from the folder,
   and no code is made of it, because the library has it already.)
 
-  If the build one day says that a name ending "Reflection" does not exist: the
-  submodule has been moved on, and ProPresenter's newer presentation.proto takes in a
-  file it did not before. Add that file's name to the list below. A test
-  (Tests/Song.Tests) fails if the list has a name that is NOT needed.
+  If the build one day says, a hundred times over, that a name "does not exist in the
+  namespace Pro.SerializationInterop.RVProtoData" (error CS0234): the submodule has
+  been moved on, and ProPresenter's newer presentation.proto takes in a file it did not
+  before. Add that file's name to the list below. (Tried, by taking uuid off the list.)
+  A test (Tests/Song.Tests) fails if the list has a name that is NOT needed.
 
   protoc warns, once for nearly every file, that an import of customOptions.proto is
   unused, and once that customOptions.proto's own import is. It is true and does no
