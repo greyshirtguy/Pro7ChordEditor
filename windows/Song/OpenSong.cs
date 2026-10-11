@@ -42,7 +42,7 @@ using RV = Pro.SerializationInterop.RVProtoData;
 
 namespace Pro7ChordEditor.Song;
 
-public sealed class OpenSong
+public sealed class OpenSong : ISheetSong
 {
     /// <summary>How many steps of undo are kept, as the reference keeps.</summary>
     internal const int UndoLimit = 200;

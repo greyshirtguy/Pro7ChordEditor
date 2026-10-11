@@ -16,6 +16,12 @@
     CopiesTests                   the copies kept before a change, and putting one back: the proofs of spec/07
     ChordProEditorTests           the ChordPro editor with no window: what may be typed, the help with
                                   brackets, what a pause saves
+    ChordSheetTests               the chord sheet's model: every case of sheet-model.json and of
+                                  layout.json, and what no vector holds
+    ChordSheetOnAFileTests        the same model on real files: what is done on the sheet is in the
+                                  file, and undone to the byte
+    SheetVectors                  the shape of sheet-model.json, and the stand-in for a song that
+                                  the vectors were made with
     Workbench                     where they work: copies in a temporary folder
 
   It is an .exe because xUnit, from its third version, makes every project of tests a

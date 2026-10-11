@@ -200,14 +200,19 @@ public class ChordProTypingTests
         Assert.Equal("Five six [E]seven eight", typist.LineWith("seven"));
         // With Ctrl, Alt or the Windows key down there is no help (rule 12), nor for
         // Delete with Shift, which is Cut: the key is left to the box.
-        typist.CaretAt(typist.PlaceOf("[D]four") + 1);
+        // (Each asked where it WOULD be helped with nothing held: Backspace just after
+        // the chord's "[", Delete just before it.)
+        var bracket = typist.PlaceOf("[D]four");
         foreach (var held in new[] { ModifierKeys.Control, ModifierKeys.Alt, ModifierKeys.Windows, ModifierKeys.Control | ModifierKeys.Alt })
         {
+            typist.CaretAt(bracket + 1);
             Assert.False(typist.Editor.KeyPressed(Key.Back, held));
+            typist.CaretAt(bracket);
             Assert.False(typist.Editor.KeyPressed(Key.Delete, held));
         }
         Assert.False(typist.Editor.KeyPressed(Key.Delete, ModifierKeys.Shift));
         Assert.Contains("[D]four", typist.Text, StringComparison.Ordinal);
+        typist.CaretAt(bracket + 1);
         // Shift with Backspace is Backspace.
         Assert.True(typist.Editor.KeyPressed(Key.Back, ModifierKeys.Shift));
         Assert.Equal("[G]One two three four", typist.LineWith("One"));
@@ -412,6 +417,15 @@ public class ChordProTypingTests
         // was after the "[A" that is gone, two along); another song opened starts at
         // its top.
         Assert.Equal((thirteen + 2, 0), typist.Selected);
+        // (Nor is there help at a chord's bracket, where with the box to be typed in
+        // Backspace and Delete would each take the chord.)
+        var chord = typist.PlaceOf("[G/B]");
+        typist.CaretAt(chord + 5);
+        Assert.False(typist.Editor.KeyPressed(Key.Back, ModifierKeys.None));
+        typist.CaretAt(chord);
+        Assert.False(typist.Editor.KeyPressed(Key.Delete, ModifierKeys.None));
+        Assert.Contains("[G/B]", typist.Text, StringComparison.Ordinal);
+        Assert.Equal(0, typist.SaidNo);
         pc.ProPresenterIsRunning = false;
         await model.RefreshAsync();
         model.Open(pc.Song("Amazing Grace"));
