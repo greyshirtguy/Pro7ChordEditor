@@ -693,13 +693,13 @@ public class ChordSheetViewTests
         hand.PointAt("Twas");
         hand.Press(Key.V, ModifierKeys.Control);
         Assert.Equal("Nothing has been copied yet. Ctrl+C copies the chords of the line the spot is on.", model.Notice);
-        Assert.Equal(model.Notice, quiet.Text);
+        Assert.Equal(SongPane.WithKeysWhole(model.Notice), quiet.Text);
 
         // Ctrl+C copies the chords of the spot's line, and says what was copied.
         hand.PointAt("Amazing");
         hand.Press(Key.C, ModifierKeys.Control);
         Assert.Equal("4 chords copied from the line" + CopiedSays, model.Notice);
-        Assert.Equal(model.Notice, quiet.Text);
+        Assert.Equal(SongPane.WithKeysWhole(model.Notice), quiet.Text);
         Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
         // Ctrl+V puts them on the spot's line: each on the same numbered word, as far
         // into it as it was. The line's own chords are replaced.
@@ -728,7 +728,7 @@ public class ChordSheetViewTests
         Assert.Equal("1 chord copied from the line" + CopiedSays, model.Notice);
         await model.WhatWasSaidIsGoneAsync();
         Assert.Equal(LibraryModel.SheetHelp, model.Notice);
-        Assert.Equal(LibraryModel.SheetHelp, quiet.Text);
+        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), quiet.Text);
     });
 
     [Fact]
@@ -1219,6 +1219,29 @@ public class ChordSheetViewTests
         Assert.False(ChordSheetView.HasRoomToSay(chords: 400, said: 300, zoom: 54, room: 773));
     });
 
+    [Fact]
+    public void AScreenReaderIsToldTheSheetIsThereAndWhatTheKeysDoOnIt() => OnAMadeUpPC(async pc =>
+    {
+        var (_, view, hand) = await Open(pc, "Amazing Grace");
+        var told = System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(hand.Canvas);
+        Assert.NotNull(told);
+        Assert.Equal("The song's chord sheet", told.GetName());
+        Assert.Equal(System.Windows.Automation.Peers.AutomationControlType.Custom, told.GetAutomationControlType());
+        Assert.Equal("chord sheet", told.GetLocalizedControlType());
+        Assert.Equal(LibraryModel.SheetHelp, told.GetHelpText());
+        Assert.True(told.IsContentElement());
+        Assert.True(hand.Canvas.Focusable);
+        // The strip's buttons are called by their number and their chord, and the two
+        // that zoom by what they do.
+        var strip = view.SongPane.ChordSheet;
+        Assert.Equal("4 C", System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(strip.ChordsOfTheKey[3]).GetName());
+        Assert.Equal("Smaller words", System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(Named<Button>(strip, "Smaller")).GetName());
+        Assert.Equal("Larger words", System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(Named<Button>(strip, "Larger")).GetName());
+        // And the box a chord is typed in.
+        hand.Click("saved");
+        Assert.Equal("The chord being typed", System.Windows.Automation.Peers.UIElementAutomationPeer.CreatePeerForElement(hand.Box).GetName());
+    });
+
     // ---- The switch between the two editors
 
     [Fact]
@@ -1443,13 +1466,61 @@ public class ChordSheetViewTests
     });
 
     [Fact]
+    public void TheNamesOfKeysAreKeptWholeWhereTheQuietLineIsBrokenInTwo() => Pictures.OnAThreadOfItsOwn(() =>
+    {
+        // A character with no width, that joins what is either side of it, each side
+        // of every plus; and nothing else is changed.
+        var joiner = ((char)0x2060).ToString();
+        Assert.Equal("Ctrl" + joiner + "+" + joiner + "C and Ctrl" + joiner + "+" + joiner + "V", SongPane.WithKeysWhole("Ctrl+C and Ctrl+V"));
+        Assert.Equal("Nothing was changed.", SongPane.WithKeysWhole("Nothing was changed."));
+        Assert.Equal(LibraryModel.SheetHelp, SongPane.WithKeysWhole(LibraryModel.SheetHelp).Replace(joiner, "", StringComparison.Ordinal));
+        Assert.Equal(LibraryModel.SheetHelp.Count(unit => unit == '+') * 2, SongPane.WithKeysWhole(LibraryModel.SheetHelp).Count(unit => unit == (char)0x2060));
+
+        // And WPF keeps to it. Laid out narrower and narrower, a line left to itself is
+        // broken at the plus of "Ctrl+C"; with the two joined, the name is whole on the
+        // next line. They add nothing to how wide the words are.
+        static System.Windows.Media.FormattedText Laid(string text, double width) => new(
+            text,
+            CultureInfo.GetCultureInfo("en-US"),
+            FlowDirection.LeftToRight,
+            new System.Windows.Media.Typeface(SheetLook.Font, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal),
+            12.5,
+            System.Windows.Media.Brushes.Black,
+            1.0)
+        {
+            MaxTextWidth = width,
+        };
+
+        const string before = "Delete removes  -  Ctrl";
+        const string plain = before + "+C and Ctrl+V: a line";
+        var whole = SongPane.WithKeysWhole(plain);
+        Assert.Equal(Laid(plain, 2000).WidthIncludingTrailingWhitespace, Laid(whole, 2000).WidthIncludingTrailingWhitespace, 0.001);
+        var line = Laid("Ctrl", 2000).Height;
+        var upTo = Laid(before, 2000).WidthIncludingTrailingWhitespace;
+        var brokenOnce = false;
+        foreach (var width in new[] { upTo + 2, upTo + 6, upTo + 10, upTo + 14 })
+        {
+            double TallOf(string text)
+            {
+                var from = text.IndexOf("Ctrl", StringComparison.Ordinal);
+                var to = text.IndexOf(" and", StringComparison.Ordinal);
+                return Laid(text, width).BuildHighlightGeometry(new Point(0, 0), from, to - from)!.Bounds.Height;
+            }
+
+            brokenOnce |= TallOf(plain) > line * 1.5;
+            Assert.True(TallOf(whole) < line * 1.5, Said($"at {width} the name of the key is on two lines"));
+        }
+        Assert.True(brokenOnce, "left to itself the line was never broken inside the key's name: this test holds nothing");
+    });
+
+    [Fact]
     public void TheQuietLineIsAsTallWhateverItSaysWhileTheSheetIsShown() => OnAMadeUpPC(async pc =>
     {
         var (model, view, hand) = await Open(pc, "Amazing Grace");
         var quiet = Named<TextBlock>(view.SongPane, "Quiet");
         var foot = Named<FrameworkElement>(view.SongPane, "Foot");
         // What the keys do is on two lines here, and is all there.
-        Assert.Equal(LibraryModel.SheetHelp, quiet.Text);
+        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), quiet.Text);
         var tall = foot.ActualHeight;
         Assert.True(quiet.ActualHeight > 30, "the help is " + quiet.ActualHeight + " tall");
         // Something short is said for a few seconds: the line is as tall as it was, so

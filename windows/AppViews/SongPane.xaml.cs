@@ -121,6 +121,19 @@ public partial class SongPane : UserControl
 
     private static Visibility Seen(bool seen) => seen ? Visibility.Visible : Visibility.Collapsed;
 
+    /// <summary>
+    /// A sentence as the quiet line shows it: with the names of keys kept whole where
+    /// the line is broken in two. Left to itself a line may be broken at the plus of
+    /// "Ctrl+C", which then reads "Ctrl" and, on the next line, "+C" (SEEN, in the first
+    /// picture of the real window with the sheet's line in it). A character with no
+    /// width that joins what is either side of it is put each side of every plus
+    /// (U+2060; FOUND by trying that WPF keeps to it, and gives it no width).
+    /// </summary>
+    internal static string WithKeysWhole(string sentence) =>
+        sentence.Contains('+', StringComparison.Ordinal) ? sentence.Replace("+", Joined + "+" + Joined, StringComparison.Ordinal) : sentence;
+
+    private static readonly string Joined = ((char)0x2060).ToString();
+
     // How tall a line of the quiet line is.
     private double LineOfTheQuietLine => Math.Ceiling(Quiet.FontFamily.LineSpacing * Quiet.FontSize);
 
@@ -141,7 +154,7 @@ public partial class SongPane : UserControl
         // needs, and stays until the next thing is done. What the keys do on the sheet
         // is long, and has up to four lines. Anything else is one line.
         var wrong = model.Refused is not null;
-        Quiet.Text = model.Notice;
+        Quiet.Text = WithKeysWhole(model.Notice);
         Quiet.TextWrapping = wrong || onTheSheet ? TextWrapping.Wrap : TextWrapping.NoWrap;
         Quiet.TextTrimming = wrong ? TextTrimming.None : TextTrimming.CharacterEllipsis;
         Quiet.MaxHeight = wrong || !onTheSheet ? double.PositiveInfinity : MostLinesOfHelp * LineOfTheQuietLine;
@@ -339,7 +352,7 @@ public partial class SongPane : UserControl
             if (room > 40)
             {
                 var help = new FormattedText(
-                    LibraryModel.SheetHelp,
+                    WithKeysWhole(LibraryModel.SheetHelp),
                     CultureInfo.CurrentUICulture,
                     FlowDirection.LeftToRight,
                     new Typeface(Quiet.FontFamily, Quiet.FontStyle, Quiet.FontWeight, Quiet.FontStretch),

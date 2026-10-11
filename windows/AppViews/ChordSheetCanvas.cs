@@ -37,6 +37,7 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
@@ -179,6 +180,28 @@ public sealed class ChordSheetCanvas : FrameworkElement
     [DllImport("user32.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern uint GetClipboardSequenceNumber();
+
+    // What a screen reader is told of the sheet: that it is there, what it is called,
+    // and what the keys do on it. An element that draws itself says nothing of itself
+    // otherwise, not even its name. (It says no more than that yet: a song's lines and
+    // their chords are not read out from here. They are in the ChordPro text, which is a
+    // box of text and is read as one.)
+    protected override AutomationPeer OnCreateAutomationPeer() => new Told(this);
+
+    private sealed class Told(ChordSheetCanvas sheet) : FrameworkElementAutomationPeer(sheet)
+    {
+        protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Custom;
+
+        protected override string GetClassNameCore() => "ChordSheet";
+
+        protected override string GetLocalizedControlTypeCore() => "chord sheet";
+
+        protected override string GetHelpTextCore() => LibraryModel.SheetHelp;
+
+        protected override bool IsContentElementCore() => true;
+
+        protected override bool IsControlElementCore() => true;
+    }
 
     private static SolidColorBrush Frozen(Color colour, double alpha = 1)
     {
