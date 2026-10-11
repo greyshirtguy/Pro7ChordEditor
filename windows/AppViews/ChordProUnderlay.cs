@@ -144,30 +144,7 @@ public sealed class ChordProUnderlay : FrameworkElement
     /// How wide a line's letters are as they are drawn here, chords bold: for a test to
     /// hold against how wide the box has the same line.
     /// </summary>
-    internal double WidthOf(string line) => Letters(line, line.StartsWith('{')).WidthIncludingTrailingWhitespace;
-
-    // The pieces of a line that the box draws each on a line of its own: a line of the
-    // song's text has no line feed in it, but its words may have one of the other
-    // characters a text box starts a new line at.
-    private static IEnumerable<(int Start, int End)> Pieces(string line)
-    {
-        var start = 0;
-        for (var at = 0; at < line.Length; at++)
-        {
-            if (ChordProTyping.BreaksALineInATextBox(line[at]))
-            {
-                if (at > start)
-                {
-                    yield return (start, at);
-                }
-                start = at + 1;
-            }
-        }
-        if (line.Length > start)
-        {
-            yield return (start, line.Length);
-        }
-    }
+    internal double WidthOf(string line) => Letters(line).WidthIncludingTrailingWhitespace;
 
     private int LineAt(int place)
     {
@@ -229,15 +206,18 @@ public sealed class ChordProUnderlay : FrameworkElement
         context.PushClip(new RectangleGeometry(view));
         for (var line = first; line <= last; line++)
         {
-            foreach (var (start, end) in Pieces(lines[line]))
+            if (lines[line].Length == 0)
             {
-                var at = box.GetRectFromCharacterIndex(starts[line] + start);
-                if (at.IsEmpty)
-                {
-                    continue;
-                }
-                var whole = start == 0 && end == lines[line].Length;
-                context.DrawText(Letters(whole ? lines[line] : lines[line][start..end], lines[line].StartsWith('{')), box.TranslatePoint(at.TopLeft, this));
+                continue;
+            }
+            // (Words that have in them a character at which a text box starts a new
+            // line, though it ends no line of the song's, are drawn on two lines here as
+            // they are there: the letters are laid out by the same means, and what
+            // follows such a character starts at the left again in both.)
+            var at = box.GetRectFromCharacterIndex(starts[line]);
+            if (!at.IsEmpty)
+            {
+                context.DrawText(Letters(lines[line]), box.TranslatePoint(at.TopLeft, this));
             }
         }
         context.Pop();
@@ -246,13 +226,16 @@ public sealed class ChordProUnderlay : FrameworkElement
     // A line's letters, made ready to draw: in the box's font and size, the chords in
     // their colour and bold. Kept, since most lines are the same from one drawing to
     // the next.
-    private FormattedText Letters(string line, bool greyed)
+    private FormattedText Letters(string line)
     {
-        var key = (greyed ? "{" : " ") + line;
-        if (kept.TryGetValue(key, out var ready))
+        if (kept.TryGetValue(line, out var ready))
         {
             return ready;
         }
+        // (Which stretches are chords, and whether the line is a greyed one, in which
+        // nothing is a chord, is the editor's to say.)
+        var colours = ChordProEditor.Colouring(line);
+        var greyed = colours.Greyed.Count > 0;
         if (kept.Count >= MostKept)
         {
             kept.Clear();
@@ -269,15 +252,12 @@ public sealed class ChordProUnderlay : FrameworkElement
             null,
             TextOptions.GetTextFormattingMode(of),
             VisualTreeHelper.GetDpi(this).PixelsPerDip);
-        if (!greyed)
+        foreach (var chord in colours.Chords)
         {
-            foreach (var chord in ChordProEditor.Colouring(line).Chords)
-            {
-                made.SetForegroundBrush(ChordBrush ?? words, chord.Start, chord.End - chord.Start);
-                made.SetFontWeight(FontWeights.Bold, chord.Start, chord.End - chord.Start);
-            }
+            made.SetForegroundBrush(ChordBrush ?? words, chord.Start, chord.End - chord.Start);
+            made.SetFontWeight(FontWeights.Bold, chord.Start, chord.End - chord.Start);
         }
-        kept[key] = made;
+        kept[line] = made;
         return made;
     }
 

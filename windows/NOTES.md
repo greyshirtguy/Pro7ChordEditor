@@ -976,7 +976,9 @@ names. What to know before changing any of it:
     else has said they answer it, first;
   - it keeps a line feed as a line feed, and whatever line breaks it is given, as
     given; a carriage return, a line separator, and four characters more start a
-    new line in it too (`ChordProTyping.BreaksALineInATextBox`);
+    new line in it too. So they do in the letters drawn behind it, which are laid
+    out by the same means: a test holds the two against each other, dot for dot,
+    with each such character in a line of words;
   - it will not put its caret between the two units of a line break of two, nor
     inside a character of two units; told to select from such a place, it selects
     from somewhere else, without a word. So a change the box is told to make is
@@ -1021,6 +1023,40 @@ names. What to know before changing any of it:
   so too). A test asks the lists as a screen reader does.
 - **The first start of a fresh build still takes some eighteen seconds** before
   there is a window; later starts about one. It is M10's.
+- **How the proofs were shown to bite**, as before: each rule broken in one small
+  way in turn, in the two clones, with the tests run after each (the pictures left
+  out, which take long and hold nothing).
+  - Of the editor's plain code (`ChordProEditor`): eighty-nine breakages, one of
+    which changed nothing. Seventy were caught at once. **Three were rules no test
+    held**: that two lines of chords alone saved together are one step of undo;
+    that a saving is a step of its own and does not join the one before it; and
+    that in a box with a line of chords alone and a line of words, each keeps its
+    own chords when the other's are changed. One the build itself refuses (words
+    compared by how they look in a language: the rule of the project that no words
+    are, stops it). Fourteen cannot be told from the rule by any input. They are
+    of two sorts. Some are tests kept as the reference has them that a later test
+    says by itself: a stray bracket looked for on its own, a bracket on the line
+    before taken for this chord's (one that closes on another line is no chord
+    anyway), a song that is barred asked the rule or asked to save. The others are
+    what the song does itself when a box is written: it puts chords in order, and
+    one past a line's end on the line's last character.
+  - Of the window's part (the typing in `LibraryModel`, `ChordProTyping`,
+    `ChordProText`, `ChordProUnderlay`, and the song's pane): a hundred and
+    eighty-one, one of which changed nothing. A hundred and seventy-one were caught
+    at once. **Three were rules no test held**, two of them with a case that asked
+    at the wrong place and so held nothing: that Backspace at a bracket is not
+    helped where nothing can be typed, that Shift with Delete, which is Cut, is
+    not helped as Delete is, and that at the largest size the large letter is the
+    one greyed. Three are the same to look at (Saved said over a refusal, which is
+    said before it; a revert asked for with nothing to revert; what is stale asked
+    to be laid out again, which something else always is). **Three were code that
+    did nothing, and it was taken out**: a redo ending a run of typing that an undo
+    had ended already; the letters behind asking by themselves whether a line is a
+    group's name, which the editor's colouring says; and the letters behind cut
+    into pieces where a text box starts a new line within a line of words, which
+    they do by themselves (the test above).
+  Each of the six has a case now, and each case was run against the breakage it
+  was written for.
 
 ## Left rough, and what to ask
 

@@ -21,6 +21,7 @@
 // At the foot, with no box at all: the one change between two texts, line breaks as the
 // song counts them, and the box's undo (ChordProTyping.cs).
 
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -643,11 +644,16 @@ public class ChordProTypingTests
         box.ScrollToHome();
         TheSame("smaller");
         // Words with a character in them at which a text box starts a new line, though
-        // it is no line break of the song's: each piece is where the box has it.
+        // it is no line break of the song's: the letters behind start a new line there
+        // too, and stand where the box has its own. Each such character in turn.
         typist.Editor.SetScale(1);
-        typist.Editor.Show(new LibraryModel.ChordProShown("one line" + (char)0x2029 + "of the song's, in two\nand its next", 2, 2, null), canType: true);
-        Assert.Equal(3, box.LineCount);
-        TheSame("a line the box breaks in two");
+        foreach (var unit in new[] { (char)0x0B, (char)0x0C, (char)0x85, (char)0x2028, (char)0x2029 })
+        {
+            var named = "U+" + ((int)unit).ToString("X4", CultureInfo.InvariantCulture);
+            typist.Editor.Show(new LibraryModel.ChordProShown("one line" + unit + "of the song's, in two\nand its next", 2, 2, null), canType: true);
+            Assert.True(box.LineCount == 3, named + ": the box has " + box.LineCount + " lines");
+            TheSame("a line the box breaks in two at " + named);
+        }
         // And a line with a chord in it is as wide drawn bold as the box has it plain,
         // so that the letters after a chord are under the caret that is at them.
         const string line = "[G]One two three [D/F#]four [Am7]";
@@ -807,6 +813,14 @@ public class ChordProTypingTests
         }
         Assert.False(smaller.IsEnabled);
         Assert.True(larger.IsEnabled);
+        // And at the largest, the large letter is the one that is greyed.
+        for (var times = 0; times < 9; times++)
+        {
+            Click(larger);
+        }
+        Assert.Equal(1.5, model.TextZoom);
+        Assert.False(larger.IsEnabled);
+        Assert.True(smaller.IsEnabled);
         // And the keys, from the box in the pane.
         Assert.True(pane.ChordPro.KeyPressed(Key.D0, ModifierKeys.Control));
         Assert.Equal(1.0, model.TextZoom);
@@ -865,7 +879,7 @@ public class ChordProTypingTests
         model.PauseBeforeSaving = TimeSpan.FromSeconds(60);
         typist.CaretAt(typist.PlaceOf("Thirteen"));
         typist.Type("[A");
-        Assert.Empty(ChordsOf(1, "Plain Song", pc).Where(chord => chord.EndsWith(":A", StringComparison.Ordinal)));
+        Assert.DoesNotContain(ChordsOf(1, "Plain Song", pc), chord => chord.EndsWith(":A", StringComparison.Ordinal));
         // Ctrl+S, and nothing else with S.
         Assert.False(view.KeyPressed(Key.S, ModifierKeys.None));
         Assert.False(view.KeyPressed(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
@@ -1053,10 +1067,6 @@ public class ChordProTypingTests
         Assert.Equal(13, ChordProTyping.PlaceWithLineBreaksOfOneUnit(came, 99));
         Assert.Equal(0, ChordProTyping.PlaceWithLineBreaksOfOneUnit(came, -1));
         Assert.Equal(2, ChordProTyping.PlaceWithLineBreaksOfOneUnit("a\rb", 2));
-        // What else a text box starts a new line at.
-        Assert.Equal(
-            [true, true, true, true, true, true, false, false, false],
-            new[] { '\r', (char)0x0B, (char)0x0C, (char)0x85, (char)0x2028, (char)0x2029, '\n', ' ', '\t' }.Select(ChordProTyping.BreaksALineInATextBox));
     }
 
     private static TypingHistory.State S(string text, int caret, int length = 0) => new(text, caret, length);

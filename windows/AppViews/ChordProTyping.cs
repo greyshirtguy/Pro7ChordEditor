@@ -90,14 +90,6 @@ public static class ChordProTyping
         // (A place between the two units of a line break is the place before it.)
         return place - fewer;
     }
-
-    /// <summary>
-    /// The characters at which WPF's text box starts a new line, beside the line feed
-    /// that ends a line of the song's text. Words that have one of these in them are
-    /// drawn on more lines than they are.
-    /// </summary>
-    public static bool BreaksALineInATextBox(char unit) =>
-        unit is '\r' or (char)0x0B or (char)0x0C or (char)0x85 or (char)0x2028 or (char)0x2029;
 }
 
 /// <summary>
@@ -124,8 +116,8 @@ public sealed class TypingHistory
     private readonly List<Step> done = [];
     private readonly List<Step> undone = [];
 
-    // Whether the last step is over, so that nothing joins it: it was just taken back
-    // and made again.
+    // Whether the last step is over, so that nothing joins it: a step was taken back
+    // since anything was typed.
     private bool ended;
 
     public bool CanUndo => done.Count > 0;
@@ -201,9 +193,9 @@ public sealed class TypingHistory
     /// <summary>The step last taken back was made again.</summary>
     public void SteppedForward()
     {
+        // (The run is over already: a step is only made again after one was taken back.)
         if (undone.Count > 0)
         {
-            ended = true;
             done.Add(undone[^1]);
             undone.RemoveAt(undone.Count - 1);
         }
