@@ -16,8 +16,8 @@ milestone; put right what has become untrue.
 | **M3** The library | Done, 2026-10-12, bar what only the maintainer can try | Where songs are kept as files on a PC, the lists, the search, the marks, a song shown read only, whether ProPresenter is running, the app's own settings and log; and the window, in the look of Windows 11, dark and light. `spec/06`. **Nobody has seen the window itself**: it was drawn into pictures, and started ("Left rough"). **And on this PC it finds no library**, for the reason in the next section |
 | **M4** The copies | Done, 2026-10-12, bar what only the maintainer can try | A copy of a file kept before it is changed, named for when, with an index beside it; listed, thinned at the start, looked at, put back and that taken back; a mark in the list, Earlier Versions over the window, All Copies in the settings; the window's own menu. The proofs at the foot of `spec/07`. **Nothing in the app makes a copy until there is an editor**, so there is nothing of it for the maintainer to try yet but the menu and the settings ("At M4") |
 | **M5** The ChordPro editor | Done, 2026-10-12, bar what only the maintainer can try | The song as ChordPro text, typed in: what may be typed, the help with brackets, a save a moment after the typing stops, refusals, the box's own undo, colours, the size of the text; the two keys as pickers; Revert, and the words that say why there is no Save button. `spec/04`, and `spec/06` rule 12a. It has been started for real, on a made-up library of the test hymns, and a chord put on a song there ("At M5"). **Nobody has typed into it by hand, and no song chorded with it has been looked at in ProPresenter**: that is the maintainer's, on a COPY of a real library |
-| **M6** The chord sheet | Next | `spec/03`. Its model first, held to `sheet-model.json` and `layout.json` |
-| **M7** Chords with no words | The song's part done at M2 | What is left: the two editors letting it be asked (M5, M6), and the maintainer seeing in ProPresenter a song so changed |
+| **M6** The chord sheet | Done, 2026-10-12, bar what only the maintainer can try | The sheet a song now opens on: every slide a card in a frame of its group's colour, in a grid; the spot that follows the pointer; 1 to 7, a letter and the bubble a chord is typed in, Delete, the arrow keys; dragging; a line's chords copied onto another; undo and redo; the zoom; the strip of the key's chords; the switch between the two editors in the song's header; and the settings' Chords section. `spec/03`, `spec/06` rules 12 and 20a. Every case of `sheet-model.json` and `layout.json` passes. It has been started for real and looked at ("At M6"). **Nobody has pointed at it with a mouse, nor pressed a key on it**: that is the maintainer's, and it is most of what M6 is for |
+| **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -381,10 +381,95 @@ And at M4, likewise this session's, and the maintainer's to change:
     pickers in the song's header list the twenty-six and "None" only, so a song in
     C# major would show nothing there.
 56. **Every row of every list says what it shows to a screen reader** ("At M5").
-57. **The settings' Chords section waits for the sheet** (`spec/06`, "Settings": the
-    colour of a chord on the sheet and in the ChordPro text). It shows each "as it
-    will look", one of them a chord in its bubble, which is M6's to draw. The colour
-    of a chord in the text is one place in the code until then.
+57. **The settings' Chords section waited for the sheet**, and came with it at M6
+    (decision 75). `spec/06`, "Settings", has each colour shown "as it will look",
+    one of them a chord in its bubble, which was the sheet's to draw.
+58. **The sheet is one element that draws itself, in two layers** (`spec/10`: "one
+    custom-drawn element ... and does its own hit testing"). Under: the slides, their
+    words and their chords, which change when the song does. Over: the ring round the
+    slide that is picked, and the spot. So the pointer moving draws only the little
+    that moves with it, and the spot keeps up with it. The bubble a chord is typed in
+    is a third thing, a child of the element, over both.
+59. **Each line's words are one line of WPF's own layer for text, and that same line
+    is what is drawn and what is measured** (`SheetMetrics`). `spec/10` says
+    "measuring with FormattedText or GlyphRun": this is what a FormattedText is made
+    of, and it says where every unit of the line starts, which is what a tail has to
+    stand on. A place is a UTF-16 unit, as that layer counts too.
+60. **Where the slides are, and what is under a point, is plain code with nothing
+    measured in it** (`SheetGrid`), handed what things measure. So the Mac's numbers
+    are held here to the pixel, with letters of a fixed width and no window.
+61. **The bubble's box is WPF's own text box**, in a small panel of the sheet's
+    colours that does not zoom. What it may hold is the model's, held after the fact
+    as in the ChordPro text (decision 41): a key that is not taken is undone at once,
+    with the caret where it was. Input methods are off in it (decision 46). **No
+    sound is made for a key that is not taken here**; the ChordPro text makes one
+    (decision 44). For the maintainer to want or not.
+62. **The bubble is put in its place as the sheet is laid out**, not when what it
+    offers changes: how tall it then is, is not known until it has been laid out
+    ("At M6").
+63. **1 to 7 are taken by where they are, and letters by what they type**: the keys
+    of the top row and of the number pad, with Shift or without (on a keyboard that
+    has its numbers on Shift they are still one key each); A to G as the keyboard's
+    own layout has them. Ctrl with plus is the plus key with Shift or without (which
+    is the equals key), or the plus of the number pad. Nothing with Alt or the
+    Windows key held is the sheet's.
+64. **A letter pressed on the sheet opens the bubble with that letter in it, once.**
+    The key is answered by the sheet, and WPF does not go on to type a key that was
+    answered into whatever has the keyboard next. **Reasoned from how WPF hands keys
+    on, and NOT SEEN**: no key has been pressed in a real window. If the letter is
+    ever there twice, this is where to look. For the maintainer to try first.
+65. **The sheet takes the keyboard when the pointer moves over it** (rule 23a), if its
+    window is the one in front and no box of text in the window is being typed in.
+66. **None of the strip's buttons takes the keyboard when it is clicked.** A click on
+    one of the key's chords while a chord is being typed puts that chord in place of
+    what was typed (rule 39); a button that took the keyboard from the box would have
+    ended the typing first, and kept what was typed.
+67. **"The last thing copied on this computer"** (rule 52b) is told by the system's
+    own count of changes to its clipboard. A line's chords are not put on the
+    clipboard; so while the count is what it was when they were copied, nothing has
+    been copied since by any program. (The Mac asks its pasteboard the same.)
+68. **The bar that scrolls the sheet down is always there.** How many slides go to a
+    row is worked out from how wide the sheet is seen to be, and a bar that came and
+    went with the song's length would change that width as it did. What scrolls the
+    sheet wears the dark look whatever the system is, for its bars.
+69. **Laid out again, the sheet is scrolled at once** to where the slide at the top
+    was, not when the window next lays itself out ("At M6").
+70. **While the ChordPro text is shown the sheet is not laid out nor drawn, and when
+    it is come back to it is where it was scrolled to.** (On the Mac a sheet come
+    back to starts from its top. Neither app yet ties the caret of the text to the
+    slide picked on the sheet: "Left rough".)
+71. **The header's three ways, with the switch in it** (`SongLook`): one row, with
+    the switch in the middle of the pane where the name and the keys can each be read
+    in half of what it leaves, and otherwise between them where they leave it; the
+    name and the switch over the keys; and a row each. The Mac's ways in the Mac's
+    order. **How they are laid is in "At M6"**: twice the first way of doing it went
+    round for ever.
+72. **The switch is, to the system, two of a choice of one** (radio buttons): a
+    screen reader says which is chosen, and the arrow keys go between them. How they
+    look is the app's. After a click on it, and after Ctrl with 1 or 2, **the
+    keyboard goes to the editor that is then shown**, so that what is typed next
+    goes where the eye is. Ctrl with 1 and 2 are the window's whatever has the
+    keyboard, and change nothing while something is asked over the window.
+73. **The menu has a View**: the two editors, the one shown ticked, and Larger,
+    Smaller and Usual Size, which are of the editor that is shown. `spec/10` asks
+    for every command in the menu; the Mac has these on keys and buttons only.
+    Copying a whole group has only its keys, as on the Mac.
+74. **The quiet line under the sheet says what the keys do, on up to four lines**,
+    and is kept as tall as that needs whatever it says, so that the sheet does not
+    grow and shrink by a line each time something is said for a few seconds. The
+    names of keys in it are kept whole where a line is broken ("At M6").
+75. **The settings are two tabs, Chords and Backups.** A chord's colour is chosen with
+    the system's own picker, asked directly of the system (one function of
+    `comdlg32`): WPF has no door to it, and the other part of .NET that has would be
+    a second way of making windows to carry. It is no dependency. The sixteen
+    colours a person mixes in it are kept while the app runs.
+76. **A screen reader is told the sheet is there**: its name, that it is a chord
+    sheet, and what the keys do on it. An element that draws itself says nothing of
+    itself otherwise ("At M6"). It is told no more than that: a song's lines and
+    their chords are read from the ChordPro text. **For the maintainer to say**
+    whether more is wanted; the Mac's sheet says its name only.
+77. **Ctrl with the mouse's wheel zooms the sheet**, as it does the text (decision
+    47): the page gives two fingers on a trackpad, which a PC may not have.
 
 ## How it is laid out, and why
 
@@ -595,6 +680,44 @@ names. What to know before changing any of it:
   One test sends real key presses through a window of the system's that is never
   shown. Nobody's clipboard is touched: what would be pasted is put in place of
   what is selected.
+
+### The chord sheet (M6)
+
+- **In `Song`**: `ChordSheet.cs`, the Mac's file for file, with no window in it: the
+  song's rows, the spot, what each key and each thing done with the pointer asks of
+  the song, the bubble's typing, copying and pasting. `ChordLayout.cs` is the one
+  small function that says where a line's chords stand. Both are held to
+  `sheet-model.json` and `layout.json` (`ChordSheetTests`, with a stand-in for the
+  song that is the vectors' own), and `ChordSheetOnAFileTests` has the sheet on real
+  files.
+- **In `LibraryModel`**: which editor is shown; the sheet of the song that is open;
+  undo and redo of the song; the sheet's zoom and the two colours, kept with the
+  settings; a click in the strip; copying and pasting, with every sentence that is
+  said of them. `Settle` keeps a chord being typed on the sheet before anything else
+  is done to the song.
+- **In `AppViews`, the sheet in five files, each with one job**:
+  - `SheetLook.cs`: the colours and the sizes that do not zoom;
+  - `SheetGrid.cs`: where the slides are, and what is under a point. No drawing, and
+    nothing measured (decision 60);
+  - `SheetMetrics.cs`: what things measure, asked of WPF (decision 59);
+  - `SheetKeys.cs`: which key of the sheet's a key press is;
+  - `ChordSheetCanvas.cs`: the element. It tells the model what was done and draws
+    what the model then has. **Everything a pointer or a key does comes in by a
+    method a test can call** (`PointerMoved`, `Pressed`, `Dragged`, `Released`,
+    `KeyPressed`, `KeyInTheBox`); the handlers of the real pointer and keys only
+    call those. After each thing done it calls `Sync`.
+  `SheetEntry.xaml` is the bubble, `ChordSheetView.xaml` the strip and what scrolls
+  the sheet, `EditorSwitch.xaml` the two buttons in the header.
+- **The settings**: `SettingsView.xaml` has the two tabs, `ChordColourSettings.xaml`
+  the first of them, `ColourPicker.cs` the system's picker.
+- **The tests work the sheet as a person does**, by a hand at it (`Hand.cs`): it
+  asks the grid for a point that is over a place, and hands that in as the
+  pointer's; it presses a key by asking `SheetKeys` which key that is; it types into
+  the bubble's box as the ChordPro editor's tests type. What is then in the song's
+  file is what is checked. `SheetGridTests` holds the grid number for number with
+  letters of a fixed width; `SheetKeysTests` every key; `SheetModelTests` the
+  model's part and the settings; `ChordSheetViewTests` the rest, some of it by the
+  dots of what is drawn.
 
 ## What was found out
 
@@ -1058,6 +1181,78 @@ names. What to know before changing any of it:
   Each of the six has a case now, and each case was run against the breakage it
   was written for.
 
+### At M6
+
+- **Every case of `sheet-model.json` and of `layout.json` passes**: six songs' rows,
+  nine cases of where words start, thirty-eight of a line's stops and thirty-five
+  of the stop at a place, seventeen walks with the arrow keys, forty-six changes,
+  eleven typings and thirteen copyings and pastings, each compared by what the song
+  was asked and by the song afterwards.
+- **A line of text that has outlived what laid it out can be measured, and cannot be
+  drawn.** The first time the sheet drew, every test with a window in it failed
+  with "Text formatting engine cannot format a line of text due to error:
+  'ClientAbort'", from the drawing; measuring the same lines had worked. What lays
+  the lines out is now kept as long as the lines are.
+- **The header went round for ever, twice**, and the test that lays it out at every
+  width is what showed it, by never ending.
+  - On the one row, Earlier Versions was in a column that took whatever was left
+    over, which was exactly its own width. A fraction of a pixel short, it was laid
+    out a pixel narrower; its width is read from how it was laid out; so it was
+    worked out a pixel narrower still, and laid out narrower again, without end.
+    **Nothing in the header but the name is ever given less room than it needs
+    now**: each thing is in a column as wide as itself, with a column of its own for
+    what is left over.
+  - And the room the header has was read from the header. A header whose columns
+    want more than the pane has is laid out as wide as they want and cut off at the
+    pane's edge; so the room never got less than one row wanted, and it stayed one
+    row at any width. The room is read from the pane.
+- **The bubble was placed for the height it had before the key.** Seen in its first
+  picture: with "D/" typed it was a row of chords too tall. What is offered changes
+  with each key, and how tall the bubble then is, is not known until WPF has laid it
+  out again; asked at once, it said what it had been. It is placed as the sheet is
+  laid out (decision 62).
+- **A second step of zoom straight after a first began from where the sheet had
+  been.** The sheet is scrolled to keep the slide at the top where it was; WPF
+  scrolls when it next lays the window out; and a second step before that read the
+  old place against the new slides. A test with two steps together showed it. In
+  the app a laying out comes between any two keys, so nobody would have seen it; it
+  is put right all the same (decision 69).
+- **Tab's "takes the first that is offered" happens only in an empty box.** Rule 33
+  gives it to what "is not yet a chord", and (as "At M5" found of rule 15) only
+  nothing is: whatever the box takes that is something, is a chord by the vectors.
+  So `G/` and Tab keeps `G`; an empty box and Tab keeps the first offered. As on the
+  Mac and in the reference.
+- **What the pictures showed.** Twenty-three more (30 to 49): the sheet as a song
+  opens, in both looks; in a wide window, and there with its words at their smallest
+  and their largest; the spot on a word and on a chord; the bubble with "D/" typed,
+  and opened on a chord that is there; a chord being dragged; a line of chords
+  alone; blank slides; the window at its smallest; a song that states no key; a
+  chord refused while ProPresenter runs; what a paste says; a longer song; a song
+  that ProPresenter itself made, whose groups have colours, which the frames show;
+  the settings' two sections; and chords in a colour chosen, on the sheet and in
+  the text. All were opened and set beside `spec/pictures`. **Put right by
+  looking**: the bubble's height (above).
+- **The app was started for real again, with a song on its sheet.** The published
+  file, on the made-up library of the test hymns, its window spoken to as a program
+  may speak to one (no key pressed, no pointer moved). A song picked; the sheet
+  there, two slides to a row in a window of 1280; the strip's two buttons pressed,
+  and the slides laid out again larger and smaller; the other editor chosen at the
+  switch; a chord set in the ChordPro text; the sheet chosen again, with that chord
+  on it, the song's row marked as having an earlier version, Earlier Versions in
+  the header and Revert lit. Five pictures of the window itself were taken and
+  looked at. It closed with nothing wrong, and what it left in the app's own folder
+  on this PC was taken away again, each thing by its exact path. **That way of
+  speaking to a window cannot point at a word of the sheet**, which is the sheet's
+  whole business: nothing of M6's own was done to the real window but look at it.
+  Two things were found by it:
+  - **the sheet said nothing of itself to a screen reader**, not even the name it
+    had been given (decision 76);
+  - **the quiet line was broken at the plus of "Ctrl+C"**: "Ctrl" at one line's
+    end, "+C" at the next one's start. A character with no width that joins what is
+    either side of it (U+2060) is put each side of every plus in what the line
+    shows. WPF keeps to it and gives it no width: found by trying, and a test lays
+    the line out narrower and narrower to hold it.
+
 ## Left rough, and what to ask
 
 - **Nobody has seen the window.** Every picture is of the view the window holds,
@@ -1145,11 +1340,51 @@ names. What to know before changing any of it:
   - and M5's proof: **a song chorded here, on a copy of a real library, looked at
     in ProPresenter.** On this PC there is no such library to copy ("ProPresenter
     22 keeps no `.pro` files", above).
-- **The settings have no Chords section yet** (decision 57), so the colour of a chord
-  in the text cannot be chosen until M6.
-- **A slide picked from elsewhere** (`spec/04`, rule 21) has nowhere to be picked
-  from until there is a sheet. What it will ask is built and tested
-  (`ChordProEditor.SlideAt`, `StartOfSlide`); nothing calls it yet.
+- **Nobody has pointed at the sheet with a mouse, nor pressed a key on it.**
+  Everything it does was done by tests, through the doors the real pointer and keys
+  come in by; what is behind those doors is held, and the doors themselves are a
+  few lines each. What only a hand can tell, and the maintainer is asked to try, on
+  a COPY of a library:
+  - **first, a letter**: point at a word and press D. The bubble is to open with
+    one D in it (decision 64);
+  - that the spot keeps up with the pointer, on a long song as on a short one; that
+    pointing and pressing 4 needs no click first; and that the sheet does not take
+    the keyboard from the search box or the ChordPro text;
+  - the bubble: letters made capitals as they are typed, a key that is not taken
+    leaving the caret where it was, Enter, Tab, Esc, Down, Up and Right among what
+    is offered, a click on one of them, Backspace in an empty box;
+  - click, type, click, type, along a line and from slide to slide, quickly: rules
+    38 to 40, which the page calls most of what makes the sheet quick;
+  - dragging: that a chord comes away after a little movement and not before, the
+    faint one left behind, Ctrl held as it is let go; and a chord carried to a
+    slide that is out of sight (**rough**: the sheet scrolls towards the pointer
+    only while the pointer moves, not while it is held still at the edge);
+  - Ctrl+C on a line and Ctrl+V on another; a click on a line and then Ctrl+V; and
+    the same with something copied in another program in between, which is then to
+    paste nothing of the sheet's;
+  - Ctrl+Z and Ctrl+Y, and Undo, Redo, Copy and Paste in the Edit menu, with the
+    sheet having the keyboard;
+  - the zoom: Ctrl with plus, minus and 0, the two round buttons, Ctrl with the
+    wheel; that the slide at the top stays there;
+  - the wheel and a trackpad scrolling the sheet; the strip, where the pane is too
+    narrow for its seven chords, scrolled sideways by the wheel;
+  - the switch: a click, the arrow keys on it, Ctrl with 1 and 2, the View menu;
+    and that the keyboard goes to the editor shown;
+  - the settings' Chords section: the system's colour picker, and the sheet behind
+    it changing colour as one is chosen;
+  - that the sheet is sharp, and its tails on their characters, on a screen set to
+    another size than the first one's;
+  - and M6's proof, which is the maintainer's to give: that it is as quick as Simple
+    Presenter's. Every change to a song draws every slide of it again; on the test
+    songs that is nothing, and on a song of sixty slides nobody has timed it.
+- **The caret of the ChordPro text and the sheet's picked slide do not know of each
+  other** (`spec/04`, rule 21), as on the Mac: gone to from the sheet, the text is
+  where it was last left, and the sheet likewise. What would tie them is built and
+  tested (`ChordProEditor.SlideAt`, `StartOfSlide`); nothing calls it.
+- **Only the pictures hold some of how the sheet looks**: that a chord being carried
+  is left faint where it was, the colours of a bubble that is lit, the dark look of
+  the sheet's scroll bars. A test holds where the words, the chords, the spot and
+  the ring are drawn, by their dots; not these.
 - **A song whose name Windows keeps for itself** (CON, NUL, COM1 and their like)
   cannot have a folder of copies made for it. The copy then cannot be kept, and the
   change that wanted it is refused, which is the safe way to fail; but such a song
