@@ -90,12 +90,20 @@ public sealed class AppData(string folder)
 
         public string? TextChordColour { get; init; }
 
+        /// <summary>
+        /// Whether a song whose chords look as if they were put on by hand in the first
+        /// Windows editor is marked, and offered to have them moved (spec/08-repair.md,
+        /// check 2). Nothing, which is no, unless it was switched on: that editor's
+        /// fault has not been seen in a real file yet.
+        /// </summary>
+        public bool? OffersToMoveBack { get; init; }
+
         // (A list is the same as another when it has the same things in it, which is
         // not what a record makes of one by itself.)
         public bool Equals(Settings? other) =>
             other is not null && ChosenFolders.SequenceEqual(other.ChosenFolders) && LastPlace == other.LastPlace
             && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom && SheetZoom == other.SheetZoom
-            && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour;
+            && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour && OffersToMoveBack == other.OffersToMoveBack;
 
         public override int GetHashCode() => HashCode.Combine(ChosenFolders.Count, LastPlace, LastLibrary, ListsSplit);
     }
@@ -143,17 +151,22 @@ public sealed class AppData(string folder)
 
     public void Keep(Settings settings) => Write(settings, "settings.json");
 
-    // How marks.json is written: each file's path, and what was kept of it.
-    private sealed record WrittenMarks(Dictionary<string, KeptMarks.Entry> Entries);
+    // How marks.json is written: each file's path and what was kept of it, and which
+    // reading of a file made the marks (Marks.Version). A file written before that
+    // number was kept has none, which reads as 0.
+    private sealed record WrittenMarks(Dictionary<string, KeptMarks.Entry> Entries, int Version = 0);
 
     /// <summary>The copies kept, which are in <c>Backups</c> here. The app's version is for their index.</summary>
     public Copies Copies(string appVersion = "") => new(Path.Combine(Folder, "Backups"), appVersion);
 
-    /// <summary>The marks as they were last kept, or none.</summary>
+    /// <summary>
+    /// The marks as they were last kept, or none. Marks made by another reading of the
+    /// files than this build's are none: they are worked out again.
+    /// </summary>
     public KeptMarks ReadMarks() =>
-        Read<WrittenMarks>("marks.json") is { Entries: { } entries } ? new KeptMarks(entries) : new KeptMarks();
+        Read<WrittenMarks>("marks.json") is { Entries: { } entries, Version: Marks.Version } ? new KeptMarks(entries) : new KeptMarks();
 
-    public void Keep(KeptMarks marks) => Write(new WrittenMarks(new Dictionary<string, KeptMarks.Entry>(marks.Entries)), "marks.json");
+    public void Keep(KeptMarks marks) => Write(new WrittenMarks(new Dictionary<string, KeptMarks.Entry>(marks.Entries), Marks.Version), "marks.json");
 
     /// <summary>
     /// Adds a line to the log, with the time before it (by the clock at Greenwich, so

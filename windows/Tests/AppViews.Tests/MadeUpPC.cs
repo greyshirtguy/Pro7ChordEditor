@@ -56,6 +56,13 @@ internal sealed class MadeUpPC : IDisposable
     internal int TimesAsked { get; private set; }
 
     /// <summary>
+    /// If set: ProPresenter is started by someone once it has been asked after this many
+    /// times in all, and is found running from the next asking on. For a ProPresenter
+    /// that is started while the app is in the middle of something.
+    /// </summary>
+    internal int? IsStartedOnceAsked { get; set; }
+
+    /// <summary>
     /// Whether the PC has ProPresenter's folder where one is looked for. If not, there
     /// is no place to be found at all, though the folder is still on the disk for a
     /// test to choose by hand.
@@ -70,6 +77,10 @@ internal sealed class MadeUpPC : IDisposable
         chosen => new PlaceFinder(() => null, HasAProPresenterFolder ? Documents : null, chosen),
         () =>
         {
+            if (IsStartedOnceAsked is { } times && TimesAsked >= times)
+            {
+                ProPresenterIsRunning = true;
+            }
             TimesAsked++;
             return ProPresenterIsRunning;
         });
@@ -121,7 +132,24 @@ internal sealed class MadeUpPC : IDisposable
             {
                 file.Attributes = FileAttributes.Normal;
             }
-            folder.Delete(recursive: true);
+            // A test may end while the marks of the library it last chose are still
+            // being worked out, off its thread: a song's file is then being read at the
+            // moment the folder is to go, and Windows will not delete a file that is
+            // open. (FOUND when the marks came to read more of each file, at M8, with
+            // the PC busy: two tests in three hundred failed so, not the same two each
+            // time.) The reading is over in a moment, so it is waited for.
+            for (var tries = 0; ; tries++)
+            {
+                try
+                {
+                    folder.Delete(recursive: true);
+                    break;
+                }
+                catch (IOException) when (tries < 100)
+                {
+                    Thread.Sleep(50);
+                }
+            }
         }
     }
 }

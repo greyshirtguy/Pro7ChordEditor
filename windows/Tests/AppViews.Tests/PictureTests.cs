@@ -664,4 +664,105 @@ public class PictureTests
             model.SetTextChordColour("#1f7a3d");
             return Task.CompletedTask;
         });
+
+    // ---- Mending (M8)
+
+    // One of the files as the old editor left them, open, in the library of them.
+    private static async Task AnOldCopyOpen(MadeUpPC pc, LibraryModel model, string song)
+    {
+        await model.StartAsync();
+        model.ChooseLibrary(pc.Library("Old copies"));
+        await model.MarksAreWorkedOutAsync();
+        model.Open(pc.Song(song, "Old copies"));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ASongWhoseChordsAreShownTwice(bool dark) => Draw(
+        "50 a song whose chords ProPresenter shows twice, " + In(dark),
+        dark,
+        (pc, model) => AnOldCopyOpen(pc, model, "Plain Song (Chords)"));
+
+    [Fact]
+    public void ASongWhoseKeyDoesNotFitItsChords() => Draw(
+        "51 a song whose key does not fit its chords",
+        true,
+        (pc, model) => AnOldCopyOpen(pc, model, "A Song - In A Minor Key (Chords)"));
+
+    [Fact]
+    public void TheListNarrowedToTheSongsThatWantMending() => Draw(
+        "52 the list narrowed to the songs that want mending",
+        true,
+        async (pc, model) =>
+        {
+            await AnOldCopyOpen(pc, model, "It Is Well (Chords)");
+            model.Filter = MarkFilter.WantingMending;
+        });
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void MendAllAsksFirst(bool dark) => Draw(
+        "53 Mend All asks first, " + In(dark),
+        dark,
+        async (pc, model) =>
+        {
+            await AnOldCopyOpen(pc, model, "It Is Well (Chords)");
+            model.Filter = MarkFilter.WantingMending;
+            model.AskToMendAll();
+        });
+
+    [Fact]
+    public void WhatMendAllDid() => Draw(
+        "54 what Mend All did",
+        true,
+        async (pc, model) =>
+        {
+            await AnOldCopyOpen(pc, model, "It Is Well (Chords)");
+            model.Filter = MarkFilter.WantingMending;
+            model.AskToMendAll();
+            // (ProPresenter is started when three are done, so that a song that was not
+            // mended is to be seen too.)
+            pc.IsStartedOnceAsked = pc.TimesAsked + 3;
+            await model.MendAllAsync();
+        });
+
+    [Fact]
+    public void ASongOfferedToHaveItsChordsMoved() => Draw(
+        "55 a song offered to have its chords moved",
+        true,
+        async (pc, model) =>
+        {
+            await AnOldCopyOpen(pc, model, "Amazing Grace (Chords)");
+            model.SetOffersToMoveBack(true);
+        });
+
+    [Fact]
+    public void ASongShownAsItWouldBeWithItsChordsMoved() => Draw(
+        "56 a song shown as it would be with its chords moved",
+        true,
+        async (pc, model) =>
+        {
+            await AnOldCopyOpen(pc, model, "Amazing Grace (Chords)");
+            model.SetOffersToMoveBack(true);
+            model.Take(LibraryModel.OfferAction.ShowMoved);
+        });
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheSettingsMending(bool dark) => DrawView(
+        "57 the settings, mending, " + In(dark),
+        dark,
+        async pc =>
+        {
+            var model = pc.Model();
+            await model.StartAsync();
+            var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+            settings.Show("Mending");
+            return settings;
+        },
+        width: 960,
+        height: 600);
 }

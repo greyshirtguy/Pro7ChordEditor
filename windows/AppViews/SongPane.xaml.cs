@@ -37,6 +37,7 @@ public partial class SongPane : UserControl
     private LibraryModel? model;
     private LibraryModel.ShownSong? shownSong;
     private LibraryModel.PutBack? offered;
+    private string shownOffers = "";
 
     // What is being put into the pickers is from the model, and not a key picked.
     private bool showing;
@@ -174,6 +175,7 @@ public partial class SongPane : UserControl
         }
 
         Header.Visibility = UnderTheHeader.Visibility = Seen(song is not null);
+        ShowTheOffers();
         Editors.Visibility = Seen(read);
         Earlier.Visibility = Seen(model.HasEarlierVersions);
         NoSong.Text = model.NoSongSentence;
@@ -222,6 +224,72 @@ public partial class SongPane : UserControl
         }
         LayOutTheHeader();
     }
+
+    // What was found in the song that wants mending, a row for each: its sentence, and
+    // at its right what can be done about it (spec/08-repair.md). The rows are made
+    // again only when what they say has changed, so that a button being clicked is not
+    // taken from under the pointer.
+    private void ShowTheOffers()
+    {
+        var offers = model!.Offers;
+        var canChange = model.CanChange;
+        var said = string.Join('\n', offers.Select(offer => offer.Sentence + "|" + string.Join('|', offer.Buttons.Select(button => button.Label)))) + "|" + canChange;
+        if (string.Equals(said, shownOffers, StringComparison.Ordinal))
+        {
+            return;
+        }
+        shownOffers = said;
+        Offers.Children.Clear();
+        foreach (var offer in offers)
+        {
+            Offers.Children.Add(RowOf(offer, canChange));
+        }
+        Offers.Visibility = Seen(offers.Count > 0);
+    }
+
+    // The system's font of small signs, as the lists have their marks in (ListsPane.xaml).
+    private static readonly FontFamily Signs = new("Segoe Fluent Icons, Segoe MDL2 Assets");
+
+    private Border RowOf(LibraryModel.Offer offer, bool canChange)
+    {
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
+        DockPanel.SetDock(buttons, Dock.Right);
+        foreach (var one in offer.Buttons)
+        {
+            var action = one.Action;
+            var button = new Button { Content = one.Label, Padding = new Thickness(12, 4, 12, 5), Margin = new Thickness(buttons.Children.Count == 0 ? 0 : 6, 0, 0, 0) };
+            // What changes the song cannot be done while ProPresenter is running; what
+            // only shows it can.
+            var changes = action is LibraryModel.OfferAction.Mend or LibraryModel.OfferAction.SetKey or LibraryModel.OfferAction.MoveBack;
+            button.IsEnabled = canChange || !changes;
+            button.Click += (_, _) => model?.Take(action);
+            buttons.Children.Add(button);
+        }
+        var sign = new TextBlock
+        {
+            Text = ((char)0xE90F).ToString(),
+            FontFamily = Signs,
+            FontSize = 14,
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(0, 0, 9, 0),
+        };
+        sign.SetResourceReference(TextBlock.ForegroundProperty, "SystemFillColorCautionBrush");
+        DockPanel.SetDock(sign, Dock.Left);
+        var sentence = new TextBlock { Text = offer.Sentence, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center };
+        var across = new DockPanel { LastChildFill = true };
+        across.Children.Add(buttons);
+        across.Children.Add(sign);
+        across.Children.Add(sentence);
+        var row = new Border { Padding = new Thickness(16, 7, 12, 7), BorderThickness = new Thickness(0, 0, 0, 1), Child = across };
+        row.SetResourceReference(Border.BackgroundProperty, "SystemFillColorCautionBackgroundBrush");
+        row.SetResourceReference(Border.BorderBrushProperty, "DividerStrokeColorDefaultBrush");
+        return row;
+    }
+
+    /// <summary>The offers as they are shown, each as its sentence and its buttons: for a test to read and to click.</summary>
+    internal IReadOnlyList<(string Sentence, IReadOnlyList<Button> Buttons)> OffersShown =>
+        [.. Offers.Children.OfType<Border>().Select(row => (DockPanel)row.Child).Select(across =>
+            (across.Children.OfType<TextBlock>().Last().Text, (IReadOnlyList<Button>)[.. across.Children.OfType<StackPanel>().Single().Children.OfType<Button>()]))];
 
     // The song's two keys, each to be set: the key its chords are written in, and,
     // quieter beside it, the key ProPresenter is to show them in. Neither changes any

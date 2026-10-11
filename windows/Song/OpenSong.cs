@@ -409,8 +409,47 @@ public sealed class OpenSong : ISheetSong
     /// with a copy kept first.
     /// </summary>
     /// <exception cref="Refusal">Nothing was changed, and its sentence says why.</exception>
-    public void MoveBack() =>
-        ChangeEveryBox((words, chords) => chords.Select(chord => chord with { At = OldEditor.Unshifted(words, chord.At) }));
+    public void MoveBack() => ChangeEveryBox(MovedBack);
+
+    /// <summary>
+    /// What the editors would be handed if `MoveBack` were done: for the song to be
+    /// shown both ways, as it is and as it would be, before anything is changed
+    /// (spec/08-repair.md, check 2). Nothing is changed here, and nothing is saved.
+    /// </summary>
+    public IReadOnlyList<TextBox> TextBoxesMovedBack
+    {
+        get
+        {
+            var moved = presentation.Clone();
+            foreach (var text in Checks.Texts(moved))
+            {
+                Rewrite(text, MovedBack);
+            }
+            return Reading.TextBoxes(moved, rows);
+        }
+    }
+
+    /// <summary>
+    /// The song as it would be if `MoveBack` were done, for the sheet to show: it can be
+    /// looked at, and refuses whatever is asked of it (SongAsItWouldBe.cs).
+    /// </summary>
+    public ISheetSong AsItWouldBeMovedBack() => new SongAsItWouldBe(TextBoxesMovedBack, Key);
+
+    // A box's chords, each where the first Windows editor meant it.
+    private static IEnumerable<Chord> MovedBack(string words, IReadOnlyList<Chord> chords) =>
+        chords.Select(chord => chord with { At = OldEditor.Unshifted(words, chord.At) });
+
+    // Writes a text's chords again: those `chordsFor` makes of its own (handed the box's
+    // words, and its chords as the file has them, in order of place). A text with no
+    // chords is not touched.
+    private static void Rewrite(RV.Graphics.Types.Text text, Func<string, IReadOnlyList<Chord>, IEnumerable<Chord>> chordsFor)
+    {
+        var chords = Reading.ChordsOf(text);
+        if (chords.Count > 0)
+        {
+            Writing.WriteChords(chordsFor(Reading.WordsOf(text), chords), text);
+        }
+    }
 
     /// <summary>
     /// Puts the last change back as it was before, and saves. A step that was joined to
@@ -768,11 +807,10 @@ public sealed class OpenSong : ISheetSong
     }
 
     // Gives every text box of the file's slides that has chords the chords that
-    // `chordsFor` makes of its own (handed the box's words, and its chords as the file
-    // has them, in order of place). Which boxes those are is Checks.cs's to say: every
-    // one, shown by the editors or not. One save, one step of undo, and before the
-    // save a copy of the file, kept as before a mending. Answers whether anything
-    // changed.
+    // `chordsFor` makes of its own (`Rewrite`). Which boxes those are is Checks.cs's to
+    // say: every one, shown by the editors or not. One save, one step of undo, and
+    // before the save a copy of the file, kept as before a mending. Answers whether
+    // anything changed.
     private bool ChangeEveryBox(Func<string, IReadOnlyList<Chord>, IEnumerable<Chord>> chordsFor)
     {
         var changed = presentation.Clone();
@@ -783,11 +821,7 @@ public sealed class OpenSong : ISheetSong
             var after = before.Clone();
             foreach (var text in Checks.Texts(after))
             {
-                var chords = Reading.ChordsOf(text);
-                if (chords.Count > 0)
-                {
-                    Writing.WriteChords(chordsFor(Reading.WordsOf(text), chords), text);
-                }
+                Rewrite(text, chordsFor);
             }
             if (!after.Equals(before))
             {

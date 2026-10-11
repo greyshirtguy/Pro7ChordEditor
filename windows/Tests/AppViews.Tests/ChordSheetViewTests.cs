@@ -1259,7 +1259,9 @@ public class ChordSheetViewTests
         Assert.Equal("", model.Shown!.Key);
         Assert.Equal(["1 C", "2 Dm", "3 Em", "4 F", "5 G", "6 Am", "7 Bdim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
         Assert.Equal(Visibility.Visible, says.Visibility);
-        Assert.Equal("The song names no key: pick the one its chords are in", says.Text);
+        // (With which key its chords look like, which the same sum as doubts a key can
+        // say: spec/08-repair.md, check 3.)
+        Assert.Equal("The song names no key: pick the one its chords are in. They look like D.", says.Text);
         // 1 to 7 go by C until a key is set.
         hand.PointAt("Almighty");
         hand.Press(Key.D2);
@@ -1268,6 +1270,21 @@ public class ChordSheetViewTests
         // out; and nothing of the strip is squeezed: the chords are as wide as they were.
         var chords = Named<FrameworkElement>(strip, "Chords");
         var wide = chords.ActualWidth;
+        // As the pane is made narrower: first which key the chords look like goes, and
+        // the page's words stand alone; then they go too.
+        var said = new List<string>();
+        for (var width = 1280; width >= 760; width -= 10)
+        {
+            Pictures.LayOut(view, width, 600);
+            var now = says.Visibility == Visibility.Visible ? says.Text : "";
+            if (said.Count == 0 || said[^1] != now)
+            {
+                said.Add(now);
+            }
+        }
+        Assert.Equal(
+            ["The song names no key: pick the one its chords are in. They look like D.", "The song names no key: pick the one its chords are in", ""],
+            said);
         Pictures.LayOut(view, 760, 600);
         Assert.Equal(Visibility.Collapsed, says.Visibility);
         Assert.Equal(wide, chords.ActualWidth, 0.5);

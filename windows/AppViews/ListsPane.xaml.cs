@@ -85,6 +85,10 @@ public partial class ListsPane : UserControl
 
         public string ChordsTip => song.ChordsTip;
 
+        public bool WantsMending => song.WantsMending;
+
+        public string MendingTip => song.MendingTip;
+
         /// <summary>How strongly the row is drawn: a file that cannot be read is fainter.</summary>
         public double Strength => song.CannotBeRead ? 0.55 : 1;
 
@@ -99,6 +103,12 @@ public partial class ListsPane : UserControl
             }
         }
     }
+
+    /// <summary>The songs' rows as they are shown: for a test to read.</summary>
+    internal IReadOnlyList<Row> RowsShown => shownRows;
+
+    /// <summary>The list's fourth choice, its row, and Mend All beside it: for a test to read and to click.</summary>
+    internal (FrameworkElement Row, System.Windows.Controls.Primitives.ToggleButton Choice, Button MendAll) MendingParts => (MendingRow, Mending, MendAll);
 
     private void Follow(LibraryModel? now)
     {
@@ -156,6 +166,10 @@ public partial class ListsPane : UserControl
             All.IsChecked = model.Filter == MarkFilter.All;
             WithChords.IsChecked = model.Filter == MarkFilter.WithChords;
             Without.IsChecked = model.Filter == MarkFilter.WithoutChords;
+            Mending.IsChecked = model.Filter == MarkFilter.WantingMending;
+            MendingRow.Visibility = model.OffersWantingMending ? Visibility.Visible : Visibility.Collapsed;
+            MendAll.Visibility = model.OffersMendAll ? Visibility.Visible : Visibility.Collapsed;
+            MendAll.IsEnabled = model.CanMendAll;
 
             // The songs. While they are the same songs in the same order (marks coming
             // in, a song opened), each row is only told what it now is, so that the
@@ -232,6 +246,10 @@ public partial class ListsPane : UserControl
     private void WithChordsIsChosen(object sender, RoutedEventArgs e) => Narrow(MarkFilter.WithChords);
 
     private void WithoutIsChosen(object sender, RoutedEventArgs e) => Narrow(MarkFilter.WithoutChords);
+
+    private void MendingIsChosen(object sender, RoutedEventArgs e) => Narrow(MarkFilter.WantingMending);
+
+    private void MendAllWasClicked(object sender, RoutedEventArgs e) => model?.AskToMendAll();
 
     private void Narrow(MarkFilter to)
     {

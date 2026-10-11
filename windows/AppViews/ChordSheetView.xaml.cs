@@ -136,14 +136,29 @@ public partial class ChordSheetView : UserControl
         var seen = false;
         if (noKey && Strip.ActualWidth > 0)
         {
-            NoKey.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             Chords.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             Zoom.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            seen = HasRoomToSay(
-                Chords.DesiredSize.Width,
-                NoKey.DesiredSize.Width - NoKey.Margin.Left,
-                Zoom.DesiredSize.Width - Zoom.Margin.Left,
-                Strip.ActualWidth - Strip.Padding.Left - Strip.Padding.Right);
+            // (Measured as it would be if it were there. Put away, it measures as
+            // nothing, and nothing always has room: FOUND at M8, when a test made the
+            // pane narrower a little at a time and the words came and went by turns.)
+            NoKey.Visibility = Visibility.Visible;
+            // With which key its chords look like, if that is known and there is room to
+            // say it (spec/08-repair.md, check 3); else the page's words alone; else
+            // nothing.
+            foreach (var sentence in new[] { model!.NoKeySentence, LibraryModel.NoKey }.Distinct())
+            {
+                NoKey.Text = sentence;
+                NoKey.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                seen = HasRoomToSay(
+                    Chords.DesiredSize.Width,
+                    NoKey.DesiredSize.Width - NoKey.Margin.Left,
+                    Zoom.DesiredSize.Width - Zoom.Margin.Left,
+                    Strip.ActualWidth - Strip.Padding.Left - Strip.Padding.Right);
+                if (seen)
+                {
+                    break;
+                }
+            }
         }
         NoKey.Visibility = seen ? Visibility.Visible : Visibility.Collapsed;
     }

@@ -13,6 +13,9 @@
                two keys, each to be set. Where the pane is too narrow for the name to
                be read beside them, the keys go on a row of their own under it, and
                where even that is too wide each has a row (SongLook.cs);
+    offers     under the header, a row for each thing found in the song that wants
+               mending (spec/08-repair.md): a sentence that says what, and at its right
+               the button that puts it right. None for most songs;
     the song   on the chord sheet, under the strip of its key's chords; or as ChordPro
                text, under a line of help (or, in a warmer colour, why this song can be
                read there and not changed) with the size of the text at its right: a
@@ -134,6 +137,8 @@
       </StackPanel>
     </Grid>
     <Border x:Name="UnderTheHeader" DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+    <!-- (Its rows are made in the code beside, from the model's offers.) -->
+    <StackPanel x:Name="Offers" DockPanel.Dock="Top" />
 
     <Grid>
       <TextBlock x:Name="NoSong"

@@ -83,7 +83,7 @@
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" MinWidth="380" />
         </Grid.ColumnDefinitions>
-        <views:ListsPane Grid.Column="0" />
+        <views:ListsPane x:Name="Listed" Grid.Column="0" />
         <!-- The edge. It is the bar's colour, and has the look's own small grip in its middle. -->
         <GridSplitter x:Name="Edge"
                       Grid.Column="1"
@@ -103,5 +103,6 @@
     </DockPanel>
     <views:EarlierVersionsPanel Visibility="Collapsed" />
     <views:RevertQuestionPanel Visibility="Collapsed" />
+    <views:MendAllPanel x:Name="MendAll" Visibility="Collapsed" />
   </Grid>
 </UserControl>

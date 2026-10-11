@@ -227,7 +227,9 @@ public class WindowListsTests
         var songs = Rows("Songs");
         Assert.Equal(MadeUpPC.Songs.Length, songs.Count);
         Assert.Contains("Amazing Grace. Has 40 chords.", songs);
-        Assert.Contains("Plain Song. Has 8 chords. Earlier versions of this song are kept.", songs);
+        // (Its history left it in E, which its chords do not look like: that is said
+        // too, since M8.)
+        Assert.Contains("Plain Song. Has 8 chords. Earlier versions of this song are kept. It says it is in E, but its chords look like G.", songs);
         Assert.Contains("Nonsense. This file could not be read as a ProPresenter presentation.", songs);
         Assert.Contains("Rock Of Ages (Toplady).", songs);
         Assert.DoesNotContain(songs, row => row.Contains("Pro7ChordEditor", StringComparison.Ordinal) || row.Contains('{', StringComparison.Ordinal));
@@ -272,9 +274,9 @@ public class WindowListsTests
     }
 
     [Fact]
-    public void TheMarkFilterHasTheThreeChoicesTheWindowOffers()
+    public void TheMarkFilterHasTheFourChoicesTheWindowOffers()
     {
         // (The window has a button for each, by name: one more would have none.)
-        Assert.Equal([MarkFilter.All, MarkFilter.WithChords, MarkFilter.WithoutChords], Enum.GetValues<MarkFilter>());
+        Assert.Equal([MarkFilter.All, MarkFilter.WithChords, MarkFilter.WithoutChords, MarkFilter.WantingMending], Enum.GetValues<MarkFilter>());
     }
 }

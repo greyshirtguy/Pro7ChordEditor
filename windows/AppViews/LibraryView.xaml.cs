@@ -37,6 +37,12 @@ public partial class LibraryView : UserControl
     /// <summary>The song's pane: for a test to type into its text.</summary>
     internal SongPane SongPane => Song;
 
+    /// <summary>The lists at the left: for a test to click in.</summary>
+    internal ListsPane ListsPane => Listed;
+
+    /// <summary>Mend All's panel, over the window: for a test to read and to answer.</summary>
+    internal MendAllPanel MendAllPanel => MendAll;
+
     /// <summary>
     /// Asks the person for a folder, with the system's own chooser, over the window
     /// this is in. Nothing, if they chose none.
@@ -86,6 +92,25 @@ public partial class LibraryView : UserControl
     /// <summary>A key was pressed, with these others held. Answers whether it was one of the view's own.</summary>
     internal bool KeyPressed(Key key, ModifierKeys held)
     {
+        // While Mend All is asking, at work, or saying what it did, it is over the whole
+        // window: Esc is Cancel at its question and Done once it has finished, and the
+        // window's other keys do nothing behind it.
+        if (Model.MendAllQuestion is not null || Model.MendingAll is not null)
+        {
+            if (key == Key.Escape && held == ModifierKeys.None)
+            {
+                if (Model.MendAllQuestion is not null)
+                {
+                    Model.DontMendAll();
+                }
+                else
+                {
+                    Model.CloseMendAll();
+                }
+                return true;
+            }
+            return held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2 or Key.S;
+        }
         // Ctrl with 1 shows the chord sheet and with 2 the ChordPro text, and the
         // keyboard goes to the one shown. Not while something is asked over the window.
         if (held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2)

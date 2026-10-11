@@ -50,7 +50,7 @@ using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
 
-public sealed class LibraryModel : INotifyPropertyChanged
+public sealed partial class LibraryModel : INotifyPropertyChanged
 {
     /// <summary>How much of the height of the two lists the libraries have, unless the bar between them was moved.</summary>
     public const double UsualListsSplit = 0.36;
@@ -144,16 +144,28 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
         /// <summary>If it could not be read, the sentence that says so. Then there are no lines.</summary>
         public string? Problem { get; init; }
+
+        /// <summary>
+        /// What the checks find in it (spec/08-repair.md): of the song that is open, as
+        /// it is now. Nothing for a copy that is only looked at.
+        /// </summary>
+        public Findings? Found { get; init; }
     }
 
     /// <summary>A song as the list shows it: its name, and what its marks say in words.</summary>
-    public sealed record SongRow(string Id, string Name, Marks? Marks, bool HasCopies = false)
+    public sealed record SongRow(string Id, string Name, Marks? Marks, bool HasCopies = false, bool OfferingToMoveBack = false)
     {
         public bool CannotBeRead => Marks?.CannotBeRead == true;
 
         public bool IsOldEditorsCopy => Marks?.IsOldEditorsCopy == true;
 
         public bool HasChords => Marks?.HasChords == true;
+
+        /// <summary>Whether something in it wants mending (spec/06, rule 9; spec/08-repair.md).</summary>
+        public bool WantsMending => Marks?.WantsMending(OfferingToMoveBack) == true;
+
+        /// <summary>What wants mending in it, in words: a sentence for each thing found.</summary>
+        public string MendingTip => Marks is null ? "" : string.Join(' ', WhatWantsMending(Marks, OfferingToMoveBack));
 
         public static string CannotBeReadTip => "This file could not be read as a ProPresenter presentation.";
 
@@ -188,6 +200,10 @@ public sealed class LibraryModel : INotifyPropertyChanged
                 if (HasCopies)
                 {
                     said.Add(HasCopiesTip);
+                }
+                if (WantsMending)
+                {
+                    said.Add(MendingTip);
                 }
                 if (IsOldEditorsCopy)
                 {
@@ -399,13 +415,14 @@ public sealed class LibraryModel : INotifyPropertyChanged
     {
         get
         {
-            var narrowed = Listing.Narrowed(Songs, typed).Where(song => filter.Lets(marks.GetValueOrDefault(song.Id))).Select(song => song.Id).ToHashSet(Paths.ById);
+            var narrowed = Listing.Narrowed(Songs, typed).Where(song => filter.Lets(marks.GetValueOrDefault(song.Id), OffersToMoveBack)).Select(song => song.Id).ToHashSet(Paths.ById);
             return [.. Songs.Where(song => narrowed.Contains(song.Id) || Paths.Same(song.Id, SongId))];
         }
     }
 
     /// <summary>The songs listed, each as its row shows it.</summary>
-    public IReadOnlyList<SongRow> Rows => [.. ListedSongs.Select(song => new SongRow(song.Id, song.Name, marks.GetValueOrDefault(song.Id), HasCopies(song)))];
+    public IReadOnlyList<SongRow> Rows =>
+        [.. ListedSongs.Select(song => new SongRow(song.Id, song.Name, marks.GetValueOrDefault(song.Id), HasCopies(song), OffersToMoveBack))];
 
     /// <summary>Whether the song that is open has copies kept.</summary>
     public bool HasEarlierVersions => Songs.FirstOrDefault(song => Paths.Same(song.Id, SongId)) is { } song && HasCopies(song);
@@ -559,6 +576,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         SheetZoom = NearestZoom(settings.SheetZoom ?? UsualSheetZoom);
         SheetChordColour = ColourAsKept(settings.SheetChordColour);
         TextChordColour = ColourAsKept(settings.TextChordColour);
+        OffersToMoveBack = settings.OffersToMoveBack == true;
         keptMarks = appData.ReadMarks();
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
         var thrownAway = copies.Thin();
@@ -579,7 +597,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// </summary>
     public async Task RefreshAsync()
     {
-        if (!started)
+        if (!started || MendingAllNow)
         {
             return;
         }
@@ -647,7 +665,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     public void ChoosePlace(string? id)
     {
-        if (Paths.Same(id, PlaceId) || !Settle())
+        if (Paths.Same(id, PlaceId) || MendingAllNow || !Settle())
         {
             return;
         }
@@ -659,7 +677,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
 
     public void ChooseLibrary(string? id)
     {
-        if (Paths.Same(id, LibraryId) || !Settle())
+        if (Paths.Same(id, LibraryId) || MendingAllNow || !Settle())
         {
             return;
         }
@@ -676,7 +694,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// </summary>
     public void Open(string? id)
     {
-        if (!Settle())
+        if (MendingAllNow || !Settle())
         {
             return;
         }
@@ -722,6 +740,10 @@ public sealed class LibraryModel : INotifyPropertyChanged
     /// <summary>A folder chosen by hand becomes a place, is remembered, and is opened.</summary>
     public void Add(string folder)
     {
+        if (MendingAllNow)
+        {
+            return;
+        }
         if (!Settle())
         {
             return;
@@ -808,6 +830,13 @@ public sealed class LibraryModel : INotifyPropertyChanged
     {
         pauseStop?.Cancel();
         pauseStop = null;
+        // (A chord being typed on the song shown as it would be is nobody's to keep: it
+        // is let go, as Esc lets it go.)
+        if (Judging == Way.AsItWouldBe && Sheet is { Typing: true } onlyShown)
+        {
+            onlyShown.Press(ChordSheet.EntryKey.Escape);
+            SheetVersion++;
+        }
         // A chord being typed on the sheet is kept first (spec/03, rule 39).
         if (Sheet is { Typing: true } typing)
         {
@@ -888,6 +917,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
         Refused = null;
         refusedForProPresenter = false;
         OffersOpeningAgain = false;
+        // (The song shown as it would be is shown of the song as it was: with the song
+        // changed, it is shown as it is.)
+        StopJudging();
         try
         {
             ask(song);
@@ -915,6 +947,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         {
             return;
         }
+        StopJudging();
         if (wanted == Editor.ChordPro)
         {
             if (editor is not null && textIsStale)
@@ -1096,8 +1129,9 @@ public sealed class LibraryModel : INotifyPropertyChanged
         return sentence;
     }
 
-    // The sheet's song for a song just opened, or put back.
-    private ChordSheet MakeSheet(OpenSong song) => new(song)
+    // The sheet's song for a song just opened, or put back; or for the song as it
+    // would be, which is only shown (LibraryModel.Mending.cs).
+    private ChordSheet MakeSheet(ISheetSong song) => new(song)
     {
         PasteKeys = "Ctrl+V",
         Refused = refusal =>
@@ -1288,7 +1322,8 @@ public sealed class LibraryModel : INotifyPropertyChanged
     {
         try
         {
-            return Show(new OpenSong(copy.Path), copy.SongName);
+            // (What the checks would find in a copy is nobody's to mend, and is not said.)
+            return Show(new OpenSong(copy.Path), copy.SongName) with { Found = null };
         }
         catch (Refusal)
         {
@@ -1439,6 +1474,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
             Lines = SongText.Lines(boxes),
             Slides = song.SlideCount,
             Chords = boxes.Sum(box => box.Chords.Count),
+            Found = song.Findings,
         };
     }
 
@@ -1459,6 +1495,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         ChordPro = null;
         Sheet = null;
         Said = null;
+        Judging = null;
     }
 
     // The song as text, made afresh from it: a new sitting at the editor.
@@ -1467,6 +1504,7 @@ public sealed class LibraryModel : INotifyPropertyChanged
         editor = new ChordProEditor(song);
         sitting++;
         ShowText(editor);
+        Judging = null;
         Sheet = MakeSheet(song);
         SheetVersion++;
     }
@@ -1622,5 +1660,6 @@ public sealed class LibraryModel : INotifyPropertyChanged
         SheetZoom = SheetZoom == UsualSheetZoom ? null : SheetZoom,
         SheetChordColour = SheetChordColour,
         TextChordColour = TextChordColour,
+        OffersToMoveBack = OffersToMoveBack ? true : null,
     });
 }

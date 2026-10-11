@@ -80,6 +80,11 @@ public sealed class Refusal : Exception
 
     internal static Refusal OnlyForReading => new(Why.OnlyForReading, "This song was opened only to be looked at. Nothing was changed.");
 
+    // (Of the song shown as it would be with its chords moved: SongAsItWouldBe.cs.)
+    internal static Refusal ShownAsItWouldBe => new(
+        Why.OnlyForReading,
+        "This is the song as it would be with its chords moved, shown to be looked at. Nothing was changed.");
+
     internal static Refusal SlideGone => new(Why.SlideGone, "That slide is no longer in the song. Nothing was changed.");
 
     internal static Refusal TextBoxGone => new(Why.TextBoxGone, "That text box is no longer on the slide. Nothing was changed.");

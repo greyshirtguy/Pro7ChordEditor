@@ -1,0 +1,50 @@
+<!--
+  Mending, in the app's settings: the one switch that mending has
+  (spec/08-repair.md, check 2).
+
+  The first Windows chord editor is thought to have saved a chord that was put on by
+  hand a little to the left of where it was put, on every line of a slide after the
+  first. A song that looks as if that happened to it can be marked, and offered to have
+  its chords moved, after being shown both ways. Whether that editor really did so has
+  not been seen in a real song, and a wrong offer to move every chord of a good song is
+  worse than none: so the page has the offer built and left switched off, and this is
+  the switch.
+
+  The other two things that are found in a song (chords that ProPresenter shows twice,
+  and a key that does not fit the chords) have no switch: they are always marked and
+  offered, and the words here say so, so that nobody looks for one.
+
+  Nothing here touches a song. What is shown comes from LibraryModel, which this view is
+  handed. It has a ground of its own and says what colour words are, both the system's:
+  a test draws it with no window to have them from.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.MendingSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource ApplicationBackgroundBrush}"
+             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+             FontFamily="Segoe UI Variable Text, Segoe UI"
+             FontSize="13"
+             UseLayoutRounding="True">
+  <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <TextBlock Text="Mending" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
+    <TextBlock Text="What the old Windows chord editor (versions 0.9) left in songs, and what is offered for it."
+               TextWrapping="Wrap"
+               Margin="0,4,0,18"
+               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+    <CheckBox x:Name="MoveBack" Click="MoveBackWasClicked">
+      <TextBlock Text="Offer to move chords that look as if they were put on in the old editor" TextWrapping="Wrap" />
+    </CheckBox>
+    <TextBlock TextWrapping="Wrap" Margin="28,6,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+      That editor is thought to have saved a chord that was put on by hand a little to the left of where it was put, on every line of a slide after the first.
+      It has not been seen in a real song yet, so this is off.
+      Switched on, a song that looks so is marked in the list, and can be shown both ways, as it is and as it would be, before anything is moved.
+    </TextBlock>
+
+    <TextBlock TextWrapping="Wrap" Margin="0,22,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+      Two other things are always looked for, and have no switch: chords written so that ProPresenter shows them twice, and a key that does not fit a song&#x2019;s chords.
+      A song that has either is marked in the list, and says which when it is opened. Nothing is changed until its button is clicked, and a copy of the song is kept first.
+    </TextBlock>
+  </StackPanel>
+</UserControl>
