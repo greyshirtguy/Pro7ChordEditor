@@ -666,8 +666,13 @@ changing any of it:
   with no submodule and nothing installed. That was the last of M0's "done when".
 - **Pushing is over SSH.** The key on this Mac is one GitHub knows. Over https, the
   token in the keychain may not change `.github/workflows`, and a push that touches a
-  workflow is refused. `gh` is installed and not signed in; it is not needed to push,
-  and the runs of a public repository can be read without it.
+  workflow is refused. `gh` is not needed to push, and the runs of a public
+  repository can be read without it. (It was not signed in at first. It has been
+  since 2026-10-12, as the maintainer's account, and is what published the first
+  release: `gh release create ... --prerelease --latest=false --verify-tag`, of a
+  tag pushed first, after both workflows had passed on its commit; and the image
+  was then fetched back and held against the one sent. A release is published on
+  the maintainer's word and not otherwise.)
 
 ### At M1
 
