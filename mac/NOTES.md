@@ -146,13 +146,21 @@ And at M6, 2026-10-11:
     character that takes two units (rule 18a).
 32. **The sheet takes the keyboard when the pointer moves over it** (rule 23a), not
     only when clicked, unless a box of text is being typed in. Mine, so that pointing
-    and pressing needs no click first. The maintainer's to keep or not.
-33. **The key is shown twice while the sheet is**, in the song's header and in the
-    sheet's strip: both pages ask for a picker. Built as written, and asked of the
-    maintainer.
+    and pressing needs no click first. The maintainer, the same day: "sounds good".
+33. **The key is picked in the song's header and nowhere else.** Both pages asked for
+    a picker, so the sheet showed the key twice, in the header and in its strip. The
+    maintainer, on trying it: "my gut says 'we only need one'... I would keep the top
+    key picker". The strip has the key's seven chords and no picker (`spec/03`, rule
+    14); Simple Presenter has its one picker in the strip.
 34. **What is copied with Command+C is the sheet's own**, as in the reference: it is
     not put on the system's pasteboard, and so does not replace what the person had
     copied elsewhere.
+35. **The empty lines a text box's words end with get no row on the sheet** (`spec/03`,
+    rule 2a), unless a chord stands on one. The maintainer's, on seeing cards too
+    tall: "prob best to remove the trailing blank lines for now". Only what is drawn:
+    the words in the file are never touched. The ChordPro text still has those lines,
+    as empty lines, since what may be typed there is held to the song line for line
+    (`spec/04`, rule 6).
 
 ## How it is laid out, and why
 
@@ -662,6 +670,15 @@ changing any of it:
     of more than 6 lines; in ten the tallest slide is more than three times the
     song's middling one. The maintainer asked for cards of one size; whether that is
     to have a limit is theirs to say.
+  - **40 text boxes of 6,091 end with empty lines** (one, in 28 of them; up to
+    fifteen), in 19 songs, and no chord stands on any. They made the cards of 11 songs
+    taller, and get no row now (decision 35).
+  - **The song the maintainer named for a card too tall has no such lines.** One of
+    its slides has one line and the rest two, and the card of the one is as tall as
+    the others': that is rule 8, all cards one size, which the maintainer asked for
+    in Simple Presenter after trying cards of differing sizes. In 104 of the 422
+    songs the tallest slide has more lines than the song's middling one, so most of
+    their cards have room to spare. Asked of the maintainer.
   - **49 songs have a line wider than 900 at the sheet's size, 20 of them wider than
     2,000**: whole verses as one line, which ProPresenter wraps and the sheet does
     not (rule 12). Their cards are that wide, and the sheet scrolls sideways.

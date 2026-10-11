@@ -338,6 +338,38 @@ struct ChordSheetTests {
         #expect(sheet.rows[1].chords == [Chord(at: 0, name: "D")] && sheet.rows[2].chords == [Chord(at: 0, name: "C")])
     }
 
+    @Test("Mine, not a vector. The empty lines a text box's words end with get no row, and do not make the song's cards taller; one that a chord stands on is kept")
+    func emptyLinesAtTheEnd() {
+        // Two lines of words and then three line breaks; and a box of one line.
+        let boxes = [
+            TextBox(slide: 0, element: "A", words: "ab\ncd\n\n\n", chords: [Chord(at: 0, name: "G"), Chord(at: 3, name: "D")]),
+            TextBox(slide: 1, element: "B", words: "ef\n\ngh\n", chords: []),
+            TextBox(slide: 2, element: "C", words: "ij"),
+        ]
+        let song = StandInSong(boxes, key: "C")
+        let sheet = ChordSheet(song: song)
+        #expect(sheet.rows.map(\.text.string) == ["ab", "cd", "ef", "", "gh", "ij"])
+        // (An empty line in the middle of a box's words is a row still.)
+        #expect(sheet.rows.map(\.count) == [2, 2, 3, 3, 3, 1])
+        #expect(sheet.mostLines == 3)
+        #expect(sheet.rows.map(\.last) == [false, true, false, false, true, true])
+        // Nothing of the words is changed by it, and a change to a line still hands
+        // every other chord of the box back.
+        sheet.put(1, 1, "Am")
+        #expect(song.asked == ["setChords slide 0 box \"A\" [\"G\"@0, \"D\"@3, \"Am\"@4] joined false"])
+        #expect(song.textBoxes[0].words == "ab\ncd\n\n\n")
+
+        // A chord on the second of three empty lines at the end: that line and the one
+        // before it are rows, the one after it is not.
+        let held = [TextBox(slide: 0, element: "A", words: "ab\n\n\n", chords: [Chord(at: 4, name: "C")])]
+        let kept = ChordSheet(song: StandInSong(held, key: "C"))
+        #expect(kept.rows.map(\.text.string) == ["ab", "", ""])
+        #expect(kept.rows.map(\.chords) == [[], [], [Chord(at: 0, name: "C")]])
+        // And a box always has one line, though its words be one line break.
+        let bare = ChordSheet(song: StandInSong([TextBox(slide: 0, element: "A", words: "\n")], key: "C"))
+        #expect(bare.rows.count == 1)
+    }
+
     @Test("Mine, not a vector. A group with no name has no row; a chord of a line of chords alone can be moved to its front; two pasted chords that land on one place leave the first")
     func threeSmallThings() throws {
         let boxes = [

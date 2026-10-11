@@ -40,6 +40,14 @@ The sheet is a list of rows made from the song's text boxes
    empty line included). A line row knows its text box, which line of it this is, the
    place its line starts at in the box, its words, its chords with their places counted
    *along the line*, and whether it is a line of chords alone.
+2a. **The empty lines a box's words end with get no row**: words that end with a line
+   break, or several, would otherwise make their slide that many lines taller, and
+   every card of the song with it (rule 8). One that a chord stands on is kept, with
+   any before it; and a box always has one line. Nothing of the words is changed by
+   this: it is only what is drawn. (**New**, asked for by the maintainer on
+   2026-10-11 after seeing cards too tall in their own library, where 40 text boxes
+   of 6,091 end so, in 19 songs of 422. Simple Presenter gives each such line a row.
+   `sheet-model.json` has no such box.)
 3. A chord belongs to the line its place is in: from the line's start up to but not
    including its line break. An empty line is taken as one place wide, so that a chord
    standing on it is not lost.
@@ -84,10 +92,14 @@ Vectors: `sheet-model.json`, `rows`.
 12. A line never wraps. The sheet scrolls both ways.
 13. A line of chords alone has no words to show: a thin rule stands where they would
     be, and its bubbles sit side by side.
-14. The strip across the top has, from the left: the word "Key" and the key picker;
-    then the key's seven chords as small buttons, each with its number 1 to 7 in grey
-    before its name. If the song states no key, the right of the strip says "The song
-    names no key: pick the one its chords are in", and the picker shows C.
+14. The strip across the top has the key's seven chords as small buttons, each with
+    its number 1 to 7 in grey before its name. If the song states no key, they are
+    C's, and the right of the strip says "The song names no key: pick the one its
+    chords are in". **The key is not picked here**: it is picked in the song's header
+    over the sheet ([06-library.md](06-library.md), rule 12), which is there for both
+    editors. (In Simple Presenter the strip begins with the word "Key" and the key's
+    picker, and these pages asked for one in both places, so that the sheet showed the
+    key twice. The maintainer, 2026-10-11: "we only need one".)
 
 The sizes above are Simple Presenter's and need not be matched to the pixel. The
 proportions and the look should be: the pictures in `spec/pictures` are what to hold
@@ -130,8 +142,8 @@ your own pictures up against.
     clicked, and also when the pointer moves over it, unless a box of text elsewhere
     in the window is being typed in. Pointing and pressing 4 then needs no click
     first. (**New**, on the Mac, where a view does not have the keyboard until it is
-    given it: to be tried by the maintainer. In the reference the sheet has the
-    keyboard whenever its page is open.)
+    given it; the maintainer agreed to it on 2026-10-11. In the reference the sheet
+    has the keyboard whenever its page is open.)
 
 Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
 
@@ -241,9 +253,9 @@ This is how a second verse gets the chords of the first. Vectors: `sheet-model.j
 
 53. **Ctrl+Z** undoes the last change and **Ctrl+Shift+Z** or **Ctrl+Y** puts it back.
     Every change is one step, or several joined as one (rules 44 and 52).
-54. The key picker sets the key the chords are written in
-    ([05-song-and-saving.md](05-song-and-saving.md)). 1 to 7 and what is offered while
-    typing go by it. A song that states no key is taken to be in C until one is set.
+54. The key picker, in the song's header (rule 14), sets the key the chords are
+    written in ([05-song-and-saving.md](05-song-and-saving.md)). 1 to 7 and what is
+    offered while typing go by it. A song that states no key is taken to be in C until one is set.
     Changing the key does not change any chord.
 
 ## What each thing asks of the song

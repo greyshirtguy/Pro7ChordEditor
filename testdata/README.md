@@ -193,6 +193,10 @@ not say the same, the vector is what the reference answers.
     whatever was done before the paste; [`spec/03`](../spec/03-chord-sheet.md), rule
     52, says what these apps do instead. So this one is first Simple Presenter's to
     put right, if the maintainer agrees it is wrong.)
+  - in `rows`, a text box whose words end with one line break, and one whose words
+    end with three with a chord on the second: once Simple Presenter leaves such
+    lines off its sheet as these apps do ([`spec/03`](../spec/03-chord-sheet.md),
+    rule 2a).
 
 ## What must not come in here
 

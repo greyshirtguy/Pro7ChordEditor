@@ -975,8 +975,10 @@ struct ChordSheetCanvasView: NSViewRepresentable {
     }
 }
 
-/// The strip across the top of the sheet: the key, and its own chords on the keys 1 to
-/// 7, which can be clicked there too (spec/03, rule 14).
+/// The strip across the top of the sheet: the key's own chords on the keys 1 to 7,
+/// which can be clicked there too (spec/03, rule 14). The key itself is set in the
+/// song's header, over this, and nowhere else: the reference has its picker here, and
+/// these apps had it in both places until the maintainer said one was enough.
 struct SheetStrip: View {
     var model: LibraryModel
     var sheet: ChordSheet
@@ -1008,19 +1010,6 @@ struct SheetStrip: View {
 
     private var chords: some View {
         HStack(spacing: 8) {
-            Text("Key")
-                .font(.system(size: 13))
-                .foregroundStyle(Color(nsColor: SheetLook.quiet))
-            // Every usual key. A song that states none is taken to be in C, which is
-            // what the picker then shows.
-            Picker("Key", selection: Binding(get: { sheet.key }, set: { model.setKey($0) })) {
-                ForEach(model.keys.contains(sheet.key) ? model.keys : [sheet.key] + model.keys, id: \.self) { Text($0).tag($0) }
-            }
-            .labelsHidden()
-            .fixedSize()
-            .disabled(!model.canChange)
-            .help("The key the song's chords are written in. It changes no chord.")
-            Spacer().frame(width: 10)
             ForEach(Array(sheet.inKey.enumerated()), id: \.offset) { index, name in
                 Button {
                     model.putOfKey(index + 1)

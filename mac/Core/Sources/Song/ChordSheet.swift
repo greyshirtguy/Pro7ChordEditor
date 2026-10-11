@@ -29,6 +29,8 @@
 //     differ) the paste is joined to whatever was done before it.
 //   - A place is never the second half of a pair of units (a character from beyond the
 //     first 65,536): the pointer and the keys pass over it. The page was silent.
+//   - The empty lines a text box's words END with get no row, unless a chord stands on
+//     one (the maintainer's, 2026-10-11). The reference gives each a row.
 //
 // What is drawn where is not here. The two things that go by where the words are on
 // the screen (which place is under the pointer, and which stop is nearest above or
@@ -214,7 +216,8 @@ public final class ChordSheet {
             }
             last = block.slide
             var start = 0
-            for (l, text) in block.words.lines.enumerated() {
+            let lines = Self.withoutEmptyEnd(block.words.lines, of: block)
+            for (l, text) in lines.enumerated() {
                 // An empty line is taken as one place wide, so that a chord standing on
                 // it is not lost.
                 let end = start + max(1, text.length)
@@ -266,6 +269,23 @@ public final class ChordSheet {
         if let lifted = dragged, chordAt(lifted.from.row, lifted.from.at) != lifted.name {
             dragged = nil
         }
+    }
+
+    /// A text box's lines without the empty ones its words end with: those get no row.
+    /// A slide whose words end with a line break or several would otherwise count as
+    /// that many lines taller, and every card of the song is as tall as its tallest
+    /// slide. An empty line that a chord stands on is kept, and so are those before it,
+    /// so that the chord is not lost from sight; and a box always has one line.
+    static func withoutEmptyEnd(_ lines: [Words], of block: TextBox) -> [Words] {
+        var kept = lines
+        var start = lines.reduce(0) { $0 + $1.length + 1 }
+        while kept.count > 1, let last = kept.last, last.isEmpty {
+            // (Where the line starts: the whole length so far, less its own place.)
+            start -= 1
+            if block.chords.contains(where: { $0.at >= start }) { break }
+            kept.removeLast()
+        }
+        return kept
     }
 
     // ---- Where a chord can go
