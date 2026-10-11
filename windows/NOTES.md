@@ -673,6 +673,28 @@ names. What to know before changing any of it:
   the window cut the song's header short (decision 24); and there the middle of
   the three choices over the songs did not fit its words, so each is now as wide
   as its words want.
+- **Every test of the library and of the window's model passed the first time it was
+  run.** So, as before, **how the proofs were shown to bite**: each rule broken in
+  one small way in turn, in two clones made for it, with the tests run after each.
+  - Of the library's plain code (`Places`, `Listing`, `Marks`, `AppData`,
+    `SongText`, `ProPresenterApp`): a hundred breakages, one of which changed
+    nothing, to see the count tell. Eighty-eight were caught at once. **Eight were
+    rules no test held**: a folder named as nothing in ProPresenter's file of
+    paths; a song whose ending is in capitals; a folder that is one library, called
+    by its own name (the case for it had chosen a folder named as the breakage named
+    it); that the first editor's copy is a name that ENDS " (Chords)", so spelt
+    (three ways of getting that wrong); that one chord is chords; and that what the
+    app keeps of its own can be kept a second time. Two cannot be told from the rule
+    by any input. One cannot be reached: what is done when the system will not say
+    whether ProPresenter is running.
+  - Of the window's model, the two lists' arithmetic, the look and the small
+    pictures: ninety-seven, one of which changed nothing. Ninety were caught at
+    once. **Five were rules no test held**: that a second start does nothing (the
+    case for it could not tell); a song's own key and the key it is shown in, told
+    apart; a song's slides where it has more text boxes than slides; and a folder
+    chosen twice, kept once. One wastes work and breaks nothing ("Left rough").
+  Each of the thirteen has a case now, and each case was run against the breakage
+  it was written for.
 - **`Get-ChildItem -Filter *.pro` in Windows PowerShell also lists `.proPref` and
   `.proPaths`.** It made ProPresenter's settings folder look as if it had fifteen
   songs in it. The app tells a song's ending by itself (`Listing.cs`).
