@@ -76,21 +76,31 @@ public partial class LibraryView : UserControl
     // (spec/06, rule 12a). The view is asked before whatever in it has the keyboard.
     private void AKeyWasPressed(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape && Model.RevertQuestion is not null)
+        if (KeyPressed(e.Key, Keyboard.Modifiers))
+        {
+            e.Handled = true;
+        }
+    }
+
+    /// <summary>A key was pressed, with these others held. Answers whether it was one of the view's two.</summary>
+    internal bool KeyPressed(Key key, ModifierKeys held)
+    {
+        if (key == Key.Escape && held == ModifierKeys.None && Model.RevertQuestion is not null)
         {
             Model.DontRevert();
-            e.Handled = true;
+            return true;
         }
-        else if (e.Key == Key.Escape && Model.Earlier is not null)
+        if (key == Key.Escape && held == ModifierKeys.None && Model.Earlier is not null)
         {
             Model.CloseEarlierVersions();
-            e.Handled = true;
+            return true;
         }
-        else if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+        if (key == Key.S && held == ModifierKeys.Control)
         {
             Model.SaveNow();
-            e.Handled = true;
+            return true;
         }
+        return false;
     }
 
     // ---- The menu

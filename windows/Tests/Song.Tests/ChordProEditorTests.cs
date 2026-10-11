@@ -397,6 +397,93 @@ public sealed class ChordProEditorTests : IDisposable
         Assert.Equal(ChordProEditor.Verdict.NotTheWords, Type(editor, "Five six", "Five [A]six"));
         Assert.False(editor.Save());
         Assert.Equal(before, File.ReadAllBytes(song.Path));
+
+        // One bracket of either kind is enough, with no other of its pair.
+        foreach (var (name, bracketed) in new[] { ("Opened.pro", "Thir[teen"), ("Closed.pro", "Thir]teen") })
+        {
+            var one = new ChordProEditor(PlainSongWith(name, (made, boxes) =>
+            {
+                var text = Workbench.TextOf(made, boxes[1].Element);
+                text.RtfData = ByteString.CopyFromUtf8(text.RtfData.ToStringUtf8().Replace("Thirteen", bracketed, StringComparison.Ordinal));
+            }));
+            Assert.Contains(bracketed, one.Text, StringComparison.Ordinal);
+            Assert.Equal(editor.Barred, one.Barred);
+            Assert.Equal(ChordProEditor.Verdict.NotTheWords, Type(one, "Five six", "Five [A]six"));
+        }
+    }
+
+    // An RTF from its pieces, with a backslash between each two. (So that no backslash
+    // need be typed into this file before a letter.)
+    private static ByteString Rtf(params string[] pieces) => ByteString.CopyFrom(System.Text.Encoding.ASCII.GetBytes(string.Join((char)0x5C, pieces)));
+
+    private static void RemoveChords(Graphics.Types.Text text)
+    {
+        var others = text.Attributes.CustomAttributes.Where(entry => !IsAChord(entry)).ToList();
+        text.Attributes.CustomAttributes.Clear();
+        text.Attributes.CustomAttributes.AddRange(others);
+    }
+
+    // A line of words with nothing on it, between two that have words. It is a line of
+    // words still, and not a line of chords alone: with every chord taken out it is the
+    // nothing it was. But a chord typed on it has no character to hang on (rule 16), and
+    // is left in the text and never saved. (As the Mac does. No test file has such a
+    // line, and nobody has said whether a real song does.)
+    [Fact]
+    public void AChordTypedOnALineOfWordsThatHasNoCharactersIsLetThroughAndIsNotSaved()
+    {
+        var song = PlainSongWith("Empty line.pro", (made, boxes) =>
+        {
+            var text = Workbench.TextOf(made, boxes[1].Element);
+            text.RtfData = Rtf("{", "rtf1 One", "par ", "par Two}");
+            RemoveChords(text);
+        });
+        Assert.Equal("One\n\nTwo", song.TextBoxes[1].Words);
+        var editor = new ChordProEditor(song);
+        Assert.Null(editor.Barred);
+        var own = editor.Lines.Select((line, n) => (line, n)).Where(one => one.line.Box == 1).ToList();
+        Assert.Equal([SongLineKind.Words, SongLineKind.Words, SongLineKind.Words], own.Select(one => one.line.Kind));
+        Assert.Equal(["One", "", "Two"], own.Select(one => one.line.Text));
+        var file = File.ReadAllBytes(song.Path);
+        Assert.Equal(ChordProEditor.Verdict.Taken, TypeOnLine(editor, own[1].n, "[G]"));
+        Assert.Equal(ChordProEditor.Verdict.NotTheWords, TypeOnLine(editor, own[1].n, "[G]x"));
+        Assert.False(editor.Save());
+        Assert.Equal(file, File.ReadAllBytes(song.Path));
+        Assert.Equal("[G]", editor.Text.Split('\n')[own[1].n]);
+        // The lines beside it take theirs as any line does.
+        Assert.Equal(ChordProEditor.Verdict.Taken, TypeOnLine(editor, own[2].n, "[D]Two"));
+        Assert.True(editor.Save());
+        Assert.Equal(["5:D"], ChordsOf(1, song.Path));
+    }
+
+    // Half a character among the words: one unit of a character that is two, with no
+    // other half. A .NET string holds it as it is, and so does WPF's text box (tried), so
+    // the text made from such a song is the song's words unit for unit, and by rule 20a
+    // as it is written the song is not barred here. (On the Mac it is: a Swift string
+    // cannot hold half a character. NOTES.md has this for the maintainer to say.)
+    [Fact]
+    public void WordsWithHalfACharacterInThemAreKeptUnitForUnitAndTheSongCanBeTypedIn()
+    {
+        var half = (char)0xD83D;
+        var song = PlainSongWith("Half.pro", (made, boxes) =>
+        {
+            var text = Workbench.TextOf(made, boxes[1].Element);
+            text.RtfData = Rtf("{", "rtf1 Thir", "u-10179?teen}");
+            RemoveChords(text);
+        });
+        Assert.Equal("Thir" + half + "teen", song.TextBoxes[1].Words);
+        var editor = new ChordProEditor(song);
+        Assert.Null(editor.Barred);
+        Assert.Contains("Thir" + half + "teen", editor.Text, StringComparison.Ordinal);
+        var rtf = Workbench.TextOf(Workbench.Read(song.Path), song.TextBoxes[1].Element).RtfData;
+        // A chord before the half, and one after it: the half is one place.
+        Assert.Equal(ChordProEditor.Verdict.Taken, Type(editor, "Thir" + half + "teen", "[A]Thir" + half + "[E]teen"));
+        // The half itself cannot be typed over, nor completed.
+        Assert.Equal(ChordProEditor.Verdict.NotTheWords, Type(editor, half.ToString(), "x"));
+        Assert.Equal(ChordProEditor.Verdict.NotTheWords, Type(editor, half.ToString(), half.ToString() + (char)0xDE00));
+        Assert.True(editor.Save());
+        Assert.Equal(["0:A", "5:E"], ChordsOf(1, song.Path));
+        // The words are as they were, to the byte.
+        Assert.Equal(rtf, Workbench.TextOf(Workbench.Read(song.Path), song.TextBoxes[1].Element).RtfData);
     }
 
     [Fact]
@@ -604,6 +691,28 @@ public sealed class ChordProEditorTests : IDisposable
         editor.Reload(keepingWhatIsTyped: false);
         Assert.Equal(SongText.Text(song.TextBoxes), editor.Text);
         Assert.DoesNotContain("[A]", editor.Text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EachSavingIsAStepOfUndoOfItsOwnHoweverManyRoundsItTook()
+    {
+        var song = bench.Open(Plain);
+        var editor = new ChordProEditor(song);
+        var original = File.ReadAllBytes(song.Path);
+        Type(editor, "One two", "One [A]two");
+        Assert.True(editor.Save());
+        var once = File.ReadAllBytes(song.Path);
+        // A second saving, of a line of chords alone and of a box of words: two rounds.
+        Type(editor, "Thirteen", "[E]Thirteen");
+        Type(editor, "[G] [D/F#] [Em]", "[G] [Em]");
+        Assert.True(editor.Save());
+        Assert.NotEqual(once, File.ReadAllBytes(song.Path));
+        song.Undo();
+        Assert.Equal(once, File.ReadAllBytes(song.Path));
+        Assert.True(song.CanUndo);
+        song.Undo();
+        Assert.Equal(original, File.ReadAllBytes(song.Path));
+        Assert.False(song.CanUndo);
     }
 
     [Fact]

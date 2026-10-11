@@ -119,11 +119,13 @@ public class ChordProTypingTests
 
         await model.WhatWasTypedIsSavedAsync();
         Assert.Equal(["0:C", "10:G/B", "27:G/B"], ChordsOf(1, "Plain Song", pc));
-        // The saving did not set the text afresh from under the person typing.
+        // The saving did not set the text afresh from under the person typing: the
+        // text, the caret and the box's undo are as they were.
         typist.Show();
         Assert.Equal("Thir[G/B]teen", typist.LineWith("Thir"));
         Assert.Equal((inWord + 5, 0), typist.Selected);
         Assert.Equal(1, model.ChordPro!.Version);
+        Assert.True(typist.Editor.CanUndo);
     });
 
     [Fact]
@@ -353,6 +355,17 @@ public class ChordProTypingTests
         // One step back, and it is as it was.
         Assert.True(typist.Editor.Undo());
         Assert.Equal(before, typist.Text);
+        // Two lines pasted over themselves, a chord more in the second and the line
+        // break between them two characters: what is selected after is what was
+        // pasted, counted as the song counts it.
+        const string two = "[G]One two three [D]four\nFive six [Em]seven eight";
+        const string pasted = "[G]One two three [D]four\r\nFive [A]six [Em]seven eight";
+        var at = typist.PlaceOf(two);
+        typist.Paste(pasted, at, over: two.Length);
+        Assert.Equal("Five [A]six [Em]seven eight", typist.LineWith("seven"));
+        Assert.DoesNotContain("\r", typist.Text, StringComparison.Ordinal);
+        Assert.Equal((at, pasted.Length - 1), typist.Selected);
+        Assert.Equal(typist.Text, model.ChordPro!.Text);
 
         // On its way in, what is pasted or dropped has its line breaks made one unit
         // each: asked of the box as WPF asks it.
@@ -388,11 +401,13 @@ public class ChordProTypingTests
         Assert.False(typist.Editor.CanUndo);
         Assert.False(ApplicationCommands.Undo.CanExecute(null, typist.Box));
         Assert.True(typist.Box.IsReadOnly);
-        // Nothing can be typed while it runs, by either door or by a paste.
+        // Nothing can be typed while it runs, by either door or by a paste; and no
+        // sound is made, as none is by any box that is only to be read.
         typist.Type("[");
         typist.Press(Key.Back);
         Assert.False(typist.Editor.KeyPressed(Key.Back, ModifierKeys.None));
         Assert.Equal("Thirteen", typist.LineWith("Thirteen"));
+        Assert.Equal(0, typist.SaidNo);
         // The same song's text made again leaves the caret at the place it was (which
         // was after the "[A" that is gone, two along); another song opened starts at
         // its top.
@@ -540,6 +555,30 @@ public class ChordProTypingTests
     });
 
     [Fact]
+    public void ChordsAreDrawnBoldAndAGroupsNameInItsOwnColour() => Pictures.OnAThreadOfItsOwn(() =>
+    {
+        static int Blue(int[] dots) => dots.Count(dot => (dot & 0xFF) > 200 && ((dot >> 16) & 0xFF) < 60 && ((dot >> 8) & 0xFF) < 60);
+
+        // A group's name, in a colour of the test's own to tell it by.
+        var grouped = Alone("{c: Verse 1}\nwords");
+        grouped.Editor.Underlay.QuietBrush = Brushes.Blue;
+        var named = Pictures.Drawn(new Border { Background = Brushes.Black, Child = grouped.Editor }, 600, 400).Dots;
+        Assert.True(Blue(named) > 60, "only " + Blue(named) + " dots of a group's name are in its colour");
+        Assert.Equal(0, Orange(named));
+
+        // Chords, and the same letters as the box itself would draw them in the same
+        // colour: bold has a good deal more of its colour in it.
+        var chords = Alone("[G/B] [D/F#] [Am7] [Em]");
+        var ground = new Border { Background = Brushes.Black, Child = chords.Editor };
+        var bold = Orange(Pictures.Drawn(ground, 600, 400).Dots);
+        chords.Box.Foreground = chords.Editor.Underlay.ChordBrush;
+        chords.Editor.Underlay.Visibility = Visibility.Hidden;
+        var plain = Orange(Pictures.Drawn(ground, 600, 400).Dots);
+        Assert.True(plain > 40, "the box drew only " + plain + " dots of its own letters in the chords' colour");
+        Assert.True(bold > plain * 5 / 4, bold + " dots of the chords against " + plain + " of the same letters drawn plain: are they bold?");
+    });
+
+    [Fact]
     public void TheLettersDrawnBehindTheBoxAreDotForDotWhereTheBoxHasItsOwn() => Pictures.OnAThreadOfItsOwn(() =>
     {
         // Lines of words only, long and short, one of them past the box's right edge,
@@ -589,9 +628,14 @@ public class ChordProTypingTests
         typist.Editor.SetScale(0.5);
         box.ScrollToHome();
         TheSame("smaller");
+        // Words with a character in them at which a text box starts a new line, though
+        // it is no line break of the song's: each piece is where the box has it.
+        typist.Editor.SetScale(1);
+        typist.Editor.Show(new LibraryModel.ChordProShown("one line" + (char)0x2029 + "of the song's, in two\nand its next", 2, 2, null), canType: true);
+        Assert.Equal(3, box.LineCount);
+        TheSame("a line the box breaks in two");
         // And a line with a chord in it is as wide drawn bold as the box has it plain,
         // so that the letters after a chord are under the caret that is at them.
-        typist.Editor.SetScale(1);
         const string line = "[G]One two three [D/F#]four [Am7]";
         var alone = Alone(line);
         var across = alone.Box.GetRectFromCharacterIndex(line.Length).X - alone.Box.GetRectFromCharacterIndex(0).X;
@@ -768,6 +812,20 @@ public class ChordProTypingTests
         Click(cancel);
         Assert.Equal(Visibility.Collapsed, question.Visibility);
         Assert.NotEqual(original, pc.BytesOf("Plain Song"));
+        // A click on the dimmed window behind the question is Cancel too, and so is Esc.
+        Click(revert);
+        var dimmed = Assert.IsType<Border>(Assert.IsType<Grid>(question.Content).Children[0]);
+        dimmed.RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left) { RoutedEvent = UIElement.MouseLeftButtonDownEvent });
+        Assert.Equal(Visibility.Collapsed, question.Visibility);
+        Click(revert);
+        Assert.False(view.KeyPressed(Key.Escape, ModifierKeys.Shift));
+        Assert.Equal(Visibility.Visible, question.Visibility);
+        Assert.True(view.KeyPressed(Key.Escape, ModifierKeys.None));
+        Assert.Equal(Visibility.Collapsed, question.Visibility);
+        Assert.NotEqual(original, pc.BytesOf("Plain Song"));
+        Assert.Null(model.JustPutBack);
+        // (With nothing over the window, Esc is not the view's.)
+        Assert.False(view.KeyPressed(Key.Escape, ModifierKeys.None));
         Click(revert);
         Click(Named<Button>(question, "Yes"));
         Assert.Equal(Visibility.Collapsed, question.Visibility);
@@ -780,6 +838,91 @@ public class ChordProTypingTests
         Click(Named<Button>(pane, "Undo"));
         Assert.Equal("[A]Thirteen", typist.LineWith("Thirteen"));
         Assert.Equal(("E", "A"), (key.SelectedValue, shownIn.SelectedValue));
+    });
+
+    [Fact]
+    public void TheKeyThatWouldSaveIsTheWholeViewsAndEscPutsTheEarlierVersionsAway() => OnAMadeUpPC(async pc =>
+    {
+        var model = await Open(pc, "Plain Song");
+        var view = new LibraryView(model);
+        Look.Wear(view, dark: true);
+        Pictures.LayOut(view, 1280, 800);
+        var typist = new Typist(view.SongPane.ChordPro, model);
+        model.PauseBeforeSaving = TimeSpan.FromSeconds(60);
+        typist.CaretAt(typist.PlaceOf("Thirteen"));
+        typist.Type("[A");
+        Assert.Empty(ChordsOf(1, "Plain Song", pc).Where(chord => chord.EndsWith(":A", StringComparison.Ordinal)));
+        // Ctrl+S, and nothing else with S.
+        Assert.False(view.KeyPressed(Key.S, ModifierKeys.None));
+        Assert.False(view.KeyPressed(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
+        Assert.False(view.KeyPressed(Key.A, ModifierKeys.Control));
+        Assert.Null(model.Said);
+        Assert.True(view.KeyPressed(Key.S, ModifierKeys.Control));
+        Assert.Equal(["0:C", "10:G/B", "23:A"], ChordsOf(1, "Plain Song", pc));
+        Assert.Equal("Saved. Every change here is saved as it is made: there is nothing to save by hand.", Named<TextBlock>(view.SongPane, "Quiet").Text);
+        // Esc puts the earlier versions away.
+        model.ShowEarlierVersions();
+        Assert.NotNull(model.Earlier);
+        Assert.True(view.KeyPressed(Key.Escape, ModifierKeys.None));
+        Assert.Null(model.Earlier);
+    });
+
+    [Fact]
+    public void InTheSongsPaneASongThatCannotBeChangedHereSaysWhyOverItsText() => OnAMadeUpPC(async pc =>
+    {
+        var bytes = pc.BytesOf("Plain Song");
+        "Thir[een"u8.CopyTo(bytes.AsSpan(bytes.AsSpan().IndexOf("Thirteen"u8)));
+        File.WriteAllBytes(pc.Song("Plain Song"), bytes);
+        var model = await Open(pc, "Plain Song");
+        var view = new LibraryView(model);
+        Look.Wear(view, dark: true);
+        Pictures.LayOut(view, 1280, 800);
+        var pane = view.SongPane;
+        Assert.Equal("This song's words have square brackets of their own in them, so it cannot be changed as ChordPro text.", Named<TextBlock>(pane, "Help").Text);
+        Assert.True(pane.ChordPro.TextBox.IsReadOnly);
+        Assert.Contains("Thir[een", pane.ChordPro.TextBox.Text, StringComparison.Ordinal);
+        // Its keys can still be set, and the line under it does not say that what is
+        // typed is saved.
+        Assert.True(Named<ComboBox>(pane, "Key").IsEnabled);
+        Assert.Equal("4 slides, 11 chords.", Named<TextBlock>(pane, "Quiet").Text);
+        // Another song opened, and the line of help is the usual one again.
+        model.Open(pc.Song("Amazing Grace"));
+        Assert.Equal(ChordProEditor.Help, Named<TextBlock>(pane, "Help").Text);
+        Assert.False(pane.ChordPro.TextBox.IsReadOnly);
+    });
+
+    [Fact]
+    public void TheHeaderIsLaidOutInTheRoomThePaneHas() => OnAMadeUpPC(async pc =>
+    {
+        var model = await Open(pc, "A Song - In A Minor Key");
+        // (With an earlier version, so that its button is there too.)
+        model.SetShownKey("Bm");
+        var view = new LibraryView(model);
+        Look.Wear(view, dark: true);
+        var pane = view.SongPane;
+        var name = Named<TextBlock>(pane, "SongName");
+        var keys = Named<FrameworkElement>(pane, "Keys");
+        var earlier = Named<Button>(pane, "Earlier");
+
+        (int NameSpan, int KeysRow, int KeysColumn, int EarlierRow, int EarlierColumn) Where(double width)
+        {
+            Pictures.LayOut(view, width, 600);
+            Pictures.LayOut(view, width, 600);
+            return (Grid.GetColumnSpan(name), Grid.GetRow(keys), Grid.GetColumn(keys), Grid.GetRow(earlier), Grid.GetColumn(earlier));
+        }
+
+        // Wide: one row, the name, Earlier Versions, the keys.
+        Assert.Equal((1, 0, 2, 0, 1), Where(1280));
+        // Narrower: the name over the keys, with Earlier Versions at the right of the
+        // keys' row.
+        Assert.Equal((3, 1, 0, 1, 2), Where(760));
+        // At the window's least: Earlier Versions beside the name, and the keys by
+        // themselves.
+        Assert.Equal((1, 1, 0, 0, 2), Where(620));
+        Assert.Equal(3, Grid.GetColumnSpan(keys));
+        // And wide again, it is one row again; nothing is cut short but the name.
+        Assert.Equal((1, 0, 2, 0, 1), Where(1280));
+        Assert.True(keys.ActualWidth >= keys.DesiredSize.Width - 15);
     });
 
     [Fact]
@@ -874,6 +1017,11 @@ public class ChordProTypingTests
         Assert.Equal(new TextChange(1, 2, grin), TextChange.Between("a" + wink, "a" + grin));
         Assert.Equal(new TextChange(3, 2, ""), TextChange.Between("a" + grin + grin, "a" + grin));
         Assert.Equal(new TextChange(1, 0, wink), TextChange.Between("a" + grin, "a" + wink + grin));
+        // Nor of two that END with the same unit and begin with another.
+        var other = char.ConvertFromUtf32(0x1F200);
+        Assert.Equal(grin[1], other[1]);
+        Assert.NotEqual(grin[0], other[0]);
+        Assert.Equal(new TextChange(1, 2, other), TextChange.Between("a" + grin + "b", "a" + other + "b"));
     }
 
     [Fact]
@@ -974,6 +1122,16 @@ public class ChordProTypingTests
         Assert.Equal(2, history.Steps);
         history.Forget();
         Assert.False(history.CanUndo || history.CanRedo);
+
+        // An undo ends the run that is then the last, too: what is typed where that
+        // run left the caret is a step of its own.
+        var run = new TypingHistory();
+        run.Note(S("a", 1), S("ab", 2));
+        run.Note(S("ab", 0), S("xab", 1));
+        run.SteppedBack();
+        run.Note(S("ab", 2), S("abc", 3));
+        Assert.Equal(2, run.Steps);
+        Assert.Equal(S("ab", 2), run.Before);
     }
 
     [Fact]

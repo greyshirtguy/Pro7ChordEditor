@@ -372,6 +372,19 @@ public class ChordProModelTests
     });
 
     [Fact]
+    public void WhenTheAppComesToTheFrontWhatWasTypedAndIsStillWaitingIsSaved() => OnAMadeUpPC(async pc =>
+    {
+        var model = await Open(pc, "Plain Song");
+        model.PauseBeforeSaving = TimeSpan.FromSeconds(60);
+        Assert.True(model.TextMayBecome(With("One two", "One [A]two", model)));
+        await model.RefreshAsync();
+        Assert.Equal(["0:G", "4:A", "14:D", "28:Em"], ChordsOf(0, "Plain Song", pc));
+        // (Its own save is not something else's change: the song is not read again.)
+        Assert.Equal(1, model.ChordPro!.Version);
+        Assert.Equal(12, model.Shown!.Chords);
+    });
+
+    [Fact]
     public void TheSongThatIsOpenStaysInTheListWhenItsFirstChordTakesItOutOfWhatTheListIsNarrowedTo() => OnAMadeUpPC(async pc =>
     {
         // A song with no chords: Plain Song with every chord taken off, through the song itself.
@@ -678,6 +691,19 @@ public class ChordProModelTests
         Assert.Null(model.Shown);
         Assert.Null(model.Said);
         Assert.DoesNotContain("Saved", model.Notice, StringComparison.Ordinal);
+    });
+
+    [Fact]
+    public void SomethingSaidAgainIsNotTakenAwayByTheWaitOfTheFirstTimeItWasSaid() => OnAMadeUpPC(async pc =>
+    {
+        var model = await Open(pc, "Plain Song");
+        model.SayingLasts = TimeSpan.FromMilliseconds(30);
+        model.SaveNow();
+        model.SayingLasts = TimeSpan.FromSeconds(60);
+        model.SaveNow();
+        // Well past the first wait, and long before the second is over.
+        await Task.Delay(200);
+        Assert.StartsWith("Saved.", model.Said, StringComparison.Ordinal);
     });
 
     // ---- The size of the text (spec/04, rule 25)
