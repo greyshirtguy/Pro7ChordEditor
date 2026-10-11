@@ -151,7 +151,11 @@ words; dropping a `.pro` file on the window to open it.
     chords here." The band goes by itself when ProPresenter does. If it was started
     without the app being told (the app was in front all the while), the next save is
     refused, and the band is there from then.
-20. There is no way to switch this off in the app.
+20. There is no way to switch this off in the app. (Whether the rule should hold for
+    a file that the running ProPresenter cannot have open, such as a copy of a
+    library somewhere else, was raised by the maintainer on 2026-10-11 and put on
+    hold. `mac/NOTES.md`, "Asked for by the maintainer, for later", has what was
+    thought. Until it is decided, rules 16 to 19 are the rule.)
 
 ## What the app keeps of its own
 

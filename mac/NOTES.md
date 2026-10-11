@@ -831,9 +831,8 @@ second of Simple Presenter in so many words.
   sideways (89 and 45 of 422 at the usual zoom). What would help: lines that wrap,
   which the page forbids and which chords over a wrapped line make hard.
 - **Nothing may be saved while ProPresenter is running, wherever the file is**, which
-  the maintainer wants looked at again: a file outside the workspace ProPresenter
-  has open (a copy on the Desktop, another workspace) is nothing it can have in its
-  hands. Thoughts were given on 2026-10-11 and nothing is decided or built.
+  the maintainer wants looked at again and has put on hold: "Asked for by the
+  maintainer, for later" has what was thought and what is to be found out first.
 - **An empty line in the middle of a slide's words takes a whole line's height**,
   chords' row and all, though no chord can go there.
 - **`spec/pictures` are of Simple Presenter's sheet in one column.** Once the
@@ -921,3 +920,64 @@ second of Simple Presenter in so many words.
 
   None of it is started. All three change what both apps do, so `spec/04` is changed
   first, with the maintainer's yes.
+
+- **Saving while ProPresenter is running, where that is safe** (raised by the
+  maintainer on 2026-10-11, and the same day put on hold: "hold off on the editing
+  while pro is running (more thoughts to sort through ...) - just keep notes for when
+  I revisit this"). **Nothing of it is decided or built. `spec/06`, rules 16 to 20,
+  stand as they are.** What was said, for whoever picks it up:
+  1. *What the rule is for.* Not our own save, which is safe already: the file is
+     written beside itself and swapped in whole, and is refused if anything else has
+     changed it since it was read (`spec/05`). The harm would be ProPresenter holding
+     a song in its memory and later writing its old copy over ours, so that chords
+     put on here are lost without a word; or showing the old song until it is
+     started again. That it does either is still **a guess** (`spec/06`, rule 16).
+  2. *The maintainer's first idea*: "it's okay to edit a file outside of the active
+     workspace - or even outside the active playlist".
+  3. *Three cases, from safe to not known.*
+     - **A file that the running ProPresenter cannot have open**: one that is not
+       under the folder it is running on. A copy of a library on the Desktop, a
+       folder chosen by hand, another workspace than the one in use. Safe by what it
+       is. This alone would end "quit ProPresenter first" for trying things on a
+       copy, which is where the rule is felt most.
+     - **A file in the folder it is running on, that it has not loaded**: not in the
+       playlist on its screen, not the song picked in its library. Probably safe,
+       and **a guess**: nothing outside ProPresenter can see what it has loaded, and
+       the person can click any song at any moment.
+     - **A file it has loaded, or is showing.** The likeliest to go wrong.
+  4. *Which folder ProPresenter is running on depends on which ProPresenter it is*,
+     and this has to be right before the first case can be trusted:
+     - ProPresenter 21 on the Mac has workspaces, listed in its settings with one
+       marked as in use (`spec/06`, rule 3). The settings are to be read again at
+       the moment of saving, not remembered from the start.
+     - Older versions of ProPresenter 7 had no workspaces. The maintainer: "older
+       version had no workspace - but a pref pointing to a folder (default was
+       documents\propresenter\)". For those the folder it is running on is that one
+       folder (`PathSettings.proPaths` on Windows, `spec/06`, rule 3).
+     - **How a version keeps its songs is to be looked at afresh for every version
+       before the rule is relaxed for it.** This app works on places whose songs are
+       `.pro` files in a folder and on nothing else (decision 19). A place that is
+       not such a folder is to be spotted and left alone, and where it cannot be
+       told what a running ProPresenter is working on, nothing is saved, as now.
+  5. *Finding out, in place of guessing, for the second and third cases.* With a
+     made-up song in a library of the folder ProPresenter is running on: change a
+     chord from outside while the song is (a) not opened since ProPresenter started,
+     (b) opened earlier and not picked now, (c) picked in the library, (d) in the
+     playlist that is on its screen, (e) live. After each, see whether ProPresenter
+     shows the new chord when the song is next picked (a stage screen shows chords);
+     then make ProPresenter save that song (change a slide in its editor; quit it)
+     and read the file to see whether the chord is still there. Ten minutes, and it
+     needs the maintainer's ProPresenter and eyes. The build that does it would need
+     a way round the rule that no released build has.
+  6. *ProPresenter can be asked over the network*, where that is switched on in its
+     settings, which presentation is in front and which playlist is open. That could
+     tell the third case from the second. It is another thing to go wrong and
+     another setting to depend on: worth it only if (5) shows that what is loaded is
+     what matters.
+  7. *What I would build first*, if asked: the first case only, with the rule kept
+     as it is everywhere inside the folder ProPresenter is running on, and kept
+     everywhere if that folder cannot be told for certain. The two nets stay
+     whatever is allowed: the copy kept before a file's first change, and the
+     refusal to save over a file something else has changed. If the second or third
+     case were ever allowed, a third net: a look at the file a moment after it was
+     saved, to say so if it is no longer what was written.
