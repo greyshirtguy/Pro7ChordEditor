@@ -10,8 +10,9 @@ milestone; put right what has become untrue.
 
 | | | |
 | --- | --- | --- |
-| **M0** Setting up | Built, 2026-10-12. **Not done until the workflow has run on GitHub's machine**, which wants a push, and nothing has been pushed | The four layers and the app, empty; the reader of a `.pro` made at each build; forty-nine tests; one picture; the app published as one file, and started; the workflow, written and never run. The first editor moved to `old/` |
-| **M1** The rules | Next | Every case of every vector file but `sheet-model.json` and `layout.json`. `mac/NOTES.md`, "The rules (M1)" and "At M1", says what the Mac port had to pin down; `spec/02`, "To the letter", has it for both apps |
+| **M0** Setting up | Done, 2026-10-12 | The four layers and the app, empty; the reader of a `.pro` made at each build; forty-nine tests; one picture; the app published as one file, and started; the workflow, which passed on GitHub's Windows machine at the first push (its run of the tests, the picture among them, and the app as one file). The first editor moved to `old/` |
+| **M1** The rules | Done, 2026-10-12 | `ChordRules`: every rule of `spec/02`, the words of an RTF, the stand-ins written into one, the key fit and the first editor's shift. Every case of the sixteen vector files M1 is held to passes (some thirty-one thousand answers), with cases of our own for what no vector holds |
+| **M2** The song | Next | Open a `.pro`; hand over its text boxes; set a box's chords; set the key; save safely; undo and redo. The proofs at the foot of `spec/05`, on copies of `testdata/files`. `mac/NOTES.md`, "The song (M2)" and "At M2", first |
 
 ## What the maintainer decided, 2026-10-12
 
@@ -58,7 +59,27 @@ And what I chose, each the maintainer's to change:
     each commit was given them for itself (`git -c user.name=… -c user.email=… commit`).
     Asked, the maintainer said "that git name is fine". Nothing was said of setting it
     on this PC, so each commit is still given it for itself.
-11. **The commits are on `master`**, as the Mac's are, and are not pushed.
+11. **The commits are on `master`**, as the Mac's are. They are pushed when the
+    maintainer asks; and, since 2026-10-12, a rule or a decision the maintainer has
+    agreed is pushed at once (`spec/11`, "How a milestone goes"), so that the other
+    app's session has it. **Start a session by fetching**, as that page now says: the
+    Mac's session changes `spec/` and `testdata/` while this one works.
+
+And the same day, later:
+
+12. **"push and keep going!!"** The maintainer's, on being told M0 was built: so M0
+    was pushed, and M1 was built with no plan shown first and no wait between the two
+    (as the Mac's M5 and M6 were). What the plan asks for at a milestone's start is in
+    the report at its end instead.
+13. **The stand-ins written into an RTF are M1's here** (`RtfWords.WithLine`,
+    `WithTheOpeningOf`), where the Mac built them at its M7. Their vector file,
+    `stand-ins-in-rtf.json`, came with the Mac's M7, after the plan's row for M1 was
+    written, and that row holds M1 to every vector file but the chord sheet's two.
+    Only the plain functions are here. What asks them (a chord more or fewer on a
+    line of chords alone, chords onto a blank slide) is still M7's, in the song.
+14. **A directive and a heading in a ChordPro file are found by hand**, not with .NET's
+    regular expressions, as on the Mac (`ChordProSong.cs`); and so are the chords
+    taken out of ChordPro text (`WithoutChords`).
 
 ## How it is laid out, and why
 
@@ -115,6 +136,34 @@ windows/
   `Debug`, `Release` or `Out`, wherever it is. **Do not give source such a name**: the
   copies of M4 are not to be in a folder called `Backups`. After adding a folder, look
   at `git status`.
+
+### The rules (M1)
+
+`ChordRules/Chords.cs` is the way in and lists the files, which are the Mac's under
+the same names. What to know before changing any of it:
+
+- **The rules stand under `Chords`**, as the C++ has them under `chords::`, with the
+  names they have there in the way C# writes names: `Chords.Transposed("C#m", "E",
+  "Db")`. Three things that are not from `chords.cpp` have names of their own:
+  `RtfWords`, `KeyFit`, `OldEditor`.
+- **A text box's words are a plain `string`, and a place is an `int` into it.** .NET
+  counts in UTF-16 units already, so there is nothing like the Mac's `Words` and
+  `Units`. But every call that compares or searches text says `Ordinal`, the build
+  stops on one that does not, and sorting is LINQ's `OrderBy`, which keeps equals in
+  order where `List.Sort` does not. Keep it so.
+- **White space, a letter and a number are the page's own lists** (`Text.cs`), never
+  .NET's. As it happens .NET's white space IS Qt's list today, and a test says so if
+  that ever changes.
+- **No file of the rules has a character outside ASCII in it, nor a backslash and a
+  "u".** The characters that cannot be seen are written as numbers
+  (`(char)0x200B`), and RTF in a test is put together from pieces (`Rtf(...)` in
+  `NotHeldByVectorsTests`). After writing anything about those characters or about
+  RTF, look: `grep -rlP '[^\x00-\x7F]' windows --include=*.cs --exclude-dir=old`.
+- **Tests**: one test for each list of each vector file, reading every case
+  (`Tests/ChordRules.Tests/Vectors.cs` says how they are compared and what is said of
+  one that fails: which file, which case, what was got, with every character that
+  cannot be seen written as its number). Tests marked "Mine, not a vector" are just
+  that.
 
 ## What was found out
 
@@ -226,13 +275,60 @@ windows/
   2). Both rules will be met for real. Whether ProPresenter 22 on Windows has
   workspaces (rule 3) is still to be found out, by reading only, with the
   maintainer's leave.
+- **The workflow passed on GitHub's Windows machine at the first push** (2026-10-12,
+  `windows-latest`, a minute): the forty-nine tests, the picture among them, and the
+  app published as its one file of the same size to the byte as here. So a view is
+  drawn into a picture on a machine with no screen. That was the last of M0's "done
+  when". To see how a run went: `gh run list`, and `gh run view <number> --log`.
+
+### At M1
+
+- **Every case of every vector file passed the first time the tests were run**, the
+  rules having been ported function by function from `chords.cpp`, and the reader of
+  RTF from the Mac's port of `rtf.cpp`. That proves little, so:
+- **How the tests were shown to bite.** Each rule was broken in one small way in
+  turn, a hundred and sixty-two ways in all, in a clone made for it in a temporary
+  folder, and the tests run each time (a throwaway script: a list of pieces of the
+  source and what each is changed to, one at a time, the file put back after).
+  - **129 were caught by a vector.**
+  - **25 were caught only by a case of our own.** One is the Mac's "still wanted"
+    (chords moving with trimmed words). Five are what white space, a letter and a
+    number are, which `TextTests` holds over every one of the 65,536 units.
+    **Nineteen are rules no vector holds**, found here: each has a case in
+    `NotHeldByVectorsTests` now, its answer read from the reference's code, and
+    `testdata/README.md` ("Still wanted") lists them for whoever next makes the
+    vectors. They are corners: a letter from outside ASCII in a chord; a gap inside a
+    part a comment named; a file with carriage returns alone; a picture and a table
+    of lists in an RTF; the exact edges of "four chords", "three quarters", "four
+    more" and "a quarter more" in the two new rules.
+  - **8 cannot be told from the rule by any input** (worked through by hand; each is
+    a second lock on a door another check already holds, in the reference too): a
+    delta named among a chord's signs, which is a letter anyway; "or the part has no
+    name" for an empty line, a marked part always having one; "or it has chords" for
+    a line with no words, which is never blank once it has its stand-ins; not
+    trimming a line of stand-ins, which trimming would not change; bringing a
+    negative number round before it is made a unit, which making it a unit does;
+    taking the bass off a chord before reading its kind, which is read from the
+    other end (twice); and "on or before the first line break", no chord ever being
+    put on one.
+- **The six rules about text met real code and stopped nothing that was right.** One
+  thing learnt: asked for the first place of a single character (`IndexOf('/')`),
+  the build wants the comparison said, where for the last place (`LastIndexOf('/')`)
+  it does not.
+- **.NET rounds a number written to four places as Python's `round` does**, a tie
+  going to the even digit by the exact value held (`0.03125` is `0.0312`). The page
+  warns that not every way of rounding does; this one is held by a test of the ties
+  there can be.
+- **Where the Mac's port and the reference part, in corners no song will meet.** Seen
+  while reading the Mac's `ChordProSong.swift`: it makes a directive's name small
+  with Swift's `lowercased()` and asks `hasPrefix`, which go by whole characters
+  (`spec/02`, "To the letter", has everything done on units). A name such as
+  `start_of_` followed by an accent laid over the underline is a `start_of_` name to
+  the reference and here, and not on the Mac. Nothing writes such a thing. **For the
+  maintainer to pass on, or not.**
 
 ## Left rough, and what to ask
 
-- **The workflow has never run.** It is written from the Mac's and from what worked
-  here, and GitHub's machine may differ: it has no screen, and whether a view draws
-  into a picture there is not known until it is tried. Ask for a push; then read the
-  run (`gh run list`), and put right what it shows.
 - **In Visual Studio, only the listing of the tests has been seen.** The maintainer
   opened the solution in Visual Studio 2026 and its Test Explorer listed the
   forty-nine (2026-10-12), without the two packages named at the foot of
@@ -240,9 +336,16 @@ windows/
   tests pass when run from there, and that F5 starts the app (`App` as the startup
   project), nobody has said. And Visual Studio may one day write the solution file
   again without its comment.
-- **The six rules about text have been tried on a scratch file only.** M1 is where
-  they meet real code. If one proves wrong for a case, say why where it is switched
-  off, and not for the whole project.
+- **The rules have been tried on no real song.** The Mac's session read 400 text
+  boxes of real songs with its reader and with Apple's own and found them the same
+  (`mac/NOTES.md`, "At M1"). Nothing of the kind has been done here: it wants the
+  maintainer's leave to read their library on this PC, and it is the same look that
+  is asked before M3 (below). When it is given: read every text box with `RtfWords`
+  and with `tools/look.py`, which has a reader of its own, and set the two side by
+  side.
+- **If one of the six rules about text proves wrong for a case** (the list of songs
+  sorted as the system sorts names, at M3), say why where it is switched off, and
+  not for the whole project.
 - **Pictures are of a view that only has to be laid out.** A view that waits for
   something (a list filled a moment later, a text box that wants the keyboard) will
   need the thread's queue of work run before it is drawn. `Pictures.cs` does not do

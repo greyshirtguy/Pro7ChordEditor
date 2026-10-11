@@ -1,10 +1,10 @@
 # Pro7 Chord Editor for Windows
 
 The Windows app, being built second of the two, to the plan in
-[`spec/11-plan.md`](../spec/11-plan.md). So far it is set up and no more: its projects,
-the reader of ProPresenter's files, and tests that pass. It opens one window, which
-says there is nothing to open yet. **There is nothing here to use, and nothing to
-download.**
+[`spec/11-plan.md`](../spec/11-plan.md). So far it has what the app will stand on and
+no app: its projects, the reader of ProPresenter's files, and the rules of chords,
+held to the same answers as the Mac app's. It opens one window, which says there is
+nothing to open yet. **There is nothing here to use, and nothing to download.**
 
 The first Windows editor, version 0.9.5, is in [`old/`](old/README.md) as it was, and
 its [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
@@ -61,7 +61,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 
 | | |
 | --- | --- |
-| `ChordRules/` | The rules of chords. Plain .NET, with no file and no window in it. Empty until milestone M1 |
+| `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
 | `Song/` | The song as the editors see it, the library, the copies, the checks. No window in it. Empty until milestone M2 |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
