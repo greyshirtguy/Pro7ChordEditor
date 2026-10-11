@@ -64,5 +64,6 @@ struct WindowListsTests {
         #expect(ChordColour.colour("ffd9a8") == nil && ChordColour.colour("#ffd9a") == nil && ChordColour.colour("#gggggg") == nil)
         #expect(ChordColour.colour(nil) == nil)
         #expect(LibraryModel.colour("#FFD9A8") == "#ffd9a8" && LibraryModel.colour("red") == nil && LibraryModel.colour("#12345") == nil)
+        #expect(LibraryModel.colour("1234567") == nil && LibraryModel.colour("#12345g") == nil && LibraryModel.colour("#12 456") == nil)
     }
 }

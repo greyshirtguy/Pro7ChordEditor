@@ -811,12 +811,19 @@ struct ChordSheetViewTests {
         canvas.released(at: point, shift: false, copy: false)
         #expect(sheet.typing && sheet.entry.text.isEmpty)
         #expect(window.firstResponder === canvas.entry.field.currentEditor())
+        // (The pointer wanders off to a line of another slide meanwhile, and the spot
+        // with it: it is the line that was CLICKED that is pasted onto.)
+        let elsewhere = second + 2
+        let untouched = sheet.rows[elsewhere].chords
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: elsewhere, at: 0))), shift: false)
+        #expect(sheet.spot.row == elsewhere)
         // Command+V is the sheet's: the box closes, changing nothing of its own, and
         // the first line's chords are on the second, word for word.
         #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
         #expect(!sheet.typing && canvas.entry.isHidden && window.firstResponder === canvas)
         #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace")
             == [Chord(at: 1, name: "G"), Chord(at: 5, name: "G7"), Chord(at: 13, name: "C"), Chord(at: 25, name: "G")])
+        #expect(sheet.rows[elsewhere].chords == untouched)
         #expect(model.notice == "4 chords put on the line.")
 
         // With something typed in the box, Command+V is the box's own.
@@ -837,7 +844,10 @@ struct ChordSheetViewTests {
         _ = canvas.performKeyEquivalent(with: try press("v", .command, in: window))
         #expect(sheet.typing)
         // Command+C in an empty box has nothing of the box's to copy: it copies the
-        // chords of the box's line, and the box stays open.
+        // chords of the box's line (wherever the pointer has gone), and the box stays
+        // open.
+        let fewer = try #require(sheet.rows.indices.first { sheet.usable($0) && !sheet.rows[$0].alone && sheet.rows[$0].chords.count != 4 && sheet.rows[$0].chords.count > 0 })
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: fewer, at: 0))), shift: false)
         #expect(canvas.performKeyEquivalent(with: try press("c", .command, in: window)))
         #expect(sheet.typing && model.notice == "4 chords copied from the line: Command+V puts them on the lines from the spot's on, word for word")
         #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
