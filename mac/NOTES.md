@@ -614,3 +614,23 @@ second of Simple Presenter in so many words.
   is rebuilt, since an ad hoc signature is a new one each build. **A guess**, not yet
   seen. If it does, signing with the maintainer's own Apple Development certificate
   stops it.
+
+## Asked for by the maintainer, for later
+
+- **More help with typing a chord in the ChordPro editor** (said 2026-10-11, after
+  first trying M5; "this can be for later"). Three things, in their words and mine:
+  1. *Once a chord's letter is in, the next character should only be what makes sense
+     for a chord.* As built, what is between brackets is held to `couldBecome`: a note,
+     then any letters, digits and the signs a chord's name is written with
+     (`spec/02`). So `[e_]` is already refused, but `[Exyz]` is let through, since any
+     letter may follow. Holding it tighter needs a rule of what a chord's *quality* may
+     be, which the rules do not have: `couldBecome` is the reference's, and the vectors
+     hold it. So this is a change to `spec/02` or `spec/04`, for both apps.
+  2. *Typing `ma` should offer `maj`*: what is offered while typing, as the sheet's
+     bubble offers it (`completions`), shown at the caret in the text.
+  3. *Perhaps the case put right as it is typed*: `[e]` made `[E]`, as the sheet's
+     bubble does (`tidied`). Today the text keeps what was typed and the SAVE tidies
+     the name, so the text and the file differ until the song is opened again.
+
+  None of it is started. All three change what both apps do, so `spec/04` is changed
+  first, with the maintainer's yes.
