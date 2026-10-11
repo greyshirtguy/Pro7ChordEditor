@@ -412,6 +412,28 @@ public sealed class LibraryTests : IDisposable
         Assert.Equal(new Marks(7), again.ReadMarks().MarksFor(song));
         Assert.Equal(["marks.json", "settings.json"], Directory.EnumerateFileSystemEntries(data.Folder).Select(entry => Path.GetFileName(entry)).Order(StringComparer.Ordinal));
 
+        // The marks are kept with a number that says which reading of the files made
+        // them (Marks.Version: it goes up when a build comes to say more of a file, as
+        // M8 did with what the checks find). Kept under another number, or under none
+        // as before M8, they are not believed: they are taken as not there, and worked
+        // out again.
+        var marksFile = Path.Combine(data.Folder, "marks.json");
+        var asKept = File.ReadAllText(marksFile);
+        Assert.Contains("\"version\": " + Marks.Version, asKept, StringComparison.Ordinal);
+        File.WriteAllText(marksFile, asKept.Replace("\"version\": " + Marks.Version, "\"version\": " + (Marks.Version - 1), StringComparison.Ordinal));
+        Assert.Equal(0, again.ReadMarks().Count);
+        var noNumber = System.Text.Json.Nodes.JsonNode.Parse(asKept)!.AsObject();
+        Assert.True(noNumber.Remove("version"));
+        File.WriteAllText(marksFile, noNumber.ToJsonString());
+        Assert.Equal(0, again.ReadMarks().Count);
+        File.WriteAllText(marksFile, asKept);
+        Assert.Equal(2, again.ReadMarks().Count);
+        // And what the checks find is kept with the rest of a song's marks.
+        var found = new Marks(11, IsOldEditorsCopy: true, ShownTwice: 3, DoubtedKey: "Ab", LikelierKey: "F#m", LooksMovedLeft: true);
+        kept.Keep(found, song);
+        data.Keep(kept);
+        Assert.Equal(found, again.ReadMarks().MarksFor(song));
+
         // A file that cannot be read is taken as not there.
         File.WriteAllText(Path.Combine(data.Folder, "settings.json"), "{ not json");
         File.WriteAllText(Path.Combine(data.Folder, "marks.json"), "[1, 2");

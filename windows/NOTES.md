@@ -1661,6 +1661,19 @@ names. What to know before changing any of it:
   app has copies of it: nothing more was built for it. Names that are not chords
   (F, G) are kept as they are, as the page says. Chords on a box that is not the
   words (E) are in sight and can be dragged, where the editors show the box.
+- **A copy cannot be put back over a file that cannot be read, in either app, and
+  nothing says so.** `spec/08`, H, has Earlier Versions offered for such a song, and
+  it is: the copies can be looked at. But **Put This One Back** there does nothing
+  and says nothing. Putting back is a save of the song that is open (`spec/07`, rule
+  19), and a file that cannot be read is not open. The Mac's is the same
+  (`LibraryModel.swift`, `putBackPicked`). It is the one time a kept copy matters
+  most, and it is rare: only a file that went wrong after this app had kept a copy
+  of it has any. Read on the way through M8, and NOT put right here, since it would
+  be a rule of the apps' and not of this one's. **Proposed, for the maintainer**:
+  over a file that cannot be read, the copy is put back as over any other (not while
+  ProPresenter is running, the file as it is copied first, written beside and
+  swapped in), without the check that the file is the one last read, there being
+  none. Until then Settings, Backups can save the copy as a file.
 - **The copy moved out of a library is kept as a copy "before mending"**, the three
   reasons a copy has having no fourth. All Copies lists it under its own name, as
   the copy of a song that is no longer there.
