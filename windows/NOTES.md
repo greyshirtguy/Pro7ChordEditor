@@ -18,6 +18,7 @@ milestone; put right what has become untrue.
 | **M5** The ChordPro editor | Done, 2026-10-12, bar what only the maintainer can try | The song as ChordPro text, typed in: what may be typed, the help with brackets, a save a moment after the typing stops, refusals, the box's own undo, colours, the size of the text; the two keys as pickers; Revert, and the words that say why there is no Save button. `spec/04`, and `spec/06` rule 12a. It has been started for real, on a made-up library of the test hymns, and a chord put on a song there ("At M5"). **Nobody has typed into it by hand, and no song chorded with it has been looked at in ProPresenter**: that is the maintainer's, on a COPY of a real library |
 | **M6** The chord sheet | Done, 2026-10-12, bar what only the maintainer can try | The sheet a song now opens on: every slide a card in a frame of its group's colour, in a grid; the spot that follows the pointer; 1 to 7, a letter and the bubble a chord is typed in, Delete, the arrow keys; dragging; a line's chords copied onto another; undo and redo; the zoom; the strip of the key's chords; the switch between the two editors in the song's header; and the settings' Chords section. `spec/03`, `spec/06` rules 12 and 20a. Every case of `sheet-model.json` and `layout.json` passes. It has been started for real and looked at ("At M6"). **Nobody has pointed at it with a mouse, nor pressed a key on it**: that is the maintainer's, and it is most of what M6 is for |
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
+| **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -458,7 +459,8 @@ And at M4, likewise this session's, and the maintainer's to change:
     and is kept as tall as that needs whatever it says, so that the sheet does not
     grow and shrink by a line each time something is said for a few seconds. The
     names of keys in it are kept whole where a line is broken ("At M6").
-75. **The settings are two tabs, Chords and Backups.** A chord's colour is chosen with
+75. **The settings are tabs: Chords and Backups** (and, since M8, Mending between
+    them: decision 86). A chord's colour is chosen with
     the system's own picker, asked directly of the system (one function of
     `comdlg32`): WPF has no door to it, and the other part of .NET that has would be
     a second way of making windows to carry. It is no dependency. The sixteen
@@ -470,6 +472,114 @@ And at M4, likewise this session's, and the maintainer's to change:
     whether more is wanted; the Mac's sheet says its name only.
 77. **Ctrl with the mouse's wheel zooms the sheet**, as it does the text (decision
     47): the page gives two fingers on a trackpad, which a PC may not have.
+
+At M8, where `spec/08` is silent or can be read two ways. **The Mac app has not built
+M8**, so each of these is the first word on it and not the last: the maintainer's to
+change, and then both apps'.
+
+78. **The checks look at every text box of every slide in the file**, shown by the
+    editors or not: of every cue, switched on or off, every action that is a slide,
+    every element that has text. The page does not say which. The reference
+    (`tools/make-fixtures.py`) goes through every text box of the file, and the old
+    editor wrote to the first element of every slide of every cue whatever it was.
+    No test file has a chord on a box the editors do not show, so `repairs.json`
+    does not tell the two readings apart. A song is marked for what is in its file,
+    and mending it mends all of it.
+79. **A mending writes every text box that has chords, and not only those in which a
+    range runs over a line break.** The page says "the box's chords". But the old
+    editor wrote every range of a song its own way, and on a line of chords alone its
+    way runs a chord on to the next and crosses no line break: check 1 does not find
+    such a box. `repairs.json` has it put right all the same (the last box of Plain
+    Song), and its `putRight` is what the second proof is held to. A song in which
+    check 1 finds nothing is not touched, whatever its ranges: so the lines of chords
+    alone that Simple Presenter 0.8 to 0.82 wrote are left as the page says.
+80. **A mending is one step of undo of its own kind, and one save**, however many
+    slides it changes. The song's other changes are a step for each slide, joined;
+    two hundred steps are kept; and a song of more slides than that, mended so, could
+    only have been half unmended. A test has a song of 254 slides.
+81. **A chord that is on no character (check 0) is handed to BOTH editors where it
+    will be written**: the last character, or the character before the line break.
+    The page asks it of the sheet. Without it the ChordPro text would not show such a
+    chord at all, a song would have a chord in one editor that it had not in the
+    other, and typing in that text box would drop the chord unseen (`spec/04`, rule
+    24). It is done once, where the editors are handed their text boxes
+    (`Reading.ChordsHanded`); nothing is saved for it until the box is next written.
+    **For the maintainer to say**, and for the Mac's text.
+82. **"Wants mending" is: chords shown twice, or a key that does not fit the
+    chords.** And chords that look moved to the left, only while that check's offer
+    is switched on (decision 86). **Not a song that states no key**: nothing in it is
+    broken, and most songs typed by hand state none. The sum that doubts a key is
+    used for it all the same, on the sheet's strip: "The song names no key: pick the
+    one its chords are in. They look like D." Where there is not room for both
+    sentences the page's stands alone.
+83. **The list's fourth choice is on a row of its own, and is there only where the
+    library has a song that wants mending** (or while it is the one chosen, so that it
+    can be seen to be). There is no room for four where the lists are at their
+    narrowest; and most libraries have no such song, and need not be asked about one
+    for ever. It says "Wanting mending". **Mend All** is beside it while it is chosen.
+84. **Mend All** mends each song of the narrowed list in turn as the open song is
+    mended: asked the same things first, a copy kept, one save. It asks first, over
+    the window (how many songs, how many chords, that nothing is moved or renamed,
+    that a copy of each is kept); shows how far it has got, with **Stop**, which lets
+    the song in hand be finished; **stops at the first song refused because
+    ProPresenter is running**, since every other would be too; and then lists what it
+    did, by name, a song that was not mended with why. The song that is open is
+    mended as the song that is open: it is a step of undo there. Nothing else can be
+    begun while it is at work.
+85. **A key is said in words in a sentence, and as the lists have it on a button**:
+    "This song says it is in A flat, but its chords look like F sharp minor. [Set Key
+    to F#m]". The page's own sentence spells it out; the lists of keys in the header
+    say `Ab` and `F#m`.
+86. **Check 2's offer is behind a switch in the settings (Mending), off as the app
+    comes**, as the page asks until the old editor's fault has been seen in a real
+    file. What the check finds in each song is worked out and kept whether or not it
+    is offered, so switching it on marks the songs at once. Switched on, such a song
+    says so with **Show Me**; that shows the song on the sheet as it would be, and
+    the row then says "This is the song with those chords moved to where they look to
+    have been meant. Nothing has been changed." with **Show As It Is** (and then
+    **Show Moved**), **Move the Chords** and **Leave Them**. The song shown as it
+    would be can be looked at and nothing else: what is done to it is refused, and
+    says why. Whatever changes the song, shows the other editor or opens another
+    song shows it as it is again.
+87. **Putting a copy's chords into its original** (the page's "folding"), step by
+    step:
+    - a "(Chords)" copy that is open, whose original is beside it with the same
+      words, says "This is a copy that the old Windows chord editor saved of "X",
+      which has no chords." (or "which has 12 chords of its own"), with **Put Its
+      Chords into "X"...**;
+    - that asks, over the window: "Put this copy's chords into "X"?", then which song
+      is given how many chords of which, its key if that changes ("and its key, G, in
+      place of D"), what of its own is replaced, that the words are the same and are
+      not changed, and that a copy of each file is kept first. **Put the Chords In**,
+      and **Cancel**, which is what Enter gives;
+    - yes: a copy of the copy's file is kept; **the original is opened in the copy's
+      place** and given the chords and the key as **one step of undo there**, with a
+      copy of its own file kept first. So what is then seen is the song playlists
+      point at, with the chords in it, and Ctrl+Z takes them out again;
+    - and at once: "What of the copy, "X (Chords)"?" with **Move It Out** and **Leave
+      It**, which is what Enter gives.
+88. **A copy moved out of the library is its file kept among the app's copies, under
+    its own name, and then taken from the library's folder.** It is taken only once a
+    kept copy has been read back and is the file to the byte; not while ProPresenter
+    is running; and it is looked at first (a song of this library's list, named as
+    that editor named its copies, and there). Settings, Backups lists it, and can
+    save it as a file again. It is never simply deleted. Its reason is written as
+    "before mending", there being no other.
+89. **A copy that was left says so when it is next opened**: "...saved of "X", which
+    has its chords and its key already.", with **Move This Copy Out of the
+    Library...**, which asks as above. So "leave it" can be thought better of.
+90. **Where the words of the two differ, only opening the other is offered**: "The
+    words of the two are not the same, so its chords cannot be put into that song
+    from here. [Open "X"]". A copy with no chords offers nothing.
+91. **The marks are kept with a number that says which reading of the files made
+    them** (2, at M8). Marks kept by a build that knew less are worked out again:
+    without that, a song that wants mending would go unmarked until its file changed.
+92. **The panel that asked Revert's question asks whichever question the model has**,
+    and is `QuestionPanel`. Its second button is named by the question ("Cancel",
+    "Leave It") and is what Enter and Esc give. Mend All has a panel of its own, for
+    its progress and its list.
+93. **The list's four choices answer being switched on by a program, as by a click**
+    ("At M8").
 
 ## How it is laid out, and why
 
@@ -709,7 +819,7 @@ names. What to know before changing any of it:
     call those. After each thing done it calls `Sync`.
   `SheetEntry.xaml` is the bubble, `ChordSheetView.xaml` the strip and what scrolls
   the sheet, `EditorSwitch.xaml` the two buttons in the header.
-- **The settings**: `SettingsView.xaml` has the two tabs, `ChordColourSettings.xaml`
+- **The settings**: `SettingsView.xaml` has the tabs, `ChordColourSettings.xaml`
   the first of them, `ColourPicker.cs` the system's picker.
 - **The tests work the sheet as a person does**, by a hand at it (`Hand.cs`): it
   asks the grid for a point that is over a place, and hands that in as the
@@ -719,6 +829,40 @@ names. What to know before changing any of it:
   letters of a fixed width; `SheetKeysTests` every key; `SheetModelTests` the
   model's part and the settings; `ChordSheetViewTests` the rest, some of it by the
   dots of what is drawn.
+
+### The mending (M8)
+
+- **In `ChordRules`**: nothing new but `Chords.OnACharacter`, which is the sum `Tidy`
+  already did for a chord's place, taken out so that it can be asked for by itself
+  (check 0). The rules of checks 2 and 3 were there since M1 (`OldEditor`, `KeyFit`).
+- **In `Song`**:
+  - `Checks.cs` asks the three checks of a file: which text boxes (`Texts`), a chord
+    as the file has it, with its range's end (`Written`), and what is found
+    (`Findings`). Nothing in it changes anything;
+  - `OpenSong` has the putting right: `Mend`, `MoveBack` and `FoldIn`, each one save
+    and one step of undo with a copy kept first, and `Findings` of the song as it is
+    now. `TextBoxesMovedBack` is the song as it would be, worked out on a copy in
+    memory, and `SongAsItWouldBe.cs` is that as a song the sheet can show and not
+    change;
+  - `Folding.cs`: which song a copy is a copy of, and what putting its chords in
+    would do (`Plan`, `Folded`). `OpenSong.FoldIn` saves what `Folded` makes;
+  - `Marks.cs` has what the checks find among a song's marks, and `WantsMending`.
+- **In `AppViews`, the model in three files**: `LibraryModel.cs` as before;
+  `LibraryModel.Mending.cs` (the offers for the open song, the song shown both ways,
+  Mend All, and every sentence of them); `LibraryModel.Folding.cs` (the copies).
+  **What is found in the open song is carried with what is shown of it**
+  (`ShownSong.Found`), so that it is worked out when the song changes and not each
+  time the window asks.
+- **The views**: the offers are rows under the song's header, made in the code beside
+  `SongPane.xaml` from the model's `Offers`, each a sentence and its buttons;
+  `MendAllPanel.xaml` and `QuestionPanel.xaml` are over the window while they are
+  wanted; `MendingSettings.xaml` is the settings' second tab; the list's mark, its
+  fourth choice and Mend All's button are in `ListsPane.xaml`.
+- **The tests**: `Song.Tests/MendingTests` has the page's three proofs, held to
+  `repairs.json`, and what a mending is as a change; `FoldingTests` the copies.
+  `AppViews.Tests/MendingModelTests` and `FoldingModelTests` have the model, on the
+  made-up PC's library of the old editor's copies (`MadeUpPC` can put their songs
+  beside them); `MendingViewTests` the window's parts.
 
 ## What was found out
 
@@ -1253,6 +1397,119 @@ names. What to know before changing any of it:
     either side of it (U+2060) is put each side of every plus in what the line
     shows. WPF keeps to it and gives it no width: found by trying, and a test lays
     the line out narrower and narrower to hold it.
+- **How the proofs were shown to bite.** Each rule of the sheet was broken in one
+  small way in turn, in clones made for it, and the tests run after each.
+  - **The model, 189 ways** (`ChordSheet.cs`, `ChordLayout.cs`): 168 were caught at
+    once. Eighteen were not, and each was given a case, after which all eighteen were
+    caught: a line that begins with spaces; where the spot cannot be set; Shift on a
+    line of chords alone; the keys picking the spot's slide and asking for it to be
+    shown; two stops as near; where a pushed bubble stands; a chord past its line's
+    end; a chord of no name; empty lines and groups' names in a copy and a paste;
+    lines of chords alone pasted as one step of undo; Tab after the pointer has
+    moved, and with one picked; a click picking its slide; each of the keys 1 to 7;
+    and what parts words, unit for unit. Two cannot be told: an empty line's one
+    place where a line's chords are set (nothing gets there with an empty line, the
+    spot never being on one: said where it is), and an empty box kept, which asks
+    for a chord of no name and is refused that further in. One was a change that
+    changes nothing, to see the driver tell.
+  - **The view, 326 ways** (the sheet's files of `AppViews`): 298 were caught at
+    once. Fifteen were given cases and are caught: a line of chords alone at another
+    size; two stops as near, in the grid; a colour chosen, at another size and in
+    the bubble; the bubble staying where its chord will stand; the pointer's shape
+    off the cards; Right in the middle of the box; three parts of rule 52b; the
+    quiet line's wrapping and its four lines; the menu at the text's largest; a
+    colour written with no hash; and each Usual Colour by its own colour. Twelve
+    cannot be told: three were found to be the same whichever way (a line's end is
+    put right by `Believed` whatever was said of it; what scrolls the sheet stretches
+    it over what is seen whatever it asks for; the switch's cell over the keys is
+    exactly its size), six were known beforehand to be the same, and three are only
+    to be seen. One was the driver's own.
+  - **And one fault of M6's was found later, by a test of M8's**: the strip's sentence
+    for a song with no key was measured while it was put away, as nothing, and
+    nothing always has room. Made narrower a little at a time, the pane showed it and
+    hid it by turns ("At M8").
+
+### At M8
+
+- **The three proofs pass, and more.** `spec/08` asks that the checks find in each
+  test file what `repairs.json` says, that each damaged file mended as that file says
+  has exactly the chord entries of the clean file it was made from, and that mending
+  changes nothing else. All three are held. And **each damaged file, put right, IS
+  the clean file, to the byte**: the three with nothing but ranges wrong after Mend;
+  Amazing Grace, whose chords were put on by hand, after Move the Chords (or after
+  both, in either order); and the song whose key was reset, after Mend and Set Key.
+  That is these files' luck as much as a rule (they were damaged by a tool that
+  writes a file as this app does), and it is held all the same: it could not be so if
+  a mending touched anything it should not.
+- **The same of the copies.** There is no test data for putting a copy's chords into
+  its original. But each file in `as-the-old-windows-app-left-them` is the copy the
+  old editor would have saved of the song of the same name in
+  `made-by-simple-presenter`. So the tests make the original as someone would have
+  had it, that song with every chord taken off, and put the copy into it: and for the
+  two copies in which the old editor left nothing but its ranges, the original is
+  then the song the copy was made from, to the byte.
+- **Where the page is silent, or says other than the test data.** Each is a decision
+  above, for the maintainer:
+  - which text boxes the checks look at (78);
+  - "the box's chords": `repairs.json` has every box of a mended song put right (79);
+  - a chord on no character, "shown on the sheet": and in the text (81);
+  - what "wants mending" is, and a song with no key (82);
+  - **and one that is not decided, only said: a copy's key is not always the better
+    one.** The page has the original given the copy's `music`. The old editor wrote A
+    flat into copies of songs whose key it could not show (C of the page's table):
+    so the song beside such a copy may have the right key still, and putting the copy
+    in replaces it with the mistake. That is the test file A Song - In A Minor Key:
+    its original says F sharp minor, its copy A flat. As built, the page is followed
+    to the letter; the question before it is done says "and its key, A flat, in place
+    of F sharp minor. A flat does not look like the key of those chords, which look
+    like F sharp minor: once they are in, the song offers to set it."; and it does.
+    **Proposed, for the maintainer**: where the copy's key is one check 3 doubts and
+    the original's is not, the original keeps its own.
+- **Found on the way, each put right and held by a test**:
+  - **the strip's sentence for a song with no key came and went** as the pane was
+    made narrower (a fault of M6's, above): it is measured as it would be if shown;
+  - **a test's made-up PC could be taken away while a song's file was still being
+    read for its marks**, and Windows will not delete a file that is open. The marks
+    read more of each file than they did, and with the PC busy one test in a run
+    of a hundred and seventy failed so, and not the same one each time. The taking
+    away waits for the reading;
+  - **the list's choices did not answer a program switching them on.** A screen
+    reader may switch such a button on the system's way, which changes the button and
+    raises no click: it looked chosen and the list was as it had been. True of the
+    three choices since M3; found on the way to trying Mend All in the real window;
+  - **"1 chords"** in the log, of a song with one;
+  - a sort of the chords handed to the editors, written with check 0, did nothing (a
+    place brought onto a character never passes one that was after it) and is out.
+- **Working out a song's marks now reads the words of every text box**, for the
+  checks; before, it only counted chords. On the test files it is not to be
+  measured. Nobody has timed it on a library of hundreds of songs; it is done once
+  for each file and kept.
+- **What the pictures showed.** Eighteen more (50 to 62): a copy with chords shown
+  twice, in both looks; a key that does not fit; the list narrowed to what wants
+  mending, with Mend All; its question, in both looks, and what it did, with a song
+  that was not mended; a song offered to have its chords moved, and shown as it
+  would be; the settings' Mending, in both looks; a copy beside its original, in
+  both looks; the question before its chords are put in; the original with the
+  chords and the question of the copy, in both looks; the copy moved out; and a copy
+  whose original has its chords already. All were opened and looked at. Picture 41,
+  a song with no key on the sheet, now says which its chords look like.
+- **The app was started for real, and the mending worked through in its window.**
+  The published file, on a made-up library of the four copies beside their songs
+  (the songs with no chords), its window spoken to as a program may speak to one: no
+  key pressed, no pointer moved. In turn: the list read as a screen reader is told
+  of it, each copy saying what wants mending; a copy opened, its two offers there;
+  **Mend** pressed, and the quiet line saying what was done; **Wanting mending**
+  switched on the system's way, and the list narrowed (which is how the fault above
+  was found, and that it is put right); **Mend All**, its question read, three songs
+  mended and listed; a copy's chords **put into its song**, the question before and
+  the question after read, and the copy **moved out**; and a key **set**. Nine
+  pictures of the window itself were taken (real 9 to 17) and looked at. Then the
+  files: the copy that was mended, the song the other copy was put into, and the
+  copy whose key was set, are each the clean test file to the byte; the copy that
+  was moved out is in the library no longer and is among the copies kept; the songs
+  not asked about are as they were. It closed with nothing wrong, and what it left
+  in the app's own folder on this PC was taken away again by its exact paths. The
+  window came after twenty-five seconds, with the PC busy at other things.
 
 ## Left rough, and what to ask
 
@@ -1378,6 +1635,35 @@ names. What to know before changing any of it:
   - and M6's proof, which is the maintainer's to give: that it is as quick as Simple
     Presenter's. Every change to a song draws every slide of it again; on the test
     songs that is nothing, and on a song of sixty slides nobody has timed it.
+- **Nobody has clicked any of the mending by hand, and it has been near no real
+  song.** The made-up library it was tried on is the test files. What the maintainer
+  is asked to try, on a COPY of a library that the old editor was used on:
+  - whether the songs it marks are the ones that were saved in that editor, and none
+    else; and what ProPresenter shows of one before and after **Mend**;
+  - **the one test that settles check 2** (`spec/08`, B), which only the maintainer
+    can make: in the old editor, a chord on the first word of a slide's second line,
+    saved, and looked at in ProPresenter. Until then its switch stays off;
+  - Mend All on some dozens of songs: how long it takes, that the list behind it is
+    right afterwards, **Stop**, and Esc and Enter at its question;
+  - a copy put into its original, and the copy moved out: that ProPresenter then
+    lists the song with its chords and not the copy, and that a playlist that had
+    the song still has it; and **Settings, Backups**, where the copy now is;
+  - the row of offers where the pane is narrow: a long sentence beside two or three
+    buttons has not been looked at there.
+- **For the maintainer to say, of M8**: each of decisions 78 to 93, and above all
+  - whether a song beside a copy with a doubted key should keep its own ("At M8");
+  - whether the ChordPro text is to show a chord that is on no character (81);
+  - whether the fourth choice should be there always, as the page's four (83);
+  - the words: every sentence of the mending is in `LibraryModel.Mending.cs` and
+    `LibraryModel.Folding.cs`, and all but the page's three are this session's.
+- **What M8 does not do.** A song cut short by the old editor (H) is listed as one
+  that cannot be read, as any such file is, and Earlier Versions is offered if the
+  app has copies of it: nothing more was built for it. Names that are not chords
+  (F, G) are kept as they are, as the page says. Chords on a box that is not the
+  words (E) are in sight and can be dragged, where the editors show the box.
+- **The copy moved out of a library is kept as a copy "before mending"**, the three
+  reasons a copy has having no fourth. All Copies lists it under its own name, as
+  the copy of a song that is no longer there.
 - **The caret of the ChordPro text and the sheet's picked slide do not know of each
   other** (`spec/04`, rule 21), as on the Mac: gone to from the sheet, the text is
   where it was last left, and the sheet likewise. What would tie them is built and

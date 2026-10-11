@@ -10,6 +10,14 @@ another line. The same song can be had as ChordPro text, each chord in square br
 where it is played, and chords typed in there. The words cannot be changed in either.
 Every change is saved as it is made, with a copy of the song's file as it was kept
 first, and a song's earlier versions can be looked at and put back.
+
+**It knows a song that the first Windows editor saved**, by what that editor left in
+the file: chords written so that ProPresenter shows them twice, and sometimes the
+wrong key. Such a song is marked in the list and says what was found when it is
+opened, with a button that puts it right; a whole list of them can be mended at
+once. And where that editor saved its copy, "Song (Chords)", beside a song, the
+copy's chords can be put into the song itself.
+
 **There is nothing here to download yet, and it has not been tried on a real library:
 do not use it on yours.**
 
@@ -25,7 +33,7 @@ files, wherever it is, can always be chosen by hand.
 
 The first Windows editor, version 0.9.5, is in [`old/`](old/README.md) as it was, and
 its [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
-still works as it did. This app is to replace it, and to find and mend what it left in
+still works as it did. This app is to replace it, and finds and mends what it left in
 files ([`spec/08-repair.md`](../spec/08-repair.md)).
 
 Built with .NET 10 and WPF. So far it has been run on Windows 11 and nowhere else.
@@ -93,7 +101,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | --- | --- |
 | `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
-| `Song/` | The song as the editors see it; the library: where songs are, the lists, the marks, the app's own settings; and the copies kept before a change. The checks are to come. No window in it |
+| `Song/` | The song as the editors see it; the library: where songs are, the lists, the marks, the app's own settings; the copies kept before a change; and the checks for what the first editor left in a file, with the mending of it. No window in it |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
 | `App/` | The app itself: the few lines that start it, and how it is built to be given out |
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |
