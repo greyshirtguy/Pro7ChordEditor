@@ -193,6 +193,8 @@ SHAPES = [
     ("three plain spaces, which is no run of stand-ins", apple(b"\\f0\\fs84 \\cf2    }")),
     ("a space and an em quad whose word runs up to the bracket", apple(b"\\cf2  \\uc0" + BARE_Q + b"}")),
     ("an em quad straight after a word with no space, and a space", apple(b"\\cf2\\uc0" + BARE_Q + b"  }")),
+    ("an em quad written straight in, straight after a word with no space, and a space",
+     b"{\\rtf1\\ansi\\cf2" + EM_QUAD.encode("utf-8") + b" }"),
     ("stand-ins with no space after their words", apple(b"\\f0 \\uc0" + BARE_Z + b"\\uc0" + BARE_Q + b"\\uc0" + BARE_Z + b"}")),
     ("stand-ins each in a group of its own", apple(b"{\\f0 " + Z + b"}{\\f1 " + Q + b"}{\\f0 " + Z + b"}}")),
     ("stand-ins written straight in as UTF-8", b"{\\rtf1\\ansi " + (ZERO_WIDTH + EM_QUAD + ZERO_WIDTH).encode("utf-8") + b"}"),

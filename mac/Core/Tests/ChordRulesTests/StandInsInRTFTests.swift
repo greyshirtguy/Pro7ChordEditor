@@ -99,6 +99,11 @@ struct StandInsInRTFTests {
         let before = RTFWords.rtf(apple(#"\cf2\uc0\u8193  }"#), withLine: 0, become: standIns(1, space))
         #expect(shown(before) == shown(apple(#"\cf2\uc0  }"#)))
         #expect(before.map { RTFWords.words(ofRTF: $0) } == standIns(1, space))
+        // The same where the em quad is written straight in, as its three bytes of
+        // UTF-8: it is no control word, and the word before it still has no space.
+        let straightIn = Array(#"{\rtf1\ansi\cf2"#.utf8) + [0xE2, 0x80, 0x81] + Array(" }".utf8)
+        #expect(RTFWords.words(ofRTF: straightIn) == Words(units: [0x2001, 0x20]))
+        #expect(RTFWords.rtf(straightIn, withLine: 0, become: standIns(1, space)) == Array(#"{\rtf1\ansi\cf2  }"#.utf8))
     }
 
     @Test("The same where the character whose place it takes is itself a word with no space after it, straight after another")
