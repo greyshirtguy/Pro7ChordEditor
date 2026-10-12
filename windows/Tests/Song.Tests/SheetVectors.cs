@@ -198,6 +198,9 @@ internal sealed class StandInSong(IEnumerable<TextBox> textBoxes, string key) : 
     /// <summary>What to refuse everything with, if anything.</summary>
     internal Refusal? Refusing { get; set; }
 
+    /// <summary>The song's last text box goes, as if something else had changed the song.</summary>
+    internal void LoseItsLastBox() => boxes.RemoveAt(boxes.Count - 1);
+
     public IReadOnlyList<string> UsedChords => [.. boxes.SelectMany(box => box.Chords.Select(chord => chord.Name))];
 
     internal IReadOnlyList<string> After => [.. boxes.Select(box => Said(box.Slide, box.Element, box.Words, box.Chords))];

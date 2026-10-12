@@ -703,6 +703,142 @@ public class ChordSheetTests
         Assert.Empty(song.Asked);
     }
 
+    // MINE, NOT A VECTOR (as the Mac's `carriedInFromTheStrip`, case for case). One of
+    // the key's chords carried in from the strip: over a place the spot goes with it;
+    // let go there it is put on as its key would put it, in place of what is there; off
+    // the places it is put nowhere (rules 46a to 46g).
+    [Fact]
+    public void OneOfTheKeysChordsCarriedInFromTheStripIsPutWhereItIsLetGoAsItsKeyWouldPutIt()
+    {
+        // (In G the key's chords are G, Am, Bm, C, D, Em and F#dim.)
+        var (sheet, song) = vectors.Sheet("grace");
+        sheet.SetSpot(4, 0);
+        sheet.Carry("C", 2, 5);
+        Assert.Equal((new Spot(-1, 0), "C"), sheet.Dragged);
+        Assert.Equal(new Spot(2, 5), sheet.Spot);
+        // While it is carried the spot is its own, and not the pointer's.
+        sheet.PointerOver(4, 0);
+        Assert.Equal(new Spot(2, 5), sheet.Spot);
+        Assert.True(sheet.DropOfKey());
+        Assert.Null(sheet.Dragged);
+        Assert.Equal(("C", new Spot(2, 5)), (sheet.ChordAt(2, 5), sheet.Spot));
+        // One change, joined to nothing: and it is what the key 4 asks with the spot there.
+        var (keyed, keyedSong) = vectors.Sheet("grace");
+        keyed.SetSpot(2, 5);
+        keyed.PutOfKey(4);
+        Assert.Single(song.Asked);
+        Assert.Equal(keyedSong.Asked, song.Asked);
+        Assert.EndsWith("joined false", song.Asked[0], StringComparison.Ordinal);
+
+        // In place of the chord that is there (rule 43).
+        sheet.Carry("Em", 1, 8);
+        Assert.True(sheet.DropOfKey());
+        Assert.Equal(["C", "Em", "G", "G"], sheet.Rows[1].Chords.Select(chord => chord.Name).Order(StringComparer.Ordinal));
+
+        // Off the places nothing shows it, and let go it is put nowhere.
+        song.Asked.Clear();
+        sheet.Carry("D", 7, 4);
+        sheet.CarryOff();
+        Assert.Null(sheet.Dragged);
+        Assert.False(sheet.DropOfKey());
+        // A row that is a group's name, a row there is not, and a name that is no chord.
+        sheet.Carry("D", 7, 4);
+        sheet.Carry("D", 5, 0);
+        Assert.Null(sheet.Dragged);
+        sheet.Carry("D", 99, 0);
+        Assert.Null(sheet.Dragged);
+        sheet.Carry("Hello", 7, 4);
+        Assert.Null(sheet.Dragged);
+        Assert.False(sheet.DropOfKey());
+        Assert.Empty(song.Asked);
+        Assert.Equal("", sheet.ChordAt(7, 4));
+
+        // The key that copies a chord as it is dragged changes nothing here (rule 46g).
+        sheet.Carry("D", 7, 4);
+        sheet.Drop(copy: true);
+        Assert.Null(sheet.Dragged);
+        Assert.Equal("D", sheet.ChordAt(7, 4));
+        Assert.Single(song.Asked);
+
+        // A chord lifted from the sheet is not let go of by what is for one from the
+        // strip, nor put on by it.
+        sheet.Lift(7, 4);
+        sheet.CarryOff();
+        Assert.Equal(new Spot(7, 4), sheet.Dragged?.From);
+        Assert.False(sheet.DropOfKey());
+        Assert.NotNull(sheet.Dragged);
+        sheet.DropNowhere();
+
+        // While another chord is being typed nothing is carried; but picking one up
+        // keeps what was typed and closes the bubble, and then it is (rule 46e). The
+        // two are two changes, neither joined to the other.
+        song.Asked.Clear();
+        sheet.SetSpot(6, 5);
+        sheet.StartTyping("B");
+        sheet.Type("Bm7");
+        sheet.Carry("C", 9, 0);
+        Assert.Null(sheet.Dragged);
+        Assert.True(sheet.Typing);
+        sheet.LiftOfKey();
+        Assert.False(sheet.Typing);
+        Assert.Equal("Bm7", sheet.ChordAt(6, 5));
+        Assert.Single(song.Asked);
+        sheet.Carry("C", 9, 0);
+        Assert.True(sheet.DropOfKey());
+        Assert.Equal("C", sheet.ChordAt(9, 0));
+        Assert.Equal(2, song.Asked.Count);
+        Assert.EndsWith("joined false", song.Asked[1], StringComparison.Ordinal);
+        // Picked up with nothing typed: nothing is kept, and the bubble is closed.
+        sheet.SetSpot(8, 0);
+        sheet.StartTyping();
+        sheet.LiftOfKey();
+        Assert.False(sheet.Typing);
+        Assert.Equal("", sheet.ChordAt(8, 0));
+        Assert.Equal(2, song.Asked.Count);
+
+        // On a line of chords alone it takes the place of the chord whose place it is
+        // over, or past the last is one more (rule 22); on a blank slide, and on a
+        // slide with no text box, it is the first.
+        var (intro, introSong) = vectors.Sheet("intro");
+        intro.Carry("Bm", 1, 2);
+        Assert.True(intro.DropOfKey());
+        Assert.Equal(["D", "Bm", "A"], intro.Rows[1].Chords.Select(chord => chord.Name));
+        intro.Carry("G", 1, 6);
+        Assert.True(intro.DropOfKey());
+        Assert.Equal([new Chord(0, "D"), new Chord(2, "Bm"), new Chord(4, "A"), new Chord(6, "G")], intro.Rows[1].Chords);
+        Assert.Equal(2, introSong.Asked.Count);
+        Assert.All(introSong.Asked, asked => Assert.True(asked.StartsWith("setChordsAlone", StringComparison.Ordinal) && asked.EndsWith("joined false", StringComparison.Ordinal), asked));
+        var (blank, _) = vectors.Sheet("blank");
+        blank.Carry("C", 1, 0);
+        Assert.True(blank.DropOfKey());
+        Assert.Equal([new Chord(0, "C")], blank.Rows[1].Chords);
+        Assert.False(blank.Rows[1].Blank);
+        var (bare, _) = vectors.Sheet("bare");
+        bare.Carry("C", 2, 0);
+        Assert.True(bare.DropOfKey());
+        Assert.Equal([new Chord(0, "C")], bare.Rows[2].Chords);
+
+        // What the song refuses is said, and is answered as not put on.
+        var (refusing, refusingSong) = vectors.Sheet("grace");
+        var said = 0;
+        refusing.Refused = _ => said++;
+        refusingSong.Refusing = Refusal.ProPresenterIsRunning;
+        refusing.Carry("C", 2, 5);
+        Assert.False(refusing.DropOfKey());
+        Assert.Equal((1, "", null), (said, refusing.ChordAt(2, 5), refusing.Dragged));
+
+        // The place it was over goes, the song having been changed under it: it is
+        // carried no longer.
+        var two = new StandInSong([Box(0, "A", "Holy holy"), Box(1, "B", "Lord God")], "C");
+        var small = new ChordSheet(two);
+        small.Carry("F", 1, 0);
+        Assert.NotNull(small.Dragged);
+        two.LoseItsLastBox();
+        small.Reload();
+        Assert.Null(small.Dragged);
+        Assert.Equal(-1, small.Spot.Row);
+    }
+
     // A name the song already has that is no chord is moved, copied and pasted as it is;
     // only what is typed must be a chord.
     [Fact]

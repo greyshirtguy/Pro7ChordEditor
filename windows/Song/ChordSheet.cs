@@ -32,6 +32,11 @@
 //   - The empty lines a text box's words END with get no row, unless a chord stands on
 //     one (the maintainer's, 2026-10-11). The reference gives each a row.
 //
+// And one thing is here that the reference has not: one of the key's chords carried in
+// from the strip and let go on a place (the page, "A chord dragged out of the strip";
+// the maintainer's, 2026-10-12). It is `LiftOfKey`, `Carry(name, row, at)`, `CarryOff`
+// and `DropOfKey`, at the foot, and what it asks of the song is what a key's `Put` asks.
+//
 // What is drawn where is not here. The two things that go by where the words are on
 // the screen (which place is under the pointer, and which stop is nearest above or
 // below) are handed an `ISheetMeasure`, so that the window's answers and the tests' come
@@ -252,7 +257,11 @@ public sealed class ChordSheet
     /// </summary>
     public int TypingsBegun { get; private set; }
 
-    /// <summary>A chord being dragged: where from, and its name.</summary>
+    /// <summary>
+    /// A chord being dragged: where from, and its name. One of the key's chords carried
+    /// in from the strip is from nowhere on the sheet (its row is -1), and is held here
+    /// only while it is over a place that can take it.
+    /// </summary>
     public (Spot From, string Name)? Dragged { get; private set; }
 
     public IReadOnlyList<CopiedLine>? Copied { get; private set; }
@@ -357,9 +366,17 @@ public sealed class ChordSheet
         {
             Typing = false;
         }
-        if (Dragged is { } lifted && !string.Equals(ChordAt(lifted.From.Row, lifted.From.At), lifted.Name, StringComparison.Ordinal))
+        if (Dragged is { } lifted)
         {
-            Dragged = null;
+            // The chord that was lifted has gone from where it was; or the place one
+            // from the strip was over has.
+            var gone = lifted.From.Row >= 0
+                ? !string.Equals(ChordAt(lifted.From.Row, lifted.From.At), lifted.Name, StringComparison.Ordinal)
+                : !Usable(spot.Row);
+            if (gone)
+            {
+                Dragged = null;
+            }
         }
     }
 
@@ -1144,11 +1161,20 @@ public sealed class ChordSheet
         }
     }
 
-    /// <summary>It is let go: it moves to the spot, or with <paramref name="copy"/> another is put there.</summary>
+    /// <summary>
+    /// It is let go: it moves to the spot, or with <paramref name="copy"/> another is put
+    /// there. (One that came from the strip is put there, whatever <paramref name="copy"/>
+    /// is: rule 46g.)
+    /// </summary>
     public void Drop(bool copy)
     {
         if (Dragged is not { } lifted)
         {
+            return;
+        }
+        if (lifted.From.Row < 0)
+        {
+            DropOfKey();
             return;
         }
         Dragged = null;
@@ -1156,6 +1182,60 @@ public sealed class ChordSheet
     }
 
     public void DropNowhere() => Dragged = null;
+
+    // ---- A chord carried in from the strip (rules 46a to 46g)
+
+    /// <summary>
+    /// One of the key's chords is picked up from the strip, to be carried to a place. A
+    /// chord that is being typed is kept first, as it is when the sheet is left for
+    /// anything else: so one of these can be carried while another is typed, which a
+    /// chord of the sheet's own cannot.
+    /// </summary>
+    public void LiftOfKey() => Settle();
+
+    /// <summary>
+    /// It is over a place: the spot goes there and shows its name, as for a chord lifted
+    /// from the sheet. Only a chord is carried so, and never while one is being typed
+    /// (picking it up ended that).
+    /// </summary>
+    public void Carry(string name, int index, int at)
+    {
+        if (Typing || !Usable(index) || !Chords.IsChord(name))
+        {
+            CarryOff();
+            return;
+        }
+        Dragged = (new Spot(-1, 0), name);
+        SetSpot(index, at);
+    }
+
+    /// <summary>
+    /// It is over a place no longer: bare sheet, a frame, the strip, anything else. No
+    /// place shows it, and let go now it is put nowhere. (A chord lifted from the sheet
+    /// is not let go of by this.)
+    /// </summary>
+    public void CarryOff()
+    {
+        if (Dragged is { From.Row: < 0 })
+        {
+            Dragged = null;
+        }
+    }
+
+    /// <summary>
+    /// It is let go. Over a place it is put there, as its key would have put it with the
+    /// spot there, in place of whatever chord is there; anywhere else nothing is done.
+    /// Answers whether the song took it.
+    /// </summary>
+    public bool DropOfKey()
+    {
+        if (Dragged is not { From.Row: < 0 } lifted)
+        {
+            return false;
+        }
+        Dragged = null;
+        return Put(spot.Row, spot.At, lifted.Name);
+    }
 
     // ---- How
 

@@ -161,6 +161,81 @@ public sealed class ChordSheetOnAFileTests : IDisposable
     // The last chord taken off a line of chords alone that has words over it: the line
     // is one zero-width space, its row is there still with the spot on it, and a chord
     // is put on it again. So for one that is the whole of its slide.
+    // As the Mac's `carriedInFromTheStrip`, on the same file: one of the key's chords
+    // carried in from the strip and let go on a place is in the file, as its key would
+    // have put it with the spot there; undone, the file is byte for byte what it was.
+    [Fact]
+    public void OneOfTheKeysChordsCarriedInFromTheStripIsInTheFileAsItsKeyWouldHavePutIt()
+    {
+        var song = bench.Open(Shaped);
+        var bytes = File.ReadAllBytes(song.Path);
+        var sheet = new ChordSheet(song);
+        var said = new List<string>();
+        sheet.Refused = refusal => said.Add(refusal.Sentence);
+        var name = sheet.InKey[3];
+        var words = WordsRow(sheet);
+        var at = sheet.Stops(words).First(stop => sheet.ChordAt(words, stop).Length == 0);
+        var four = RowWhere(sheet, row => row.Slide == 3 && row.Alone);
+        var first = RowWhere(sheet, row => row.Slide == 0 && row.Blank);
+        var last = RowWhere(sheet, row => row.Slide == 11 && row.Blank);
+        Assert.Equal(4, sheet.Rows[four].Chords.Count);
+        Assert.Equal("", song.TextBoxes[11].Element);
+
+        // The song as it is read from its file: each box's words and chords. (Not its
+        // boxes' ids: the box a slide with none is given has a new one each time.)
+        List<string> Read() => [.. new OpenSong(song.Path).TextBoxes.Select(box => Spelt.N(box.Slide) + " " + Spelt.Of(box.Words) + " " + Spelt.Of(box.Chords))];
+
+        foreach (var (row, place) in new[] { (words, at), (four, 2), (four, 8), (first, 0), (last, 0) })
+        {
+            var which = "row " + Spelt.N(row) + ", place " + Spelt.N(place);
+            sheet.Carry(name, row, place);
+            Assert.Equal(new Spot(row, place), sheet.Spot);
+            Assert.True(sheet.DropOfKey(), which);
+            Assert.Equal((name, new Spot(row, place)), (sheet.ChordAt(row, place), sheet.Spot));
+            var carried = Read();
+            Assert.False(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(song.Path)), which);
+            song.Undo();
+            Assert.False(song.CanUndo);
+            Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(song.Path)), which);
+            sheet.Reload();
+            // The key 4, with the spot there, makes the same of the file.
+            sheet.SetSpot(row, place);
+            sheet.PutOfKey(4);
+            Assert.Equal(carried, Read());
+            song.Undo();
+            Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(song.Path)), which);
+            sheet.Reload();
+        }
+        // In a chord's place it took that chord's; past the last it was one more.
+        sheet.Carry(name, four, 2);
+        sheet.DropOfKey();
+        Assert.Equal(["E", name, "C#m", "A"], Names(sheet.Rows[four]));
+        sheet.Carry(name, four, 8);
+        sheet.DropOfKey();
+        Assert.Equal(["E", name, "C#m", "A", name], Names(sheet.Rows[four]));
+        song.Undo();
+        song.Undo();
+        Assert.False(song.CanUndo);
+        sheet.Reload();
+
+        // Let go off the places: nothing is asked of the song at all.
+        sheet.Carry(name, words, at);
+        sheet.CarryOff();
+        Assert.False(sheet.DropOfKey());
+        Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(song.Path)));
+        Assert.False(song.CanUndo);
+        Assert.Empty(said);
+
+        // While ProPresenter is running it is refused like any change, in the song's
+        // own sentence, and the file is as it was.
+        bench.ProPresenterIsRunning = true;
+        sheet.Carry(name, words, at);
+        Assert.False(sheet.DropOfKey());
+        Assert.Equal(["ProPresenter is running. Quit it to change chords here. Nothing was changed."], said);
+        Assert.Equal(("", null), (sheet.ChordAt(words, at), sheet.Dragged));
+        Assert.True(bytes.AsSpan().SequenceEqual(File.ReadAllBytes(song.Path)));
+    }
+
     [Fact]
     public void TheLastChordTakenOffALineOfChordsAloneLeavesItALineOfChordsAloneStill()
     {
