@@ -833,6 +833,10 @@ public class ChordSheetTests
         var small = new ChordSheet(two);
         small.Carry("F", 1, 0);
         Assert.NotNull(small.Dragged);
+        // (Read again with its place still there, it is carried still.)
+        small.Reload();
+        Assert.Equal((new Spot(-1, 0), "F"), small.Dragged);
+        Assert.Equal(new Spot(1, 0), small.Spot);
         two.LoseItsLastBox();
         small.Reload();
         Assert.Null(small.Dragged);
