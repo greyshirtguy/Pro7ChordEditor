@@ -1216,6 +1216,19 @@ more.)
   object, and wants `override`.
 - **The made-up Mac's "Blank Slides" has no line of chords alone.** The tests of
   the window that want one put `Chords With No Words.pro` there themselves.
+- **How the tests were shown to bite**: sixty-seven breakages, one at a time, after
+  the commit, of the model's four functions, the sheet's end, the grip and the
+  strip's wiring. Fifty-six were caught as the tests stood. Of the eleven that were
+  not: seven were given a test each (that the sheet is laid out again after a
+  chord is let go, without which a line with a chord more is drawn from a layout
+  with a bubble fewer; that Shift is asked as it is let go; that each time over the
+  sheet the chord comes in over the top afresh; that a button is not left dead by a
+  carrying the system never ended; what the grip draws; and that the strip's end
+  clears what is shown when the system tells only it); three were lines that did
+  nothing and are gone (letting go of the chord a second time after it is let go,
+  and keeping the scrolling within the sheet, which the scroll view does itself);
+  and one changes nothing that can be seen (`dropOfKey` holding the name to being
+  a chord, which `carry` has done already). All seven are caught now.
 
 ### Rules the vectors did not hold, and what became of them
 ### Rules the vectors did not hold, and what became of them
