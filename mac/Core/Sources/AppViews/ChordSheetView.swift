@@ -28,7 +28,9 @@
 //
 // What the Mac does its own way (spec/10-platforms.md): Command where the page says
 // Ctrl; Option copies a chord as it is dragged; either delete key; Return opens the
-// bubble on what is at the spot.
+// bubble on what is at the spot; and one of the key's chords is carried from the strip
+// to a word by the system's own dragging, which this view is the far end of ("A chord
+// carried in from the strip", below; the near end is KeyChordGrip.swift).
 //
 // The keyboard. The view is the window's first responder while no chord is being
 // typed, and the box in the bubble is while one is. It takes the keyboard when it is
@@ -307,6 +309,15 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// While the two are the same, a line's chords are the last thing that was copied.
     var whatWasCopiedLast: () -> Int = { NSPasteboard.general.changeCount }
     private var copiedWhen: Int?
+    /// While one of the key's chords is carried over the sheet: when the sheet last
+    /// scrolled under it, and whether it has been clear of the top of what is seen
+    /// since it came over.
+    private var carriedScrolledAt: TimeInterval?
+    private var carriedClearOfTheTop = false
+    /// What the time is, in seconds, and whether Shift is held: asked of the system,
+    /// which is not told either while a thing is dragged. (The tests answer for it.)
+    var now: () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
+    var shiftIsHeld: () -> Bool = { NSEvent.modifierFlags.contains(.shift) }
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -318,6 +329,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         }
         addSubview(entry)
         setAccessibilityLabel("The song's chord sheet")
+        // One of the key's chords, carried from the strip, may be let go here; and
+        // nothing else that is dragged may.
+        registerForDraggedTypes([.chordOfTheKey])
     }
 
     @available(*, unavailable)
@@ -781,6 +795,126 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     override func mouseUp(with event: NSEvent) {
         released(at: convert(event.locationInWindow, from: nil), shift: event.modifierFlags.contains(.shift),
                  copy: event.modifierFlags.contains(.option))
+    }
+
+    // ---- A chord carried in from the strip (spec/03, rules 46a to 46g)
+    //
+    // The Mac's own dragging carries it. A button of the strip begins it
+    // (KeyChordGrip.swift), the system draws the button's picture under the pointer,
+    // and this view, which has said it takes such a chord and nothing else, is told
+    // as the chord comes over it, moves, leaves and is let go. What each of those does
+    // to the song is ChordSheet's.
+
+    /// One of the key's chords, carried from the strip, is over a point of the view;
+    /// or, with no point, is over the view no longer. Answers whether letting go would
+    /// put it on: whether it is over a place. Only then is it shown, in a lit bubble
+    /// at that place.
+    @discardableResult
+    func carriedOfKey(_ name: String, to point: NSPoint?, shift: Bool) -> Bool {
+        guard let sheet else { return false }
+        if let point, let place = placeCarriedTo(point, shift: shift) {
+            sheet.carry(name, over: place.row, place.at)
+        } else {
+            sheet.carryOff()
+        }
+        needsDisplay = true
+        return sheet.dragged.map { $0.from.row < 0 } ?? false
+    }
+
+    /// It is let go at a point: over a place it is put there, and anywhere else
+    /// nothing is done. Answers whether the song took it.
+    @discardableResult
+    func droppedOfKey(_ name: String, at point: NSPoint, shift: Bool) -> Bool {
+        guard let sheet else { return false }
+        let put = carriedOfKey(name, to: point, shift: shift) && sheet.dropOfKey()
+        sheet.carryOff()
+        sync()
+        return put
+    }
+
+    /// How near the top or the bottom of what is seen a carried chord is held for the
+    /// sheet to scroll, and how fast it then goes at the very edge, in a second.
+    static let carriedNear = 36.0
+    static let carriedFastest = 520.0
+
+    /// A chord carried in from the strip is held near the top or the bottom of what is
+    /// seen of the sheet: the sheet goes that way, faster the nearer the edge, so that
+    /// a slide out of sight can be reached (rule 46f). It goes by the time that has
+    /// passed and not by how often it is asked: the system tells the view of the chord
+    /// at every move of the pointer, and now and again while it lies still.
+    ///
+    /// Not upwards until the chord has once been clear of the top: it comes from the
+    /// strip, over the top of the sheet, and is not to scroll the sheet on its way in.
+    func scrollIfCarriedNearAnEdge(_ point: NSPoint) {
+        let seen = visibleRect
+        let near = Self.carriedNear
+        if point.y >= seen.minY + near {
+            carriedClearOfTheTop = true
+        }
+        var depth = 0.0
+        if point.y > seen.maxY - near {
+            depth = min(1, (point.y - (seen.maxY - near)) / near)
+        } else if point.y < seen.minY + near, carriedClearOfTheTop {
+            depth = -min(1, (seen.minY + near - point.y) / near)
+        }
+        let time = now()
+        guard depth != 0 else {
+            carriedScrolledAt = nil
+            return
+        }
+        // (The first time it is found near an edge the clock is only started.)
+        let passed = carriedScrolledAt.map { min(0.2, max(0, time - $0)) } ?? 0
+        carriedScrolledAt = time
+        let top = max(0, min(seen.minY + depth * Self.carriedFastest * passed, bounds.height - seen.height))
+        if abs(top - seen.minY) >= 0.5 {
+            scroll(NSPoint(x: seen.minX, y: top))
+        }
+    }
+
+    /// The chord a pasteboard carries from the strip, if it carries one.
+    static func chordOfKey(on pasteboard: NSPasteboard) -> String? {
+        guard pasteboard.availableType(from: [.chordOfTheKey]) != nil, let name = pasteboard.string(forType: .chordOfTheKey), !name.isEmpty else { return nil }
+        return name
+    }
+
+    /// What is dragged is over the view: where, and whether it may be let go there. (The
+    /// system's word for putting a thing somewhere is "copy", and its sign for it a
+    /// green plus beside the pointer.)
+    private func carried(by dragging: any NSDraggingInfo) -> NSDragOperation {
+        guard let name = Self.chordOfKey(on: dragging.draggingPasteboard) else { return [] }
+        scrollIfCarriedNearAnEdge(convert(dragging.draggingLocation, from: nil))
+        // (Where it is, is asked again after any scrolling: another place is under
+        // the pointer then.)
+        return carriedOfKey(name, to: convert(dragging.draggingLocation, from: nil), shift: shiftIsHeld()) ? .copy : []
+    }
+
+    override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
+        // (Picking the chord up kept a chord that was being typed: its bubble goes.)
+        sync()
+        carriedScrolledAt = nil
+        carriedClearOfTheTop = false
+        return carried(by: sender)
+    }
+
+    override func draggingUpdated(_ sender: any NSDraggingInfo) -> NSDragOperation {
+        carried(by: sender)
+    }
+
+    override func draggingExited(_ sender: (any NSDraggingInfo)?) {
+        carriedOfKey("", to: nil, shift: false)
+    }
+
+    override func draggingEnded(_ sender: any NSDraggingInfo) {
+        carriedOfKey("", to: nil, shift: false)
+    }
+
+    override func prepareForDragOperation(_ sender: any NSDraggingInfo) -> Bool {
+        Self.chordOfKey(on: sender.draggingPasteboard) != nil
+    }
+
+    override func performDragOperation(_ sender: any NSDraggingInfo) -> Bool {
+        guard let name = Self.chordOfKey(on: sender.draggingPasteboard) else { return false }
+        return droppedOfKey(name, at: convert(sender.draggingLocation, from: nil), shift: shiftIsHeld())
     }
 
     // ---- The keys
@@ -1273,7 +1407,8 @@ struct ChordSheetCanvasView: NSViewRepresentable {
 }
 
 /// The strip across the top of the sheet: the key's own chords on the keys 1 to 7,
-/// which can be clicked there too (spec/03, rule 14). The key itself is set in the
+/// which can be clicked there too, or dragged from there onto a word (spec/03, rules
+/// 14 and 46a; KeyChordGrip.swift is what takes the mouse over each). The key itself is set in the
 /// song's header, over this, and nowhere else: the reference has its picker here, and
 /// these apps had it in both places until the maintainer said one was enough.
 struct SheetStrip: View {
@@ -1348,27 +1483,55 @@ struct SheetStrip: View {
     private var chords: some View {
         HStack(spacing: 8) {
             ForEach(Array(sheet.inKey.enumerated()), id: \.offset) { index, name in
+                let says = Self.says(of: name, number: index + 1)
+                // The button is there for the keyboard and for what reads the screen
+                // aloud. The mouse is taken by what lies over it, which makes a press
+                // let go the button's click and a press pulled away the chord picked
+                // up to be carried to a word.
                 Button {
                     model.putOfKey(index + 1)
                 } label: {
-                    HStack(spacing: 5) {
-                        Text(String(index + 1))
-                            .font(.system(size: 11))
-                            .foregroundStyle(Color(nsColor: SheetLook.caption))
-                        Text(name)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(Color(nsColor: SheetLook.words))
-                    }
-                    .lineLimit(1)
-                    .fixedSize()
-                    .padding(.horizontal, 8)
-                    .frame(minWidth: 34, minHeight: 26)
-                    .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: SheetLook.chip)))
+                    Self.chip(index + 1, name)
                 }
                 .buttonStyle(.plain)
-                .help("Puts \(name) on the spot. The key \(index + 1) does the same.")
+                .help(says)
+                .overlay {
+                    KeyChordHandle(name: name, says: says, picture: { Self.picture(of: index + 1, name) },
+                                   clicked: { model.putOfKey(index + 1) }, lifted: { model.liftOfKey() }, ended: { model.carriedOfKeyEnded() })
+                }
             }
         }
         .fixedSize()
+    }
+
+    /// What one of the key's chords says of itself when it is pointed at (spec/03,
+    /// rule 46h).
+    static func says(of name: String, number: Int) -> String {
+        "Puts \(name) on the spot. The key \(number) does the same. Or drag it onto a word."
+    }
+
+    /// One of the key's chords as the strip shows it: its number in grey, and its name.
+    static func chip(_ number: Int, _ name: String) -> some View {
+        HStack(spacing: 5) {
+            Text(String(number))
+                .font(.system(size: 11))
+                .foregroundStyle(Color(nsColor: SheetLook.caption))
+            Text(name)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(Color(nsColor: SheetLook.words))
+        }
+        .lineLimit(1)
+        .fixedSize()
+        .padding(.horizontal, 8)
+        .frame(minWidth: 34, minHeight: 26)
+        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: SheetLook.chip)))
+    }
+
+    /// The same as a picture, to go with the pointer while the chord is carried.
+    @MainActor
+    static func picture(of number: Int, _ name: String) -> NSImage? {
+        let renderer = ImageRenderer(content: chip(number, name).environment(\.colorScheme, .dark))
+        renderer.scale = NSScreen.main?.backingScaleFactor ?? 2
+        return renderer.nsImage
     }
 }

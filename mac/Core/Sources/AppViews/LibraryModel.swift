@@ -575,6 +575,23 @@ public final class LibraryModel {
         sheetVersion += 1
     }
 
+    /// One of the key's chords is picked up from the strip, to be carried to the sheet
+    /// and let go on a word: a chord that was being typed is kept first (spec/03, rule
+    /// 46e).
+    public func liftOfKey() {
+        guard let sheet, sheet.typing else { return }
+        sheet.liftOfKey()
+        sheetVersion += 1
+    }
+
+    /// The carrying is over, wherever it ended: nothing is left looking as if a chord
+    /// were still over the sheet.
+    public func carriedOfKeyEnded() {
+        guard let sheet else { return }
+        sheet.carryOff()
+        sheetVersion += 1
+    }
+
     /// Copies the chords of the spot's line, or of its whole group, and says so on the
     /// quiet line for a few seconds.
     public func copyChords(wholeGroup: Bool) {

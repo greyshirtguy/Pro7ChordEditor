@@ -32,9 +32,11 @@ struct PictureTests {
         return folder
     }()
 
-    /// Draws a view off the screen and writes it as a PNG. Says where.
+    /// Draws a view off the screen and writes it as a PNG. Says where. `first` is
+    /// done to the view once it is laid out, before it is drawn.
     @discardableResult
-    private func draw(_ view: some View, named name: String, size: NSSize = NSSize(width: 1000, height: 560), dark: Bool = false) throws -> URL {
+    private func draw(_ view: some View, named name: String, size: NSSize = NSSize(width: 1000, height: 560), dark: Bool = false,
+                      first: @MainActor (NSView) -> Void = { _ in }) throws -> URL {
         let appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
         let host = NSHostingView(rootView: view.frame(width: size.width, height: size.height).environment(\.colorScheme, dark ? .dark : .light))
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
@@ -45,6 +47,7 @@ struct PictureTests {
         // (The lists fill themselves in on the next turns of the run loop.)
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.4))
         host.layoutSubtreeIfNeeded()
+        first(host)
         let picture = try #require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
         host.cacheDisplay(in: host.bounds, to: picture)
         let png = try #require(picture.representation(using: .png, properties: [:]))
@@ -257,6 +260,34 @@ struct PictureTests {
         sheet.carry(over: from, 13)
         try draw(LibraryWindow(model: model), named: "19 dragging a chord", size: Self.sheetSize)
         sheet.dropNowhere()
+    }
+
+    @Test("One of the key's chords carried from the strip, over a word: its button faint in the strip, and another held down")
+    func carriedFromTheStrip() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        let fourth = try #require(sheet.inKey.dropFirst(3).first)
+        sheet.carry(fourth, over: try row("That saved a wretch like me", of: sheet), 13)
+        var found = 0
+        try draw(LibraryWindow(model: model), named: "37 a chord carried from the strip", size: Self.sheetSize) { window in
+            // The fourth button's chord is out being carried, and the sixth is held down.
+            @MainActor func look(in view: NSView) {
+                if let grip = view as? KeyChordGrip {
+                    found += 1
+                    if grip.name == fourth {
+                        grip.pressed(at: NSPoint(x: 4, y: 4))
+                        _ = grip.pulled(to: NSPoint(x: 4, y: 14))
+                    } else if grip.name == sheet.inKey.dropFirst(5).first {
+                        grip.pressed(at: NSPoint(x: 4, y: 4))
+                    }
+                }
+                view.subviews.forEach(look)
+            }
+            look(in: window)
+        }
+        #expect(found == 7)
+        sheet.carryOff()
     }
 
     @Test("The sheet of a song with blank slides and a line of chords alone")
