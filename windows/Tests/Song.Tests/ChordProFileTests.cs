@@ -203,6 +203,10 @@ public sealed class ChordProFileTests : IDisposable
         Assert.Equal(
             "{title: Loose}\n\nOne\nTwo\n\nThree\n\n{comment: Chorus}\nFour\n",
             ChordProFile.TextOf("Loose", "", [Loose(0, "One\nTwo"), Loose(1, "Three"), new TextBox(2, "Chorus", null, true, "id", "Four", [], false)]));
+        // A group's name is written on one line too, and cannot end its own line early.
+        Assert.Equal(
+            "{title: Named}\n\n{comment: Bridge (2) again}\nFive\n",
+            ChordProFile.TextOf("Named", "", [new TextBox(0, "Bridge {2}\nagain", null, true, "id", "Five", [], false)]));
 
         // A song that states no key has no line for one; and what is in a heading is on
         // one line and cannot end it.
