@@ -101,10 +101,13 @@ public class ChordProFilesViewTests
             Assert.True(at.X >= 0 && at.Y >= 0 && at.X + part.ActualWidth <= view.ActualWidth && at.Y + part.ActualHeight <= view.ActualHeight, "a part of the panel is outside the window");
         });
 
-        // Cancel.
+        // Cancel: the panel goes, and nothing was made.
         Click(other);
         Assert.Equal(Visibility.Collapsed, panel.Visibility);
         Assert.Null(model.NewSong);
+        Assert.Equal(MadeUpPC.Songs, model.Songs.Select(song => song.Name));
+        Assert.Null(model.SongId);
+        Assert.Equal(MadeUpPC.Songs.Length, Directory.GetFiles(Path.Combine(pc.Place, "Libraries", "Songs")).Length);
     });
 
     [Fact]

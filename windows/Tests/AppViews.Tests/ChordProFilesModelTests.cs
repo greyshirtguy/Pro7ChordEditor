@@ -138,6 +138,12 @@ public class ChordProFilesModelTests
         model.DontMakeTheSong();
         model.BringIn(AFile(pc, "No chords.cho", "Verse 1\nOne\nTwo\nThree\n"));
         Assert.Equal((("Chords", "None"), "which makes 2 slides"), (model.NewSong!.Summary[4], model.NewSong.Slides));
+        // Made, it is said to have none; and one part is a part, and one slide a slide.
+        model.MakeTheSong();
+        Assert.Equal(Q("No chords") + " was made from No chords.cho: 1 part, 2 slides, no chords.", model.Notice);
+        model.BringIn(AFile(pc, "One.cho", "Verse 1\n[G]One\n"));
+        model.MakeTheSong();
+        Assert.Equal(Q("One") + " was made from One.cho: 1 part, 1 slide, 1 chord.", model.Notice);
     });
 
     [Fact]
@@ -592,11 +598,13 @@ public class ChordProFilesModelTests
         Assert.Equal(Q("Plain Song") + " was written as Again.cho.", model.Notice);
 
         // Where it cannot be written, that is said, and nothing is said to be written.
-        var into = Path.Combine(pc.Documents, "No such folder", "Plain Song.cho");
+        var into = Path.Combine(pc.Documents, "No such folder", "Unwritten.cho");
         model.WriteAsChordPro(into);
-        Assert.StartsWith("Plain Song.cho could not be written: ", model.Refused, StringComparison.Ordinal);
+        Assert.StartsWith("Unwritten.cho could not be written: ", model.Refused, StringComparison.Ordinal);
         Assert.False(File.Exists(into));
-        Assert.Contains("Could not write Plain Song.cho.", pc.Log, StringComparison.Ordinal);
+        Assert.Contains("Could not write Unwritten.cho.", pc.Log, StringComparison.Ordinal);
+        Assert.DoesNotContain("Wrote Unwritten.cho.", pc.Log, StringComparison.Ordinal);
+        Assert.DoesNotContain("was written as", model.Notice ?? "", StringComparison.Ordinal);
 
         // A name that a file cannot have is offered as one it can.
         model.Open(pc.Song("A Song - In A Minor Key"));
