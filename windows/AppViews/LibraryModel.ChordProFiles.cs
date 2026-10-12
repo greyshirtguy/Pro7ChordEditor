@@ -121,11 +121,16 @@ public sealed partial class LibraryModel
     /// <summary>The panel of a new song, while it is over the window.</summary>
     public NewSongAsked? NewSong { get; private set; }
 
-    /// <summary>Whether a song can be made now: there is a library for it to go into, and nothing else is being done to it.</summary>
-    public bool CanBringInAFile => started && Library is not null && !MendingAllNow && MendAllQuestion is null && Asked is null;
+    // Whether something is over the window, asking or showing. Nothing else is begun
+    // then: the menu is under it, but Alt and a letter still reach a menu.
+    private bool SomethingIsOverTheWindow =>
+        Asked is not null || MendAllQuestion is not null || MendingAll is not null || Earlier is not null || NewSong is not null;
 
-    /// <summary>Whether the song that is open can be written as a ChordPro file.</summary>
-    public bool CanWriteChordPro => openSong is not null && Shown is { Problem: null };
+    /// <summary>Whether a song can be made now: there is a library for it to go into, and nothing is over the window.</summary>
+    public bool CanBringInAFile => started && Library is not null && !SomethingIsOverTheWindow;
+
+    /// <summary>Whether the song that is open can be written as a ChordPro file: there is one, it can be read, and nothing is over the window.</summary>
+    public bool CanWriteChordPro => openSong is not null && Shown is { Problem: null } && !SomethingIsOverTheWindow;
 
     /// <summary>The name a ChordPro file of the song that is open is offered: the song's, with the ending.</summary>
     public string NameForAChordProFile => Song.NewSong.Tidied(Shown?.Name ?? "") + ChordProFile.Ending;

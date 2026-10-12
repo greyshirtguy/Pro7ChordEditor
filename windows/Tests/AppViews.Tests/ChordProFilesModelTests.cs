@@ -430,8 +430,38 @@ public class ChordProFilesModelTests
         Assert.False(model.CanBringInAFile);
         model.BringIn(ASong("plain-song.cho"));
         Assert.Null(model.NewSong);
+        // (Nor is the song written out from under a question.)
+        Assert.False(model.CanWriteChordPro);
+        var under = Path.Combine(pc.Documents, "Under a question.cho");
+        model.WriteAsChordPro(under);
+        Assert.False(File.Exists(under));
         model.Answer(false);
-        Assert.True(model.CanBringInAFile);
+        Assert.True(model.CanBringInAFile && model.CanWriteChordPro);
+        // While the earlier versions of a song are being looked at.
+        model.ShowEarlierVersions();
+        Assert.NotNull(model.Earlier);
+        Assert.False(model.CanBringInAFile || model.CanWriteChordPro);
+        model.BringIn(ASong("plain-song.cho"));
+        Assert.Null(model.NewSong);
+        model.CloseEarlierVersions();
+        // While what Mend All did is still to be read.
+        model.Filter = MarkFilter.WantingMending;
+        model.AskToMendAll();
+        await model.MendAllAsync();
+        Assert.True(model.MendingAll is { Finished: true });
+        Assert.False(model.CanBringInAFile || model.CanWriteChordPro);
+        model.CloseMendAll();
+        model.Filter = MarkFilter.All;
+        Assert.True(model.CanBringInAFile && model.CanWriteChordPro);
+        // And while a new song is itself being asked about: a second file is not read
+        // over the first.
+        model.BringIn(ASong("plain-song.cho"));
+        var asked = model.NewSong;
+        Assert.False(model.CanBringInAFile || model.CanWriteChordPro);
+        model.BringIn(ASong("amazing-grace.cho"));
+        Assert.Same(asked, model.NewSong);
+        model.DontMakeTheSong();
+        Assert.True(model.CanBringInAFile && model.CanWriteChordPro);
 
         // A library with no songs in it takes one: it is made like the app's own.
         model.ChooseLibrary(pc.Library("Kids"));
