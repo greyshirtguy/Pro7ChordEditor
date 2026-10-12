@@ -152,6 +152,20 @@ public class ChordFromTheStripTests
         Assert.True(canvas.CarriedOfKey(name, over, shift: true));
         Assert.Equal(new Spot(line, 5), sheet.Spot);
 
+        // Over another chord's bubble it is the character under the pointer still, and
+        // not that chord's place (rule 41, as for a chord dragged along the sheet). At
+        // the right-hand end of the bubble of the G7 over "grace", the two differ.
+        var top = hand.PlaceOf("Amazing").Row;
+        var which = sheet.Rows[top].Chords.ToList().FindIndex(chord => chord.Name == "G7");
+        var bubbles = hand.Grid.Lines[top].Placed!;
+        var onABubble = new Point(hand.Grid.Lines[top].Left + bubbles.Xs[which] + bubbles.Widths[which] - 2, hand.Grid.Lines[top].ChordTop + (canvas.Metrics.BubbleHeight / 2));
+        var chordsPlace = sheet.Rows[top].Chords[which].At;
+        Assert.Equal((top, chordsPlace, true), hand.Grid.PlaceAt(onABubble, shift: false));
+        var under = hand.Grid.PlaceCarriedTo(onABubble, shift: false);
+        Assert.True(under is { } found && found.Row == top && found.At != chordsPlace, "the point on the bubble is over the chord's own character: this would prove nothing");
+        Assert.True(canvas.CarriedOfKey(name, onABubble, shift: false));
+        Assert.Equal(new Spot(top, under!.Value.At), sheet.Spot);
+
         // Beside the cards is bare sheet, and so is a frame's foot: it shows nowhere,
         // and let go there nothing is asked of the song.
         foreach (var bare in OffThePlaces(hand))
@@ -168,6 +182,12 @@ public class ChordFromTheStripTests
         Assert.Null(sheet.Dragged);
         Assert.Equal(before, pc.BytesOf("Amazing Grace"));
         Assert.False(model.CanUndo);
+        // A chord lifted from the sheet is not taken for one from the strip: what
+        // cannot be carried in is not said to be showing because that one is.
+        sheet.Lift(line, 25);
+        Assert.Equal((new Spot(line, 25), "D"), sheet.Dragged);
+        Assert.False(canvas.CarriedOfKey("Hello", over, shift: false));
+        sheet.DropNowhere();
 
         // Let go over the place.
         Assert.True(canvas.DroppedOfKey(name, over, shift: false));
@@ -224,6 +244,18 @@ public class ChordFromTheStripTests
         var read = new ChordSheet(new OpenSong(pc.Song(song)));
         Assert.Equal(sheet.Rows[alone].Chords, read.Rows[alone].Chords);
         Assert.Null(model.Refused);
+
+        // And so it is of a sheet that nothing else tells the window about: the
+        // sheet's element lays itself out again when a chord is let go on it, and
+        // does not wait to be told that the song has changed. (The song is opened
+        // again, to be changed, with nobody listening to it.)
+        var apart = new ChordSheet(new OpenSong(pc.Song(song), new Safeguards(() => false, (_, _) => { })));
+        canvas.Show(apart);
+        var had = apart.Rows[alone].Chords.Count;
+        Assert.Equal(had, canvas.Grid!.Lines[alone].Placed!.Xs.Count);
+        Assert.True(canvas.DroppedOfKey(name, hand.PointOf(new Spot(alone, had * 2)), shift: false));
+        Assert.Equal(had + 1, apart.Rows[alone].Chords.Count);
+        Assert.Equal(had + 1, canvas.Grid!.Lines[alone].Placed!.Xs.Count);
     });
 
     [Fact]
@@ -319,6 +351,19 @@ public class ChordFromTheStripTests
         strip.ChordPressed(fourth, new Point(5, 5));
         Assert.True(strip.ChordPulled(fourth, name, new Point(5, 12), buttonIsDown: true));
         Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        // With the bubble open and nothing typed in it: nothing is kept, and the
+        // bubble is closed all the same, before the system has the chord. (The song
+        // has not changed, so it is not the song's changing that tells the window.)
+        hand.Click(new Spot(line, 5));
+        Assert.True(sheet.Typing);
+        Assert.True(hand.BubbleIsOpen);
+        var closed = false;
+        meanwhile = () => closed = !sheet.Typing && !hand.BubbleIsOpen;
+        strip.ChordPressed(fourth, new Point(5, 5));
+        Assert.True(strip.ChordPulled(fourth, name, new Point(5, 12), buttonIsDown: true));
+        Assert.True(closed, "the bubble was still open when the chord was handed over");
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
 
         // While ProPresenter is running: refused in the song's own sentence, and the
         // system is told that nothing was done.
@@ -353,6 +398,9 @@ public class ChordFromTheStripTests
 
         Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragEnterEvent, carried, bare));
         Assert.Null(sheet.Dragged);
+        // (Shift is read from the first the sheet hears of it, as it comes over it.)
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragEnterEvent, carried, place, shift: true));
+        Assert.Equal(new Spot(line, 5), sheet.Spot);
         Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place));
         Assert.Equal(new Spot(line, 7), sheet.Spot);
         Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place, shift: true));
@@ -440,6 +488,8 @@ public class ChordFromTheStripTests
         var carried = ChordSheetCanvas.Carrying(sheet.InKey[0]);
         const double near = ChordSheetCanvas.CarriedNear;
         const double fastest = ChordSheetCanvas.CarriedFastest;
+        // (The Mac's numbers, so that the two apps scroll alike: spec/03, rule 46f.)
+        Assert.Equal((36.0, 520.0), (near, fastest));
         // (Across the sheet: over the first card, where its lines' words are.)
         var across = hand.Grid.Cells[0].Card.Left + 40;
 
@@ -526,6 +576,17 @@ public class ChordFromTheStripTests
         // And it goes by whole pixels, so that the words stay sharp.
         Assert.Equal(Math.Round(At()), At());
 
+        // Told of it twice before the window has laid itself out again, as may happen:
+        // the sheet has gone both times, the second from where the first left it.
+        ScrollTo(200);
+        Held(120);
+        Held(up: 0);
+        clock += 0.1;
+        Told(canvas, DragDrop.DragOverEvent, carried, new Point(across, 200 + scroll.ViewportHeight));
+        clock += 0.1;
+        Told(canvas, DragDrop.DragOverEvent, carried, new Point(across, 200 + (fastest * 0.1) + scroll.ViewportHeight));
+        Assert.Equal(200 + (fastest * 0.2), At(), 1.0);
+
         // What is not one of the key's chords scrolls nothing, wherever it is held.
         var text = new DataObject(DataFormats.UnicodeText, "C");
         var stays = At();
@@ -542,6 +603,11 @@ public class ChordFromTheStripTests
             Held(up: 0);
         }
         Assert.Equal(scroll.ScrollableHeight, At(), 1.0);
+        // And there the sheet says it went nowhere, which is what it went: the place
+        // shown is the one under the pointer, and not one further on that is not seen.
+        clock += 0.1;
+        Assert.Equal(0, canvas.ScrollIfCarriedNearAnEdge(new Point(across, At() + scroll.ViewportHeight)));
+        Assert.Equal(scroll.ScrollableHeight, At(), 1.0);
 
         // Now that it has been clear of the top, held at the top the sheet goes up:
         // half way into the edge half as fast, and never past its start.
@@ -555,6 +621,22 @@ public class ChordFromTheStripTests
         Held(near / 2);
         Assert.Equal(bottom - (fastest * 0.15), At(), 1.0);
         for (var times = 0; times < 60; times++)
+        {
+            clock += 0.2;
+            Held(0);
+        }
+        Assert.Equal(0, At());
+        clock += 0.1;
+        Assert.Equal(0, canvas.ScrollIfCarriedNearAnEdge(new Point(across, 0)));
+        Assert.Equal(0, At());
+        // And short of an end, what it says it went is how far it did go.
+        Held(120);
+        Held(up: 0);
+        clock += 0.1;
+        var went = canvas.ScrollIfCarriedNearAnEdge(new Point(across, scroll.ViewportHeight));
+        Assert.Equal(fastest * 0.1, went, 1.0);
+        Assert.Equal(went, At());
+        for (var times = 0; times < 5; times++)
         {
             clock += 0.2;
             Held(0);
