@@ -36,8 +36,9 @@ then perhaps a slash and a **bass** note.
 | `isChord(typed)` | `parts(typed).valid` and `couldBecome(typed)`. What the editors ask before putting a *newly typed* chord on | `chord-names.json` |
 
 A chord that is in a file already is never held to `isChord`. `C /// | Am ///` is not
-one, and is kept, shown, moved and copied as it is. (Simple Presenter's sheet will not
-move such a chord. That is put right here: see "Chords that are not chords" in
+one, and is kept, shown, moved and copied as it is. (Up to its version 0.88 Simple
+Presenter's sheet would not move such a chord. That was put right here first, and
+there since: see "Chords that are not chords" in
 [03-chord-sheet.md](03-chord-sheet.md).)
 
 ## Keys

@@ -6,7 +6,9 @@ to somebody's Sunday library.
 
 **New.** Simple Presenter keeps a copy of a file the first time its editor changes it
 (under "Edit Backups" in its own data), and has no way to look at them or put one
-back. This is that idea finished. Nothing here has been built or tried.
+back. (Since its version 0.89 it has one way back, taken from these pages: Revert,
+which puts the song being edited back as it was when it was opened.) This is that
+idea finished. Nothing here has been built or tried.
 
 ## When a copy is made
 

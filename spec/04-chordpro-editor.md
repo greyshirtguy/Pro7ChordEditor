@@ -182,9 +182,10 @@ chords as it had, and a blank slide's took none. Both limits went with M7, and r
 ## Different from the reference, on purpose
 
 22. **A chord the song already has that is not a chord.** Rule 6 asks that every
-    bracket could become a chord. In Simple Presenter a song that already has
-    `[C /// | Am ///]` in it therefore fails the rule from the start, and nothing in it
-    can be changed as ChordPro. Here, the names the song has when it is opened are let
+    bracket could become a chord. In Simple Presenter, up to its version 0.88, a song
+    that already has `[C /// | Am ///]` in it therefore failed the rule from the start,
+    and nothing in it could be changed as ChordPro (it does as this rule says since).
+    Here, the names the song has when it is opened are let
     through as they are: rule 6 holds a bracket to `couldBecome` only if what is in it
     is not, exactly, one of those names. They are saved back as they were (rule 15
     likewise lets them through).

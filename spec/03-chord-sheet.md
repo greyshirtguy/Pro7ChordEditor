@@ -13,12 +13,22 @@ maintainer means Simple Presenter to follow. One thing has been added since, and
 Simple Presenter's to follow too: a chord can be dragged out of the strip onto a word
 ("A chord dragged out of the strip").
 
+(**It has followed**, in its version 0.89 of 2026-10-12: its sheet is this grid and
+zooms, the key is picked over the sheet and not in the strip, the empty lines a box's
+words end with get no row, a name that is no chord is moved and copied like any
+other, and a paste says what came of it. `reference/` holds it as it is now, and
+[`reference/README.md`](../reference/README.md) says what is still different. The
+chord dragged out of the strip it has not got yet.)
+
 ![The chord sheet](pictures/chord-editor.png)
 
 This page is the working editor of Simple Presenter written down:
-`reference/simple-presenter/qml/ChordSheet.qml` (1,200 lines, a sixth of them comments
-that say why) and `chordlayout.js`. Read that file before building this; where this
-page and that file differ, this page says so and says why.
+`reference/simple-presenter/qml/ChordSheet.qml` (1,700 lines now, a good part of them
+comments that say why) and `chordlayout.js`. Read that file before building this;
+where this page and that file differ, this page says so and says why. (Much of what
+is said below of Simple Presenter is of its sheet as it was when this page was
+written, up to its version 0.88, and is left standing as the reason a rule is as it
+is.)
 `reference/simple-presenter/tests/chords-scripted-test.qml` is that app's own test of
 it, eighty checks that read as a list of what it must do.
 
@@ -60,8 +70,9 @@ The sheet is a list of rows made from the song's text boxes
    any before it; and a box always has one line. Nothing of the words is changed by
    this: it is only what is drawn. (**New**, asked for by the maintainer on
    2026-10-11 after seeing cards too tall in their own library, where 40 text boxes
-   of 6,091 end so, in 19 songs of 422. Simple Presenter gives each such line a row.
-   `sheet-model.json` has no such box.)
+   of 6,091 end so, in 19 songs of 422. Simple Presenter gave each such line a row
+   up to its version 0.88, and leaves them off since. `sheet-model.json` has such
+   boxes in the song `ends`.)
 3. A chord belongs to the line its place is in: from the line's start up to but not
    including its line break. An empty line is taken as one place wide, so that a chord
    standing on it is not lost.
@@ -396,11 +407,12 @@ that a test can reach, and the maintainer's hand for the rest.
     its chords; a copied line of words goes only onto a line of words. Where the kinds
     differ, that line is passed over, and the next copied line goes to the next line.
 52. However many lines it changes, a paste undoes as one: each change after the first
-    that is *made* is joined to the one before. (**Unlike the reference**, which joins
+    that is *made* is joined to the one before. (**Unlike the reference as it was**,
+    up to its version 0.88, which joined
     every copied line but the first, whether or not the first changed anything. Where
-    the first copied line is passed over by rule 51, its paste is joined to whatever
-    was done before it, and one undo takes that back too. `sheet-model.json` has no
-    such case.)
+    the first copied line is passed over by rule 51, its paste was joined to whatever
+    was done before it, and one undo took that back too. It does as this rule says
+    since, and `sheet-model.json` has such a case in the song `lead`.)
 
 52a. **A paste says what came of it**, on the line at the bottom of the window, for a
     few seconds, as a copy does. A paste that changes nothing would otherwise look
@@ -473,8 +485,9 @@ plain code with no window in it, and hold it to that file.
 ## Chords that are not chords
 
 Some files have chord names that are not chords: `C /// | Am ///`, `N.C.`. They are
-shown as they are and kept as they are. **Unlike Simple Presenter's sheet**, which
-refuses to put on anything that is not a chord and so cannot move or copy one of
+shown as they are and kept as they are. **Unlike Simple Presenter's sheet as it
+was** (up to its version 0.88), which refused to put on anything that is not a chord
+and so could not move or copy one of
 these, this app holds only *newly typed* names to `isChord` (rule 37). A name the song
 already has may be dragged, copied and pasted like any other, and is put as it is: a
 slash on its end is not left off either (rule 36 is for what is typed). To change

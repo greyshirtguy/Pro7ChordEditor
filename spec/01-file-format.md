@@ -275,9 +275,10 @@ To the letter:
 
 - **Only a line of chords alone is ever made stand-ins.** A request for a line that
   has words, or for an empty line, is refused, whatever asks
-  ([05-song-and-saving.md](05-song-and-saving.md)). (Simple Presenter would make
-  stand-ins of any line it was asked for, its words with it. Nothing in it asks for
-  another, and here it is not left to that: the words are not the app's to change.)
+  ([05-song-and-saving.md](05-song-and-saving.md)). (Up to its version 0.88 Simple
+  Presenter would make stand-ins of any line it was asked for, its words with it.
+  Nothing in it asked for another, and here it was not left to that: the words are
+  not the app's to change. Since its version 0.89 it refuses as these apps do.)
 - The text is changed whenever the line is not already exactly that run of stand-ins:
   when the number of chords is another, and also when the line was never a clean run
   (three plain spaces with one chord on them). So after any such request the line has
@@ -287,8 +288,8 @@ To the letter:
   the spot and takes chords, the first of them without a byte of the RTF changing.
   Decided by the maintainer on 2026-10-12, for Simple Presenter and both apps: "if a
   blank line had chords and you deleted all - you should be able to put some back on
-  that line". (Until then, and in Simple Presenter at the commit that `reference/`
-  holds, such a line was left with no stand-in at all. In a box with other lines that
+  that line". (Until then, and in Simple Presenter up to its version 0.88, such a
+  line was left with no stand-in at all. In a box with other lines that
   is an empty line, which takes nothing; so a line of chords under a verse, once
   emptied, was gone for good but for undo.)
 
@@ -307,10 +308,13 @@ To the letter:
   (a line with no character has no place) is met only in a request for a line that
   was never one.
 
-Simple Presenter does this by reading the RTF into its own model and writing the whole
-RTF again in its own words. **Do not copy that.** It suits an app that edits text
-anyway; here it would rewrite the RTF of someone's library for the sake of one line.
-Instead change the RTF **in place**:
+Simple Presenter did this, up to its version 0.89, by reading the RTF into its own
+model and writing the whole RTF again in its own words. **Do not copy that.** It suits
+an app that edits text anyway; here it would rewrite the RTF of someone's library for
+the sake of one line. Instead change the RTF **in place**. (Simple Presenter does so
+too since the change that followed its version 0.89, by these same steps and held to
+the same vectors: `reference/simple-presenter/src/rtfstandins.h`. It differs in two
+things, both said after the steps.)
 
 1. Read the RTF, keeping for every unit of its plain text the bytes it was written
    with: a plain character's one byte; a control word's backslash, letters, number
@@ -349,6 +353,29 @@ Taking a `\u` out would leave its stand-in to be read as a word, and a `\uc0` pu
 would do the same to those after it; so such a line is refused. What ProPresenter on
 Windows writes is **not known** ([Not known](#not-known)): if it is that, these steps
 are to be widened when a file of it has been seen, in both apps and in the vectors.
+
+**Where Simple Presenter differs**, having these steps too:
+
+- Where there is no result it does not refuse. It has a writer of RTF, and writes the
+  text box's words again whole as it did before, and says so in its log. The apps,
+  which have none, refuse.
+- **The other ranges of the box go with the words there, and here they do not.**
+  Besides its chords a text box has custom attributes that are said of a range of its
+  words and are not chords ("these are in capitals"), and these pages leave every one
+  of them as it is ([Never touched](#never-touched)). A line of stand-ins made longer
+  or shorter leaves such a range where the words no longer are: one over all the
+  words stops short of the stand-in put in, or, with a chord taken off, **ends past
+  the last of the words**. **Known**, of real songs (the Linux machine, 2026-10-12,
+  read and not changed): of 164 text boxes with a line of chords alone in 120
+  presentations, 96 have such a range, every one of them capitals over all the words
+  of a box that holds nothing but the line. Simple Presenter moves the ends of these
+  ranges with the words (`rtfstandins::placeAfter`: a place at the line's old end or
+  past it moves by as much as the line grew or shrank; one before it stays, or comes
+  back to the line's new end if what it was on is gone), which is what a text system
+  does when characters are typed after others, and **a guess** at what ProPresenter
+  does. What ProPresenter makes of a range that ends past the words is **not known**.
+  It is the maintainer's to say whether the apps are to do the same; until then the
+  three do not write the same file for these boxes, in that one field.
 
 `testdata/vectors/stand-ins-in-rtf.json` has RTF in every shape real songs were found
 to have, and in some they were not, each with the bytes it becomes for a number of

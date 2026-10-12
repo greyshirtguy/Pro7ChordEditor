@@ -116,8 +116,9 @@ written in, *original*, and the one ProPresenter shows them in, *user*.
 7. **New: a second picker, "ProPresenter shows it in"**, sets the user key alone. The
    old Windows editor had the two side by side, and people use it to have ProPresenter
    transpose a song for them. Put it in the song's header beside the first, quieter.
-   (Simple Presenter has no such picker: it sets both together, always, and lets its
-   own show choose a key for the night.) For a song that states no key it is refused:
+   (Simple Presenter had no such picker up to its version 0.88: it set both together,
+   always, and let its own show choose a key for the night. It has one since, "Shown
+   in", beside its "Key".) For a song that states no key it is refused:
    a `music` made with only a `user` in it would read as a song in A flat. The person
    is told to set the song's key first.
 8. The editors never draw chords in the user key. They show what is in the file.
