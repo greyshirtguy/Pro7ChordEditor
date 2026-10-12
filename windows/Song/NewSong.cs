@@ -636,7 +636,11 @@ public static class NewSong
     // The bytes that would be written are read as any song's are, and must be the song
     // that was asked for: its name and key, a group for each part, each slide with one
     // text box that is shown, with the slide's words and its chords; and no id twice.
-    private static void Check(byte[] bytes, ParsedSong song, string name, int linesToASlide)
+    //
+    // (Nothing made here has ever failed it, which is as it should be and proves
+    // nothing about it. So a test spoils a song that was made, a dozen ways, and each
+    // must be refused: NewSongTests. It can be asked from there.)
+    internal static void Check(byte[] bytes, ParsedSong song, string name, int linesToASlide)
     {
         RV.Presentation made;
         try

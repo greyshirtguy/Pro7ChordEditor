@@ -869,6 +869,97 @@ public sealed class NewSongTests : IDisposable
         }
     }
 
+    // What was made is read back, as any song is read, before a byte of it is written
+    // (decision 106). Nothing made here fails that, so here a song that was made is
+    // spoilt, one way at a time, and each must be refused.
+    [Fact]
+    public void WhatIsReadBackBeforeAnythingIsWrittenMustBeTheSongThatWasAskedFor()
+    {
+        var song = Song("plain-song.cho");
+        var made = NewSong.Made(song, "Plain Song", 2, TestFile(ProPresenters), "", Now);
+        Assert.Equal(4, made.Cues.Count);
+        // As it was made, it passes.
+        NewSong.Check(made.ToByteArray(), song, "Plain Song", 2);
+
+        RV.Graphics.Types.Text Text(RV.Presentation of, int slide) => ElementsOf(CuesAsShown(of)[slide]).Single().Element_.Text;
+        void Refused(string what, Action<RV.Presentation> spoil)
+        {
+            var spoilt = made.Clone();
+            spoil(spoilt);
+            var refusal = Assert.Throws<Refusal>(() => NewSong.Check(spoilt.ToByteArray(), song, "Plain Song", 2));
+            Assert.True(
+                refusal.Reason == Refusal.Why.NotMade && refusal.Sentence == "The song could not be made: what was made did not read back as the song that was asked for.",
+                what + ": " + refusal.Sentence);
+        }
+
+        Refused("another name", spoilt => spoilt.Name = "Another");
+        Refused("another key", spoilt => spoilt.Music.Original.MusicKey = RV.MusicKeyScale.Types.MusicKey.A);
+        Refused("another key to be shown in", spoilt => spoilt.Music.User.MusicKey = RV.MusicKeyScale.Types.MusicKey.A);
+        Refused("no key", spoilt => spoilt.Music = null);
+        Refused("a group of another name", spoilt => spoilt.CueGroups[1].Group.Name = "Chorus 9");
+        Refused("a group more", spoilt => spoilt.CueGroups.Add(new RV.Presentation.Types.CueGroup { Group = new RV.Group { Name = "Tag" } }));
+        Refused("a slide that its group does not name", spoilt => spoilt.CueGroups[0].CueIdentifiers.RemoveAt(1));
+        Refused("a slide named first by the group after its own", spoilt =>
+        {
+            var second = spoilt.CueGroups[0].CueIdentifiers[1];
+            spoilt.CueGroups[0].CueIdentifiers.RemoveAt(1);
+            spoilt.CueGroups[1].CueIdentifiers.Insert(0, second);
+        });
+        Refused("two slides the other way round", spoilt =>
+        {
+            var ids = spoilt.CueGroups[0].CueIdentifiers;
+            (ids[0], ids[1]) = (ids[1], ids[0]);
+        });
+        Refused("a slide missing", spoilt =>
+        {
+            spoilt.CueGroups[2].CueIdentifiers.Clear();
+            spoilt.Cues.RemoveAt(spoilt.Cues.Count - 1);
+        });
+        Refused("a slide more", spoilt =>
+        {
+            var more = spoilt.Cues[0].Clone();
+            more.Uuid = new RV.UUID { String = OpenSong.NewId("A") };
+            spoilt.Cues.Add(more);
+            spoilt.CueGroups[2].CueIdentifiers.Add(more.Uuid.Clone());
+        });
+        Refused("one id for two slides", spoilt => spoilt.Cues.Add(spoilt.Cues[0].Clone()));
+        Refused("a slide switched off", spoilt => CuesAsShown(spoilt)[1].IsEnabled = false);
+        Refused("other words on a slide", spoilt => Text(spoilt, 0).RtfData = ByteString.CopyFrom(RtfWords.WithWords(Text(spoilt, 0).RtfData.Span, "One two three four\nFive six seven nine")!));
+        Refused("no words on a slide", spoilt => Text(spoilt, 2).RtfData = ByteString.CopyFrom(RtfWords.WithWords(Text(spoilt, 2).RtfData.Span, "")!));
+        Refused("a chord missing", spoilt => Writing.WriteChords(Reading.ChordsOf(Text(spoilt, 0)).Skip(1), Text(spoilt, 0)));
+        Refused("a chord a place along", spoilt => Writing.WriteChords(Reading.ChordsOf(Text(spoilt, 1)).Select((chord, n) => n == 0 ? chord with { At = chord.At + 1 } : chord), Text(spoilt, 1)));
+        Refused("a chord of another name", spoilt => Writing.WriteChords(Reading.ChordsOf(Text(spoilt, 3)).Select((chord, n) => n == 0 ? chord with { Name = "G7" } : chord), Text(spoilt, 3)));
+        Refused("a chord on a slide that has none", spoilt =>
+        {
+            // (Plain Song's second slide has two chords on its first line and none on its second.)
+            var text = Text(spoilt, 1);
+            Writing.WriteChords([.. Reading.ChordsOf(text), new Chord(RtfWords.Read(text.RtfData.Span).Length - 1, "D")], text);
+        });
+        Refused("a second text box that is shown", spoilt =>
+        {
+            var elements = ElementsOf(CuesAsShown(spoilt)[0]);
+            var another = elements[0].Clone();
+            another.Element_.Uuid = new RV.UUID { String = OpenSong.NewId("A") };
+            another.DataLinks.Clear();
+            elements.Add(another);
+        });
+        Refused("the text box linked to show something else", spoilt =>
+            ElementsOf(CuesAsShown(spoilt)[0])[0].DataLinks.Add(new RV.Slide.Types.Element.Types.DataLink { ClockText = new RV.Slide.Types.Element.Types.DataLink.Types.ClockText() }));
+
+        // Bytes that are no presentation at all; and the song held to another's file,
+        // or to other lines to a slide than it was made with.
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check([0x0A, 0xFF, 0xFF], song, "Plain Song", 2)).Reason);
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(made.ToByteArray(), Song("amazing-grace.cho"), "Plain Song", 2)).Reason);
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(made.ToByteArray(), song, "Plain Song", 4)).Reason);
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(made.ToByteArray(), song, "Plain Song", 1)).Reason);
+        // A song with no key, held as one: and one given a key it was not asked to have.
+        var keyless = Song("holy-holy-holy.txt");
+        var madeKeyless = NewSong.Made(keyless, "Holy", 2, TestFile(ProPresenters), "", Now);
+        NewSong.Check(madeKeyless.ToByteArray(), keyless, "Holy", 2);
+        madeKeyless.Music = made.Music.Clone();
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(madeKeyless.ToByteArray(), keyless, "Holy", 2)).Reason);
+    }
+
     // ---- The file (rule 16)
 
     [Fact]
