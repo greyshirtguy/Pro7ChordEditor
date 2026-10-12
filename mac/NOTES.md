@@ -17,6 +17,7 @@ milestone; put right what has become untrue.
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
 | **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
 | **M7** Chords with no words | Built, 2026-10-11. **Seen in ProPresenter by the maintainer, 2026-10-12: "They showed"** (which cases were among what was looked at was not said) | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made, and its third, that ProPresenter shows what was written, the maintainer made. Since then, decision 58: a line that loses its last chord takes chords again |
+| A chord from the strip (asked for after M7) | Built, 2026-10-12. **Not yet tried by a hand**: what carries it is the system's, and no test can be the system | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -358,6 +359,36 @@ And on 2026-10-12, the maintainer having read what M7 left to ask:
     agree on". A session is now building the Windows app from `spec/`, and reads
     the repository for what the rules are.
 
+And the same day, the maintainer having used the app and caught a hand at something
+it could not do:
+
+60. **One of the key's chords can be dragged out of the strip onto a word**
+    (`spec/03`, rules 46a to 46h, new). The maintainer: "my brain wanted to add a
+    chord by drag and drop... I think other user might do that same - Let's add
+    that (despite not being as fast as clicking/hotkeys)". That it be added is
+    theirs. What it does to the letter is mine, each to be said otherwise:
+    - **let go over a place it does what its key does with the spot there**, and so
+      asks the song nothing new: no vector changed, and none could hold it;
+    - **it lands only where it is shown.** Over the bare sheet, a frame or its foot
+      there is no lit bubble, and letting go puts nothing on. A chord dragged along
+      the sheet is otherwise (off the cards it lands on the last place it was
+      over), and that was left as it is. One from the strip has crossed other
+      slides on its way, and a hand that lets go between two of them is not to
+      leave a chord on the one behind;
+    - **it can be carried while another chord is being typed**, which a chord of the
+      sheet's cannot: picking it up keeps what was typed and closes the bubble. To
+      refuse it, as rule 40 does, would make the strip dead after every click on a
+      word, since a click opens the bubble;
+    - **the key that copies does nothing**, there being nothing to move;
+    - **the sheet scrolls** when it is held near the top or bottom of what is seen;
+    - each button says its three ways when pointed at.
+61. **It is carried by the Mac's own dragging** (`spec/10`, the table): the button's
+    picture under the pointer, the green plus where it can be put, the slide back
+    where it cannot, Esc. None of that is written here, and Windows has its own.
+    What is carried is the chord's name under a type of this app's own, offered to
+    this app only.
+
+## How it is laid out, and why
 ## How it is laid out, and why
 
 ```
@@ -633,7 +664,39 @@ changing any of it:
 - **The test song is not among `TestData.presentationPaths()`**, which are the files
   Simple Presenter was asked to read: tests name it (`ChordsWithNoWordsTests.shaped`).
 
+### A chord dragged out of the strip (after M7)
+
+- **In `Song`**, at the foot of `ChordSheet.swift`: `liftOfKey` (keeps a chord that
+  was being typed), `carry(_:over:_:)`, `carryOff`, `dropOfKey`. A chord from the
+  strip is held in `dragged`, as one lifted from the sheet is, with a place it came
+  from that is nowhere (row -1); and only while it is over a place. So what draws
+  the lit bubble for a carried chord draws this one, with nothing added.
+- **In `AppViews`, the strip's end**: `KeyChordGrip.swift`. A view of AppKit lies
+  over each button of the strip, seen through, and takes the mouse: a press let go
+  is the button's click, and a press pulled 6 away begins the system's dragging.
+  **It is there because a button of SwiftUI cannot begin that dragging** and still
+  be clicked: SwiftUI has its own way of dragging (`onDrag`), and how that and a
+  button's click share a press could not be found out without a hand. The button
+  is still under it, for the keyboard and for what reads the screen aloud. The
+  grip draws only a shade: on a button held down, and a paler one while its chord
+  is out.
+- **The sheet's end**: in `SheetCanvas`, "A chord carried in from the strip".
+  `carriedOfKey` and `droppedOfKey` are what happens; the six things the system
+  calls on a view that something is dragged over (`draggingEntered` and the rest)
+  only read the name off the pasteboard and the place off the pointer, and call
+  those. `scrollIfCarriedNearAnEdge` goes by the clock, and not upwards until the
+  chord has once been clear of the top (it comes in over the top).
+- **Two things the view asks the system are answered by the tests instead**: the
+  time (`now`) and whether Shift is held (`shiftIsHeld`). The system tells a view
+  neither while a thing is dragged over it.
+- **Tests**: `carriedInFromTheStrip` in `ChordSheetTests` (the rules, on the
+  vectors' songs) and in `ChordSheetOnAFileTests` (the file: each place, undone to
+  the byte, and the same as the key makes it); `ChordFromTheStripTests` (the
+  window's two ends, its head says how); picture 37.
+
 ## What was found out
+
+- **A file read and written back unchanged is the same, byte for byte**## What was found out
 
 - **A file read and written back unchanged is the same, byte for byte**, in every
   file tried: the nine of `testdata/files`, and copies of 22 real songs of the
@@ -1134,6 +1197,27 @@ more.)
   `sheet-model.json` and `layout.json` to the byte, before it was touched. The
   tests' `StandInSong` is that tool's stand-in in Swift, and was changed with it.
 
+### At the chord from the strip
+
+- **What the system does between the strip and the sheet is not tested, and cannot
+  be here.** The tests press a button and pull, and take what it hands the system;
+  and they tell the sheet what the system would (with a stand-in for what the
+  system hands a view, made by the test). That the system, given the one, does the
+  other is AppKit's oldest road, and it is still only read about, not seen.
+- **The picture that goes with the pointer is the button's own**: SwiftUI is asked
+  to draw the same view again (`ImageRenderer`). Read back, it has a button's
+  colour to the number and nothing at its rounded corners. **But ask the picture
+  for its own bytes (as TIFF) and they come in another colour space, a shade
+  lighter**: a test that read them so said the picture was wrong when it was not.
+  It is read by drawing it into a picture of known colours.
+- **What the system hands a view is not tied to the main thread in its
+  description** (`NSDraggingInfo`), so a stand-in for it in a test says
+  `@preconcurrency`; and one of its old members is already a member of every
+  object, and wants `override`.
+- **The made-up Mac's "Blank Slides" has no line of chords alone.** The tests of
+  the window that want one put `Chords With No Words.pro` there themselves.
+
+### Rules the vectors did not hold, and what became of them
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -1218,6 +1302,26 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
+- **A chord dragged out of the strip has not been tried by a hand** (decision 60).
+  To try, with ProPresenter quit, and to say of each what is odd:
+  1. press a button of the strip, pull it down over a word and let go: is the chord
+     there? Does the button's picture come with the pointer, and the lit bubble
+     show where it will land, as it does for a chord dragged along the sheet?
+  2. let go between two slides, on a frame's foot, and back on the strip: nothing
+     is put on, and the picture goes back to the strip;
+  3. Esc while it is carried: the same;
+  4. a click on a button (no pull) still puts the chord on the spot, and the
+     button shades as it is pressed;
+  5. click a word so that the bubble opens, type "G", and then drag a chord from
+     the strip to another word: G is kept where it was typed, and the other lands
+     where it is let go;
+  6. on a long song, hold the chord near the bottom of the sheet: does it scroll,
+     and at a speed that can be steered? (The speed is a guess: `carriedFastest`.)
+     And scrolled down, does bringing a chord in over the top leave the sheet
+     where it was?
+  7. the button's tooltip, and whether it gets in the way of a press.
+  And whether a chord let go off the cards ought, after all, to land on the last
+  place it was over, as one dragged along the sheet does.
 - **What M7 writes has been seen in ProPresenter by the maintainer** (2026-10-12:
   "They showed"), which was the plan's third proof. Which of the five things below
   were looked at was not said, and what was not is still to be tried, on a song made
