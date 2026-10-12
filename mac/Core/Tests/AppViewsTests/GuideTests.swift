@@ -405,5 +405,6 @@ struct GuideTests {
             #expect(abs(image.size.width - GuideLook.width) < 0.5, "\(name) would be shown \(image.size.width) wide")
         }
         #expect(GuidePicture.image("no such picture") == nil)
+        #expect(GuideFiles.picture("no such picture") == nil)
     }
 }
