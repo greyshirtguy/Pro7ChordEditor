@@ -103,6 +103,12 @@ song the width they took.)
    presentation; they are Renewed Vision's, and nothing in this repository's licence
    makes them anyone else's. On the Mac they are drawn from the outline's path and
    are in one file (`ListIcons.swift`), so that they can be taken out in one place.
+6d. **The window's title is the app's name and, after it in square brackets, its
+   version**: "Pro7 Chord Editor [0.2]". So that whoever uses a build, or shows one
+   to somebody, sees which it is. Each app has its own version number, the one its
+   own releases go by. A build that knows of no version says the name alone, with no
+   brackets. (**New**, the maintainer's, 2026-10-12: "show the version # in the main
+   app title (after its name in [])". Until then the title was the name.)
 7. **Libraries** at the top left: each folder under `Libraries`, by name, whether or
    not it has songs in it yet. The one last used is opened at the start. Over them,
    where there is more than one place (rule 3), a choice of place, and **Choose
