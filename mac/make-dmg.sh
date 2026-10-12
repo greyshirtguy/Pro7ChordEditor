@@ -11,8 +11,13 @@
 #      Xcode gives every build it makes for its own use (the entitlement
 #      get-task-allow), which lets any other program on the Mac look inside the app
 #      as it runs: right for a build one is working on, wrong for one given out.
+#      And with what a debugger goes by taken out of the program (stripped), which
+#      Xcode does only when it installs or archives, not when it builds: the tables
+#      it leaves in name every file the program was made from by its whole path, and
+#      so the folders of the Mac it was built on, the account's name among them.
 #   2. Looks at what it built: its version, that it runs on both kinds of Mac, how it
-#      is signed, and that its seal holds.
+#      is signed, that its seal holds, and that nothing in it names a folder of this
+#      Mac.
 #   3. Lays out a folder: the app, a way to Applications to drag it onto, and the
 #      read-me that is kept beside this script (mac/dmg/Read Me First.txt).
 #   4. Makes a compressed image of that folder, mounts the image, and holds the app in
@@ -57,6 +62,8 @@ xcodebuild \
     -derivedDataPath "$DERIVED" \
     ONLY_ACTIVE_ARCH=NO \
     CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+    DEPLOYMENT_POSTPROCESSING=YES \
+    STRIP_INSTALLED_PRODUCT=YES \
     build > "$BUILD/build.log" 2>&1 || { tail -40 "$BUILD/build.log" >&2; echo "the build failed: all of what it said is in $BUILD/build.log" >&2; exit 1; }
 [ -d "$APP" ] || { echo "the build did not leave $APP" >&2; exit 1; }
 
@@ -75,6 +82,17 @@ if codesign -d --entitlements - "$APP" 2>/dev/null | grep -q "get-task-allow"; t
 fi
 SIGNED=$(codesign -dv "$APP" 2>&1 | sed -n 's/^Signature=//p; s/^Authority=//p' | head -1)
 [ -n "$SIGNED" ] || SIGNED="in a way this script does not know"
+# Nothing in the app is to say where on this Mac it was made: not the home folder of
+# whoever built it, nor the folder this script is in. (Looked for as bytes, in every
+# file: `strings` does not show what is in a program's tables for a debugger.)
+for WHERE in "$HOME" "$HERE"; do
+    NAMED=$(LC_ALL=C grep -r -a -l -F "$WHERE" "$APP" | head -3 || true)
+    if [ -n "$NAMED" ]; then
+        echo "the app names a folder of this Mac ($WHERE), in:" >&2
+        echo "$NAMED" >&2
+        exit 1
+    fi
+done
 
 # ---- The folder the image is made of
 STAGE=$(mktemp -d "${TMPDIR:-/tmp}/Pro7ChordEditor-dmg.XXXXXX")

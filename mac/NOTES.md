@@ -17,7 +17,7 @@ milestone; put right what has become untrue.
 | **M5** The ChordPro editor | Done, 2026-10-11 | A song is shown as ChordPro text and its chords typed in: the one rule of what may be typed, the help with brackets, a save a moment after the typing stops, all of one saving one step of undo. The two keys in the song's header. Refusals said under the song. **The first build that changes a chord from the window. The maintainer has not yet tried it**; it is to be tried on a COPY of a library first |
 | **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
 | **M7** Chords with no words | Built, 2026-10-11. **Seen in ProPresenter by the maintainer, 2026-10-12: "They showed"** (which cases were among what was looked at was not said) | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made, and its third, that ProPresenter shows what was written, the maintainer made. Since then, decision 58: a line that loses its last chord takes chords again |
-| A chord from the strip (asked for after M7) | Built, 2026-10-12. **Not yet tried by a hand**: what carries it is the system's, and no test can be the system | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
+| A chord from the strip (asked for after M7) | Built, 2026-10-12, and used by the maintainer the same day: "This is quite nice/exciting". Which of the seven things under "Left rough" were among what was tried was not said | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -388,7 +388,17 @@ it could not do:
     What is carried is the chord's name under a type of this app's own, offered to
     this app only.
 
-## How it is laid out, and why
+62. **The window's title says the version, after the name in square brackets**:
+    "Pro7 Chord Editor [0.2]" (`spec/06`, rule 6d, new, for both apps). The
+    maintainer: "show the version # in the main app title (after its name in [])".
+    Mine: that a build which knows of no version says the name alone; and that the
+    title is made in the package (`AppTitle`, in `LibraryWindow.swift`), where a
+    test holds it, the app's own folder being no place for a rule.
+63. **Version 0.2, and a release of it** (2026-10-12). The maintainer: "Let's bump
+    to version 0.2 ... and make a downloadable release". It is 0.1 with the chord
+    from the strip and the version in the title. The build number went from 1 to 2
+    with it. "The disk image" below has what was checked.
+
 ## How it is laid out, and why
 
 ```
@@ -1296,10 +1306,29 @@ the About text, a Developer ID, notarizing) is still to come.
   the maintainer's to name; `mac-v0.1` would keep the two apart.)
 - **Checked, without the app once being run**: both kinds of Mac are in it (arm64
   and x86_64); its seal holds, in the build and again in the mounted image, where
-  it is byte for byte the app that was built; it has no entitlement; nothing in it
-  names a path of this Mac; macOS's own judge of downloads (`spctl`) rejects it, as
-  the read-me says it will; and a copy of the image marked as a browser marks a
-  download mounts as one, and an app copied out of it carries the mark.
+  it is byte for byte the app that was built; it has no entitlement; macOS's own
+  judge of downloads (`spctl`) rejects it, as the read-me says it will; and a copy
+  of the image marked as a browser marks a download mounts as one, and an app
+  copied out of it carries the mark.
+- **"Nothing in it names a path of this Mac" was written here of 0.1, and was
+  wrong.** The program in the 0.1 image names the folder it was built in 682
+  times (`/Users/dan/dev/Pro7ChordEditor/mac/...`), and so the name of the account
+  on the maintainer's Mac: in the tables a debugger goes by, which say where every
+  file the program was made from lay. Xcode takes those out when it installs or
+  archives, and not when it builds, which is what the script did. They were looked
+  for with `strings`, which does not show them; looked for as bytes (`grep -a`)
+  they are plain. Found on 2026-10-12, when 0.2 was being checked. What it gives
+  away is small (the commits in the repository are signed with the same first
+  name), but it was said to have been checked and had not been. **The 0.1 image on
+  the Releases page still has it**: whether that image stays is the maintainer's
+  to say.
+- **Since 0.2 the program is stripped** (`DEPLOYMENT_POSTPROCESSING=YES` and
+  `STRIP_INSTALLED_PRODUCT=YES` to `xcodebuild`), as an app sent to Apple's store
+  is, and **the script refuses an app in which any file names the home folder of
+  whoever built it, or the folder the script is in**. The image is 4.5 MB where it
+  was 8.1. (`STRIP_STYLE=all` given on the command line stops the build: it is
+  then asked of the package's parts too, which are not whole programs and cannot
+  be stripped so. Left unsaid, each part is stripped in its own way.)
 - **Every test passes against the optimised code** too (`swift test -c release
   -Xswiftc -enable-testing`): 304. The tests otherwise run against a build made for
   debugging, which is not what is in the image.
@@ -1321,6 +1350,16 @@ the About text, a Developer ID, notarizing) is still to come.
   `mac-v0.1`, the maintainer having said "please publish": that image, of the app
   as it was at that tag. A pre-release, so that the page's "latest" is still the
   Windows editor 0.9.5, which `windows/README.md` points people at.
+- **0.2, given out on 2026-10-12** at the maintainer's word ("make a downloadable
+  release"), as a pre-release tagged `mac-v0.2`. Version 0.2, build 2. Checked as
+  0.1 was, and besides: no file in it names a folder of this Mac; the system's
+  loader reads the stripped program for both kinds of Mac (`dyld_info`), and it
+  links to nothing but what macOS has; all 317 tests pass against the optimised
+  code. **Unlike 0.1, nobody had opened this image before it was given out**: this
+  session does not run the app, and the maintainer asked for the release and not
+  for an image to try. It is the first build whose program is stripped. The copy
+  marked as a download is beside it (`... (as if downloaded).dmg`) for whoever
+  tries it first.
 - **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
   whose, and that they are here at the maintainer's asking). In a repository that
   is one thing; in an app handed to other people it is another, and is the
