@@ -714,7 +714,8 @@ ProPresenter is for.
     ...", "X is too large to be a song.", "X has no words in it."). What a making
     was refused for is said there too, and the panel stays, so that another name or
     another song to look like can be tried; while ProPresenter is running the panel
-    says so beforehand and its button is greyed.
+    says so beforehand and its button is greyed, whatever was refused before (that
+    is said again once ProPresenter is quit).
 111. **The two commands are in the File menu**: "New Song from ChordPro File..." and
     "Save Song as ChordPro File...". The first is greyed with no library open, the
     second with no song open that can be read, and **both while anything is over
@@ -1851,6 +1852,67 @@ names. What to know before changing any of it:
     in their folders. Everything from the choosing of a file on is the
     maintainer's hand ("Left rough"); what the panel says and does is held by
     tests and pictures with no chooser in them.
+- **How the proofs were shown to bite**, as before: each rule of M9 broken in one
+  small way in turn, in clones made for it, and the tests run after each.
+  - **The logic, 185 ways** (`RtfWords.WithWords`, `ChordProFile.cs`, `NewSong.cs`,
+    `SongFile.WriteNew`, the new refusals): 170 were noticed at once, one of them by
+    a test that then never ended (with COM10 taken for a device, every numbering of
+    it is one too, and the looking for a free name goes round for ever). Five were
+    noticed later: one once the list pointed at the right place (the stand-ins'
+    writer has the same few lines as the writer of any words, and the list had
+    found those first), and four once they had cases, which are a group's name with
+    a brace in it written as ChordPro, and three questions of the check (below).
+    Nine cannot be told: what was made is always read back as written; the size of
+    a file asked before it is read and after, each of which the other covers; the
+    lines to a slide made one at least in two places; the check where the making
+    calls it; a box asked whether words can be written after its opening, when it
+    has a character; an id inside a table of a kind a slide has none of; a blank
+    slide in the check, which has not the words either; and one found so, that the
+    model's chords need not be left out where what is said of the words is
+    gathered, the writing of the slide's own chords taking them out anyway. One was
+    a change that changes nothing, to see the driver tell.
+  - **The window's, 117 ways** (`LibraryModel.ChordProFiles.cs`, `NewSongPanel`, and
+    what of `LibraryView` and `LibraryModel.cs` M9 added): 97 were noticed at once.
+    Seven were noticed later, each with a case now or tried again: that the panel
+    says ProPresenter is running (its first try was stopped by another clone's
+    driver); the order of that and a refusal (below); a name taken while the panel
+    is read; a song made with no chords said to have none; a file that was not
+    written not also said to be written; **Cancel making the song** (it put the
+    panel away just the same, and the case had asked no more than that); and the
+    rows of one file shown for another. Eleven cannot be told: five are the same
+    whichever way, and six are only to be seen or need a window (two lines with
+    nothing in them left standing, where the keyboard goes, two things about where
+    the rows are drawn, and the system's chooser asked for a file when none may be
+    brought in). One piece was taken out of the app
+    as idle, and one was the driver's own.
+  - **What the breaking found that was more than a missing case.**
+    - **The check before a song is written had never been seen to refuse
+      anything**, every song made here passing it. It has a test of its own now: a
+      made song is spoilt thirty ways and each must be refused. Breaking the
+      check's questions then showed three of them answered by no spoiling, each of
+      which wanted a file that reads, to this app, exactly as the song asked for:
+      one id for two slides; the slide of a second part put into the group of the
+      part before it, where the two have one name; and a cue more that this app
+      does not show (switched off, or no slide at all), which ProPresenter would
+      have.
+    - **A fault in the app**: what was put down as a thing that could not be told
+      could. A making refused for some other reason, and then ProPresenter
+      started: the button was greyed for ProPresenter and the sentence over it was
+      still the old refusal. It is why the button is greyed now, and the refusal is
+      said again once ProPresenter is quit.
+    - **Two guards for one thing** kept the rows of one file from being shown for
+      another, and breaking either was not noticed, the other holding. One was
+      taken out, and the other is held.
+    - **A test of the settings failed for ten commits and was not seen**: About
+      made a fourth section, a second test still counted three, and only the tests
+      thought to be touched had been run. A clone's run of a breakage showed it,
+      every breakage there being "noticed" by that one test. **Every commit that
+      changes a view is to be followed by all of the window's tests, not some.**
+    - **Of the driver itself**, for whoever runs several clones at once again: it
+      stopped a test that never ended by stopping every test of that name, the
+      other clones' among them; and before that it waited for ever, the test still
+      holding the pipe it was reading. It now starts each run so that it can stop
+      that run and what it started, and nothing else.
 
 ## Left rough, and what to ask
 
