@@ -9,7 +9,9 @@ lines are a card and the cards are one column, as the picture below shows. Here 
 are a grid, like the slides of a presentation in ProPresenter's own window, and the
 sheet zooms: "How it looks" and "Zooming" say how. Everything else on this page (a
 line and its bubbles, the spot, typing, dragging, copying) is as it was, and the
-maintainer means Simple Presenter to follow.
+maintainer means Simple Presenter to follow. One thing has been added since, and is
+Simple Presenter's to follow too: a chord can be dragged out of the strip onto a word
+("A chord dragged out of the strip").
 
 ![The chord sheet](pictures/chord-editor.png)
 
@@ -161,7 +163,8 @@ Vectors: `sheet-model.json`, `rows`.
 13. A line of chords alone has no words to show: a thin rule stands where they would
     be, and its bubbles sit side by side.
 14. The strip across the top has, at its left, the key's seven chords as small buttons,
-    each with its number 1 to 7 in grey before its name; and at its right two round
+    each with its number 1 to 7 in grey before its name, to be clicked (rule 24) or
+    dragged onto a word (rule 46a); and at its right two round
     buttons, − and +, that zoom (rule 14b). If the song states no key, the chords are
     C's, and before the two buttons the strip says "The song names no key: pick the
     one its chords are in", where there is room for it. **The key is not picked
@@ -246,7 +249,8 @@ Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
 ## Putting a chord on
 
 24. **1 to 7** put the key's own chord for that note of its scale on the spot, in place
-    of whatever is there. The buttons in the strip do the same when clicked.
+    of whatever is there. The buttons in the strip do the same when clicked, and each
+    can be dragged to a place instead (rule 46a).
 25. **A letter A to G** opens the typing bubble on the spot with that letter in it, as
     a capital.
 26. **Enter, or F2**, opens it on what is at the spot: the chord there, all of it
@@ -317,6 +321,53 @@ Vectors: `sheet-model.json`, `typing`.
 46. Dropped where it started, nothing happens.
 
 Vectors: `sheet-model.json`, `edits`.
+
+## A chord dragged out of the strip
+
+**New**, and the maintainer's, on 2026-10-12, having caught a hand at it unasked: "my
+brain wanted to add a chord by drag and drop... I think other user might do that same
+- Let's add that (despite not being as fast as clicking/hotkeys)". Simple Presenter's
+strip had the click only.
+
+46a. Each of the strip's seven buttons can be **dragged onto a place**: any place of
+    any line, on any slide. The drag starts as in rule 41, once the pointer has gone
+    6 pixels with the button down. A press let go without that is the click it always
+    was (rules 24 and 39).
+46b. While the chord is carried, the platform's own drag-and-drop shows it
+    ([10-platforms.md](10-platforms.md)). Over a place of a line the spot goes there
+    as it does for a chord dragged along the sheet (rule 41: the character under the
+    pointer, or with Shift the start of its word), and shows the chord's name in a
+    lit bubble where it would land. **That bubble is the whole of the promise: where
+    there is none, letting go puts nothing on.** There is none over the strip, over
+    the bare sheet between the cards, over a frame or its foot, over a line that can
+    take no chord, or over anything else in the window or out of it. (A chord
+    dragged along the sheet is otherwise: off the cards its bubble stays at the last
+    place it was over, and let go it lands there. One brought in from outside has
+    crossed other slides to get where it is, and is not to be left on the last of
+    them by a hand that let go on the way.)
+46c. Let go over a place, the chord is put there as its key would have put it with
+    the spot there (rule 24): in place of whatever chord is there (rule 43); on a
+    line of chords alone in place of the chord whose place it is, or past the last
+    as one more (rule 22); on a blank slide as its first. It is one change and one
+    step of undo, and the spot is left there. What it asks of the song is what a
+    key's `put` asks (`sheet-model.json`, `edits`): nothing new is asked, and no
+    vector is new.
+46d. Let go anywhere else, or with **Esc** pressed while it is carried, nothing
+    happens.
+46e. **It can be carried while another chord is being typed**, which a chord of the
+    sheet's own cannot (rule 40). Picking it up keeps what was typed and closes the
+    bubble, as leaving the sheet for anything else does (rule 39). That is done when
+    it is picked up, whether or not it is then put anywhere.
+46f. Held near the top or the bottom of what is seen of the sheet, the sheet scrolls
+    that way, so that a slide out of sight can be reached.
+46g. The key that copies a chord as it is dragged (rule 42) does nothing here: a chord
+    from the strip is always one more.
+46h. A button says all three of its ways when it is pointed at: "Puts F on the spot.
+    The key 4 does the same. Or drag it onto a word."
+
+Nothing of this is in the vectors, which hold what the song is asked and not how a
+chord got to the spot. Hold it by tests of your own: one for each of the rules above
+that a test can reach, and the maintainer's hand for the rest.
 
 ## A line's chords onto another line
 
@@ -458,6 +509,7 @@ song refused them in a sentence of its own.)
   `pictures/chord-editor.png` ([10-platforms.md](10-platforms.md)); and draw it
   wide, and zoomed down, to see the grid lay itself out.
 - The feel, which only a person can tell: chord a verse of that song by pointing and
-  pressing 1 to 7; type a run of chords click, type, click, type; drag one; copy a
-  verse onto the next. Ask the maintainer to, and to say what is slower or odder than
-  it was in Simple Presenter.
+  pressing 1 to 7; type a run of chords click, type, click, type; drag one; drag one
+  of the key's chords down from the strip onto a word; copy a verse onto the next.
+  Ask the maintainer to, and to say what is slower or odder than it was in Simple
+  Presenter.

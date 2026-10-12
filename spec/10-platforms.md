@@ -13,6 +13,7 @@ the list of those things. Anything not on it is to be the same.
 | --- | --- | --- |
 | The key for shortcuts | Command, where these pages say Ctrl | Ctrl |
 | Copying a chord while dragging | Option held (the Mac's key for "copy as you drag") | Ctrl held |
+| One of the key's chords carried from the strip ([03](03-chord-sheet.md), rule 46b) | The system's drag-and-drop: the button's picture goes with the pointer, with the system's green plus beside the pointer wherever letting go would put the chord on, and slides back to the strip when it is let go anywhere else | The system's drag-and-drop, with its own pointers for "this can be put here" and "it cannot" |
 | Zooming the sheet, and the size of the ChordPro text | Command with minus, plus (or equals) and 0; for the sheet, a pinch on the trackpad too | Ctrl with the same keys; Ctrl with the wheel, if the platform's own views do that |
 | Showing the sheet, and the ChordPro text | Command+1, Command+2 | Ctrl+1, Ctrl+2 |
 | The key that would save | Command+S, which is also File > Save | Ctrl+S |
