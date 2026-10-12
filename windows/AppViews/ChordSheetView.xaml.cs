@@ -8,6 +8,17 @@
 // is said of a song with no key is the one sum here, in a function of its own that a
 // test can ask.
 //
+// ONE OF THE KEY'S CHORDS IS ALSO DRAGGED OUT OF THE STRIP onto a word (spec/03, rules
+// 46a to 46h), and this is the near end of that: "One of the key's chords picked up",
+// below. A press on a button that is let go is the button's click, as it always was.
+// A press pulled 6 away picks the chord up, the once: a chord that was being typed is
+// kept (the model's), and the system is handed the chord's name to carry
+// (`DragDrop.DoDragDrop`), which does not come back until the chord is let go or Esc
+// is pressed. The far end is the sheet's (ChordSheetCanvas.cs). What a press and a pull
+// come to is in two methods a test can call (`ChordPressed`, `ChordPulled`), and what
+// is handed to the system is behind `Carry`, which a test puts its own in the place of:
+// **the system's own dragging is not run by any test**, since it reads the real mouse.
+//
 // While the other editor is shown the sheet's element is left as it was: nothing of it
 // is laid out or drawn for a song that is being typed into as text. When the sheet is
 // come back to it is brought up to date, and is where it was scrolled to.
@@ -122,11 +133,79 @@ public partial class ChordSheetView : UserControl
         {
             Style = (Style)Resources["OfTheKey"],
             Content = words,
-            ToolTip = "Puts " + name + " on the spot. The key " + numbered + " does the same.",
+            ToolTip = Says(name, number),
         };
         System.Windows.Automation.AutomationProperties.SetName(button, numbered + " " + name);
         button.Click += (_, _) => model?.PutOfKey(number);
+        // The button's own press and click are left as they are. These only watch for
+        // the press being pulled away, which is the chord picked up.
+        button.PreviewMouseLeftButtonDown += (_, e) => ChordPressed(button, e.GetPosition(button));
+        button.PreviewMouseMove += (_, e) => ChordPulled(button, name, e.GetPosition(button), e.LeftButton == MouseButtonState.Pressed);
+        button.PreviewMouseLeftButtonUp += (_, _) => pressedOn = null;
         return button;
+    }
+
+    /// <summary>What one of the key's chords says of itself when it is pointed at (spec/03, rule 46h).</summary>
+    internal static string Says(string name, int number) =>
+        "Puts " + name + " on the spot. The key " + number.ToString(CultureInfo.InvariantCulture) + " does the same. Or drag it onto a word.";
+
+    // ---- One of the key's chords picked up (spec/03, rules 46a and 46e)
+
+    // The button of the strip that is pressed, and where on it: until it is let go, or
+    // pulled far enough to be its chord picked up.
+    private (Button Button, Point At)? pressedOn;
+
+    /// <summary>How faint a button is while its chord is out being carried.</summary>
+    internal const double FaintWhileCarried = 0.45;
+
+    /// <summary>
+    /// What carries a chord once it is picked up: the system's own dragging, which comes
+    /// back when the chord is let go or the carrying is given up. (A test puts its own
+    /// here. The system's reads the real mouse.)
+    /// </summary>
+    internal Action<Button, string> Carry { get; set; } =
+        (button, name) => DragDrop.DoDragDrop(button, ChordSheetCanvas.Carrying(name), DragDropEffects.Copy);
+
+    /// <summary>The mouse's button is pressed on one of the strip's.</summary>
+    internal void ChordPressed(Button button, Point at) => pressedOn = (button, at);
+
+    /// <summary>
+    /// The pointer has moved over a button of the strip. If that button is pressed and
+    /// the pointer has gone 6 from where it was pressed, its chord is picked up, and
+    /// carried until it is let go: answers whether it was.
+    /// </summary>
+    internal bool ChordPulled(Button button, string name, Point to, bool buttonIsDown)
+    {
+        if (!buttonIsDown || pressedOn is not { } pressed || !ReferenceEquals(pressed.Button, button))
+        {
+            // (Let go somewhere this was not told of, or another button's.)
+            pressedOn = buttonIsDown ? pressedOn : null;
+            return false;
+        }
+        if (Math.Abs(to.X - pressed.At.X) + Math.Abs(to.Y - pressed.At.Y) < 6)
+        {
+            return false;
+        }
+        // Picked up, the once: the press is no longer one that a click can come of.
+        pressedOn = null;
+        button.ReleaseMouseCapture();
+        // A chord that was being typed is kept first, and its bubble closed (rule 46e).
+        model?.LiftOfKey();
+        var was = button.Opacity;
+        button.Opacity = FaintWhileCarried;
+        try
+        {
+            Carry(button, name);
+        }
+        finally
+        {
+            // Wherever it ended, and whether or not the sheet was told: the button is
+            // itself again, and nothing is left looking as if a chord were still over
+            // the sheet.
+            button.Opacity = was;
+            model?.CarriedOfKeyEnded();
+        }
+        return true;
     }
 
     // What is said of a song with no key is there only where there is room for it.

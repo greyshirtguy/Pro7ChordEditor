@@ -39,8 +39,18 @@
 // Only a real window keeps and gives back a mouse, so only a test with a real window
 // holds it: ChordSheetWindowTests.
 //
+// ONE OF THE KEY'S CHORDS CARRIED IN FROM THE STRIP (rules 46a to 46g) comes by the
+// system's own dragging, and the sheet is the far end of it ("A chord carried in from
+// the strip", below; the near end is in ChordSheetView.xaml.cs). The four things
+// Windows tells a view that something is dragged over only read the name and the place
+// out of what they are handed and call `CarriedIn`, `CarriedOver`, `CarriedAway` and
+// `LetGo`, which a test can call. **What the system does between the strip and the
+// sheet no test can be**: a hand has to try it.
+//
 // The Mac's is `SheetCanvas`, in ChordSheetView.swift.
 
+using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Automation;
@@ -87,6 +97,14 @@ public sealed class ChordSheetCanvas : FrameworkElement
     private uint? copiedWhen;
     private Color chordColour = SheetLook.ChordName;
 
+    // While one of the key's chords is carried over the sheet and held near its top or
+    // bottom edge: when the sheet was last asked about it there, and how far it is still
+    // owed (it goes by whole pixels; the rest waits). And whether the chord has been
+    // clear of the top of what is seen since it came over.
+    private double? carriedAskedAt;
+    private double carriedOwed;
+    private bool carriedClearOfTheTop;
+
     public ChordSheetCanvas()
     {
         AddVisualChild(under);
@@ -111,6 +129,9 @@ public sealed class ChordSheetCanvas : FrameworkElement
         Focusable = true;
         FocusVisualStyle = null;
         ClipToBounds = true;
+        // One of the key's chords, carried from the strip, may be let go here. (What
+        // else is dragged over the sheet is told it cannot be: `CarriedOver`.)
+        AllowDrop = true;
         AutomationProperties.SetName(this, "The song's chord sheet");
 
         // Undo, Redo, Copy and Paste in the Edit menu reach whatever has the keyboard as
@@ -729,6 +750,201 @@ public sealed class ChordSheetCanvas : FrameworkElement
                 Draw();
             }
         }
+    }
+
+    // ---- A chord carried in from the strip (spec/03, rules 46a to 46g)
+    //
+    // Windows' own dragging carries it (spec/10-platforms.md). A button of the strip
+    // begins it (ChordSheetView.xaml.cs), the system shows its pointer for "this can be
+    // put here" or for "it cannot" as this view answers, and this view is told as the
+    // chord comes over it, moves, leaves and is let go. What each of those does to the
+    // song is ChordSheet's.
+
+    /// <summary>
+    /// What one of the key's chords is carried as: its name, under a kind that is this
+    /// app's own and this run of it's. Nothing else takes such a thing, and the sheet
+    /// takes nothing else ("offered to this app only").
+    /// </summary>
+    internal static readonly string ChordOfTheKey = "Pro7ChordEditor.ChordOfTheKey." + Environment.ProcessId.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>What the system is handed to carry, for a chord of this name.</summary>
+    internal static DataObject Carrying(string name) => new(ChordOfTheKey, name);
+
+    /// <summary>The chord that is carried from the strip, if that is what is carried.</summary>
+    internal static string? ChordOfKey(IDataObject? carried) =>
+        carried is not null && carried.GetDataPresent(ChordOfTheKey, autoConvert: false) && carried.GetData(ChordOfTheKey, autoConvert: false) is string { Length: > 0 } name
+            ? name
+            : null;
+
+    /// <summary>What the time is, in seconds. (A test answers for the clock.)</summary>
+    internal Func<double> Now { get; set; } = () => Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+
+    /// <summary>
+    /// One of the key's chords, carried from the strip, is over a point of the sheet;
+    /// or, with no point, is over the sheet no longer. Answers whether letting go would
+    /// put it on: whether it is over a place. Only then is it shown, in a lit bubble at
+    /// that place.
+    /// </summary>
+    public bool CarriedOfKey(string name, Point? point, bool shift)
+    {
+        if (Sheet is not { } sheet)
+        {
+            return false;
+        }
+        if (point is { } at && EnsureLaidOut(sheet)?.PlaceCarriedTo(at, shift) is { } place)
+        {
+            sheet.Carry(name, place.Row, place.At);
+        }
+        else
+        {
+            sheet.CarryOff();
+        }
+        DrawOver();
+        return sheet.Dragged is { From.Row: < 0 };
+    }
+
+    /// <summary>
+    /// It is let go at a point: over a place it is put there, and anywhere else nothing
+    /// is done. Answers whether the song took it.
+    /// </summary>
+    public bool DroppedOfKey(string name, Point point, bool shift)
+    {
+        if (Sheet is not { } sheet)
+        {
+            return false;
+        }
+        var put = CarriedOfKey(name, point, shift) && sheet.DropOfKey();
+        // (The line may have a chord more, or a blank slide its first: laid out again.)
+        Sync();
+        return put;
+    }
+
+    /// <summary>
+    /// How near the top or the bottom of what is seen a carried chord is held for the
+    /// sheet to scroll, and how fast it then goes at the very edge, in a second. (The
+    /// Mac's numbers: a guess there too, until a hand has tried it.)
+    /// </summary>
+    internal const double CarriedNear = 36;
+    internal const double CarriedFastest = 520;
+
+    /// <summary>
+    /// A chord carried in from the strip is held near the top or the bottom of what is
+    /// seen of the sheet: the sheet goes that way, faster the nearer the edge, so that a
+    /// slide out of sight can be reached (rule 46f). It goes by the time that has passed
+    /// and not by how often it is asked: Windows tells the view of the chord at every
+    /// move of the pointer and, as far as is known, again and again while it lies still
+    /// (A GUESS until a hand has held one still at an edge: windows/NOTES.md).
+    ///
+    /// Not upwards until the chord has once been clear of the top: it comes from the
+    /// strip, over the top of the sheet, and is not to scroll the sheet on its way in.
+    /// </summary>
+    internal void ScrollIfCarriedNearAnEdge(Point point)
+    {
+        if (Scroll is not { } scroll)
+        {
+            return;
+        }
+        var seen = Seen;
+        if (point.Y >= seen.Top + CarriedNear)
+        {
+            carriedClearOfTheTop = true;
+        }
+        var depth = 0.0;
+        if (point.Y > seen.Bottom - CarriedNear)
+        {
+            depth = Math.Min(1, (point.Y - (seen.Bottom - CarriedNear)) / CarriedNear);
+        }
+        else if (point.Y < seen.Top + CarriedNear && carriedClearOfTheTop)
+        {
+            depth = -Math.Min(1, (seen.Top + CarriedNear - point.Y) / CarriedNear);
+        }
+        if (depth == 0)
+        {
+            carriedAskedAt = null;
+            carriedOwed = 0;
+            return;
+        }
+        // The first time it is found near an edge the clock is only started. After
+        // that the sheet is owed what the time since it was last asked comes to (a long
+        // wait counting as a fifth of a second, so that it never jumps), and goes the
+        // nearest whole number of pixels to what it is owed. The rest is owed still (or
+        // was lent): so being asked very often, each time too soon for a pixel, is not
+        // being asked in vain; and the words stay sharp as they go.
+        var time = Now();
+        var passed = carriedAskedAt is { } last ? Math.Min(0.2, Math.Max(0, time - last)) : 0;
+        carriedAskedAt = time;
+        carriedOwed += depth * CarriedFastest * passed;
+        var whole = Math.Round(carriedOwed, MidpointRounding.AwayFromZero);
+        if (whole != 0)
+        {
+            carriedOwed -= whole;
+            // (What it is seen through stops it at the sheet's top and its bottom.)
+            scroll.ScrollToVerticalOffset(scroll.VerticalOffset + whole);
+            // (So that the next thing asked of what is seen is asked of where it now is.)
+            scroll.UpdateLayout();
+        }
+    }
+
+    /// <summary>
+    /// Something that is dragged has come over the sheet, from outside it: it is over
+    /// the top afresh, and no time has yet passed at an edge. (A chord that was being
+    /// typed needs nothing here: picking one up from the strip kept it and closed its
+    /// bubble at once, by way of the model.)
+    /// </summary>
+    internal void CarriedIn()
+    {
+        carriedAskedAt = null;
+        carriedOwed = 0;
+        carriedClearOfTheTop = false;
+    }
+
+    /// <summary>
+    /// What is dragged is over the sheet: where, and whether it may be let go there.
+    /// Only one of the key's chords from the strip may, and only over a place. (The
+    /// system's word for putting a thing somewhere is "copy", and it has a pointer for
+    /// that and one for "no".)
+    /// </summary>
+    /// <param name="where">Where the pointer is on the sheet. Asked twice: again after any scrolling, when another place is under it.</param>
+    internal DragDropEffects CarriedOver(IDataObject? carried, Func<Point> where, bool shift)
+    {
+        if (ChordOfKey(carried) is not { } name)
+        {
+            return DragDropEffects.None;
+        }
+        ScrollIfCarriedNearAnEdge(where());
+        return CarriedOfKey(name, where(), shift) ? DragDropEffects.Copy : DragDropEffects.None;
+    }
+
+    /// <summary>What is dragged is over the sheet no longer: nothing shows it.</summary>
+    internal void CarriedAway() => CarriedOfKey("", null, shift: false);
+
+    /// <summary>What is dragged is let go on the sheet.</summary>
+    internal DragDropEffects LetGo(IDataObject? carried, Point at, bool shift) =>
+        ChordOfKey(carried) is { } name && DroppedOfKey(name, at, shift) ? DragDropEffects.Copy : DragDropEffects.None;
+
+    protected override void OnDragEnter(DragEventArgs e)
+    {
+        CarriedIn();
+        e.Effects = CarriedOver(e.Data, () => e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
+        e.Handled = true;
+    }
+
+    protected override void OnDragOver(DragEventArgs e)
+    {
+        e.Effects = CarriedOver(e.Data, () => e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
+        e.Handled = true;
+    }
+
+    protected override void OnDragLeave(DragEventArgs e)
+    {
+        CarriedAway();
+        e.Handled = true;
+    }
+
+    protected override void OnDrop(DragEventArgs e)
+    {
+        e.Effects = LetGo(e.Data, e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
+        e.Handled = true;
     }
 
     // A chord carried to the edge of what is seen: the sheet scrolls that way, so that it

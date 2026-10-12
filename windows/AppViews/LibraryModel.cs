@@ -1066,6 +1066,35 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     }
 
     /// <summary>
+    /// One of the key's chords is picked up from the strip, to be carried to the sheet
+    /// and let go on a word: a chord that was being typed is kept first (spec/03, rule
+    /// 46e).
+    /// </summary>
+    public void LiftOfKey()
+    {
+        if (Sheet is { Typing: true } sheet)
+        {
+            sheet.LiftOfKey();
+            SheetVersion++;
+            Changed();
+        }
+    }
+
+    /// <summary>
+    /// The carrying is over, wherever it ended: nothing is left looking as if a chord
+    /// were still over the sheet.
+    /// </summary>
+    public void CarriedOfKeyEnded()
+    {
+        if (Sheet is { } sheet)
+        {
+            sheet.CarryOff();
+            SheetVersion++;
+            Changed();
+        }
+    }
+
+    /// <summary>
     /// Copies the chords of the spot's line, or of its whole group, and says so on the
     /// quiet line for a few seconds.
     /// </summary>

@@ -550,6 +550,19 @@ public class PictureTests
             return Task.CompletedTask;
         });
 
+    // (spec/03, rule 46b: the lit bubble with the chord's name, where it would land.
+    // What the system itself shows meanwhile, its pointer, no picture here can have.)
+    [Fact]
+    public void OneOfTheKeysChordsCarriedFromTheStripOverAWord() => DrawSheet(
+        "71 one of the key" + (char)0x2019 + "s chords carried from the strip over a word",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            Assert.True(hand.Canvas.CarriedOfKey("Em", hand.PointOf(hand.PlaceOf("wretch")), shift: false));
+            return Task.CompletedTask;
+        });
+
     [Fact]
     public void ASongWithALineOfChordsAlone() => DrawSheet(
         "38 a line of chords alone, and the spot after its last",

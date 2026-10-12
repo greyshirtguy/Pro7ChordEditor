@@ -1246,7 +1246,7 @@ public class ChordSheetViewTests
         var (model, view, hand) = await Open(pc, "Amazing Grace");
         var strip = view.SongPane.ChordSheet;
         Assert.Equal(["1 G", "2 Am", "3 Bm", "4 C", "5 D", "6 Em", "7 F#dim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
-        Assert.Equal("Puts C on the spot. The key 4 does the same.", strip.ChordsOfTheKey[3].ToolTip);
+        Assert.Equal("Puts C on the spot. The key 4 does the same. Or drag it onto a word.", strip.ChordsOfTheKey[3].ToolTip);
         Assert.All(strip.ChordsOfTheKey, button => Assert.False(button.Focusable));
         Assert.Equal(Visibility.Collapsed, Named<TextBlock>(strip, "NoKey").Visibility);
 
