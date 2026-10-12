@@ -1,0 +1,117 @@
+{
+  "about": "The words of the guide that both apps show: spec/13-guide.md says when it is shown, how it is laid out and how its pictures are made. Each app carries a copy of this file, the same to the byte, and shows what it says, putting its own platform's word from \"names\" wherever a name stands in curly brackets. A wording is changed here, and nowhere else.",
+  "title": "Putting chords on a song",
+  "first": {
+    "heading": "Before you start",
+    "points": [
+      "Keep a backup of your ProPresenter library. This app changes the files of its songs.",
+      "Quit ProPresenter first. Nothing is saved while it is running.",
+      "Every change is saved as it is made, into the song’s own file. There is no Save.",
+      "A copy of a song’s file as it was is kept before the app changes it. Earlier Versions, over a song that has been changed, puts a copy back."
+    ]
+  },
+  "sections": [
+    {
+      "heading": "The quick way",
+      "lead": "Point at a word and press 1 to 7.",
+      "picture": "point-and-press",
+      "paragraphs": [
+        "Across the top of the sheet are the seven chords of the song’s key, numbered. Move the pointer over the words and an orange outline follows it: the spot, where the next chord will go. Press a number and that chord is put there. Nothing has to be clicked first.",
+        "The seven go by the song’s key, which is picked over the song. A song that names no key is taken to be in C until one is picked."
+      ]
+    },
+    {
+      "heading": "Other ways to put a chord on",
+      "items": [
+        {
+          "lead": "Type it.",
+          "text": "Click a place, or press a letter from A to G with the spot there, and type the chord: G, F#m7, D/F#. What it might be going to be is offered as you type: Down and Up choose one, and {enter} keeps it. Then click the next place: what was typed is kept, and the next chord is begun. Tab keeps it too, and moves on to the next word. Esc throws away what was typed.",
+          "picture": "typing"
+        },
+        {
+          "lead": "Click one of the seven",
+          "text": "in the strip, and it goes on the spot."
+        },
+        {
+          "lead": "Drag one of the seven",
+          "text": "out of the strip, and let it go on a word."
+        },
+        {
+          "lead": "On any letter.",
+          "text": "A chord can stand on any letter of a word: the spot goes to the letter under the pointer. With Shift held it keeps to the starts of words."
+        },
+        {
+          "lead": "With the keys alone.",
+          "text": "The arrow keys move the spot: Left and Right a word at a time, or with Shift a letter at a time, and Up and Down a line. {enter} begins a chord at the spot, or opens the one that is there to be typed over."
+        }
+      ]
+    },
+    {
+      "heading": "Changing what is there",
+      "items": [
+        {
+          "lead": "Move a chord:",
+          "text": "drag its bubble to another word, on any slide. With {copyKey} held as it is let go, it is copied and the first one stays.",
+          "picture": "dragging"
+        },
+        {
+          "lead": "Change a chord:",
+          "text": "point at it and press 1 to 7, or click it and type over it."
+        },
+        {
+          "lead": "Take a chord off:",
+          "text": "point at it and press Delete."
+        },
+        {
+          "lead": "Give a line the chords of another:",
+          "text": "with the spot on a line, {ctrl}+C copies that line’s chords, and {copyGroup} those of its whole group (a verse, a chorus). With the spot on another line, {ctrl}+V puts them on the lines from there on, word for word."
+        },
+        {
+          "lead": "Take a change back:",
+          "text": "{ctrl}+Z undoes the last change, and {redo} puts it back. Revert, under the song, takes back every change made since the song was opened."
+        }
+      ]
+    },
+    {
+      "heading": "Where there are no words",
+      "paragraphs": [
+        "A slide with no words on it, such as an intro, takes chords too: point at it and press a number, or click it and type. So does a line that has chords and no words."
+      ]
+    },
+    {
+      "heading": "The whole song as text",
+      "paragraphs": [
+        "ChordPro, beside Chords over the song, shows the song as text, with each chord in square brackets where it is played. Chords are typed in among the words. Only the chords can be changed there: the words stay as they are. {ctrl}+1 shows the sheet and {ctrl}+2 the text."
+      ],
+      "sample": "[G]Amazing [G7]grace how [C]sweet the [G]sound"
+    },
+    {
+      "heading": "Seeing more of a song",
+      "paragraphs": [
+        "The − and + at the right of the strip make the words smaller and larger, so that more slides or fewer are in view. {ctrl} with the minus and plus keys does the same."
+      ]
+    }
+  ],
+  "foot": "This page is in the Help menu, and behind the ? at the right of the strip.",
+  "pictures": {
+    "point-and-press": "The strip with the seven chords of the key of G, numbered 1 to 7, over two slides of Amazing Grace. The pointer is on the word “wretch”, and the orange outline of the spot stands over it.",
+    "typing": "A chord being typed over the word “wretch”: the box has D in it, and over the box are the chords it might be going to be.",
+    "dragging": "A chord being dragged to another word: the bubble it left is faint, and where it would land its name is lit in orange."
+  },
+  "names": {
+    "windows": {
+      "ctrl": "Ctrl",
+      "copyKey": "Ctrl",
+      "enter": "Enter",
+      "copyGroup": "Ctrl+Shift+C",
+      "redo": "Ctrl+Y"
+    },
+    "mac": {
+      "ctrl": "Command",
+      "copyKey": "Option",
+      "enter": "Return",
+      "copyGroup": "Shift+Command+C",
+      "redo": "Shift+Command+Z"
+    }
+  }
+}

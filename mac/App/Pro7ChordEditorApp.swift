@@ -9,12 +9,13 @@
 // Keep it so. A rule that finds its way into this folder cannot be proved by
 // `swift test`, and will be built a second time, differently, on Windows.
 //
-// So far (milestone M7, and a chord dragged out of the strip) the window finds
+// So far (milestone M7, a chord dragged out of the strip, and the guide) the window finds
 // ProPresenter's libraries, lists their songs, and shows one as a sheet of its slides,
 // on which chords are put, moved and taken off with the mouse and the keys, or as
 // ChordPro text in which they are typed. Each change is saved as it is made, with a
 // copy of the file as it was kept first. The copies can be seen, in the song's Earlier
-// Versions and in the settings, and one put back. mac/NOTES.md says where things stand.
+// Versions and in the settings, and one put back. A guide to all of it opens once, and
+// is under Help. mac/NOTES.md says where things stand.
 //
 // One window and not a new one at every Command+N: there is one library to look at.
 
@@ -42,7 +43,22 @@ struct Pro7ChordEditorApp: App {
                 Button("Revert to as Opened\u{2026}") { model.askToRevert() }
                     .disabled(!model.canRevert)
             }
+            // Help: the guide (spec/13-guide.md).
+            GuideCommands()
         }
+
+        // The guide: one page on how chords are put on, in a window of its own, so
+        // that the app can be used while it is read. The app opens it once, at its
+        // first start on this Mac; after that it is under Help and behind the ? at
+        // the right of the sheet's strip. (One that was open when the app was quit is
+        // not opened again by the system at the next start: it opens when asked for.)
+        Window(GuideWindow.title, id: GuideWindow.id) {
+            GuideWindow(model: model)
+        }
+        .defaultSize(width: 780, height: 820)
+        // (At a side of the screen, so that less of the main window is under it.)
+        .defaultPosition(.topTrailing)
+        .restorationBehavior(.disabled)
 
         // Command+comma: the settings, in sections. The chords' colours, and the copies
         // kept, all of them (spec/06-library.md, "Settings"; spec/07-backups.md, rule 18).

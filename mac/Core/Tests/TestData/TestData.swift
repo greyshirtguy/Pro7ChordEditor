@@ -72,4 +72,11 @@ public enum TestData {
     public static func file(_ path: String) throws -> Data {
         try Data(contentsOf: root.appendingPathComponent("files").appendingPathComponent(path))
     }
+
+    /// A file of `spec`, the folder beside `testdata` that says what the apps are to
+    /// do, by its name: "guide.json". Read where a page of it is itself what an app
+    /// is held to, as the guide's words are.
+    public static func spec(_ name: String) throws -> Data {
+        try Data(contentsOf: root.deletingLastPathComponent().appendingPathComponent("spec").appendingPathComponent(name))
+    }
 }

@@ -66,7 +66,10 @@ let package = Package(
             ]
         ),
 
-        .target(name: "AppViews", dependencies: ["ChordRules", "Song"]),
+        // (Its one folder of resources is the guide's: its words, a copy of
+        // spec/guide.json, and its pictures. Copied as it is, so that the words stay
+        // the same to the byte: Sources/AppViews/Guide.swift.)
+        .target(name: "AppViews", dependencies: ["ChordRules", "Song"], resources: [.copy("Guide")]),
 
         // How the tests find testdata/ at the top of the repository. Not a test target
         // itself: both of those use it.

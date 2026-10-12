@@ -367,6 +367,29 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "32 just reverted", size: NSSize(width: 1000, height: 560), dark: true)
     }
 
+    // ---- The guide (spec/13-guide.md)
+
+    @Test("The guide: its window as it opens, in the light and in the dark; in a narrow window; and the whole of its page")
+    func theGuide() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let opens = NSSize(width: 780, height: 820)
+        try draw(GuideWindow(model: model), named: "38 the guide, as it opens", size: opens)
+        try draw(GuideWindow(model: model), named: "39 the guide, in the dark", size: opens, dark: true)
+        try draw(GuideWindow(model: model), named: "40 the guide, in a narrow window", size: NSSize(width: 460, height: 700))
+        // All of the page, as tall as it is.
+        let guide = try #require(GuideFiles.guide)
+        let page = GuidePage(guide: guide, chordColour: .systemOrange)
+            .frame(width: GuideLook.width)
+            .padding(GuideLook.margin)
+            .background(Color(nsColor: .textBackgroundColor))
+        let whole = NSHostingView(rootView: page).fittingSize
+        try draw(page, named: "41 the guide, the whole page", size: whole)
+        try draw(page, named: "42 the guide, the whole page in the dark", size: whole, dark: true)
+        // The ? that opens it, at the right of the strip.
+        try draw(LibraryWindow(model: model), named: "43 the strip, with the way to the guide", size: Self.sheetSize)
+    }
+
     @Test("Chords with no words: the song in the shapes real ones have, as it is; with chords put on its three blank slides and on its lines of chords alone; and that as ChordPro text")
     func chordsWithNoWords() async throws {
         let mac = try MadeUpMac()

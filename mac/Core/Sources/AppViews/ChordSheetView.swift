@@ -1466,21 +1466,23 @@ struct SheetStrip: View {
         .environment(\.colorScheme, .dark)
     }
 
-    /// The size of the words, and so how many slides there are to a row.
+    /// At the strip's right: the size of the words, and so how many slides there are to
+    /// a row; and, a little apart from those two, the guide (spec/13-guide.md, rule 3).
     private var zoom: some View {
         HStack(spacing: 6) {
-            zoomButton("minus", by: -1, can: model.canZoomSheetOut,
-                       says: "Smaller words, and more slides in view. Command with the minus key does the same.")
-            zoomButton("plus", by: 1, can: model.canZoomSheetIn,
-                       says: "Larger words. Command with the plus key does the same; Command with 0 is the usual size.")
+            round("minus", named: "Smaller words", can: model.canZoomSheetOut,
+                  says: "Smaller words, and more slides in view. Command with the minus key does the same.") { model.zoomSheet(-1) }
+            round("plus", named: "Larger words", can: model.canZoomSheetIn,
+                  says: "Larger words. Command with the plus key does the same; Command with 0 is the usual size.") { model.zoomSheet(1) }
+            round("questionmark", named: "Guide", can: true, says: GuideWindow.tip) { model.showGuide() }
+                .padding(.leading, 6)
         }
         .fixedSize()
     }
 
-    private func zoomButton(_ picture: String, by direction: Int, can: Bool, says: String) -> some View {
-        Button {
-            model.zoomSheet(direction)
-        } label: {
+    /// One of the small round buttons at the strip's right.
+    private func round(_ picture: String, named name: String, can: Bool, says: String, does: @escaping () -> Void) -> some View {
+        Button(action: does) {
             Image(systemName: picture)
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(Color(nsColor: SheetLook.words).opacity(can ? 1 : 0.35))
@@ -1490,7 +1492,7 @@ struct SheetStrip: View {
         .buttonStyle(.plain)
         .disabled(!can)
         .help(says)
-        .accessibilityLabel(direction < 0 ? "Smaller words" : "Larger words")
+        .accessibilityLabel(name)
     }
 
     private var chords: some View {

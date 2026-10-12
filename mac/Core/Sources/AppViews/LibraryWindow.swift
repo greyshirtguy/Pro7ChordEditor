@@ -23,6 +23,8 @@
 // The song is SongView.swift: its header, and its two editors. What is being typed is
 // saved when the app is left, when it quits and when the window goes, as well as a
 // moment after the typing stops.
+//
+// The guide (GuideWindow.swift) is another window, which this one opens.
 
 import AppKit
 import Song
@@ -54,6 +56,7 @@ public enum AppTitle {
 
 public struct LibraryWindow: View {
     @Bindable private var model: LibraryModel
+    @Environment(\.openWindow) private var openWindow
 
     public init(model: LibraryModel) {
         self.model = model
@@ -80,6 +83,11 @@ public struct LibraryWindow: View {
             Text(model.revertQuestion?.message ?? "")
         }
         .task { await model.start() }
+        // The guide is a window of its own. It is opened whenever the model says it
+        // is to be shown: asked for with the ? in the strip, or by the app itself,
+        // once, at its first start (spec/13-guide.md). Asked for while it is open, it
+        // comes to the front: there is one of it.
+        .onChange(of: model.guideAsked) { openWindow(id: GuideWindow.id) }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willResignActiveNotification)) { _ in
             model.settle()
         }

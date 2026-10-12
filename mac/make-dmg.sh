@@ -16,8 +16,8 @@
 #      it leaves in name every file the program was made from by its whole path, and
 #      so the folders of the Mac it was built on, the account's name among them.
 #   2. Looks at what it built: its version, that it runs on both kinds of Mac, how it
-#      is signed, that its seal holds, and that nothing in it names a folder of this
-#      Mac.
+#      is signed, that its seal holds, that it has its guide (the words and every
+#      picture they name), and that nothing in it names a folder of this Mac.
 #   3. Lays out a folder: the app, a way to Applications to drag it onto, and the
 #      read-me that is kept beside this script (mac/dmg/Read Me First.txt).
 #   4. Makes a compressed image of that folder, mounts the image, and holds the app in
@@ -80,6 +80,16 @@ if codesign -d --entitlements - "$APP" 2>/dev/null | grep -q "get-task-allow"; t
     echo "the app was built with leave to be debugged (get-task-allow), which a build to give out must not have" >&2
     exit 1
 fi
+# The guide, which the app opens by itself at its first start: its words, which are
+# the spec's to the byte, and every picture those words name (spec/13-guide.md).
+GUIDE="$APP/Contents/Resources/Core_AppViews.bundle/Contents/Resources/Guide"
+[ -f "$GUIDE/guide.json" ] || { echo "the app has not got its guide: there is no $GUIDE/guide.json" >&2; exit 1; }
+cmp -s "$GUIDE/guide.json" "$HERE/../spec/guide.json" || { echo "the guide's words in the app are not spec/guide.json" >&2; exit 1; }
+PICTURES=$(sed -n 's/.*"picture": "\([^"]*\)".*/\1/p' "$GUIDE/guide.json" | sort -u)
+[ -n "$PICTURES" ] || { echo "the guide's words name no picture, which cannot be right" >&2; exit 1; }
+for PICTURE in $PICTURES; do
+    [ -s "$GUIDE/$PICTURE.png" ] || { echo "the app has not got the guide's picture $PICTURE.png" >&2; exit 1; }
+done
 SIGNED=$(codesign -dv "$APP" 2>&1 | sed -n 's/^Signature=//p; s/^Authority=//p' | head -1)
 [ -n "$SIGNED" ] || SIGNED="in a way this script does not know"
 # Nothing in the app is to say where on this Mac it was made: not the home folder of

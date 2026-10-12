@@ -4,7 +4,9 @@
 // On the Mac it is all in one folder, `Pro7ChordEditor` in the person's Application
 // Support. Nothing of the app's is ever put in ProPresenter's folders, or beside a song.
 //
-//   settings.json   the folders chosen by hand, and the place and library last open
+//   settings.json   the folders chosen by hand, the place and library last open, how
+//                   the window was left (the sizes of the words, the colours of
+//                   chords), and whether the guide has been shown
 //   marks.json      the marks worked out for each song (Marks.swift)
 //   log.txt         a line for each thing the app did
 //
@@ -52,6 +54,9 @@ public struct AppData: Sendable {
         /// How much of the height of the two lists at the window's left the libraries
         /// have, from nought to one; nothing if the bar between them was never moved.
         public var listsSplit: Double?
+        /// Whether the guide has opened by itself, as it does once: at the first start
+        /// of the app on this Mac (spec/13-guide.md, rule 2). Nothing if it never has.
+        public var guideShown: Bool?
 
         public init() {}
     }

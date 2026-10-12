@@ -141,6 +141,12 @@ public final class LibraryModel {
     /// the songs having the rest: what the bar between them is dragged to.
     public private(set) var listsSplit = LibraryModel.usualListsSplit
     public static let usualListsSplit = 0.36
+    /// Goes up each time the guide is to be shown (spec/13-guide.md): because it was
+    /// asked for, by the ? in the strip, or by the app itself, which shows it once, at
+    /// its first start on this Mac. The window watches this and opens the guide.
+    public private(set) var guideAsked = 0
+    /// Whether the guide has opened by itself already. It is remembered.
+    private var guideShown = false
     /// What the sheet just said ("4 chords copied ..."), for a few seconds.
     public private(set) var said: String?
     private var saying: Task<Void, Never>?
@@ -262,10 +268,31 @@ public final class LibraryModel {
         if thrownAway > 0 {
             appData.log("\(thrownAway) old copies were thrown away.")
         }
+        guideShown = settings.guideShown ?? false
         findPlaces(preferring: settings.lastPlace, library: settings.lastLibrary)
         proPresenterIsRunning = askWhetherProPresenterIsRunning()
         appData.log("Started. \(places.count) places found, \(libraries.count) libraries in the one open.")
+        // The guide opens by itself once: at the first start of the app on this Mac,
+        // which is the first at which the app's own settings do not say that it has.
+        // That it has is written down now, and not when the guide is closed, so that
+        // whatever becomes of this start it is not opened unasked a second time.
+        // (Only that is written: what else was kept stays as it was read, the place
+        // last open too, which may not be there to be found today.)
+        if !guideShown {
+            guideShown = true
+            var kept = appData.settings
+            kept.guideShown = true
+            appData.settings = kept
+            guideAsked += 1
+            appData.log("The guide was shown, as it is once.")
+        }
         await marksAreWorkedOut()
+    }
+
+    /// The guide is asked for: by the ? at the right of the strip. (Help in the menu
+    /// bar opens it without asking here, so that it does so with no window open too.)
+    public func showGuide() {
+        guideAsked += 1
     }
 
     /// The system says an application has started or quit, or a moment has gone by
@@ -987,6 +1014,7 @@ public final class LibraryModel {
         settings.sheetChordColour = sheetChordColour
         settings.textChordColour = textChordColour
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
+        settings.guideShown = guideShown ? true : nil
         appData.settings = settings
     }
 }

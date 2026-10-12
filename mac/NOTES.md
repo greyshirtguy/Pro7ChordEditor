@@ -18,6 +18,7 @@ milestone; put right what has become untrue.
 | **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
 | **M7** Chords with no words | Built, 2026-10-11. **Seen in ProPresenter by the maintainer, 2026-10-12: "They showed"** (which cases were among what was looked at was not said) | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made, and its third, that ProPresenter shows what was written, the maintainer made. Since then, decision 58: a line that loses its last chord takes chords again |
 | A chord from the strip (asked for after M7) | Built, 2026-10-12, and used by the maintainer the same day: "This is quite nice/exciting". Which of the seven things under "Left rough" were among what was tried was not said | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
+| The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer, and its window not yet opened by anyone**: this session does not run the app | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -399,6 +400,65 @@ it could not do:
     from the strip and the version in the title. The build number went from 1 to 2
     with it. "The disk image" below has what was checked.
 
+And the same day, on how someone new is to find out what the sheet can do:
+
+64. **A guide, in the app, opened once at the first start** (`spec/13-guide.md`, new,
+    for both apps). The maintainer asked for "a nice onboarding experience to reveal
+    all the cool editing options", with a pop-up guide, a link to a video and a
+    video in the app as the ways thought of; was advised a page in the app with its
+    pictures drawn by the tests, no video yet, and a practice song later; and said
+    "lets build the guide - open it once at first start", and "the guide will have
+    mac screenshots - for mac - but win screenshots for win". Those three things
+    are theirs. Mine, each to be said otherwise:
+    - **its words are a file of the spec, `spec/guide.json`, and no sentence of it
+      is in either app's code.** Each app carries a copy, the same to the byte, and
+      a test holds the copy to the original. It is the longest thing either app
+      says, and two sessions that never meet would otherwise each have their own
+      wording of it by the second change. The keys are named in it by short names in
+      curly brackets, with each platform's word for each;
+    - **it is a window of its own, and not a panel to be put away first**: what it
+      says is to be tried as it is read, on the song beside it;
+    - **what it says first is not a way of putting a chord on**: a backup, quit
+      ProPresenter, there is no Save, a copy is kept. The maintainer was told of
+      three such things; **the backup is a fourth, added by me**, because the guide
+      is the one thing certain to be seen by someone who never read the README;
+    - **one way is said large** (point at a word and press 1 to 7), and the rest is
+      a list under it, for the second visit;
+    - **that it was shown is written when it opens**, not when it is closed, and
+      writing it touches nothing else that is kept. So whoever had the app before
+      has it shown once too: the maintainer will, at the next start;
+    - **it is asked for under Help** (Command+?, in place of the system's "this app
+      has no help") **and with a ? at the right of the strip**, a little apart from
+      − and +. The ChordPro text has no such button: Help has it there;
+    - **three pictures** (the spot under the pointer, a chord being typed, a chord
+      being dragged), **and no picture of a chord carried from the strip**: it would
+      be the third one again with a button faint. The line of ChordPro is not a
+      picture but text, in the colour chords have there.
+65. **The guide's pictures are kept in the repository**, in
+    `Core/Sources/AppViews/Guide`, which `spec/10` had said pictures are not: these
+    are part of the app. A test draws them and **holds the kept ones to what the app
+    draws now, dot for dot**, so that a change to how the sheet looks fails until
+    they are made again and looked at. Not on GitHub's machine, which draws letters
+    a hair otherwise: there they are only seen to be there. **The pointer in them is
+    drawn by the test**, there being none in a window that is drawn, and is not the
+    system's own picture of it, which is whatever size and colour the person has set.
+66. **The README at the top has a "Try it"**, with a link for each system that
+    fetches the newest file straight away (`spec/10`, "Getting it to other people":
+    whoever publishes a release brings their row up to date in the same push). The
+    maintainer: "an obvious answer to someone who wants to try it out: links to both
+    releases (how might we handle that 'latest release' cant point to both
+    options?". GitHub gives "Latest" to one release, and while the new apps are
+    pre-releases it has it on the old Windows editor: so the README is the way in,
+    and says so. **What was put to the maintainer and is theirs to decide**: one
+    release for both apps from the next version on, the image and the zip side by
+    side under one number, which "Latest" could then be given to.
+67. **The version is still 0.2**, though the app now has the guide and 0.2 as given
+    out has not. No release was asked for; the number goes up when one is. Until
+    then a build made here says 0.2 in its title and is not the 0.2 on the Releases
+    page. **`mac/make-dmg.sh` is not to be run before the number goes up**: it would
+    write over `mac/build/Pro7ChordEditor-mac-0.2.dmg`, the copy of what was given
+    out.
+
 ## How it is laid out, and why
 
 ```
@@ -704,9 +764,39 @@ changing any of it:
   the byte, and the same as the key makes it); `ChordFromTheStripTests` (the
   window's two ends, its head says how); picture 37.
 
-## What was found out
+### The guide (after M7)
 
-- **A file read and written back unchanged is the same, byte for byte**## What was found out
+- **The words**: `Core/Sources/AppViews/Guide/guide.json`, a copy of
+  `spec/guide.json`. To change a wording, change the spec's and copy it over (and
+  put the same change in the page, `spec/13-guide.md`, "The words"): `GuideTests`
+  fails until all three say the same. `Guide.swift` reads it (`Guide`, plain, no
+  window) and puts the Mac's names for the keys in (`said(on:)`).
+- **Where the app finds it**: `GuideFiles`, in `Guide.swift`. The folder is the
+  package's one resource (`resources: [.copy("Guide")]`), which the package manager
+  puts in `Core_AppViews.bundle`: in the app's Resources when Xcode builds the app,
+  and beside the tests when `swift test` builds those, **laid out differently in
+  the two**, and both are looked in. **Not with `Bundle.module`**, which stops the
+  whole app when the bundle is not where it expects: the app opens this window by
+  itself at its first start, and a guide that is not found says so in its window
+  instead. `make-dmg.sh` refuses an app that has not got its guide.
+- **The window**: `GuideWindow.swift`. `GuidePage` is the page, `GuidePicture` one
+  picture, `GuideCommands` the Help menu's entry. The scene is in the app's own
+  file (`Window(GuideWindow.title, id: GuideWindow.id)`), with the system's putting
+  back of windows switched off for it.
+- **When it is shown**: `LibraryModel.guideAsked` goes up, and `LibraryWindow`
+  opens the window when it does. It goes up at the end of the first `start()` on a
+  Mac whose `settings.json` has no `guideShown` (which is then written, and only
+  that), and at `showGuide()`, which the ? in the strip calls. Help opens the
+  window itself and asks the model nothing, so that it works with the main window
+  closed.
+- **The pictures**: `GuidePictureTests`. Its head says how they are made again:
+
+      PRO7_GUIDE_PICTURES=write swift test --package-path mac/Core --filter GuidePictureTests
+
+  They are also written, every run, to the pictures' folder as "guide <name>.png",
+  to be looked at. `PictureTests` has the guide's own window: 38 to 43.
+
+## What was found out
 
 - **A file read and written back unchanged is the same, byte for byte**, in every
   file tried: the nine of `testdata/files`, and copies of 22 real songs of the
@@ -1253,7 +1343,37 @@ more.)
   and one changes nothing that can be seen (`dropOfKey` holding the name to being
   a chord, which `carry` has done already). All seven are caught now.
 
-### Rules the vectors did not hold, and what became of them
+### At the guide
+
+- **A window that is never shown draws at one dot to the point on this Mac**, whose
+  first screen has no dots to spare, and so would a picture made that way on any Mac
+  like it. Asking for more in the picture (`cacheDisplay` into a bitmap of twice the
+  dots, its size left in points) draws the sheet itself twice as fine, which draws
+  when asked; **but the strip's letters came out soft**: SwiftUI draws them once,
+  as finely as the window says its screen is, keeps them, and they were stretched.
+  Telling SwiftUI otherwise (`\.displayScale`) did not change it. **What did: a
+  window that says it has two dots to the point** (`TwoDotsWindow` overrides
+  `backingScaleFactor`). The pictures are then the same on any Mac's screens.
+- **Drawn three times over, the pictures were the same to the dot each time**, so
+  holding them dot for dot is not a test that fails by chance on one Mac. Whether
+  another Mac, or another macOS, draws the same dots is not known, and the test's
+  head says what to do when it does not.
+- **A PNG says how many dots it has to the metre, in whole numbers**, so a picture
+  written as 720 points wide comes back a hair off 720. The test allows half a point.
+- **A picture in a column of other things can be squeezed shorter than its width
+  makes it**, and then stands narrow in a frame too wide for it: it is held to its
+  own height (`fixedSize`, up and down). It showed in the picture of the whole page
+  and would have shown in no window, since a scrolling page squeezes nothing.
+- **The system's arrow was not used for the pointer** in the pictures: it is the
+  person's own, in the size and colour they set. The arrow is seven corners in the
+  test.
+- **Opening a window where no app stands behind the view does nothing and says
+  nothing**: `openWindow` in a view the tests draw. So the tests can ask for the
+  guide and prove the asking; that a window then opens, they cannot.
+- **Xcode's bundle for a package's resources and `swift build`'s are not laid out
+  alike**: `Core_AppViews.bundle/Contents/Resources/Guide` in the app,
+  `Core_AppViews.bundle/Guide` beside the tests. Seen by building both and looking.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -1365,6 +1485,12 @@ the About text, a Developer ID, notarizing) is still to come.
   for an image to try. It is the first build whose program is stripped. The copy
   marked as a download is beside it (`... (as if downloaded).dmg`) for whoever
   tries it first.
+- **Since the guide**: the script refuses an app that has not got it (the words,
+  held to `spec/guide.json`, and every picture they name), and the read-me in the
+  image says the guide is there. Tried on a Release built as the script builds one,
+  into a folder of this session's and not into `mac/build` (decision 67 says why).
+- **The README at the top names each download** ("Try it"). When an image is put on
+  the Releases page, the Mac's row there is changed in the same push.
 - **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
   whose, and that they are here at the maintainer's asking). In a repository that
   is one thing; in an app handed to other people it is another, and is the
@@ -1372,6 +1498,33 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
+- **The guide's window has been opened by nobody** (decision 64): this session does
+  not run the app, and no test has an app to open a window in. Its page was drawn
+  into pictures and looked at, light and dark, wide and narrow. To try, and to say
+  of each what is odd:
+  1. start the app: the guide opens, once the libraries are listed, in front of the
+     main window and towards the top right of the screen. (It will, the first time,
+     on a Mac that had the app before: nothing says yet that it was shown.) Is that
+     where it should open, and is it the size it should be?
+  2. with it open, click the main window and put a chord on: the guide stays open,
+     behind or beside;
+  3. quit and start again: it does not open;
+  4. Help > Pro7 Chord Editor Guide opens it, and so does Command+?; and the ? at
+     the right of the strip. Asked for while open, it comes to the front and there
+     is still one of it;
+  5. close the main window and ask for it under Help: it still opens;
+  6. **the Window menu**: the guide is listed there while it is open, which is the
+     system's doing. Does the system also put an entry there that opens it, and
+     has that entry taken a key? **Command+1 and Command+2 must still show the
+     sheet and the text**;
+  7. quit with the guide open, and start again: it should not come back. (That is
+     asked of the system for this window, and was not seen to work.)
+  8. the words themselves: `spec/13-guide.md`, "The words", has them to be read
+     without the app. What is wrong, missing or too much is changed in
+     `spec/guide.json`, for both apps at once.
+- **The pictures in the guide are the sheet at its usual size on a Mac with no
+  ProPresenter colours in the song.** They are of the test song, and say nothing of
+  how a real one looks.
 - **A chord dragged out of the strip has not been tried by a hand** (decision 60).
   To try, with ProPresenter quit, and to say of each what is odd:
   1. press a button of the strip, pull it down over a word and let go: is the chord

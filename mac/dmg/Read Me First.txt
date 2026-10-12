@@ -44,6 +44,13 @@ app is made from can be read at
 https://github.com/greyshirtguy/Pro7ChordEditor
 
 
+HOW CHORDS ARE PUT ON
+
+The first time the app is started it opens a guide: one page that says how
+chords are put on, moved and taken off. After that the guide is in the Help
+menu, and behind the ? at the right of the strip over a song.
+
+
 NOT IN IT YET
 
 - Finding and mending the songs that the first chord editor, the one for
