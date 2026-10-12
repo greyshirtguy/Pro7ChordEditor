@@ -1319,9 +1319,8 @@ the About text, a Developer ID, notarizing) is still to come.
   for with `strings`, which does not show them; looked for as bytes (`grep -a`)
   they are plain. Found on 2026-10-12, when 0.2 was being checked. What it gives
   away is small (the commits in the repository are signed with the same first
-  name), but it was said to have been checked and had not been. **The 0.1 image on
-  the Releases page still has it**: whether that image stays is the maintainer's
-  to say.
+  name), but it was said to have been checked and had not been. The 0.1 image was
+  taken off the Releases page for it the same day (below).
 - **Since 0.2 the program is stripped** (`DEPLOYMENT_POSTPROCESSING=YES` and
   `STRIP_INSTALLED_PRODUCT=YES` to `xcodebuild`), as an app sent to Apple's store
   is, and **the script refuses an app in which any file names the home folder of
@@ -1350,6 +1349,12 @@ the About text, a Developer ID, notarizing) is still to come.
   `mac-v0.1`, the maintainer having said "please publish": that image, of the app
   as it was at that tag. A pre-release, so that the page's "latest" is still the
   Windows editor 0.9.5, which `windows/README.md` points people at.
+- **0.1 was taken down on 2026-10-12**, once 0.2 was out, at the maintainer's word
+  ("yes take 0.1 down"): the release and its image are gone from the Releases page,
+  and the image's address answers that there is nothing there. The tag `mac-v0.1`
+  stays, for what the history and `windows/NOTES.md` say of it; a tag holds no
+  image. The two copies of that image in `mac/build` on the maintainer's Mac are
+  still there, and are not to be given to anyone.
 - **0.2, given out on 2026-10-12** at the maintainer's word ("make a downloadable
   release"), as a pre-release tagged `mac-v0.2`. Version 0.2, build 2. Checked as
   0.1 was, and besides: no file in it names a folder of this Mac; the system's
