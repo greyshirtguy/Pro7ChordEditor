@@ -24,10 +24,11 @@
 // What is NOT set, on purpose: the block that says a song came from Multitracks and is
 // licensed by them. A song typed or imported by hand is not theirs.
 //
-// A GUESS, and untested: that ProPresenter opens a presentation made here. Every field
-// it writes for an empty slide is written (proconvert::addBlankCue and makeTextElement
-// are what the editor has always added slides and text boxes with), and the file is
-// stamped as ProPresenter 7.16's, but none has been opened in ProPresenter yet.
+// A GUESS, and untested: that ProPresenter opens a presentation made here. It starts
+// as every new presentation here does (proconvert::newPresentation), and every field
+// ProPresenter writes for an empty slide is written (proconvert::addBlankCue and
+// makeTextElement are what the editor has always added slides and text boxes with),
+// but none has been opened in ProPresenter yet.
 namespace songimport {
 
 // Reads a ChordPro file from disk. An empty song, with *error set, if it cannot be read

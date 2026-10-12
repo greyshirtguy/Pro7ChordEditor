@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QColor>
 #include <QObject>
 #include <QQuickTextDocument>
 #include <QStringList>
@@ -39,6 +40,11 @@ public:
     Q_INVOKABLE QVariantList chordsOf(const QString &chordPro) const;
     Q_INVOKABLE QString withoutChords(const QString &chordPro) const;
     Q_INVOKABLE bool isPlaceholders(const QString &line) const;
+    // The text the system has as what was last copied, by this app or any other; ""
+    // if it is not text. The chord sheet keeps the chords it copies to itself, so as
+    // not to put them in the way of what was copied elsewhere, and asks this to tell
+    // whether anything has been copied since (ChordSheet.qml, copiedLast).
+    Q_INVOKABLE QString copiedText() const;
     // What a ChordPro file holds, for the import to show before it is done: { title,
     // artist, key, sections: [{ name, lines }] (how many lines each), chords (how
     // many), error }.
@@ -46,26 +52,32 @@ public:
 };
 
 // Colours ChordPro text as it is typed (ChordProEditor.qml): chords in the app's orange,
-// brackets and all, and the lines in curly brackets that name the song's parts greyed,
-// since they are not to be changed. It is given a TextEdit's document and does nothing
-// but colour it; the text is not touched.
+// brackets and all, or in the colour chosen for them in the settings (`color`), and the
+// lines in curly brackets that name the song's parts greyed, since they are not to be
+// changed. It is given a TextEdit's document and does nothing but colour it; the text
+// is not touched.
 class ChordHighlighter : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
 
     Q_PROPERTY(QQuickTextDocument *document READ document WRITE setDocument NOTIFY documentChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
 
 public:
     using QObject::QObject;
 
     QQuickTextDocument *document() const { return m_document; }
     void setDocument(QQuickTextDocument *document);
+    QColor color() const { return m_color; }
+    void setColor(const QColor &color);
 
 signals:
     void documentChanged();
+    void colorChanged();
 
 private:
     QQuickTextDocument *m_document = nullptr;
     QSyntaxHighlighter *m_highlighter = nullptr;
+    QColor m_color = QColor(0xff, 0xb4, 0x5e);
 };

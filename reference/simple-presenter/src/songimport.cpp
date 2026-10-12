@@ -4,7 +4,6 @@
 #include "workspacefiles.h"
 
 #include <QDateTime>
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QStringDecoder>
@@ -41,17 +40,8 @@ chords::Song readFile(const QString &path, QString *error)
 
 rv::data::Presentation build(const chords::Song &song, const QString &name, int linesPerSlide)
 {
-    rv::data::Presentation presentation;
-    auto *info = presentation.mutable_application_info();
-    info->set_application(rv::data::ApplicationInfo::APPLICATION_PROPRESENTER);
-    info->mutable_application_version()->set_major_version(7);
-    info->mutable_application_version()->set_minor_version(16);
-    info->mutable_application_version()->set_patch_version(2);
-    presentation.mutable_uuid()->set_string(workspace::newUuid());
-    presentation.set_name(name.toStdString());
+    rv::data::Presentation presentation = proconvert::newPresentation(name);
     presentation.mutable_last_modified_date()->set_seconds(QDateTime::currentSecsSinceEpoch());
-    presentation.mutable_background();
-    presentation.mutable_chord_chart();
 
     if (!song.title.isEmpty() || !song.artist.isEmpty() || !song.copyright.isEmpty() || !song.ccli.isEmpty()) {
         auto *ccli = presentation.mutable_ccli();
@@ -128,19 +118,9 @@ QString importFile(const QString &file, const QString &library, int linesPerSlid
     if (!QFileInfo(library).isDir())
         return QStringLiteral("There is no library to put it in");
 
-    // A file's name cannot have a slash in it, and one starting with a dot is hidden.
-    QString name = (song.title.isEmpty() ? QFileInfo(file).completeBaseName() : song.title).simplified();
-    name.replace(u'/', u'-');
-    while (name.startsWith(u'.'))
-        name.remove(0, 1);
-    if (name.isEmpty())
-        name = QStringLiteral("Song");
-    const QDir folder(library);
-    QString unique = name;
-    for (int n = 2; folder.exists(unique + QStringLiteral(".pro")); ++n)
-        unique = QStringLiteral("%1 %2").arg(name).arg(n);
-
-    const QString path = folder.filePath(unique + QStringLiteral(".pro"));
+    QString unique;
+    const QString path = proconvert::presentationFileFor(library, song.title.isEmpty() ? QFileInfo(file).completeBaseName() : song.title,
+                                                         QStringLiteral("Song"), &unique);
     error = proconvert::writePresentation(path, build(song, unique, linesPerSlide));
     if (error.isEmpty())
         *made = path;

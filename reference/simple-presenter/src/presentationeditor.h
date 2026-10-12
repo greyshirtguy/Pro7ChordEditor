@@ -49,8 +49,15 @@ class PresentationEditor : public QAbstractListModel
     // Where the copy made before the first change went, or empty if there is none yet.
     Q_PROPERTY(QString backupPath READ backupPath NOTIFY historyChanged)
     // The key the presentation's chords are written in, as chords.h names keys; "" for
-    // a presentation that names none (and for props, layouts and themes).
+    // a presentation that names none (and for props, layouts and themes). And the key
+    // ProPresenter shows them in, which the file keeps beside it: "" likewise.
     Q_PROPERTY(QString key READ key NOTIFY keyChanged)
+    Q_PROPERTY(QString shownKey READ shownKey NOTIFY keyChanged)
+    // Whether the presentation's file is no longer what it was when it was opened here,
+    // so that revertToOpened() has something to do; and whether a revert has just been made
+    // that takeBackRevert() can still take back.
+    Q_PROPERTY(bool canRevert READ canRevert NOTIFY historyChanged)
+    Q_PROPERTY(bool canTakeBackRevert READ canTakeBackRevert NOTIFY historyChanged)
 
 public:
     enum Roles { SlideRole = Qt::UserRole + 1 };
@@ -70,6 +77,9 @@ public:
     bool changed() const { return m_changed; }
     QString backupPath() const { return m_backupPath; }
     QString key() const;
+    QString shownKey() const;
+    bool canRevert() const { return m_revertible; }
+    bool canTakeBackRevert() const { return !m_beforeRevert.isEmpty(); }
 
     // Opens a presentation file from the workspace folder `workspace`, in place of any
     // open already. Returns an error message, empty on success.
@@ -136,6 +146,20 @@ public:
     // the line's stand-in characters are made anew, one for each (see
     // chords::placeholders). It is the one change the chord editors make to the words.
     //
+    //   - Only a line of chords alone is ever made stand-ins. A line that has words, or
+    //     an empty one, is refused, whatever asks: the words are not the chord editors'
+    //     to change.
+    //   - With no chords left, the line is one zero-width space, whatever it hung its
+    //     chords on, and so is a line of chords alone still: one can be put on it again.
+    //     (Left with no stand-in at all it would be an empty line, which takes nothing,
+    //     and a line of chords under a verse, once emptied, would be gone for good but
+    //     for undo. And left with the plain space it may have hung its chords on, its
+    //     text box would be read next time as holding a stray space and no more.)
+    //   - Where the line is those stand-ins already (its chords renamed, or put in
+    //     another order), only the chords are written: the text is not written again
+    //     to say the same.
+    //   - A name that is nothing once tidied is left out, and gets no stand-in.
+    //
     // For a blank slide (see song()) the line is all its box has. Nothing is done to
     // such a slide until a chord is put on it. Its first chords give the box stand-ins
     // where it had no text, in the box's own format; and where the slide has no text
@@ -146,11 +170,28 @@ public:
     // there has its text back as the file had it. So a change of mind leaves the slide
     // as it was found. (Nothing of this is kept once the presentation is closed: a
     // slide left with chords keeps what was made for them, and taking them off another
-    // day leaves its text box empty.)
+    // day leaves its text box with one stand-in, as any line of chords alone is left.)
     Q_INVOKABLE QString setChordsAlone(int row, const QString &element, int line, const QStringList &names, bool joined = false);
-    // Says what key the chords are written in. Not a change to any slide, so not one
-    // that undo takes back.
+    // Says what key the chords are written in. It changes no chord. The key
+    // ProPresenter shows them in goes with it if nobody has chosen another: if the
+    // presentation named no key, or its two keys were the same. Where they differed,
+    // someone chose to have the song shown in another key, and that is left alone.
     Q_INVOKABLE QString setKey(const QString &key);
+    // Says what key ProPresenter is to show the chords in, and that alone: it moves
+    // them there itself as it draws, and so does this app's own show. A presentation
+    // that names no key cannot be shown in another, and that is refused (a file with
+    // only this part in it would read as a song in A flat).
+    Q_INVOKABLE QString setShownKey(const QString &key);
+
+    // Makes the presentation's file what it was when it was opened here: every change
+    // since, of whatever kind, is taken back at once. The file as it is now is kept
+    // first (a copy among the others the editor keeps, and in memory), the bytes that
+    // were read at opening are written back exactly as they were, and the presentation
+    // is read afresh, with nothing to undo. takeBackRevert() puts the file back as it
+    // was just before, until the next change is made or the presentation closed. Each
+    // returns an error message, empty on success.
+    Q_INVOKABLE QString revertToOpened();
+    Q_INVOKABLE QString takeBackRevert();
 
     // The same changes as setProperties and formatText, shown but neither saved nor
     // undoable yet, for following a slider or a colour being dragged. Any number may
@@ -185,7 +226,9 @@ private:
         QString groupColor;
         bool groupStart;
     };
-    // One change: the cue or layout it was made to, as it was before and after.
+    // One change: the cue or layout it was made to, as it was before and after. Or,
+    // with no row (-1), a change to the presentation's keys: `before` and `after` are
+    // then what musicState() gave.
     struct Step
     {
         int row;
@@ -216,6 +259,21 @@ private:
     QString commit(int row, const std::string &before);
     QString restore(QList<Step> *from, QList<Step> *to, bool forwards);
     void backUp();
+    // The folder the copies of this file go to, made if it is not there; "" if it
+    // cannot be.
+    QString backupFolder() const;
+    // The presentation's two keys as they are in the file, or that it has none: what
+    // a change of key is undone to.
+    std::string musicState() const;
+    void setMusicState(const std::string &state);
+    // Saves the keys as they now are, as one change from how they were `before`.
+    QString commitMusic(const std::string &before);
+    // What a blank slide's box is remembered by in m_madeForChords.
+    QString boxKey(int row, const QString &element) const;
+    // Works out whether the file is still what was opened (see canRevert).
+    void noteFileState();
+    // Puts these bytes in the file's place and reads the presentation afresh.
+    QString putBack(const QByteArray &bytes);
 
     Kind m_kind = Kind::Presentation;
     // The file, as whichever of the three it is
@@ -231,12 +289,14 @@ private:
     QList<Step> m_undo;
     QList<Step> m_redo;
     // What the chord editors have made for chords on blank slides since the
-    // presentation was opened, by the id of the text box, so that taking the chords
-    // off again can unmake it (setChordsAlone). `added`: the slide had no text box
-    // and this one was added. Otherwise `was` is the box's text as the file had it,
-    // and `look` is what the text said of itself, apart from its words and chords,
-    // once the chords were on: while it still says the same, nothing else has been
-    // done to the box and `was` can go back.
+    // presentation was opened, by the slide and the id of the text box (boxKey: an id
+    // is one box's only on its own slide, a slide made by duplicating another keeping
+    // its boxes' ids), so that taking the chords off again can unmake it
+    // (setChordsAlone). `added`: the slide had no text box and this one was added.
+    // Otherwise `was` is the box's text as the file had it, and `look` is what the
+    // text said of itself, apart from its words and chords, once the chords were on:
+    // while it still says the same, nothing else has been done to the box and `was`
+    // can go back.
     struct MadeForChords
     {
         bool added = false;
@@ -246,6 +306,16 @@ private:
     QHash<QString, MadeForChords> m_madeForChords;
     bool m_changed = false;
     QString m_backupPath;
+    // The presentation's file as it was read when it was opened here, and the same as
+    // this app writes it (which is what the file is held against, a file being the
+    // same to the byte when it is read and written unchanged, in every one looked at,
+    // but not by any promise). They are kept through the re-openings that follow a
+    // slide being added or removed, which are part of the same sitting.
+    QByteArray m_asOpened;
+    std::string m_asOpenedWritten;
+    bool m_revertible = false;
+    // The file as it was just before revertToOpened(), for taking that back
+    QByteArray m_beforeRevert;
     // The row a preview is under way in, or -1, and its cue as it was before.
     // Whether the change being made is joined to the one before it (see Step)
     bool m_joinNext = false;

@@ -7,8 +7,8 @@ import "lib.js" as Lib
 // a chord, dragging one, copying a line's, undo); a blank slide given chords in both
 // editors, with and without a text box of its own, and left as it was found when they
 // are taken off again; the ChordPro editor (only chords can be typed); importing a
-// ChordPro file; and a new library. What the file then holds is looked at when the
-// test is over, by after_chords in run.py.
+// ChordPro file; a new presentation; and a new library. What the files then hold is
+// looked at when the test is over, by after_chords in run.py.
 QtObject {
     id: t
 
@@ -62,6 +62,15 @@ QtObject {
 
     function lineNames(lines) {
         return lines.map(line => line.text + " <" + line.chords.map(c => c.at + ":" + c.name).join(" ") + ">").join(" | ")
+    }
+
+    // Whether a colour of the window ("#rrggbb") is the orange the editor marks things with, or a good part of it
+    // (an edge one pixel wide may be shared between two).
+    function orange(c) {
+        const r = parseInt(c.substring(1, 3), 16)
+        const g = parseInt(c.substring(3, 5), 16)
+        const b = parseInt(c.substring(5, 7), 16)
+        return r > 130 && r > g + 30 && g > b + 20
     }
 
     function run() {
@@ -277,6 +286,14 @@ QtObject {
             () => {
                 check("which is one thing to undo, though it was two slides", names(kept.line) === "1:E 9:F#m7 16:Asus2 23:" + kept.picked && names(kept.other) === "0:A 18:F#m",
                       names(kept.line) + " / " + names(kept.other))
+                // The editor goes to the slide a change was undone on, and the sheet with it, though the undoing has
+                // just had every row of the sheet made anew. (That slide is far down the song; what follows is at its top.)
+                const view = named("chordSheetView")
+                const gone = lineItem(sheet().rows.findIndex(r => r.kind === "line" && r.row === editScreen.canvas.row))
+                const y = gone.mapToItem(view, 0, 0).y
+                check("and the sheet goes to the slide the editor has gone to for it", editScreen.canvas.row === sheet().rows[kept.other].row
+                      && y >= 0 && y + gone.height <= view.height, "slide " + editScreen.canvas.row + ", its first line " + Math.round(y) + " down a view of " + view.height)
+                view.contentY = 0
                 // The line's chords are copied onto the line under it.
                 let p = over(kept.line, 0)
                 testInput.mouse(1, p.x, p.y)
@@ -306,16 +323,15 @@ QtObject {
                 const disk = onDisk(kept.path, herald)
                 check("a chord goes on any letter, and is kept on that letter in the file", names(kept.line + 1) === "1:E 3:F#m 13:Asus2 21:" + kept.picked
                       && disk !== null && disk.chords.some(c => c.at === herald.length + 1 + 3 && c.name === "F#m"), names(kept.line + 1))
-                const cards = sheet().rows.filter(row => row.kind === "line" && row.first)
-                const tall = lineItem(sheet().rows.findIndex(row => row.kind === "line" && row.count === sheet().mostLines && row.first))
-                check("each slide's lines are in a card, all of one size: that of the slide with the most lines", cards.length >= 20 && sheet().mostLines >= 2
-                      && sheet().cardHeight > sheet().mostLines * 40 && sheet().cardWidth > 300 && tall !== null, cards.length + " cards of " + sheet().mostLines + " lines, "
-                      + Math.round(sheet().cardWidth) + " by " + Math.round(sheet().cardHeight))
-                const one = sheet().rows.findIndex(row => row.kind === "line" && row.first && row.last && row.count === 1)
-                const next = sheet().rows.findIndex((row, index) => index > one && row.kind === "line" && row.first)
-                check("so a slide of one line takes as much room as one of two", one >= 0 && next > one
-                      && Math.abs((lineItem(next).mapToItem(null, 0, 0).y - lineItem(one).mapToItem(null, 0, 0).y) - (sheet().cardHeight + sheet().cardGap)) < 40,
-                      one + " " + next)
+                // The slides are a grid of cards (chords2 looks at how it is drawn, and at what the grid is for).
+                const cells = sheet().cells
+                const widths = cells.map(cell => cell.width).filter((width, index, all) => all.indexOf(width) === index)
+                check("each slide's lines are in a card of its own, the cards all of one width and side by side in rows", cells.length >= 20 && sheet().columns >= 2
+                      && widths.length === 1 && cells[0].y === cells[1].y && cells[1].x >= cells[0].x + cells[0].width
+                      && cells[sheet().columns].y >= cells[0].y + cells[0].height, cells.length + " cards, " + sheet().columns + " to a row, " + widths.join("/") + " wide")
+                const one = cells.find(cell => cell.count === 1 && cells.some(other => other.gridRow === cell.gridRow && other.count === 2))
+                check("and those of a row are one height, so that a slide of one line takes as much room as the slide of two beside it", one !== undefined
+                      && cells.filter(other => other.gridRow === one.gridRow).every(other => other.height === one.height), JSON.stringify(one ?? null))
                 // A line of chords with no words: one more on the end.
                 kept.alone = sheet().rows.findIndex(row => row.kind === "line" && row.alone)
                 kept.aloneCount = sheet().rows[kept.alone].chords.length
@@ -525,6 +541,70 @@ QtObject {
             () => {
                 check("one of the key's chords clicked while typing goes where the typing was, in place of what was typed",
                       !sheet().typing && names(kept.god) === "0:Bsus4 8:D 16:B", names(kept.god))
+                // ---- Well down the song. Keeping a chord lays the whole sheet out again, and going straight on to another
+                // place is not to send the sheet back to its top by that. (It did: the rows were asked where they were
+                // before they had been put there, and all said the top.) Two slides, one under the other, by their first lines.
+                const view = named("chordSheetView")
+                const spoken = [herald, peace, born, "God and sinners reconciled", sheet().rows[kept.glory].text]
+                const firsts = sheet().rows.map((r, i) => r.kind === "line" && r.first && r.text.length > 0 && !r.alone && !spoken.includes(r.text) ? i : -1)
+                                           .filter(i => i >= 0)
+                kept.low = firsts[firsts.length - 4]
+                kept.lower = firsts[firsts.length - 3]
+                kept.scrolledFrom = view.contentY
+                view.contentY = Math.max(0, Math.min(view.contentHeight - view.height, lineItem(kept.low).y - 80))
+                return 400
+            },
+            () => {
+                const a = over(kept.low, 0)
+                testInput.mouse(1, a.x, a.y)
+                testInput.key(Qt.Key_G, 0, "g")
+                return 300
+            },
+            () => {
+                const view = named("chordSheetView")
+                const inView = index => {
+                    const item = lineItem(index)
+                    const y = item.mapToItem(view, 0, 0).y
+                    return y >= 0 && y + item.height <= view.height
+                }
+                kept.at = view.contentY
+                check("(further down the song: the sheet is scrolled, two slides are in view, and a chord is being typed on the first)",
+                      kept.at > 300 && inView(kept.low) && inView(kept.lower) && sheet().rows[kept.low].row !== sheet().rows[kept.lower].row
+                      && sheet().typing && sheet().typingRow === kept.low && sheet().typingAt === 0 && editScreen.canvas.row !== sheet().rows[kept.lower].row,
+                      "the sheet at " + Math.round(kept.at) + ", typing at " + sheet().typingRow + ":" + sheet().typingAt + ", the editor at slide " + editScreen.canvas.row)
+                click(over(kept.lower, 0))
+                return 600
+            },
+            () => {
+                const view = named("chordSheetView")
+                const bubble = named("chordEntry")
+                const corner = bubble.mapToItem(view, 0, 0)
+                // The bubble's edge, as the window shows it: the middle of its top, and for the ground a little above that
+                const edge = bubble.mapToItem(null, bubble.width / 2, 0.5)
+                const drawn = [String(testInput.windowPixel(edge.x, edge.y)), String(testInput.windowPixel(edge.x, edge.y - 6))]
+                check("a click on a line of another slide keeps the chord and opens the bubble there, and the sheet stays where it was",
+                      sheet().chordAt(kept.low, 0) === "G" && sheet().typing && sheet().typingRow === kept.lower && sheet().typingAt === 0
+                      && editScreen.canvas.row === sheet().rows[kept.lower].row && Math.abs(view.contentY - kept.at) < 1.5,
+                      "the sheet at " + Math.round(view.contentY) + ", it was at " + Math.round(kept.at) + "; typing at " + sheet().typingRow + ":" + sheet().typingAt)
+                check("with the bubble in sight, drawn at its line", bubble.visible && corner.y >= 0 && corner.y + bubble.height <= view.height
+                      && orange(drawn[0]) && !orange(drawn[1]), "its top " + Math.round(corner.y) + " down a view of " + view.height + ", its edge " + drawn.join(" over "))
+                testInput.grab("7c-kept-by-a-click-further-down")
+                testInput.type("d")
+                testInput.key(Qt.Key_Tab)
+                return 600
+            },
+            () => {
+                const view = named("chordSheetView")
+                const spot = lineItem(sheet().spotRow)
+                const y = spot ? spot.mapToItem(view, 0, 0).y : -1
+                check("Tab keeps that one and moves on along the line, and the sheet stays where it was then too",
+                      sheet().chordAt(kept.lower, 0) === "D" && !sheet().typing && sheet().spotRow === kept.lower && sheet().spotAt > 0
+                      && Math.abs(view.contentY - kept.at) < 1.5 && spot !== null && y >= 0 && y + spot.height <= view.height,
+                      "the sheet at " + Math.round(view.contentY) + ", it was at " + Math.round(kept.at) + "; the spot at " + sheet().spotRow + ":" + sheet().spotAt)
+                view.contentY = kept.scrolledFrom
+                return 400
+            },
+            () => {
                 const m = over(kept.peace, 15)
                 testInput.mouse(1, m.x, m.y)
                 testInput.key(Qt.Key_A, 0, "a")
@@ -633,7 +713,8 @@ QtObject {
                 return 400
             },
             () => {
-                check("the + beside Libraries offers a new library and a ChordPro file", labels() === "New Library, Import ChordPro File…", labels())
+                check("the + beside Libraries offers a new presentation, a new library and a ChordPro file",
+                      labels() === "New Presentation…, New Library, Import ChordPro File…", labels())
                 menu.close()
                 importSongPanel.show(kept.file)
                 return 400
@@ -651,6 +732,11 @@ QtObject {
             () => {
                 check("the song comes into the library that is open, and is opened", document !== null && document.name === "Plain Song" && document.path.endsWith("/Plain Song.pro")
                       && documents.some(d => d.name === "Plain Song"), document ? document.path : "")
+                // The list of presentations starts again at its top when what is in it changes, and the song is well
+                // down it: the list is to come to it.
+                const song = listed("Plain Song")
+                check("and the list of presentations is brought to it: its row is in view and picked out, with its name drawn",
+                      song.inView && song.picked && song.light >= 3 && song.dark >= 3, JSON.stringify(song))
                 check("as a slide for every two lines, in a group for each part, with its key", document.slides.length === 4
                       && document.slides.map(s => s.group).join("|") === "Verse 1|Verse 1|Chorus|Outro" && document.originalKey === "G" && document.hasChords,
                       document.slides.map(s => s.group).join("|") + " " + document.originalKey)
@@ -661,6 +747,99 @@ QtObject {
                 check("and a line of chords alone hangs on stand-ins", outro.chords.map(c => c.at + ":" + c.name).join(" ") === "0:G 2:D/F# 4:Em" && testInput.plain(outro.text).length === 5,
                       JSON.stringify(outro.chords))
                 testInput.grab("10-imported")
+                // A new presentation, in the library that is open.
+                kept.before = documents.length
+                click(centre(named("addLibraryButton")))
+                return 400
+            },
+            () => {
+                click(menuRow("New Presentation…"))
+                return 500
+            },
+            () => {
+                const field = named("newPresentationName")
+                check("New Presentation asks for its name first, with a name to type over", named("newPresentationPanel").visible && field.activeFocus
+                      && field.text === "New Presentation" && field.selectedText === field.text, field.text + " / " + field.selectedText)
+                testInput.grab("11-new-presentation")
+                testInput.key(Qt.Key_Escape)
+                return 300
+            },
+            () => {
+                check("Esc makes nothing", !named("newPresentationPanel").visible && documents.length === kept.before, documents.length + " " + kept.before)
+                click(centre(named("addLibraryButton")))
+                return 400
+            },
+            () => {
+                click(menuRow("New Presentation…"))
+                return 500
+            },
+            () => {
+                testInput.type("Sunday Notes")
+                testInput.key(Qt.Key_Return)
+                return 900
+            },
+            () => {
+                check("with a name typed and Enter, it is made in the library that is open, and opened", document !== null && document.name === "Sunday Notes"
+                      && document.path === libraryPath + "/Sunday Notes.pro" && documents.length === kept.before + 1
+                      && documents.some(d => d.name === "Sunday Notes") && !named("newPresentationPanel").visible, document ? document.path : "")
+                check("it has one slide, with nothing on it", document.slides.length === 1 && document.slides[0].elements.length === 0
+                      && document.slides[0].group === "" && document.hasChords === false,
+                      document.slides.length + " slides, " + (document.slides[0] ? document.slides[0].elements.length : "?") + " elements")
+                kept.made = document.path
+                kept.madeHash = testInput.fileHash(kept.made)
+                // And as the operator sees it, in what is drawn: its name over the slides, its row in the list of
+                // presentations brought into view and picked out, and one slide in the grid, a black one, with
+                // nothing where a second would be.
+                const title = named("gridTitle")
+                const titled = strokes(title)
+                const inList = listed("Sunday Notes")
+                check("its name is drawn over the slides", title.visible && title.text === "Sunday Notes" && titled.light >= 3 && titled.dark >= 3,
+                      title.text + " " + JSON.stringify(titled))
+                check("and in the list of presentations, which is brought to it: its row is in view and picked out",
+                      inList.inView && inList.picked && inList.light >= 3 && inList.dark >= 3, JSON.stringify(inList))
+                const view = named("slideGrid")
+                const tile = view.itemAtIndex(0)
+                const middle = tile ? tile.mapToItem(null, view.cellWidth / 2, (view.cellHeight - view.labelHeight) / 2) : null
+                const pixels = middle ? [[0, 0], [view.cellWidth, 0], [0, view.cellHeight]].map(by => String(testInput.windowPixel(middle.x + by[0], middle.y + by[1]))) : []
+                check("the grid draws one slide, a black one, and nothing where a second would be, beside it or below", view.count === 1 && view.columns >= 2
+                      && pixels[0] === "#000000" && pixels[1] !== "#000000" && pixels[1] === pixels[2], pixels.join(" ") + ", " + view.columns + " to a row")
+                check("and the log has a line for it, with the name of its file and of its library",
+                      testInput.readText(Log.path).includes("a new presentation, " + JSON.stringify("Sunday Notes.pro") + ", made in the library "
+                                                            + JSON.stringify(libraryPath.replace(/^.*\//, ""))))
+                testInput.grab("12-new-presentation-made")
+                // A name the library has already, and one a file cannot have.
+                const again = catalog.createPresentation(libraryPath, "Sunday Notes")
+                const slashed = catalog.createPresentation(libraryPath, " . ./Odd/Name ")
+                const nowhere = catalog.createPresentation(libraryPath + "/No Such Folder", "Lost")
+                check("a second of the same name has a number after it, in the file's name and inside the file", again.error === ""
+                      && again.path === libraryPath + "/Sunday Notes 2.pro" && catalog.open(again.path).name === "Sunday Notes 2", again.path + " " + again.error)
+                check("a name is cleared of what a file's name cannot have, and of the dots and spaces that would start it", slashed.error === ""
+                      && slashed.path === libraryPath + "/-Odd-Name.pro" && catalog.open(slashed.path).name === "-Odd-Name",
+                      slashed.path + " " + slashed.error)
+                check("and with no library to put it in nothing is made, and it says so", nowhere.error !== "" && nowhere.path === "", nowhere.error)
+                check("the first one made is not touched by the others", testInput.fileHash(kept.made) === kept.madeHash)
+                startEditing(entry("Sunday Notes"))
+                return 600
+            },
+            () => {
+                // Its one slide has no text box, and the song no other to make one like: a chord put there is given
+                // a text box as the T of the editor makes one, and it goes again with the chord.
+                const editor = editScreen.editor
+                const blank = editor.song()
+                check("in the chord editors its slide is a blank one, with no text box behind it", blank.length === 1 && blank[0].blank && blank[0].element === "",
+                      JSON.stringify(blank))
+                const put = editor.setChordsAlone(0, "", 0, ["G"])
+                const given = editor.song()
+                check("a chord put there is given a text box, though the song has none to make it like", put === "" && given.length === 1 && !given[0].blank
+                      && given[0].element !== "" && given[0].text === zeroWidth && given[0].chords.length === 1
+                      && catalog.open(kept.made).slides[0].elements.length === 1, put + " " + JSON.stringify(given))
+                const off = editor.setChordsAlone(0, given[0].element, 0, [])
+                check("and taken off again, the presentation's file is byte for byte as it was made", off === "" && editor.song()[0].element === ""
+                      && testInput.fileHash(kept.made) === kept.madeHash, off + " " + JSON.stringify(editor.song()))
+                stopEditing()
+                return 500
+            },
+            () => {
                 click(centre(named("addLibraryButton")))
                 return 400
             },

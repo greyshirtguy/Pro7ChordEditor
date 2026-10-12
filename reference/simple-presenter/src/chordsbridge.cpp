@@ -3,6 +3,8 @@
 #include "chords.h"
 #include "songimport.h"
 
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QRegularExpression>
 #include <QTextCharFormat>
 
@@ -84,6 +86,12 @@ bool Chords::isPlaceholders(const QString &line) const
     return chords::isPlaceholders(line);
 }
 
+QString Chords::copiedText() const
+{
+    const QClipboard *clipboard = QGuiApplication::clipboard();
+    return clipboard ? clipboard->text() : QString();
+}
+
 QVariantMap Chords::describeFile(const QString &path) const
 {
     QString error;
@@ -112,6 +120,9 @@ class Highlighter : public QSyntaxHighlighter
 public:
     using QSyntaxHighlighter::QSyntaxHighlighter;
 
+    // The colour chords are given
+    QColor color = QColor(0xff, 0xb4, 0x5e);
+
 protected:
     void highlightBlock(const QString &text) override
     {
@@ -123,7 +134,7 @@ protected:
             return;
         }
         QTextCharFormat format;
-        format.setForeground(QColor(0xff, 0xb4, 0x5e));
+        format.setForeground(color);
         format.setFontWeight(QFont::Bold);
         auto found = chord.globalMatch(text);
         while (found.hasNext()) {
@@ -142,7 +153,23 @@ void ChordHighlighter::setDocument(QQuickTextDocument *document)
     delete m_highlighter;
     m_highlighter = nullptr;
     m_document = document;
-    if (document && document->textDocument())
-        m_highlighter = new Highlighter(document->textDocument());
+    if (document && document->textDocument()) {
+        Highlighter *highlighter = new Highlighter(document->textDocument());
+        highlighter->color = m_color;
+        m_highlighter = highlighter;
+    }
     emit documentChanged();
+}
+
+// Another colour for the chords: the text is coloured again, and nothing of it changed.
+void ChordHighlighter::setColor(const QColor &color)
+{
+    if (color == m_color)
+        return;
+    m_color = color;
+    if (m_highlighter) {
+        static_cast<Highlighter *>(m_highlighter)->color = color;
+        m_highlighter->rehighlight();
+    }
+    emit colorChanged();
 }

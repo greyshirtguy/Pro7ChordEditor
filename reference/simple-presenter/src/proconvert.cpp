@@ -7,6 +7,7 @@
 #include "timers.h"
 #include "workspacefiles.h"
 
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QFontDatabase>
@@ -1453,6 +1454,46 @@ rv::data::Slide::Element makeMediaElement(const rv::data::Slide &slide, const QS
     *fill->mutable_media() = workspace::mediaElement(file, workspace::openWorkspace());
     fill->set_enable(true);
     return result;
+}
+
+rv::data::Presentation newPresentation(const QString &name)
+{
+    rv::data::Presentation presentation;
+    auto *info = presentation.mutable_application_info();
+    info->set_application(rv::data::ApplicationInfo::APPLICATION_PROPRESENTER);
+    info->mutable_application_version()->set_major_version(7);
+    info->mutable_application_version()->set_minor_version(16);
+    info->mutable_application_version()->set_patch_version(2);
+    presentation.mutable_uuid()->set_string(workspace::newUuid());
+    presentation.set_name(name.toStdString());
+    presentation.mutable_background();
+    presentation.mutable_chord_chart();
+    presentation.mutable_ccli();
+    presentation.mutable_timeline()->set_duration(300);
+    return presentation;
+}
+
+QString presentationName(const QString &name)
+{
+    // A file's name cannot have a slash in it, and one starting with a dot is hidden.
+    // (A space that a dot leaves at the start goes with it, and any dot after that.)
+    QString wanted = name.simplified();
+    wanted.replace(u'/', u'-');
+    while (wanted.startsWith(u'.') || wanted.startsWith(u' '))
+        wanted.remove(0, 1);
+    return wanted;
+}
+
+QString presentationFileFor(const QString &library, const QString &name, const QString &fallback, QString *unique)
+{
+    QString wanted = presentationName(name);
+    if (wanted.isEmpty())
+        wanted = fallback;
+    const QDir folder(library);
+    *unique = wanted;
+    for (int n = 2; folder.exists(*unique + QStringLiteral(".pro")); ++n)
+        *unique = QStringLiteral("%1 %2").arg(wanted).arg(n);
+    return folder.filePath(*unique + QStringLiteral(".pro"));
 }
 
 rv::data::Cue *addBlankCue(rv::data::Presentation *presentation, const std::string &name, const QSizeF &size)

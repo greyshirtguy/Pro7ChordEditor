@@ -188,6 +188,30 @@ rv::data::Slide::Element makeMediaElement(const rv::data::Slide &slide, const QS
 // of this size with nothing on it, labelled with `name`.
 rv::data::Cue *addBlankCue(rv::data::Presentation *presentation, const std::string &name, const QSizeF &size);
 
+// A presentation with nothing in it yet, to be given its slides: an id of its own, its
+// name, and what every presentation of ProPresenter's own starts with. That was looked
+// for in 98 of them, written by ProPresenter 7.8 to 21.4: all have a background and a
+// CCLI block, empty where nothing was ever put in them; 97 have a chord chart; and 90
+// have a timeline of 300 seconds. So a new one here has those four. It is stamped as
+// ProPresenter 7.16's, as everything this app makes is, with no word of which system
+// wrote it, there being none of ProPresenter's to name.
+//
+// A GUESS, and untested: that ProPresenter opens a presentation that started here.
+// None has been opened in it yet.
+rv::data::Presentation newPresentation(const QString &name);
+
+// A name as a presentation can have it, which is one its file can have: what was asked
+// for with a slash turned into a dash, and no dots or spaces at its start (a file
+// whose name starts with a dot is hidden). Empty if that leaves nothing.
+QString presentationName(const QString &name);
+
+// The file a presentation called `name` gets in the library folder `library`: the
+// name as presentationName() has it, `fallback` if that leaves nothing, and a number
+// after it if the library has one of that name already. Nothing is made here.
+// `*unique` is the name it ends up with, which is the name to write inside the file
+// too.
+QString presentationFileFor(const QString &library, const QString &name, const QString &fallback, QString *unique);
+
 // A name for a new element: `base`, or `base` and the first number that makes it one
 // no element of the slide has.
 QString uniqueElementName(const rv::data::Slide &slide, const QString &base);
