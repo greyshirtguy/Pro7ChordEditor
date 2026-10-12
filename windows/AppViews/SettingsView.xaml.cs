@@ -1,12 +1,13 @@
-// The code beside SettingsView.xaml, which says what the view is. Here its three
+// The code beside SettingsView.xaml, which says what the view is. Here its four
 // sections are given what they hold: the chords' colours and mending's one switch, both
-// of the window's model, and All Copies, of the copies this PC's app keeps.
+// of the window's model; All Copies, of the copies this PC's app keeps; and what the
+// app says of itself.
 
 using System.Windows.Controls;
 
 namespace Pro7ChordEditor.AppViews;
 
-/// <summary>The settings' sections: Chords, Mending, and Backups.</summary>
+/// <summary>The settings' sections: Chords, Mending, Backups, and About.</summary>
 public partial class SettingsView : UserControl
 {
     public SettingsView(LibraryModel model, AllCopiesModel copies)
@@ -18,7 +19,12 @@ public partial class SettingsView : UserControl
         MendingSwitch = new MendingSettings(model);
         Mending.Content = MendingSwitch;
         Backups.Content = new AllCopiesView(copies);
+        AboutTheApp = new AboutSettings();
+        About.Content = AboutTheApp;
     }
+
+    /// <summary>The fourth section: for a test to read.</summary>
+    internal AboutSettings AboutTheApp { get; }
 
     /// <summary>The second section: for a test to click its switch.</summary>
     internal MendingSettings MendingSwitch { get; }

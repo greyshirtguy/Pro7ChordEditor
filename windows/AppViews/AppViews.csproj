@@ -59,6 +59,7 @@
                     Chords: the colour of a chord in each of the two editors
     ColourPicker    the system's own picker of a colour
     MendingSettings Mending: its one switch
+    AboutSettings   About: what the app says of itself, in AboutTheApp's words
     AllCopiesModel  Backups: every copy the app keeps, with no drawing in it
     AllCopiesView   that, shown: to look at a copy, or save it as a file
 

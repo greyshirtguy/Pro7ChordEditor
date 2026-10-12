@@ -346,14 +346,14 @@ public class SheetModelTests
     });
 
     [Fact]
-    public void TheSettingsHaveThreeSectionsChordsMendingAndBackups() => OnAMadeUpPC(async pc =>
+    public void TheSettingsHaveFourSectionsChordsMendingBackupsAndAbout() => OnAMadeUpPC(async pc =>
     {
         var model = await Open(pc, "Plain Song");
         var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
         Look.Wear(settings, dark: true);
         Pictures.LayOut(settings, 960, 600);
         var sections = Named<TabControl>(settings, "Sections");
-        Assert.Equal(["Chords", "Mending", "Backups"], sections.Items.OfType<TabItem>().Select(tab => (string)tab.Header));
+        Assert.Equal(["Chords", "Mending", "Backups", "About"], sections.Items.OfType<TabItem>().Select(tab => (string)tab.Header));
         Assert.IsType<ChordColourSettings>(((TabItem)sections.SelectedItem).Content);
         settings.Show("Mending");
         Pictures.LayOut(settings, 960, 600);
@@ -361,6 +361,9 @@ public class SheetModelTests
         settings.Show("Backups");
         Pictures.LayOut(settings, 960, 600);
         Assert.IsType<AllCopiesView>(((TabItem)sections.SelectedItem).Content);
+        settings.Show("About");
+        Pictures.LayOut(settings, 960, 600);
+        Assert.Same(settings.AboutTheApp, ((TabItem)sections.SelectedItem).Content);
         settings.Show("Chords");
         Assert.Same(settings.ChordColours, ((TabItem)sections.SelectedItem).Content);
     });

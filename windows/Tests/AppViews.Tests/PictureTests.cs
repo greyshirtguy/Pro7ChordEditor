@@ -906,6 +906,25 @@ public class PictureTests
         width: 640,
         height: 480);
 
+    // ---- About (M10)
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheSettingsAbout(bool dark) => DrawView(
+        "70 the settings, about, " + In(dark),
+        dark,
+        async pc =>
+        {
+            var model = pc.Model();
+            await model.StartAsync();
+            var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+            settings.Show("About");
+            return settings;
+        },
+        width: 960,
+        height: 600);
+
     [Fact]
     public void TheSongWrittenAsAChordProFile() => Draw(
         "69 the song written as a ChordPro file",

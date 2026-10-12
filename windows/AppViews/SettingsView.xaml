@@ -4,10 +4,11 @@
     Chords    the colour of a chord in each of the two editors (ChordColourSettings);
     Mending   whether chords that look as if they were put on in the old Windows editor
               are offered to be moved (MendingSettings);
-    Backups   the copies that are kept, all of them (AllCopiesView).
+    Backups   the copies that are kept, all of them (AllCopiesView);
+    About     what the app says of itself (AboutSettings).
 
   Each is a tab, as the sections of a settings window are on the Mac. The code beside
-  this puts the three views in.
+  this puts the four views in.
 
   It is a view of its own and not written into the settings window, so that a test can
   draw it into a picture without a window being opened (spec/10-platforms.md). It has a
@@ -25,5 +26,6 @@
     <TabItem x:Name="Chords" Header="Chords" />
     <TabItem x:Name="Mending" Header="Mending" />
     <TabItem x:Name="Backups" Header="Backups" />
+    <TabItem x:Name="About" Header="About" />
   </TabControl>
 </UserControl>

@@ -1,0 +1,48 @@
+<!--
+  About, in the app's settings: what the app says of itself (spec/11-plan.md, milestone
+  M10, "the About text").
+
+      Pro7 Chord Editor
+      Version 0.1.0
+      Built from 15ac783 of its source.
+
+      It puts chords on the songs of a ProPresenter library, so that ProPresenter shows
+      them on a stage screen. It opens the library where it lies and changes the songs'
+      own files.
+
+      It is one person's hobby. Nobody supports it and nothing is promised. It is not
+      ProPresenter and has nothing to do with Renewed Vision, who make ProPresenter.
+
+      What it is made from can be read at https://github.com/greyshirtguy/Pro7ChordEditor
+
+  WHERE IT IS. On a Mac an app says this in a panel of the system's own, from the app's
+  menu. Windows has no such panel, and an app there says it in a Help menu or, as apps
+  made for Windows 11 do, at the foot of its settings. It is in the settings here: this
+  app has nothing to put in a menu called Help, and is not to promise any (AGENTS.md).
+
+  The words are AboutTheApp's, and are a proposal for the maintainer. The address is a
+  link, which is opened by whatever the person has set to open one.
+
+  It has a ground of its own and says what colour words are, both the system's: a test
+  draws it with no window to have them from.
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.AboutSettings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource ApplicationBackgroundBrush}"
+             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+             FontFamily="Segoe UI Variable Text, Segoe UI"
+             FontSize="13"
+             UseLayoutRounding="True">
+  <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <TextBlock x:Name="Named" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
+    <TextBlock x:Name="Version" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+    <TextBlock x:Name="BuiltFrom" Margin="0,2,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+    <TextBlock x:Name="WhatItIs" TextWrapping="Wrap" Margin="0,18,0,0" />
+    <TextBlock x:Name="WhoseItIs" TextWrapping="Wrap" Margin="0,12,0,0" />
+    <TextBlock TextWrapping="Wrap" Margin="0,12,0,0">
+      <Run x:Name="WhereItsSourceIs" />
+      <Hyperlink x:Name="Source" RequestNavigate="TheAddressWasClicked"><Run x:Name="Address" /></Hyperlink>
+    </TextBlock>
+  </StackPanel>
+</UserControl>
