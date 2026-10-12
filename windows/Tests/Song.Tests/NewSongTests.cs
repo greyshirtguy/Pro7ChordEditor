@@ -956,6 +956,22 @@ public sealed class NewSongTests : IDisposable
         var keyless = Song("holy-holy-holy.txt");
         var madeKeyless = NewSong.Made(keyless, "Holy", 2, TestFile(ProPresenters), "", Now);
         NewSong.Check(madeKeyless.ToByteArray(), keyless, "Holy", 2);
+
+        // One id for two slides, in a file that otherwise READS as the song: the last
+        // slide, which is of a part with no name, put first in the file under the first
+        // slide's id, and named by no group. A group's naming of that id finds the
+        // later of the two, which is the first slide; and the other, being in no group,
+        // is shown last, where it belongs. Only the asking after ids tells.
+        var twice = madeKeyless.Clone();
+        var last = twice.Cues[^1];
+        twice.Cues.RemoveAt(twice.Cues.Count - 1);
+        last.Uuid = twice.Cues[0].Uuid.Clone();
+        twice.Cues.Insert(0, last);
+        twice.CueGroups[^1].CueIdentifiers.RemoveAt(twice.CueGroups[^1].CueIdentifiers.Count - 1);
+        var asRead = Reading.TextBoxes(twice, Reading.SlideRows(twice)).Select(box => box.Group + "|" + box.Words).ToList();
+        Assert.Equal(Reading.TextBoxes(madeKeyless, Reading.SlideRows(madeKeyless)).Select(box => box.Group + "|" + box.Words), asRead);
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(twice.ToByteArray(), keyless, "Holy", 2)).Reason);
+
         madeKeyless.Music = made.Music.Clone();
         Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(madeKeyless.ToByteArray(), keyless, "Holy", 2)).Reason);
     }
