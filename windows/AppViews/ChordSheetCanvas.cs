@@ -32,6 +32,13 @@
 // (`PointerMoved`, `Pressed`, `Dragged`, `Released`, `KeyPressed`, `KeyInTheBox`), and
 // the handlers of the real pointer and keys only call those.
 //
+// BUT FOR ONE THING, which is where the sheet's first fault in a real window was. The
+// handlers of the mouse's button also keep the mouse while the button is down, so that
+// its letting go is heard wherever the pointer has got to, and give it back after. That
+// is `ButtonDown` and `ButtonUp`, and the ORDER in `ButtonUp` matters (it says why).
+// Only a real window keeps and gives back a mouse, so only a test with a real window
+// holds it: ChordSheetWindowTests.
+//
 // The Mac's is `SheetCanvas`, in ChordSheetView.swift.
 
 using System.Runtime.InteropServices;
@@ -661,22 +668,59 @@ public sealed class ChordSheetCanvas : FrameworkElement
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
-        Pressed(e.GetPosition(this), Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
-        CaptureMouse();
+        ButtonDown(e.GetPosition(this), Keyboard.Modifiers.HasFlag(ModifierKeys.Shift));
         e.Handled = true;
     }
 
     protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
     {
-        ReleaseMouseCapture();
-        Released(e.GetPosition(this), Keyboard.Modifiers.HasFlag(ModifierKeys.Shift), copy: Keyboard.Modifiers.HasFlag(ModifierKeys.Control));
+        ButtonUp(e.GetPosition(this), Keyboard.Modifiers.HasFlag(ModifierKeys.Shift), copy: Keyboard.Modifiers.HasFlag(ModifierKeys.Control));
         e.Handled = true;
     }
 
     protected override void OnLostMouseCapture(MouseEventArgs e)
     {
-        // (The button was let go somewhere this was not told of: nothing is carried on.)
-        if (pressed is not null && Mouse.LeftButton != MouseButtonState.Pressed)
+        MouseLost(buttonIsDown: Mouse.LeftButton == MouseButtonState.Pressed);
+        base.OnLostMouseCapture(e);
+    }
+
+    /// <summary>
+    /// The mouse's button is pressed at a point: what <see cref="Pressed"/> does, and the
+    /// mouse is kept, so that the letting go is told here wherever the pointer is by then.
+    /// </summary>
+    internal void ButtonDown(Point point, bool shift)
+    {
+        Pressed(point, shift);
+        CaptureMouse();
+    }
+
+    /// <summary>
+    /// The mouse's button is let go at a point: what <see cref="Released"/> does, and
+    /// THEN the mouse is given back.
+    ///
+    /// In that order. Giving the mouse back says, there and then, that the mouse was
+    /// lost (<see cref="MouseLost"/>); and a mouse lost with a press still on and the
+    /// button up is a button that was let go somewhere this was never told of, so the
+    /// press is forgotten. Given back first, every press was forgotten before its
+    /// letting go was heard: in the window a click opened no bubble and picked no
+    /// chord, and a chord that was carried went back where it had been. The maintainer
+    /// found it the first time the sheet was clicked (2026-10-12). No test had: they
+    /// called `Pressed` and `Released`, and this was between the two.
+    /// </summary>
+    internal void ButtonUp(Point point, bool shift, bool copy)
+    {
+        Released(point, shift, copy);
+        ReleaseMouseCapture();
+    }
+
+    /// <summary>
+    /// The mouse was taken from the sheet, or given back by it. If a press was on and
+    /// the button is up, it was let go somewhere this was not told of: the press is
+    /// forgotten, and a chord that was being carried is put down nowhere.
+    /// </summary>
+    internal void MouseLost(bool buttonIsDown)
+    {
+        if (pressed is not null && !buttonIsDown)
         {
             pressed = null;
             if (Sheet?.Dragged is not null)
@@ -685,7 +729,6 @@ public sealed class ChordSheetCanvas : FrameworkElement
                 Draw();
             }
         }
-        base.OnLostMouseCapture(e);
     }
 
     // A chord carried to the edge of what is seen: the sheet scrolls that way, so that it

@@ -7,6 +7,11 @@
 // those. This calls the same ones: a point of the sheet that is over a place of a line
 // is asked of the grid (`SheetGrid.PointOver`), and handed in as the pointer's.
 //
+// The button is pressed and let go by `ButtonDown` and `ButtonUp`, which are all that
+// the real button's two handlers call: they keep the mouse and give it back as well.
+// With no window there is no mouse to keep, and that part does nothing; in a real
+// window it is real (ChordSheetWindowTests).
+//
 // Typing in the bubble is typing in a box of text, and is done as the ChordPro editor's
 // tests do it: by raising what WPF raises when a character is typed.
 
@@ -77,8 +82,8 @@ internal sealed class Hand(ChordSheetCanvas canvas)
     public void ClickAt(Point point, bool shift = false)
     {
         Canvas.PointerMoved(point, shift);
-        Canvas.Pressed(point, shift);
-        Canvas.Released(point, shift, copy: false);
+        Canvas.ButtonDown(point, shift);
+        Canvas.ButtonUp(point, shift, copy: false);
     }
 
     /// <summary>A point of the bare sheet: between the slides, at its top left.</summary>
@@ -94,14 +99,14 @@ internal sealed class Hand(ChordSheetCanvas canvas)
         var start = PointOf(from, onItsChord: true);
         var end = PointOf(to);
         Canvas.PointerMoved(start, shift);
-        Canvas.Pressed(start, shift);
+        Canvas.ButtonDown(start, shift);
         for (var step = 1; step <= 4; step++)
         {
             Canvas.Dragged(new Point(start.X + ((end.X - start.X) * step / 4), start.Y + ((end.Y - start.Y) * step / 4)), shift);
         }
         if (letGo)
         {
-            Canvas.Released(end, shift, copy);
+            Canvas.ButtonUp(end, shift, copy);
         }
     }
 

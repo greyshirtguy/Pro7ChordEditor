@@ -1914,6 +1914,39 @@ names. What to know before changing any of it:
       holding the pipe it was reading. It now starts each run so that it can stop
       that run and what it started, and nothing else.
 
+### What the maintainer found by hand
+
+- **2026-10-12, the first try of a build: a click on the sheet did nothing.**
+  Pointing at a word and typing a chord opened the bubble; clicking there did not.
+  **Why**: the sheet keeps the mouse while its button is down, so that the letting
+  go is heard wherever the pointer has got to, and gives it back after. It gave it
+  back BEFORE telling itself the button was let go. Giving the mouse back says, there
+  and then, that the mouse was lost; and the mouse lost with a press on and the
+  button up is taken for a button let go somewhere the sheet was never told of, so
+  the press was forgotten. Every click was forgotten before it was heard. A chord
+  that was carried would have gone back where it had been, for the same reason.
+  **Put right** by telling the letting go first (`ChordSheetCanvas.ButtonUp`).
+- **Why no test had found it, and what holds it now.** The tests hand the sheet
+  what the pointer does by the methods its real handlers call, with no window; and
+  with no window there is no mouse to keep, so nothing is ever lost. The fault was
+  in the two lines of the handlers that the tests went round. So:
+  - the keeping and the giving back are now inside what the tests call
+    (`ButtonDown`, `ButtonUp`; `Hand` clicks and drags by them), and what the mouse
+    lost does is a method of its own with a case of its own (`MouseLost`);
+  - and **two tests put the view in a real window** (`ChordSheetWindowTests`): off
+    every screen, never brought to the front, with nothing in the taskbar, there
+    for less than a second. In it the sheet really keeps the mouse, and each test
+    first makes sure that it did. With the old order put back, both fail as the
+    maintainer saw: no bubble, and the carried chord where it was. **This is new**:
+    until now no test opened a window. No key is pressed and no pointer moved in
+    it, and nothing of the system's own is opened.
+  - **What it says of the rest**: every other handler of the real pointer and keys
+    is still held only as far as the method it calls. Each is a few lines, and none
+    of them keeps anything or gives anything back; but none has been through a real
+    window either, and one of them does choose (the pointer's moving, between
+    carrying a chord and pointing, by whether the button is down). The list under
+    "Left rough" is the more worth trying for it.
+
 ## Left rough, and what to ask
 
 - **Nobody has seen the window.** Every picture is of the view the window holds,
@@ -2001,11 +2034,14 @@ names. What to know before changing any of it:
   - and M5's proof: **a song chorded here, on a copy of a real library, looked at
     in ProPresenter.** On this PC there is no such library to copy ("ProPresenter
     22 keeps no `.pro` files", above).
-- **Nobody has pointed at the sheet with a mouse, nor pressed a key on it.**
-  Everything it does was done by tests, through the doors the real pointer and keys
-  come in by; what is behind those doors is held, and the doors themselves are a
-  few lines each. What only a hand can tell, and the maintainer is asked to try, on
-  a COPY of a library:
+- **The maintainer has now clicked the sheet, and the first click found a fault**
+  (2026-10-12, "What the maintainer found by hand", below): a click did nothing,
+  though a chord could be typed. It is put right. **The rest of this list is still
+  untried by a hand.** Everything the sheet does was done by tests, through the
+  doors the real pointer and keys come in by; what is behind those doors is held,
+  and the doors themselves are a few lines each, which is where that fault was.
+  What only a hand can tell, and the maintainer is asked to try, on a COPY of a
+  library:
   - **first, a letter**: point at a word and press D. The bubble is to open with
     one D in it (decision 64);
   - that the spot keeps up with the pointer, on a long song as on a short one; that

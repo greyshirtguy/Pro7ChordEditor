@@ -636,10 +636,10 @@ public class ChordSheetViewTests
         // click on the chord, and the bubble opens on it.
         var on = hand.PointOf(me, onItsChord: true);
         canvas.PointerMoved(on, shift: false);
-        canvas.Pressed(on, shift: false);
+        canvas.ButtonDown(on, shift: false);
         canvas.Dragged(new Point(on.X + 3, on.Y + 2), shift: false);
         Assert.Null(sheet.Dragged);
-        canvas.Released(new Point(on.X + 3, on.Y + 2), shift: false, copy: false);
+        canvas.ButtonUp(new Point(on.X + 3, on.Y + 2), shift: false, copy: false);
         Assert.True(hand.BubbleIsOpen);
         Assert.Equal("D", hand.Box.Text);
         hand.Press(Key.Escape);
@@ -647,7 +647,7 @@ public class ChordSheetViewTests
 
         // Moved 6, it is carried: the one left behind is remembered, the spot follows
         // the pointer, and nothing is changed until it is let go.
-        canvas.Pressed(on, shift: false);
+        canvas.ButtonDown(on, shift: false);
         canvas.Dragged(new Point(on.X + 4, on.Y + 2), shift: false);
         Assert.Equal((me, "D"), sheet.Dragged);
         Assert.Same(Cursors.SizeAll, canvas.Cursor);
@@ -662,7 +662,7 @@ public class ChordSheetViewTests
         Assert.NotEqual(sweet.At, sheet.Spot.At);
         // Let go on "wretch": the chord moves there, as one change.
         canvas.Dragged(hand.PointOf(wretch), shift: false);
-        canvas.Released(hand.PointOf(wretch), shift: false, copy: false);
+        canvas.ButtonUp(hand.PointOf(wretch), shift: false, copy: false);
         Assert.Null(sheet.Dragged);
         Assert.Same(Cursors.Arrow, canvas.Cursor);
         Assert.Equal("1:G 8:G7 18:C 28:G 47:D", InTheFile(0, "Amazing Grace", pc));
@@ -695,14 +695,14 @@ public class ChordSheetViewTests
         Assert.False(model.CanUndo);
         hand.Drag(me, hand.PlaceOf("like"), letGo: false);
         canvas.Dragged(hand.PointOf(me), shift: false);
-        canvas.Released(hand.PointOf(me), shift: false, copy: false);
+        canvas.ButtonUp(hand.PointOf(me), shift: false, copy: false);
         Assert.Null(sheet.Dragged);
         Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
         Assert.False(model.CanUndo);
         // Let go off the cards, it goes where the spot last was.
         hand.Drag(me, hand.PlaceOf("like"), letGo: false);
         canvas.Dragged(Hand.BareSheet, shift: false);
-        canvas.Released(Hand.BareSheet, shift: false, copy: false);
+        canvas.ButtonUp(Hand.BareSheet, shift: false, copy: false);
         Assert.Equal("1:G 8:G7 18:C 28:G 54:D", InTheFile(0, "Amazing Grace", pc));
     });
 
@@ -721,7 +721,7 @@ public class ChordSheetViewTests
         Assert.Equal(hand.PlaceOf("saved"), sheet.TypingAt);
         // Let go, it is a click on that chord: what was typed is kept, and the bubble
         // opens on the chord that was pressed.
-        hand.Canvas.Released(hand.PointOf(hand.PlaceOf("wretch")), shift: false, copy: false);
+        hand.Canvas.ButtonUp(hand.PointOf(hand.PlaceOf("wretch")), shift: false, copy: false);
         Assert.Equal("1:G 8:G7 18:C 28:G 39:Am 59:D", InTheFile(0, "Amazing Grace", pc));
         Assert.True(hand.BubbleIsOpen);
         Assert.Equal(me, sheet.TypingAt);
@@ -2004,5 +2004,49 @@ public class ChordSheetViewTests
         Opened();
         Assert.False(chords.IsEnabled || chordPro.IsEnabled || larger.IsEnabled || smaller.IsEnabled || usual.IsEnabled);
         Assert.Equal((false, false), (chords.IsChecked, chordPro.IsChecked));
+    });
+
+    // The mouse taken from the sheet while a press is on (another window came to the
+    // front, say). With the button still down the press goes on. With it up, the
+    // button was let go somewhere the sheet was never told of: the press is forgotten,
+    // and a chord that was being carried is put down nowhere.
+    [Fact]
+    public void TheMouseLostWithAPressOnAndTheButtonUpForgetsThePress() => OnAMadeUpPC(async pc =>
+    {
+        var (model, _, hand) = await Open(pc, "Amazing Grace");
+        var canvas = hand.Canvas;
+        var me = hand.PlaceOf("me");
+        var wretch = hand.PlaceOf("wretch");
+        var on = hand.PointOf(me, onItsChord: true);
+
+        // A chord carried, and the mouse lost with the button still down: it is
+        // carried still.
+        canvas.PointerMoved(on, shift: false);
+        canvas.ButtonDown(on, shift: false);
+        canvas.Dragged(hand.PointOf(wretch), shift: false);
+        Assert.Equal((me, "D"), hand.Sheet.Dragged);
+        canvas.MouseLost(buttonIsDown: true);
+        Assert.Equal((me, "D"), hand.Sheet.Dragged);
+        // Lost with the button up: it is put down nowhere. A letting go that is told
+        // afterwards all the same does nothing.
+        canvas.MouseLost(buttonIsDown: false);
+        Assert.Null(hand.Sheet.Dragged);
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        canvas.ButtonUp(hand.PointOf(wretch), shift: false, copy: false);
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
+        Assert.False(hand.BubbleIsOpen);
+
+        // A press on a place of a line, lost so: no bubble opens for it.
+        var saved = hand.PlaceOf("saved");
+        canvas.ButtonDown(hand.PointOf(saved), shift: false);
+        canvas.MouseLost(buttonIsDown: false);
+        canvas.ButtonUp(hand.PointOf(saved), shift: false, copy: false);
+        Assert.False(hand.BubbleIsOpen);
+        // With no press on, the mouse lost is nothing; and the next click is a click.
+        canvas.MouseLost(buttonIsDown: false);
+        hand.Click(saved);
+        Assert.True(hand.BubbleIsOpen);
+        Assert.Equal(saved, hand.Sheet.TypingAt);
     });
 }
