@@ -359,7 +359,11 @@ strip had the click only.
     bubble, as leaving the sheet for anything else does (rule 39). That is done when
     it is picked up, whether or not it is then put anywhere.
 46f. Held near the top or the bottom of what is seen of the sheet, the sheet scrolls
-    that way, so that a slide out of sight can be reached.
+    that way, so that a slide out of sight can be reached: faster the nearer the
+    edge, and at a speed that can be steered (on the Mac, at most some 500 pixels a
+    second, which is a guess until a hand has tried it). **Not upwards until the
+    chord has once been clear of the top**: the strip is over the sheet, so every
+    chord comes in over the top edge, and is not to scroll the sheet on its way in.
 46g. The key that copies a chord as it is dragged (rule 42) does nothing here: a chord
     from the strip is always one more.
 46h. A button says all three of its ways when it is pointed at: "Puts F on the spot.
