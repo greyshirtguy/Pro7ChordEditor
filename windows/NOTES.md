@@ -19,6 +19,7 @@ milestone; put right what has become untrue.
 | **M6** The chord sheet | Done, 2026-10-12, bar what only the maintainer can try | The sheet a song now opens on: every slide a card in a frame of its group's colour, in a grid; the spot that follows the pointer; 1 to 7, a letter and the bubble a chord is typed in, Delete, the arrow keys; dragging; a line's chords copied onto another; undo and redo; the zoom; the strip of the key's chords; the switch between the two editors in the song's header; and the settings' Chords section. `spec/03`, `spec/06` rules 12 and 20a. Every case of `sheet-model.json` and `layout.json` passes. It has been started for real and looked at ("At M6"). **Nobody has pointed at it with a mouse, nor pressed a key on it**: that is the maintainer's, and it is most of what M6 is for |
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
+| **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -581,6 +582,150 @@ change, and then both apps'.
 93. **The list's four choices answer being switched on by a program, as by a click**
     ("At M8").
 
+**M9, where `spec/09` is silent.** The page says the new song is the model "copied,
+with a new id and name, no groups and no slides", and each slide "a copy of the
+model's first slide with new ids, whose text box is given the slide's words and
+chords". Each of these is what was built where that does not say enough. None is
+known to be what ProPresenter wants: that is what the maintainer's look in
+ProPresenter is for.
+
+94. **Which slide is "the model's first".** The first, in the order the song is
+    shown (the groups' order, not the file's: in the one file to hand that
+    ProPresenter wrote, the first cue of the file is the third verse's), that has a
+    text box with words to read; failing any, the first that has a line of chords
+    alone. A song often begins with an empty slide, or with an intro of chords, and
+    neither has words to be made like. A song with neither cannot be a model, and
+    says so: "“X” has no slide with words on it, so a new song cannot be
+    made to look like it. Nothing was made."
+95. **A slide is copied as it looks, and does nothing else.** In the file a slide is
+    a cue, and a cue may also start a video, run a macro, clear a layer, go on to
+    the next slide by itself after a time, answer to a key, and carry a label and
+    notes. Those are what that ONE slide of the model song does and says. Copied
+    with it, the new song would do them on every one of its slides: a macro that
+    dims the lights, at every click. So of the cue only its slide is copied (the
+    first of its actions that is one, as the reader takes it); it has no name, no
+    going on, no key and nothing waiting to be brought in; its label says nothing
+    and has no colour; and its notes and its chord chart are left out. **This is
+    the decision most worth the maintainer's eye**: a background that a song's first
+    slide starts is, to the person, part of how the song looks, and it is not
+    copied.
+96. **What is the model SONG's own is not the new song's**: its notes, its chord
+    chart, its arrangements and which was chosen, its timeline, when it was last
+    used, a Bible reference, a slide show's timing, the old way of writing a key
+    (`music_key`), and Multitracks' licence (rule 15). **Kept**, as how the model's
+    songs are: its category, its background, its transition, where it is shown, and
+    what wrote it. A chord chart and a timeline that were there are left there,
+    empty, as ProPresenter writes them for a song that has none.
+97. **The CCLI block is made anew**, with the file's title, artist and copyright and
+    its number (rule 14), and of the model's only whether the block is to be shown.
+    Its author, its year, its album and its artwork are another song's. A file that
+    says none of these, made like a song that has no such block, has none.
+    **The number is written if it is nothing but digits**: "+22025" and "CCLI 22025"
+    are not numbers as written. (The reference's would take the first.)
+98. **A key the file does not state is not stated.** The model's is not kept: it is
+    the model song's. (This app then offers to set one, if the chords look like
+    one: `spec/08`, check 3.)
+99. **Which text box takes the words**: the slide's first that shows words of its
+    own and has words. **Any other text box of the slide that shows words of its own
+    is given none**: they are the model song's (a second language, a title), and
+    would be on every slide. Its RTF keeps its opening, so what is typed into it in
+    ProPresenter is set as it was. A text box that shows something else by a link
+    (the next slide's words, a clock) is left exactly as it is, the model's words
+    inside it and all: they are not shown.
+100. **What a text box says of stretches of its words is brought over only where it
+    was said of the model's first character, and is then said of the whole of the
+    new words.** Beside its RTF a text box keeps a list of things that RTF cannot
+    say (that words are in capitals, a gradient, a first font; the chords are in the
+    same list), each over a stretch named by places in the MODEL's words. In the
+    file ProPresenter wrote, every slide has one, over exactly the whole of that
+    slide's own words: so that is the shape a slide made here is given. One that
+    was over some later words of the model is left out, the words being gone. This
+    follows the RTF, whose opening sets all the new words as the model's first were
+    set. **It is NOT what `spec/01` has for a text box given stand-ins on a blank
+    slide**, which leaves the list as it was ("a guess"). Left as they were here,
+    a slide of more words than the model's would be in capitals for its first
+    fifty-four characters and not after, if ProPresenter goes by the list. For the
+    maintainer to say, and whether M7's box should do the same.
+101. **The ids.** New: the cue's, its action's, its slide's, each element's, and each
+    of an element's builds'. Every other id inside the cue that names one of those
+    is changed to match, in whatever capitals it was written; an id that names a
+    thing outside the slide (a timer) is left. This is what ProPresenter's own file
+    shows: each of its slides has its own four ids, and the link that says when its
+    text box is seen names that box's own id, on every slide. A new group has a new
+    id, a name, a place for a key with nothing in it, and no colour (rule 13).
+102. **How many chords a file has is said as they will be kept**: two written on one
+    place of a line are one, the later, as the rules keep them (`Chords.Tidy`).
+103. **A name.** As the reference tidies one (white space of any kind is one space;
+    a slash is a hyphen; no full stop at its start; nothing left is "Song"), and
+    what is Windows' own: each of `\ : * ? " < > |` and anything below a space is a
+    hyphen too; no full stop or space at its end; a name Windows keeps for a device
+    (CON, NUL, COM1) is given a number as a name in use is, and a full stop after
+    one is a hyphen ("Nul.x" is the device still). **The song's name inside the file
+    is the file's name**, number and hyphens and all, as in the reference. So a song
+    titled "Psalm 23: The Lord" is "Psalm 23- The Lord" made here, and would keep
+    its colon made on a Mac: **for `spec/10`**, and the maintainer may want the Mac
+    to do the same so that a library kept where both read it has no file a PC
+    cannot have.
+104. **Nothing is made while ProPresenter is running**: "ProPresenter is running.
+    Quit it to make a song here. Nothing was made." The page does not say so of a
+    new file; `AGENTS.md` says nothing is written then, and a new file in
+    ProPresenter's own library is written.
+105. **A new file is never written over one that is there.** It is written beside
+    where it is to be, under a name that is no presentation's, pushed onto the disk,
+    and moved to its name in one step that the system refuses if the name is taken;
+    then read back. The moving is the asking: nothing can take the name in between.
+106. **Before a byte is written, what was made is read as any song is read**, and
+    must be the name, the key, the groups, the slides, the words and the chords that
+    were asked for, with one text box shown on each slide and no id twice. This is
+    rule 12's "read it back" asked of the whole song. Made rightly it always passes:
+    it is there for a model song of a kind nobody thought of.
+107. **The song the app carries is the one file to hand that ProPresenter wrote**,
+    *Rock of Ages* in `testdata/files/made-by-propresenter`, pointed at from there
+    so that there is one copy of it. **"Whether it will also do as the model of a
+    slide is M9's to say" (the plan): it does.** Its first slide has one text box of
+    words, and a song made like it reads as it should. **But its look is the
+    maintainer's own library's**: the words in capitals in Century Gothic, with a
+    band of colour behind each line, in a box sized for two lines. A stranger with
+    an empty library would get that. For the maintainer to say whether that is
+    wanted or a plainer one is to be made; and where the file should live, since
+    the Mac app must carry the same bytes.
+108. **"Make it look like" offers the song that is open first**, if one is open and
+    can be read; else the song the app carries, which is listed first as "A song
+    this app carries", before the library's songs as they are listed. The page has
+    the person pick, "failing that" the app's own; that the open song is the one
+    offered is this session's.
+109. **What is shown before a song is made** (rule 8) is a panel over the window:
+    "New song from amazing-grace.cho"; then Title, Artist and Key (each "None given"
+    where the file gives none), Parts ("Verse 1 (4 lines), ...", a part the file
+    did not name being "a part with no name"), and Chords ("40 chords in all", or
+    "None"); then the name in a field, the library named, the lines to a slide in a
+    box of one to twelve with "which makes 7 slides" beside it, and the song to
+    look like. Under the name, only where the song will not be named as typed:
+    "“Songs” has a song named “Amazing Grace” already. This one
+    will be named “Amazing Grace 2”." or "As a file can be named, that is
+    “A - B”." **Make the Song** is what Enter gives (this is a form to be
+    sent, and a song made by mistake is one more file); Cancel is what Esc gives; a
+    click on the dimmed window does nothing, the name perhaps having been typed.
+    Afterwards the song is listed and open, and the quiet line says "“Amazing
+    Grace 2” was made from amazing-grace.cho: 4 parts, 7 slides, 40 chords."
+110. **A file that is no song says so in the same panel**, with only Close: the
+    reference's three sentences with the file's name first ("X could not be read:
+    ...", "X is too large to be a song.", "X has no words in it."). What a making
+    was refused for is said there too, and the panel stays, so that another name or
+    another song to look like can be tried; while ProPresenter is running the panel
+    says so beforehand and its button is greyed.
+111. **The two commands are in the File menu**: "New Song from ChordPro File..." and
+    "Save Song as ChordPro File...". The first is greyed with no library open, the
+    second with no song open that can be read, and **both while anything is over
+    the window** (a question, Mend All, the earlier versions, a new song being asked
+    about): a menu is reached by Alt and a letter though a panel lies over it. The
+    chooser of a file to bring in shows `.cho`, `.chordpro`, `.chopro`, `.crd` and
+    `.txt`, or all files; **not `.pro`**, which some use for ChordPro and which is
+    here a presentation.
+112. **A song written as ChordPro is rule 18 to the letter**, with what was being
+    typed in the song saved first. **Read back, it does not always give "the same
+    parts"**, though the page says that is its test ("At M9"): for the maintainer.
+
 ## How it is laid out, and why
 
 ```
@@ -863,6 +1008,31 @@ names. What to know before changing any of it:
   `AppViews.Tests/MendingModelTests` and `FoldingModelTests` have the model, on the
   made-up PC's library of the old editor's copies (`MadeUpPC` can put their songs
   beside them); `MendingViewTests` the window's parts.
+
+### ChordPro files (M9)
+
+- **In `ChordRules`**: reading a ChordPro file's text was there since M1
+  (`Chords.ParseSong`, `SlidesOf`). New is `RtfWords.WithWords`: any words written
+  after an RTF's own opening, and read back. It stands beside `WithTheOpeningOf`,
+  which does the same for stand-ins alone and is held by vectors; this has none (the
+  reference writes RTF in its own words) and is held by its own tests.
+- **In `Song`**:
+  - `ChordProFile.cs`: a file's bytes as text and what is refused of a file; and a
+    song as ChordPro text and as a file. It changes nothing in a library;
+  - `NewSong.cs`: what was found in a file (`Found`), the name a song will have
+    (`Tidied`, `FreeName`), the presentation (`Made`), and the making of the file
+    (`Make`). Its header says each thing the page does not, in the order of the
+    decisions above. `ModelSong` is the song to look like, the app's own being a
+    file carried inside `Song`'s library (`Song.csproj` points at the test file);
+  - `SongFile.WriteNew` (in `Writing.cs`) makes a new file as a save replaces one,
+    and never over one that is there.
+- **In `AppViews`**: the model's fourth file, `LibraryModel.ChordProFiles.cs`, has
+  the panel as a value (`NewSongAsked`, with every sentence), what each field and
+  button does, and the writing out. `NewSongPanel.xaml` shows it. The two commands
+  and the two choosers of a file are `LibraryView`'s.
+- **The tests**: `Song.Tests/ChordProFileTests` and `NewSongTests`;
+  `ChordRules.Tests/RtfWordsTests` has the new words;
+  `AppViews.Tests/ChordProFilesModelTests` and `ChordProFilesViewTests`.
 
 ## What was found out
 
@@ -1551,6 +1721,99 @@ names. What to know before changing any of it:
     no copy of either file kept. That is right, and is held now; it was not known
     until the case for something else was written wrongly first.
 
+### At M9
+
+- **The proof the plan asks is not made.** "A song made here opens in ProPresenter,
+  on this system, with its chords shown on a stage screen" is the maintainer's to
+  see. What follows is what could be shown without it.
+- **A song made here reads as the reference's own answer.** The clean test files
+  were made by Simple Presenter from the ChordPro files of `testdata/songs`
+  (`tools/simple-presenter-scripts/import.qml` has the lines to a slide of each).
+  Made here from the same files with the same lines, each song reads, in this app,
+  as that test file reads: its groups, its slides, its words, its chords, its key.
+  Held for five songs, each made to look like the app's own song, like one Simple
+  Presenter wrote, and like the one shaped as Multitracks'. (Blank Slides is held
+  to its file instead: its blank slides were made by hand afterwards.)
+- **A slide made here IS the model's slide** but for its ids, its words and what is
+  said of stretches of them: written out as text with those set aside and each id
+  numbered by where it first comes, a slide of the new song and the model's are the
+  same text. And the top of the new song, with its name, id, date, key, CCLI block,
+  groups and slides put back as the model has them, is the model to the byte.
+- **What ProPresenter's own file showed**, which settled decisions 100 and 101:
+  each of its twelve slides has its own id for the cue, the action, the slide and
+  the text box; the text box's link "seen when ..." names that box's own id on
+  every slide; and its list beside the RTF has "capitals" over exactly the whole of
+  that slide's own words (0 to 54, 0 to 57, 0 to 69 ...). Its first cue is the
+  third verse's: "first" is the order shown.
+- **Written out and read back, a song does not always give "the same parts"**
+  (rule 19's test). By the rules of reading, a `{comment}` begins a part only if
+  what it says is the name of a part (rule 3), and inside a part that a directive
+  began an empty line is only a gap (rule 5). So:
+  - a group named otherwise ("The Middle Eight", which one test song has) reads
+    back as more of the part before it;
+  - slides in no group, after a group, read back as more of that group.
+  Every line and every chord comes back, in order; the parts do not. Held as it
+  is, in `ChordProFileTests`. **A proposal, for the maintainer**: write a group
+  whose name is no part's as `{start_of_verse: The Middle Eight}` ... `{end_of_verse}`,
+  which reads back under its own name (rule 3), and write `{end_of_verse}` before
+  slides that are in no group, after which they read as a part with no name. That
+  is a change to rule 18, and so to both apps.
+- **Two parts of one name.** *It Is Well*'s file names a chorus by a line
+  ("[Chorus]") and then begins another with `{soc}`: the rules number a chorus by
+  how many a directive has begun, so both are "Chorus". The song made has two groups
+  of that name, as Simple Presenter's has. Nothing is done about it.
+- **Found on the way.**
+  - **A song named after a device would never have been made**: "Nul.x" is the
+    device whatever number is put after it, and the looking for a free name went
+    round for ever. A test hung on it before anything was committed. The full stop
+    after such a name is a hyphen now (decision 103).
+  - **A folder whose name ends in a space** cannot be written into, though the
+    system says it is there. The making says what the system says and leaves
+    nothing behind. Seen by a test's own mistake; no library is named so.
+  - **A name of some two hundred and ten characters or more cannot be made**: what
+    is written beside the file has forty-four characters more than the file's own
+    name, and a name has two hundred and fifty-five at most. The system's sentence
+    is said. The field takes two hundred.
+  - **Two things asked nothing and were taken out**: the asking whether a new
+    file's name is free before the moving that asks it in one step, and a test of
+    white space that the trimming after it made idle.
+- **What the pictures showed.** Nine more (63 to 69): the panel, dark and light,
+  which had its two columns of names out of line with each other (put right: the
+  two grids share the column's width); a file that is no song, with its sentence
+  and Close; the panel while ProPresenter is running, its button greyed and the
+  band behind it; a refusal said in the panel; the song that was made, listed and
+  open on the sheet with the quiet line saying what was made; the panel at the
+  window's smallest, where it fills the window and nothing is cut off; and the
+  quiet line after a song is written out.
+- **The app was started for real, and the menu looked at. The choosers of a file
+  were not worked, and trying went wrong.** Said in full, because it is about the
+  maintainer's own PC:
+  - The published file was started on a made-up library of three test songs, its
+    window spoken to as a program may. **Seen**: the rows as a screen reader is
+    told of them; the File menu with both commands in it, "Save Song as ChordPro
+    File..." greyed with no song open and not with one; and that "New Song from
+    ChordPro File..." puts up the system's own chooser, titled "Choose a ChordPro
+    file to make a song from", showing "ChordPro files (*.cho;*.chordpro;*.chopro;
+    *.crd;*.txt)".
+  - **What went wrong.** The chooser shows the person's own Documents. The first
+    script went on working the window after the chooser had failed to take a
+    file's name, and tried to type the new song's name into what was a field of
+    the chooser's list. It timed out, and nothing was renamed. The second, written
+    to do no more than look and press the chooser's own Cancel, did not find that
+    button, went on, and **listed the rows of the window with the chooser still
+    up: the names of eleven folders in the maintainer's Documents were printed
+    into this session's output and a scratch file.** The file was deleted. Nothing
+    was typed anywhere, and nothing was changed: Documents had no entry made or
+    changed in that hour, the made-up library was byte for byte as it began, and
+    the app's log shows no file read or written by either command. The app's own
+    folder on this PC was put back to its log alone.
+  - **So, a rule for the sessions after this one**: a program does not open the
+    system's chooser of a file on the maintainer's desktop at all. It shows their
+    files to whatever reads the window, and a script that loses its place in one is
+    in their folders. Everything from the choosing of a file on is the
+    maintainer's hand ("Left rough"); what the panel says and does is held by
+    tests and pictures with no chooser in them.
+
 ## Left rough, and what to ask
 
 - **Nobody has seen the window.** Every picture is of the view the window holds,
@@ -1717,6 +1980,43 @@ names. What to know before changing any of it:
 - **The copy moved out of a library is kept as a copy "before mending"**, the three
   reasons a copy has having no fourth. All Copies lists it under its own name, as
   the copy of a song that is no longer there.
+- **No song made from a ChordPro file has been opened in ProPresenter, and nobody
+  has clicked any of M9 by hand.** The maintainer is asked, on a COPY of a library
+  or an empty one, with ProPresenter quit:
+  - **File > New Song from ChordPro File...**: that the system's chooser comes,
+    shows ChordPro files and text files, and that a file chosen brings the panel;
+    the name's field (typing in it, and that Enter makes the song and Esc cancels);
+    the two boxes of choices; a file that is no song; a refusal;
+  - **then, in ProPresenter**: that the song is in the library and opens; that it
+    looks like the song it was made to look like, on every slide, **to the end of
+    each line** (decision 100: capitals, a fill, a second font); that its groups
+    have their names and the colours ProPresenter gives those names; that showing a
+    slide starts nothing (decision 95); and **that its chords show on a stage
+    screen**. Made like the app's own song, and made like one of the library's own;
+    a song of four lines to a slide made like one of two; a song with a line of
+    chords alone (its last slide, in *Amazing Grace*'s file);
+  - **and the same on the Mac**, once the Mac app has M9, with a song made on each
+    opened on the other;
+  - **File > Save Song as ChordPro File...**: that the chooser offers the song's
+    name with `.cho`, asks before writing over a file, and that the file opens in
+    whatever else reads ChordPro.
+- **For the maintainer to say, of M9**: each of decisions 94 to 112, and above all
+  that a slide is copied without what it starts (95); what becomes of a second text
+  box (99) and of what is said of stretches of words (100, and M7's box with it);
+  whether *Rock of Ages* is the song to carry, and where it should live (107);
+  names on a PC and on a Mac (103); and what a song written out should read back
+  as (112, "At M9").
+- **What M9 does not do.** One file at a time, chosen from the menu: a file cannot
+  be dropped on the window, nor handed to the app as it starts. A new song has no
+  arrangement, and its groups no colours of their own. Nothing is asked about a
+  song the library has already under the same name: it is made beside it, with a
+  number. A file's `{comment}` that is not a part's name, and its tablature, are
+  left out, as the rules of reading have it. The chords of a file are not held to
+  being chords this app knows beyond what the rules do (`[*Coda]` is dropped).
+- **The same few lines write a character by its number in two places** of
+  `RtfWords.cs`, for stand-ins (`BytesOf`, held by vectors) and for any words
+  (`WordsWritten`). The first could be the second with a test before it. Left, so
+  as not to touch what the vectors hold for the sake of tidiness.
 - **The caret of the ChordPro text and the sheet's picked slide do not know of each
   other** (`spec/04`, rule 21), as on the Mac: gone to from the sheet, the text is
   where it was last left, and the sheet likewise. What would tie them is built and

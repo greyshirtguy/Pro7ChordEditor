@@ -18,6 +18,13 @@ opened, with a button that puts it right; a whole list of them can be mended at
 once. And where that editor saved its copy, "Song (Chords)", beside a song, the
 copy's chords can be put into the song itself.
 
+**A new song can be made from a ChordPro file**, the plain-text form that SongSelect
+and others give songs out in: the file is read and what was found in it shown, and
+the song is then made to look like a song the library already has, by copying one of
+that song's slides for each of the new one's. A song can be written out as a ChordPro
+file too. **No song made this way has yet been opened in ProPresenter**
+([`NOTES.md`](NOTES.md)).
+
 **There is nothing here to download yet, and it has not been tried on a real library:
 do not use it on yours.**
 
@@ -101,7 +108,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | --- | --- |
 | `ChordRules/` | The rules of chords, and the words of an RTF. Plain .NET, with no file and no window in it |
 | `ProFormat/` | The reader and writer of ProPresenter's files, made at each build from `proto/autogen-proto`. One file of it is written by hand |
-| `Song/` | The song as the editors see it; the library: where songs are, the lists, the marks, the app's own settings; the copies kept before a change; and the checks for what the first editor left in a file, with the mending of it. No window in it |
+| `Song/` | The song as the editors see it; the library: where songs are, the lists, the marks, the app's own settings; the copies kept before a change; the checks for what the first editor left in a file, with the mending of it; and ChordPro files, read, written, and made into a new song. No window in it |
 | `AppViews/` | The window: what it shows and what a click does. A library, so that the tests can draw it into pictures |
 | `App/` | The app itself: the few lines that start it, and how it is built to be given out |
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |
