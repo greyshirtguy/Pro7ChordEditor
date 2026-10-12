@@ -141,4 +141,32 @@ public class ChordSheetWindowTests
         Assert.Equal(to.At + ":D", hand.ChordsOf(line));
         Assert.Contains(new OpenSong(pc.Song("Amazing Grace")).TextBoxes, box => box.Chords.Any(one => one.Name == "D" && box.Words[one.At..].StartsWith("wretch", StringComparison.Ordinal)));
     });
+
+    // One of the key's chords dragged out of the strip (spec/03, rule 46a). A button
+    // keeps the mouse while it is pressed, as the sheet does, which is WPF's own doing
+    // and happens only in a window. Before its chord is handed to the system to carry,
+    // the button gives the mouse back: so that it is a button no longer held down, of
+    // which no click comes when the chord is let go. (What the system then does with
+    // the chord is not run here, nor anywhere: this test's own is in its place.)
+    [Fact]
+    public void InARealWindowAButtonOfTheStripGivesTheMouseBackBeforeItsChordIsHandedOver() => InARealWindow("Amazing Grace", (pc, model, hand) =>
+    {
+        var strip = ((LibraryView)Window.GetWindow(hand.Canvas)!.Content).SongPane.ChordSheet;
+        var fourth = strip.ChordsOfTheKey[3];
+        var before = pc.BytesOf("Amazing Grace");
+        var handed = new List<bool>();
+        strip.Carry = (button, _) => handed.Add(button.IsMouseCaptured);
+
+        hand.PointAt("wretch");
+        Assert.True(fourth.CaptureMouse(), "the button could not keep the mouse: this test would prove nothing");
+        Assert.True(fourth.IsMouseCaptured);
+        strip.ChordPressed(fourth, new Point(5, 5));
+        Assert.True(strip.ChordPulled(fourth, "C", new Point(5, 12), buttonIsDown: true));
+        Assert.Equal([false], handed);
+        Assert.False(fourth.IsMouseCaptured);
+        Assert.False(fourth.IsPressed);
+        // No click came of it: nothing was put on the spot.
+        Assert.Equal(before, pc.BytesOf("Amazing Grace"));
+        Assert.False(model.CanUndo);
+    });
 }

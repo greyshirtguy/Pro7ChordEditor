@@ -10,9 +10,11 @@
 // what is the window's: its two ends.
 //
 //   - THE SHEET'S END. Windows tells a view four things as something is dragged over
-//     it. The four handlers read the name and the place out of what they are handed
-//     and call `CarriedIn`, `CarriedOver`, `CarriedAway` and `LetGo`, and these tests
-//     call the same four, with a real `DataObject` such as the strip hands over.
+//     it: that it has come over it, that it is over it still, that it has left, and
+//     that it was let go. Each is told here as WPF tells it, by raising WPF's own
+//     event on the sheet with what WPF hands over (`Told`, below), and the thing
+//     carried is a real `DataObject` such as the strip hands the system. So the
+//     sheet's four handlers are run, and not only what they call.
 //   - THE STRIP'S END. A press on a button and a pull of 6 picks the chord up. The
 //     handlers of the real mouse call `ChordPressed` and `ChordPulled`, and so do
 //     these. What then carries the chord is the system's (`DragDrop.DoDragDrop`), and
@@ -24,6 +26,7 @@
 // gives up at Esc, or goes on telling the sheet of a chord that is held still:
 // windows/NOTES.md lists those for a hand.
 
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -77,22 +80,74 @@ public class ChordFromTheStripTests
         return [beside, foot];
     }
 
+    // What Windows tells a view of something that is dragged over it, made as WPF makes
+    // it and raised on the sheet as WPF raises it: answers what the sheet said may be
+    // done. (WPF lets nobody else make one of these by name; the one way it has is found
+    // by its shape. Should WPF change that, this says so.)
+    private static DragDropEffects Told(ChordSheetCanvas sheet, RoutedEvent what, IDataObject carried, Point at, bool shift = false, bool ctrl = false)
+    {
+        var keys = DragDropKeyStates.LeftMouseButton | (shift ? DragDropKeyStates.ShiftKey : 0) | (ctrl ? DragDropKeyStates.ControlKey : 0);
+        var made = typeof(DragEventArgs).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic).SingleOrDefault(each => each.GetParameters().Length == 5);
+        Assert.True(made is not null, "WPF no longer makes a DragEventArgs from five things");
+        var handed = made!.GetParameters().Select(parameter => parameter.ParameterType switch
+        {
+            var type when type == typeof(IDataObject) => (object)carried,
+            var type when type == typeof(DragDropKeyStates) => keys,
+            var type when type == typeof(DragDropEffects) => DragDropEffects.Copy,
+            var type when type == typeof(DependencyObject) => sheet,
+            var type when type == typeof(Point) => at,
+            var type => throw new InvalidOperationException("WPF makes a DragEventArgs from a " + type.Name + ", which this does not know"),
+        }).ToArray();
+        var told = (DragEventArgs)made.Invoke(handed);
+        told.RoutedEvent = what;
+        sheet.RaiseEvent(told);
+        // (Nothing above the sheet is left to say otherwise.)
+        Assert.True(told.Handled, "the sheet did not answer for itself");
+        return told.Effects;
+    }
+
+    // The window drawn, and of that only the dots of the sheet: of what is seen of it.
+    // (So that nothing else in the window, a button of the strip gone faint or what the
+    // quiet line says, is taken for the sheet's.)
+    private static int[] TheSheetDrawn(LibraryView view, double width = 1280, double height = 800)
+    {
+        var picture = Pictures.Drawn(view, width, height);
+        var scroll = (ScrollViewer)view.SongPane.ChordSheet.FindName("Scroll");
+        var seen = new Rect(scroll.TranslatePoint(new Point(0, 0), view), new Size(scroll.ViewportWidth, scroll.ViewportHeight));
+        var dots = new List<int>();
+        for (var y = (int)Math.Ceiling(seen.Top * Pictures.Scale); y < (int)(seen.Bottom * Pictures.Scale); y++)
+        {
+            for (var x = (int)Math.Ceiling(seen.Left * Pictures.Scale); x < (int)(seen.Right * Pictures.Scale); x++)
+            {
+                dots.Add(picture.Dots[(y * picture.Width) + x]);
+            }
+        }
+        Assert.True(dots.Count > 100_000, "what is seen of the sheet is only " + dots.Count + " dots");
+        return [.. dots];
+    }
+
     // ---- The sheet's end
 
     [Fact]
     public void OverAPlaceTheChordShowsThereAndLetGoItIsInTheFileAndOffThePlacesItShowsNowhereAndLetGoChangesNothing() => OnAMadeUpPC(async pc =>
     {
-        var (model, _, hand) = await Open(pc, "Amazing Grace");
+        var (model, view, hand) = await Open(pc, "Amazing Grace");
         var canvas = hand.Canvas;
         var sheet = hand.Sheet;
         var before = pc.BytesOf("Amazing Grace");
         var line = hand.PlaceOf("wretch").Row;
         var name = sheet.InKey[3];
         var over = hand.PointOf(new Spot(line, 7));
+        // (The sheet as it is drawn with the spot alone over that place.)
+        hand.PointAt(new Spot(line, 7));
+        var plain = TheSheetDrawn(view);
 
         Assert.True(canvas.CarriedOfKey(name, over, shift: false));
         Assert.Equal((new Spot(-1, 0), name), sheet.Dragged);
         Assert.Equal(new Spot(line, 7), sheet.Spot);
+        // It is drawn there, with its name in a lit bubble: not as the spot alone is.
+        var lit = TheSheetDrawn(view);
+        Assert.True(Enumerable.Range(0, lit.Length).Count(dot => lit[dot] != plain[dot]) > 200, "the chord carried over a place is drawn as the spot alone is");
         // With Shift it goes to the start of the word.
         Assert.True(canvas.CarriedOfKey(name, over, shift: true));
         Assert.Equal(new Spot(line, 5), sheet.Spot);
@@ -104,6 +159,7 @@ public class ChordFromTheStripTests
             Assert.True(canvas.CarriedOfKey(name, over, shift: false));
             Assert.False(canvas.CarriedOfKey(name, bare, shift: false));
             Assert.Null(sheet.Dragged);
+            Assert.True(plain.SequenceEqual(TheSheetDrawn(view)), "the lit bubble is still drawn");
             Assert.False(canvas.DroppedOfKey(name, bare, shift: false));
         }
         // Off the sheet altogether.
@@ -208,10 +264,9 @@ public class ChordFromTheStripTests
             Assert.False(hand.BubbleIsOpen);
             Assert.Equal("1:G 8:G7 18:C 28:G 39:Bm7 59:D", InTheFile(0, "Amazing Grace", pc));
             Assert.Equal(ChordSheetView.FaintWhileCarried, fourth.Opacity);
-            canvas.CarriedIn();
-            Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => hand.PointOf(new Spot(line, 13)), shift: false));
+            Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragEnterEvent, carried, hand.PointOf(new Spot(line, 13))));
             Assert.Equal((name, new Spot(line, 13)), (sheet.Dragged?.Name, sheet.Spot));
-            Assert.Equal(DragDropEffects.Copy, canvas.LetGo(carried, hand.PointOf(new Spot(line, 13)), shift: false));
+            Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DropEvent, carried, hand.PointOf(new Spot(line, 13))));
         };
         strip.ChordPressed(fourth, new Point(5, 5));
         Assert.True(strip.ChordPulled(fourth, name, new Point(5, 12), buttonIsDown: true));
@@ -228,26 +283,29 @@ public class ChordFromTheStripTests
 
         // The system ends it while the chord is still shown over a place, and tells the
         // sheet nothing (at Esc, say): nothing is left looking as if it were carried,
-        // and the window is told to draw the sheet again.
-        var drawn = 0;
+        // and the sheet is drawn again without it.
+        hand.PointAt(new Spot(line, 13));
+        var plain = TheSheetDrawn(view);
+        var version = 0;
         meanwhile = () =>
         {
-            canvas.CarriedIn();
-            Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => hand.PointOf(new Spot(line, 13)), shift: false));
+            Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragEnterEvent, carried, hand.PointOf(new Spot(line, 13))));
             Assert.NotNull(sheet.Dragged);
-            drawn = model.SheetVersion;
+            version = model.SheetVersion;
+            Assert.False(plain.SequenceEqual(TheSheetDrawn(view)), "the chord carried over a place is drawn as the spot alone is");
         };
         strip.ChordPressed(fourth, new Point(5, 5));
         Assert.True(strip.ChordPulled(fourth, name, new Point(5, 12), buttonIsDown: true));
         Assert.Null(sheet.Dragged);
-        Assert.True(model.SheetVersion > drawn);
+        Assert.True(model.SheetVersion > version);
+        Assert.True(plain.SequenceEqual(TheSheetDrawn(view)), "the lit bubble is still drawn");
         Assert.Equal(1.0, fourth.Opacity);
         Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
 
         // So it is if the carrying fails outright.
         meanwhile = () =>
         {
-            canvas.CarriedOver(carried, () => hand.PointOf(new Spot(line, 13)), shift: false);
+            Told(canvas, DragDrop.DragOverEvent, carried, hand.PointOf(new Spot(line, 13)));
             throw new InvalidOperationException("the system would not carry it");
         };
         strip.ChordPressed(fourth, new Point(5, 5));
@@ -255,12 +313,19 @@ public class ChordFromTheStripTests
         Assert.Null(sheet.Dragged);
         Assert.Equal(1.0, fourth.Opacity);
 
+        // With nothing being typed, picking one up and its going nowhere changes
+        // nothing of the song.
+        meanwhile = () => { };
+        strip.ChordPressed(fourth, new Point(5, 5));
+        Assert.True(strip.ChordPulled(fourth, name, new Point(5, 12), buttonIsDown: true));
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+
         // While ProPresenter is running: refused in the song's own sentence, and the
         // system is told that nothing was done.
         var before = pc.BytesOf("Amazing Grace");
         pc.ProPresenterIsRunning = true;
-        Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => hand.PointOf(new Spot(line, 0)), shift: false));
-        Assert.Equal(DragDropEffects.None, canvas.LetGo(carried, hand.PointOf(new Spot(line, 0)), shift: false));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, hand.PointOf(new Spot(line, 0))));
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DropEvent, carried, hand.PointOf(new Spot(line, 0))));
         Assert.Equal(Running, model.Notice);
         Assert.Equal(before, pc.BytesOf("Amazing Grace"));
         Assert.Null(sheet.Dragged);
@@ -286,26 +351,28 @@ public class ChordFromTheStripTests
         Assert.EndsWith("." + Environment.ProcessId, ChordSheetCanvas.ChordOfTheKey, StringComparison.Ordinal);
         Assert.Equal(name, ChordSheetCanvas.ChordOfKey(carried));
 
-        canvas.CarriedIn();
-        Assert.Equal(DragDropEffects.None, canvas.CarriedOver(carried, () => bare, shift: false));
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragEnterEvent, carried, bare));
         Assert.Null(sheet.Dragged);
-        Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => place, shift: false));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place));
         Assert.Equal(new Spot(line, 7), sheet.Spot);
-        Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => place, shift: true));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place, shift: true));
         Assert.Equal(new Spot(line, 5), sheet.Spot);
-        Assert.Equal(DragDropEffects.None, canvas.CarriedOver(carried, () => bare, shift: false));
+        // (The key that copies a chord dragged along the sheet does nothing here.)
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place, ctrl: true));
+        Assert.Equal(new Spot(line, 7), sheet.Spot);
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragOverEvent, carried, bare));
         Assert.Null(sheet.Dragged);
         // Let go off the places, should the system tell of it all the same: nothing.
-        Assert.Equal(DragDropEffects.None, canvas.LetGo(carried, bare, shift: false));
-        Assert.Equal(DragDropEffects.Copy, canvas.CarriedOver(carried, () => place, shift: false));
-        canvas.CarriedAway();
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DropEvent, carried, bare));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DragOverEvent, carried, place));
+        Told(canvas, DragDrop.DragLeaveEvent, carried, place);
         Assert.Null(sheet.Dragged);
         Assert.Equal(before, pc.BytesOf("Amazing Grace"));
 
         // Anything else that is dragged over the sheet is not taken: text from another
-        // app, a file, this app's kind with nothing under it, the kind of another run
-        // of this app, and nothing at all.
-        IDataObject?[] others =
+        // app, a file, this app's kind with nothing under it or with what is no name
+        // under it, and the kind of another run of this app.
+        IDataObject[] others =
         [
             new DataObject(DataFormats.UnicodeText, "C"),
             new DataObject(DataFormats.Text, "C"),
@@ -313,37 +380,50 @@ public class ChordFromTheStripTests
             new DataObject(ChordSheetCanvas.ChordOfTheKey, ""),
             new DataObject(ChordSheetCanvas.ChordOfTheKey, 4),
             new DataObject("Pro7ChordEditor.ChordOfTheKey.0", "C"),
-            null,
         ];
         foreach (var other in others)
         {
             Assert.Null(ChordSheetCanvas.ChordOfKey(other));
-            canvas.CarriedIn();
-            Assert.Equal(DragDropEffects.None, canvas.CarriedOver(other, () => place, shift: false));
+            Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragEnterEvent, other, place));
+            Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragOverEvent, other, place));
             Assert.Null(sheet.Dragged);
-            Assert.Equal(DragDropEffects.None, canvas.LetGo(other, place, shift: false));
+            Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DropEvent, other, place));
         }
+        Assert.Null(ChordSheetCanvas.ChordOfKey(null));
+        Assert.Equal(DragDropEffects.None, canvas.CarriedOver(null, place, shift: false));
+        Assert.Equal(DragDropEffects.None, canvas.LetGo(null, place, shift: false));
         // And a name that is no chord, under this app's own kind, is put nowhere.
         var nonsense = ChordSheetCanvas.Carrying("Hello");
-        Assert.Equal(DragDropEffects.None, canvas.CarriedOver(nonsense, () => place, shift: false));
-        Assert.Equal(DragDropEffects.None, canvas.LetGo(nonsense, place, shift: false));
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DragOverEvent, nonsense, place));
+        Assert.Equal(DragDropEffects.None, Told(canvas, DragDrop.DropEvent, nonsense, place));
         Assert.Equal(before, pc.BytesOf("Amazing Grace"));
         Assert.False(model.CanUndo);
     });
 
     [Fact]
-    public void LetGoTheChordGoesToTheCharacterUnderThePointerOrWithShiftHeldToTheStartOfItsWord() => OnAMadeUpPC(async pc =>
+    public void LetGoTheChordGoesToTheCharacterUnderThePointerOrWithShiftHeldToTheStartOfItsWordAndCtrlChangesNothing() => OnAMadeUpPC(async pc =>
     {
-        var (_, _, hand) = await Open(pc, "Amazing Grace");
+        var (model, _, hand) = await Open(pc, "Amazing Grace");
         var canvas = hand.Canvas;
         var line = hand.PlaceOf("wretch").Row;
         var name = hand.Sheet.InKey[2];
         var carried = ChordSheetCanvas.Carrying(name);
-        Assert.Equal(DragDropEffects.Copy, canvas.LetGo(carried, hand.PointOf(new Spot(line, 7)), shift: false));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DropEvent, carried, hand.PointOf(new Spot(line, 7))));
         Assert.Equal("1:G 8:G7 18:C 28:G 41:Bm 59:D", InTheFile(0, "Amazing Grace", pc));
-        Assert.Equal(DragDropEffects.Copy, canvas.LetGo(carried, hand.PointOf(new Spot(line, 16)), shift: true));
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DropEvent, carried, hand.PointOf(new Spot(line, 16)), shift: true));
         Assert.Equal("1:G 8:G7 18:C 28:G 41:Bm 47:Bm 59:D", InTheFile(0, "Amazing Grace", pc));
         Assert.Equal(new Spot(line, 13), hand.Sheet.Spot);
+        // With the key that copies held (rule 46g): one more, as without it.
+        Assert.Equal(DragDropEffects.Copy, Told(canvas, DragDrop.DropEvent, carried, hand.PointOf(new Spot(line, 20)), ctrl: true));
+        Assert.Equal("1:G 8:G7 18:C 28:G 41:Bm 47:Bm 54:Bm 59:D", InTheFile(0, "Amazing Grace", pc));
+        // Each was one step of undo.
+        for (var steps = 0; steps < 3; steps++)
+        {
+            Assert.True(model.CanUndo);
+            Assert.True(hand.Press(Key.Z, ModifierKeys.Control));
+        }
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
     });
 
     [Fact]
@@ -353,12 +433,15 @@ public class ChordFromTheStripTests
         const double height = 480;
         var (_, view, hand) = await Open(pc, "Amazing Grace", width, height);
         var canvas = hand.Canvas;
+        var sheet = hand.Sheet;
         var scroll = (ScrollViewer)view.SongPane.ChordSheet.FindName("Scroll");
         var clock = 100.0;
         canvas.Now = () => clock;
-        var carried = ChordSheetCanvas.Carrying(hand.Sheet.InKey[0]);
+        var carried = ChordSheetCanvas.Carrying(sheet.InKey[0]);
         const double near = ChordSheetCanvas.CarriedNear;
         const double fastest = ChordSheetCanvas.CarriedFastest;
+        // (Across the sheet: over the first card, where its lines' words are.)
+        var across = hand.Grid.Cells[0].Card.Left + 40;
 
         // How far down the sheet is scrolled, and how far it can be.
         double At()
@@ -375,19 +458,25 @@ public class ChordFromTheStripTests
         ScrollTo(200);
 
         // The system tells the sheet that what is carried is so far down from the top
-        // of what is seen of it, or so far up from the bottom. (Where that is on the
-        // sheet is asked each time it is wanted: the sheet scrolls under the pointer.)
+        // of what is seen of it, or so far up from the bottom. The pointer does not
+        // move as the sheet scrolls under it: so the place the chord is then shown at
+        // is the one that has come under the pointer, and not the one that was there.
+        var cameUnder = 0;
         void Held(double? down = null, double up = 0, bool entering = false, IDataObject? what = null)
         {
-            Pictures.LayOut(view, width, height);
-            if (entering)
+            var from = At();
+            var fromTheTop = down ?? (scroll.ViewportHeight - up);
+            var was = hand.Grid.PlaceCarriedTo(new Point(across, from + fromTheTop), shift: false);
+            Told(canvas, entering ? DragDrop.DragEnterEvent : DragDrop.DragOverEvent, what ?? carried, new Point(across, from + fromTheTop));
+            if (what is not null)
             {
-                canvas.CarriedIn();
+                return;
             }
-            canvas.CarriedOver(
-                what ?? carried,
-                () => new Point(scroll.HorizontalOffset + (scroll.ViewportWidth / 2), down is { } far ? scroll.VerticalOffset + far : scroll.VerticalOffset + scroll.ViewportHeight - up),
-                shift: false);
+            var now = hand.Grid.PlaceCarriedTo(new Point(across, At() + fromTheTop), shift: false);
+            Spot? under = now is { } place ? new Spot(place.Row, place.At) : null;
+            Spot? shown = sheet.Dragged is null ? null : sheet.Spot;
+            Assert.Equal(under, shown);
+            cameUnder += now != was ? 1 : 0;
         }
 
         // In from the strip, over the top: the sheet does not scroll up under it,
@@ -439,11 +528,11 @@ public class ChordFromTheStripTests
 
         // What is not one of the key's chords scrolls nothing, wherever it is held.
         var text = new DataObject(DataFormats.UnicodeText, "C");
-        var was = At();
+        var stays = At();
         Held(up: 0, what: text);
         clock += 0.1;
         Held(up: 0, what: text);
-        Assert.Equal(was, At());
+        Assert.Equal(stays, At());
 
         // Never past the end.
         Held(120);
@@ -454,14 +543,17 @@ public class ChordFromTheStripTests
         }
         Assert.Equal(scroll.ScrollableHeight, At(), 1.0);
 
-        // Now that it has been clear of the top, held at the top the sheet goes up;
-        // and never past its start.
+        // Now that it has been clear of the top, held at the top the sheet goes up:
+        // half way into the edge half as fast, and never past its start.
         var bottom = At();
         Held(120);
         Held(0);
         clock += 0.1;
         Held(0);
         Assert.Equal(bottom - (fastest * 0.1), At(), 1.0);
+        clock += 0.1;
+        Held(near / 2);
+        Assert.Equal(bottom - (fastest * 0.15), At(), 1.0);
         for (var times = 0; times < 60; times++)
         {
             clock += 0.2;
@@ -474,10 +566,21 @@ public class ChordFromTheStripTests
         Held(up: 0);
         clock += 0.1;
         Assert.Equal(0, At());
+        // Nor is the time it was off the sheet, having left it at an edge and come
+        // back over it at one.
+        clock += 0.1;
+        Held(up: 0);
+        var left = At();
+        Assert.True(left > 0);
+        Told(canvas, DragDrop.DragLeaveEvent, carried, new Point(across, left + scroll.ViewportHeight));
+        Assert.Null(sheet.Dragged);
+        clock += 0.1;
+        Held(up: 0, entering: true);
+        Assert.Equal(left, At());
 
         // Taken off the sheet and brought over it again, it comes in over the top
         // afresh: the sheet does not scroll up under it this time either.
-        canvas.CarriedAway();
+        Told(canvas, DragDrop.DragLeaveEvent, carried, new Point(across, left));
         ScrollTo(200);
         Held(4, entering: true);
         clock += 0.1;
@@ -485,6 +588,10 @@ public class ChordFromTheStripTests
         clock += 0.1;
         Held(4);
         Assert.Equal(200, At());
+
+        // (And all of that held the place shown to the one under the pointer: which, as
+        // the sheet scrolled, was often another than had been there.)
+        Assert.True(cameUnder >= 5, "the sheet scrolled another place under the pointer only " + cameUnder + " times");
     });
 
     // ---- The strip's end
@@ -568,5 +675,16 @@ public class ChordFromTheStripTests
         fourth.RaiseEvent(Button(Mouse.PreviewMouseUpEvent));
         Assert.False(strip.ChordPulled(fourth, "C", new Point(0, 6), buttonIsDown: true));
         Assert.Equal(["C"], handed);
+
+        // The pointer's moving is watched too: moved with no button down, the press
+        // is forgotten. (Unless a hand is at the real mouse this instant with its
+        // button down: then this would prove nothing, and is not asked.)
+        if (Mouse.LeftButton != MouseButtonState.Pressed)
+        {
+            strip.ChordPressed(fourth, new Point(0, 0));
+            fourth.RaiseEvent(new MouseEventArgs(Mouse.PrimaryDevice, 0) { RoutedEvent = Mouse.PreviewMouseMoveEvent });
+            Assert.False(strip.ChordPulled(fourth, "C", new Point(0, 6), buttonIsDown: true));
+            Assert.Equal(["C"], handed);
+        }
     });
 }

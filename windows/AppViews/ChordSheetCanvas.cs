@@ -772,9 +772,7 @@ public sealed class ChordSheetCanvas : FrameworkElement
 
     /// <summary>The chord that is carried from the strip, if that is what is carried.</summary>
     internal static string? ChordOfKey(IDataObject? carried) =>
-        carried is not null && carried.GetDataPresent(ChordOfTheKey, autoConvert: false) && carried.GetData(ChordOfTheKey, autoConvert: false) is string { Length: > 0 } name
-            ? name
-            : null;
+        carried?.GetData(ChordOfTheKey, autoConvert: false) is string { Length: > 0 } name ? name : null;
 
     /// <summary>What the time is, in seconds. (A test answers for the clock.)</summary>
     internal Func<double> Now { get; set; } = () => Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
@@ -837,12 +835,15 @@ public sealed class ChordSheetCanvas : FrameworkElement
     ///
     /// Not upwards until the chord has once been clear of the top: it comes from the
     /// strip, over the top of the sheet, and is not to scroll the sheet on its way in.
+    ///
+    /// Answers how far down the sheet went (less than nothing: up). The pointer has not
+    /// moved, so what is under it now is that much further down the sheet.
     /// </summary>
-    internal void ScrollIfCarriedNearAnEdge(Point point)
+    internal double ScrollIfCarriedNearAnEdge(Point point)
     {
         if (Scroll is not { } scroll)
         {
-            return;
+            return 0;
         }
         var seen = Seen;
         if (point.Y >= seen.Top + CarriedNear)
@@ -862,7 +863,7 @@ public sealed class ChordSheetCanvas : FrameworkElement
         {
             carriedAskedAt = null;
             carriedOwed = 0;
-            return;
+            return 0;
         }
         // The first time it is found near an edge the clock is only started. After
         // that the sheet is owed what the time since it was last asked comes to (a long
@@ -875,14 +876,19 @@ public sealed class ChordSheetCanvas : FrameworkElement
         carriedAskedAt = time;
         carriedOwed += depth * CarriedFastest * passed;
         var whole = Math.Round(carriedOwed, MidpointRounding.AwayFromZero);
-        if (whole != 0)
+        if (whole == 0)
         {
-            carriedOwed -= whole;
-            // (What it is seen through stops it at the sheet's top and its bottom.)
-            scroll.ScrollToVerticalOffset(scroll.VerticalOffset + whole);
-            // (So that the next thing asked of what is seen is asked of where it now is.)
-            scroll.UpdateLayout();
+            return 0;
         }
+        carriedOwed -= whole;
+        // Never past the sheet's top or its bottom.
+        var from = scroll.VerticalOffset;
+        var to = Math.Max(0, Math.Min(scroll.ScrollableHeight, from + whole));
+        scroll.ScrollToVerticalOffset(to);
+        // (At once, and not when the window next lays itself out: the next asking, which
+        // may come first, is to find the sheet where it now is.)
+        scroll.UpdateLayout();
+        return to - from;
     }
 
     /// <summary>
@@ -904,15 +910,16 @@ public sealed class ChordSheetCanvas : FrameworkElement
     /// system's word for putting a thing somewhere is "copy", and it has a pointer for
     /// that and one for "no".)
     /// </summary>
-    /// <param name="where">Where the pointer is on the sheet. Asked twice: again after any scrolling, when another place is under it.</param>
-    internal DragDropEffects CarriedOver(IDataObject? carried, Func<Point> where, bool shift)
+    internal DragDropEffects CarriedOver(IDataObject? carried, Point at, bool shift)
     {
         if (ChordOfKey(carried) is not { } name)
         {
             return DragDropEffects.None;
         }
-        ScrollIfCarriedNearAnEdge(where());
-        return CarriedOfKey(name, where(), shift) ? DragDropEffects.Copy : DragDropEffects.None;
+        // (Held at an edge the sheet goes under the pointer, and the place the chord is
+        // then shown at is the one that has come under it.)
+        var scrolled = ScrollIfCarriedNearAnEdge(at);
+        return CarriedOfKey(name, new Point(at.X, at.Y + scrolled), shift) ? DragDropEffects.Copy : DragDropEffects.None;
     }
 
     /// <summary>What is dragged is over the sheet no longer: nothing shows it.</summary>
@@ -925,13 +932,13 @@ public sealed class ChordSheetCanvas : FrameworkElement
     protected override void OnDragEnter(DragEventArgs e)
     {
         CarriedIn();
-        e.Effects = CarriedOver(e.Data, () => e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
+        e.Effects = CarriedOver(e.Data, e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
         e.Handled = true;
     }
 
     protected override void OnDragOver(DragEventArgs e)
     {
-        e.Effects = CarriedOver(e.Data, () => e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
+        e.Effects = CarriedOver(e.Data, e.GetPosition(this), e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey));
         e.Handled = true;
     }
 
