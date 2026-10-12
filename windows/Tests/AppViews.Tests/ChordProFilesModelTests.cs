@@ -400,6 +400,15 @@ public class ChordProFilesModelTests
         model.BringIn(AFile(pc, "Large.cho", new string('x', ChordProFile.MostBytes + 1)));
         Assert.Equal("Large.cho is too large to be a song.", model.NewSong!.Problem);
         Assert.Equal(before, Everything(pc));
+
+        // With ProPresenter running, a file that is no song still says why it is none:
+        // whether it is started while the panel is there, or was running already.
+        pc.ProPresenterIsRunning = true;
+        model.ProPresenterMayHaveChanged();
+        Assert.Equal(("Large.cho is too large to be a song.", false, true), (model.NewSong!.Standing, model.NewSong.CanMake, model.NewSong.ProPresenterIsRunning));
+        model.DontMakeTheSong();
+        model.BringIn(AFile(pc, "Empty.cho", ""));
+        Assert.Equal(("Empty.cho has no words in it.", false), (model.NewSong!.Standing, model.NewSong.CanMake));
     });
 
     [Fact]
