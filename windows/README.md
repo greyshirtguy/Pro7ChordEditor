@@ -114,6 +114,7 @@ is nothing ([`ProFormat/ProFormat.csproj`](ProFormat/ProFormat.csproj) says why)
 | `Tests/` | The tests of each, held to [`testdata/`](../testdata/README.md) |
 | `Pro7ChordEditor.slnx` | All of the above as one, for `dotnet` and Visual Studio |
 | `Directory.Build.props`, `Directory.Packages.props`, `.editorconfig`, `global.json` | What all the projects have in common; every package they take, and its version; rules for the code, six of which stop a build; and how tests are run. Each says at its top what it is |
+| `make-zip.ps1`, `zip/` | What makes the zip that is given out, and the read-me that goes in it. It makes a file and does nothing with it |
 | [`NOTES.md`](NOTES.md) | What was decided and found out on the way, and what is left rough |
 | [`old/`](old/README.md) | The first editor, as it was |
 

@@ -1,0 +1,66 @@
+Pro7 Chord Editor for Windows
+An early build. It needs Windows 10 or 11, on a 64-bit PC.
+
+
+WHAT IT IS
+
+It puts chords on the songs of a ProPresenter library, so that ProPresenter
+shows them on a stage screen. It opens the library where it lies and changes
+the songs' own files.
+
+It is one person's hobby. Nobody supports it and nothing is promised. It is not
+ProPresenter and has nothing to do with Renewed Vision, who make ProPresenter.
+
+
+BEFORE YOU USE IT
+
+- Keep a backup of your ProPresenter library.
+- Quit ProPresenter first. Nothing is saved while ProPresenter is running.
+- Try it on a copy first: copy one folder out of ProPresenter's Libraries to
+  somewhere else, and open the copy with Choose Folder.
+
+Every change is saved as it is made. Before the app first changes a song's
+file it keeps a copy of the file as it was; the copies are under Earlier
+Versions, in a song's header, and in Settings under Backups. They are kept on
+this PC only, in
+%LOCALAPPDATA%\Pro7ChordEditor
+
+
+STARTING IT THE FIRST TIME
+
+There is one file, Pro7ChordEditor.exe. Take it out of the zip and put it
+where you like. Nothing is installed, and nothing else is needed.
+
+This build is not signed, so Windows cannot say who made it. The first time
+it is started Windows may stop it and say "Windows protected your PC". To go
+on:
+
+1. Click "More info".
+2. Click "Run anyway".
+
+After that it starts like any other program. The first start takes some
+seconds before its window comes, while the file unpacks what it needs.
+
+Do this only for something whose maker you have reason to trust. What this
+app is made from can be read at
+https://github.com/greyshirtguy/Pro7ChordEditor
+
+
+IF IT FINDS NO LIBRARY
+
+It reads songs that are kept as .pro files, in the Libraries folder of
+ProPresenter's own folder, which is in Documents unless it was moved. A copy
+of ProPresenter that keeps its songs otherwise has none for it to find. Any
+folder of .pro files can be opened with Choose Folder.
+
+
+NOT YET TRIED
+
+- A song made from a ChordPro file (File, New Song from ChordPro File) has
+  not yet been opened in ProPresenter. Until it has, make one only to try
+  it, and look at it in ProPresenter before it is wanted.
+
+
+NOT IN IT YET
+
+- An icon.

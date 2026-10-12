@@ -367,3 +367,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# What make-zip.ps1 makes, in this folder and no other: the app published, the folder
+# laid out, and the zip. (A release is put on GitHub by hand, and is not kept here.)
+/build/
