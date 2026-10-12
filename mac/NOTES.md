@@ -1216,6 +1216,19 @@ more.)
   object, and wants `override`.
 - **The made-up Mac's "Blank Slides" has no line of chords alone.** The tests of
   the window that want one put `Chords With No Words.pro` there themselves.
+- **GitHub's Mac has its scroll bars beside what they scroll**, having no trackpad,
+  and there they take room. The test of the scrolling passed here and failed there:
+  it had measured how far the sheet can go before a bar under the sheet had come
+  and gone again (it comes while the sheet is first sized, and goes a turn of the
+  run loop later: seen here by telling the scroll view to have its bars so,
+  `scrollerStyle = .legacy`). The test now measures as it goes, and is run both
+  ways. Nothing in the app was wrong: the bar under the sheet does go by itself.
+  **A test of the window that measures what is seen of a scroll view is to be run
+  with the bars beside it too.**
+- **What a view is seen through scrolls by whole points.** Asked to go 0.52 it went
+  1, so that a slow scroll asked for often went twice as fast as was meant. What
+  the sheet is owed under a carried chord is kept, and it goes the nearest whole
+  number of points to that.
 - **How the tests were shown to bite**: sixty-seven breakages, one at a time, after
   the commit, of the model's four functions, the sheet's end, the grip and the
   strip's wiring. Fifty-six were caught as the tests stood. Of the eleven that were

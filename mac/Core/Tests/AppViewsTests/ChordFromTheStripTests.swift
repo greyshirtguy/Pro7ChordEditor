@@ -67,8 +67,11 @@ struct ChordFromTheStripTests {
 
     /// The real sheet, wired to a model as the window wires it, in a window that is
     /// never shown.
-    private func view(for model: LibraryModel, width: Double = 900, height: Double = 600) -> (SheetCanvas, NSWindow) {
+    private func view(for model: LibraryModel, width: Double = 900, height: Double = 600, bars: NSScroller.Style? = nil) -> (SheetCanvas, NSWindow) {
         let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: width, height: height))
+        if let bars {
+            scroll.scrollerStyle = bars
+        }
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: width, height: height), styleMask: [.borderless], backing: .buffered, defer: false)
         window.isReleasedWhenClosed = false
         window.contentView = scroll
@@ -370,29 +373,40 @@ struct ChordFromTheStripTests {
         #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace").filter { $0.name == grip.name }.map(\.at) == [7, 13])
     }
 
-    @Test("Held near the bottom of what is seen, the sheet scrolls down, and near the top, up: by the time that has passed, faster the nearer the edge, and never past its ends. Not upwards on the chord's way in from the strip")
-    func scrolledAtItsEdges() async throws {
+    @Test("Held near the bottom of what is seen, the sheet scrolls down, and near the top, up: by the time that has passed, faster the nearer the edge, and never past its ends. Not upwards on the chord's way in from the strip. So with the scroll bars over the sheet, and beside it",
+          arguments: [false, true])
+    func scrolledAtItsEdges(barsBeside: Bool) async throws {
         let mac = try MadeUpMac()
         let model = await open("Amazing Grace", on: mac)
-        let (canvas, window) = view(for: model, width: 520, height: 300)
+        // (GitHub's Mac has no trackpad, and so has its scroll bars beside what they
+        // scroll, where they take room: a bar under the sheet comes and goes as the
+        // sheet settles, and with it how much of the sheet is seen. Nothing here is
+        // measured once and kept.)
+        let (canvas, window) = view(for: model, width: 520, height: 300, bars: barsBeside ? .legacy : .overlay)
         defer { window.close() }
         var clock = 100.0
         canvas.now = { clock }
         canvas.shiftIsHeld = { false }
-        let room = canvas.bounds.height - canvas.visibleRect.height
-        try #require(room > 400, "the song is not tall enough here to scroll: \(canvas.bounds.height)")
         canvas.scroll(NSPoint(x: 0, y: 200))
         #expect(canvas.visibleRect.minY == 200)
+        /// How far down the sheet can be scrolled, as things are now.
+        func end() -> Double {
+            canvas.bounds.height - canvas.visibleRect.height
+        }
+        try #require(end() > 400, "the song is not tall enough here to scroll: \(canvas.bounds.height)")
+        let near = SheetCanvas.carriedNear
+        let fastest = SheetCanvas.carriedFastest
 
         let grip = KeyChordGrip(frame: NSRect(x: 0, y: 0, width: 40, height: 26))
         grip.name = try #require(model.sheet?.inKey.first)
         let carried = try pasteboard(carrying: grip)
         defer { carried.releaseGlobally() }
         let dragged = Dragged(carried, over: window)
-        /// The system tells the sheet that the chord is so far down what is seen of it.
-        func held(_ down: Double, entering: Bool = false) {
+        /// The system tells the sheet that the chord is so far down from the top of
+        /// what is seen of it, or so far up from the bottom.
+        func held(_ down: Double? = nil, up: Double = 0, entering: Bool = false) {
             let seen = canvas.visibleRect
-            dragged.draggingLocation = canvas.convert(NSPoint(x: seen.midX, y: seen.minY + down), to: nil)
+            dragged.draggingLocation = canvas.convert(NSPoint(x: seen.midX, y: down.map { seen.minY + $0 } ?? seen.maxY - up), to: nil)
             _ = entering ? canvas.draggingEntered(dragged) : canvas.draggingUpdated(dragged)
         }
 
@@ -405,64 +419,65 @@ struct ChordFromTheStripTests {
         held(10)
         #expect(canvas.visibleRect.minY == 200)
         // In the middle: nothing.
-        held(150)
+        held(120)
         clock += 0.1
-        held(150)
+        held(120)
         #expect(canvas.visibleRect.minY == 200)
 
         // At the very bottom: the clock is started the first time, and then the sheet
         // goes its fastest for the time that has passed.
-        held(300)
+        held(up: 0)
         #expect(canvas.visibleRect.minY == 200)
         clock += 0.1
-        held(300)
-        #expect(abs(canvas.visibleRect.minY - (200 + SheetCanvas.carriedFastest * 0.1)) < 1)
+        held(up: 0)
+        #expect(abs(canvas.visibleRect.minY - (200 + fastest * 0.1)) < 1)
         // Half way into the edge: half as fast. And a long wait counts as a fifth of
         // a second, so that the sheet never jumps.
         let from = canvas.visibleRect.minY
         clock += 0.1
-        held(300 - SheetCanvas.carriedNear / 2)
-        #expect(abs(canvas.visibleRect.minY - (from + SheetCanvas.carriedFastest * 0.05)) < 1)
+        held(up: near / 2)
+        #expect(abs(canvas.visibleRect.minY - (from + fastest * 0.05)) < 1)
         let then = canvas.visibleRect.minY
         clock += 30
-        held(300)
-        #expect(abs(canvas.visibleRect.minY - min(room, then + SheetCanvas.carriedFastest * 0.2)) < 1)
+        held(up: 0)
+        #expect(abs(canvas.visibleRect.minY - min(end(), then + fastest * 0.2)) < 1)
         // Asked very often, each time too soon for the sheet to go a whole point, it
         // goes all the same as the time adds up: 40 askings a thousandth of a second
         // apart, barely into the edge, are 40 thousandths at a tenth of its fastest,
         // which is two points and a little owed.
         canvas.scroll(NSPoint(x: 0, y: 200))
-        held(150)
-        held(300 - SheetCanvas.carriedNear * 0.9)
+        held(120)
+        held(up: near * 0.9)
         for _ in 0..<40 {
             clock += 0.001
-            held(300 - SheetCanvas.carriedNear * 0.9)
+            held(up: near * 0.9)
         }
-        #expect(abs(canvas.visibleRect.minY - (200 + SheetCanvas.carriedFastest * 0.1 * 0.04)) < 0.6, "\(canvas.visibleRect.minY)")
+        #expect(abs(canvas.visibleRect.minY - (200 + fastest * 0.1 * 0.04)) < 0.6, "\(canvas.visibleRect.minY)")
 
         // Never past the end.
         for _ in 0..<40 {
             clock += 0.2
-            held(300)
+            held(up: 0)
         }
-        #expect(abs(canvas.visibleRect.minY - room) < 1)
+        #expect(abs(canvas.visibleRect.minY - end()) < 1)
 
         // Now that it has been clear of the top, held at the top the sheet goes up;
         // and never past its start.
-        held(150)
+        let bottom = canvas.visibleRect.minY
+        held(120)
         held(0)
         clock += 0.1
         held(0)
-        #expect(abs(canvas.visibleRect.minY - (room - SheetCanvas.carriedFastest * 0.1)) < 1)
+        #expect(abs(canvas.visibleRect.minY - (bottom - fastest * 0.1)) < 1)
         for _ in 0..<60 {
             clock += 0.2
             held(0)
         }
         #expect(canvas.visibleRect.minY == 0)
         // Leaving the edge stops the clock: back at it, the time away is not counted.
-        held(150)
+        held(120)
         clock += 0.1
-        held(300)
+        held(up: 0)
         clock += 0.1
         #expect(canvas.visibleRect.minY == 0)
 
