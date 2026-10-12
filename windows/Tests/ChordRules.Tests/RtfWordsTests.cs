@@ -125,6 +125,114 @@ public class RtfWordsTests
         Assert.True(tried > 0, "no line of the vectors was a line of stand-ins already");
     }
 
+    // ---- New words after an RTF's own opening (spec/09-chordpro-files.md, rule 12)
+    //
+    // MINE: no vector has this, and Simple Presenter does it another way (it writes the
+    // whole RTF in its own words). What is held: that what is made reads back as the
+    // words, for every RTF the vectors have and for words of every awkward kind; that
+    // the opening is the model's own, byte for byte; and, by hand, the bytes themselves.
+
+    [Fact]
+    public void NewWordsAreWrittenAfterTheOpeningOfEveryRtfTheVectorsHaveAndReadBackAsThemselves()
+    {
+        string[] wanted =
+        [
+            "Amazing grace how sweet the sound\nThat saved a wretch like me",
+            "One line",
+            "3 times round",
+            " a space first, and one last ",
+            "Caf" + (char)0xE9 + " au lait: it" + (char)0x2019 + "s {good} \\ or not",
+            "a\tb",
+            "Joy " + (char)0xD83C + (char)0xDF89 + " to the world",
+            new([(char)0x9999, (char)0x6E2F, '\n', (char)0xFFFD, (char)0x7F, (char)0xA0]),
+            "\n\nthree empty lines before, and one after\n",
+            Chords.Placeholders(3),
+        ];
+        using var vector = Held.Read("rtf-text.json");
+        var models = 0;
+        foreach (var one in vector.RootElement.GetProperty("cases").EnumerateArray())
+        {
+            var model = one.GetProperty("rtfBase64").GetBytesFromBase64();
+            var name = Held.Text(one, "name");
+            var had = RtfWords.Read(model);
+            if (had.Length == 0)
+            {
+                // A box with no character has no opening to give.
+                Assert.Null(RtfWords.WithWords(model, wanted[0]));
+                continue;
+            }
+            models++;
+            foreach (var words in wanted)
+            {
+                var made = RtfWords.WithWords(model, words);
+                Assert.True(made is not null, name + ": nothing was made for " + Units(words));
+                Assert.True(string.Equals(words, RtfWords.Read(made), StringComparison.Ordinal), name + ": what was made does not read back as " + Units(words));
+            }
+            // The opening is the model's own: what is made for one set of words and
+            // for another begins the same, and begins as the model does, for as far as
+            // the model has no word of its own.
+            var a = RtfWords.WithWords(model, "Amazing")!;
+            var b = RtfWords.WithWords(model, "Blessed")!;
+            var same = 0;
+            while (same < a.Length && same < b.Length && a[same] == b[same])
+            {
+                same++;
+            }
+            // (But for the one space that parts a control word from the words, where
+            // the model's first character was written with a backslash.)
+            Assert.True(
+                same > 1 && (model.AsSpan(0, same).SequenceEqual(a.AsSpan(0, same)) || (a[same - 1] == 0x20 && model.AsSpan(0, same - 1).SequenceEqual(a.AsSpan(0, same - 1)))),
+                name + ": the opening is not the model's");
+            // After it there is nothing above ASCII, whatever the words.
+            Assert.DoesNotContain(RtfWords.WithWords(model, wanted[4])!.AsSpan(same).ToArray(), one => one > 0x7E);
+            Assert.Equal((byte)'A', a[same]);
+            // And none of the model's own words are left in it.
+            Assert.Equal("Amazing", RtfWords.Read(a));
+        }
+        Assert.True(models >= 20, "fewer RTFs with words than there were are in the vectors");
+    }
+
+    [Fact]
+    public void NewWordsByHandTheBytesThemselves()
+    {
+        byte[] model = [.. "{"u8, 0x5C, .. "rtf1"u8, 0x5C, .. "ansi{"u8, 0x5C, .. "fonttbl"u8, 0x5C, .. "f0 Helvetica;}"u8, 0x5C, .. "f0"u8, 0x5C, .. "fs96 Old words}"u8];
+        Assert.Equal("Old words", RtfWords.Read(model));
+        byte[] opening = model[..^"Old words}".Length];
+
+        // A line break is a backslash and a line feed; a brace and a backslash have a
+        // backslash before them; a letter with an accent is its number.
+        var words = "A{b}" + (char)0x5C + "c\n" + (char)0xE9;
+        byte[] expected = [.. opening, .. "A"u8, 0x5C, .. "{b"u8, 0x5C, .. "}"u8, 0x5C, 0x5C, .. "c"u8, 0x5C, 0x0A, 0x5C, .. "uc0"u8, 0x5C, .. "u233 }"u8];
+        Assert.Equal(expected, RtfWords.WithWords(model, words));
+        // A unit of the upper half is written as it is, and never as a negative number.
+        byte[] high = [.. opening, 0x5C, .. "uc0"u8, 0x5C, .. "u55356 "u8, 0x5C, .. "uc0"u8, 0x5C, .. "u57225 }"u8];
+        Assert.Equal(high, RtfWords.WithWords(model, new([(char)0xD83C, (char)0xDF89])));
+
+        // An opening that ends in a control word with no space of its own (here, the
+        // one that stands before a character written by its number): words that begin
+        // with a plain character are parted from it by a space, or "3" would be read as
+        // more of that word's number; words that begin with a backslash need none.
+        byte[] numbered = [.. "{"u8, 0x5C, .. "rtf1"u8, 0x5C, .. "ansi"u8, 0x5C, .. "f0"u8, 0x5C, .. "uc0"u8, 0x5C, .. "u8203 }"u8];
+        Assert.Equal(((char)0x200B).ToString(), RtfWords.Read(numbered));
+        byte[] upTo = numbered[..^"?u8203 }".Length];
+        Assert.Equal((byte)'0', upTo[^1]);
+        Assert.Equal([.. upTo, .. " 3 times}"u8], RtfWords.WithWords(numbered, "3 times")!);
+        Assert.Equal([.. upTo, .. "  3}"u8], RtfWords.WithWords(numbered, " 3")!);
+        Assert.Equal([.. upTo, 0x5C, .. "{x"u8, 0x5C, .. "}}"u8], RtfWords.WithWords(numbered, "{x}")!);
+
+        // Braces left open by the opening are closed again, each of them.
+        byte[] nested = [.. "{"u8, 0x5C, .. "rtf1{"u8, 0x5C, .. "b {"u8, 0x5C, .. "i deep}}}"u8];
+        Assert.Equal("deep", RtfWords.Read(nested));
+        Assert.Equal([.. nested[..^"deep}}}".Length], .. "new}}}"u8], RtfWords.WithWords(nested, "new")!);
+
+        // No words at all: the opening, and its braces closed. And a box with no
+        // character has no opening to give.
+        Assert.Equal([.. opening, .. "}"u8], RtfWords.WithWords(model, "")!);
+        Assert.Equal("", RtfWords.Read(RtfWords.WithWords(model, "")!));
+        Assert.Null(RtfWords.WithWords("{}"u8, "words"));
+        Assert.Null(RtfWords.WithWords([], "words"));
+    }
+
     private static byte[]? Expected(JsonElement one) =>
         one.GetProperty("outBase64").ValueKind == JsonValueKind.Null ? null : one.GetProperty("outBase64").GetBytesFromBase64();
 

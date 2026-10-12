@@ -128,4 +128,75 @@ internal static class SongFile
             throw new Failure("the file did not read back as it was written.");
         }
     }
+
+    /// <summary>
+    /// Makes a NEW file of these bytes, whole or not at all, and never in the place of
+    /// one that is there: if something has that name already, nothing is written and
+    /// the answer is no. (A song made from a ChordPro file: NewSong.cs.)
+    ///
+    /// As a save is done: written beside where it is to be, under a name that is no
+    /// presentation's, pushed onto the disk, and then moved to its name in one step,
+    /// which the system refuses if the name is taken. Then read back.
+    /// </summary>
+    internal static bool WriteNew(byte[] bytes, string path)
+    {
+        var beside = path + "." + Guid.NewGuid().ToString("N") + ".saving";
+        try
+        {
+            using (var file = new FileStream(beside, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                file.Write(bytes);
+                file.Flush(flushToDisk: true);
+            }
+            if (File.Exists(path) || Directory.Exists(path))
+            {
+                ClearAway(beside);
+                return false;
+            }
+            try
+            {
+                File.Move(beside, path, overwrite: false);
+            }
+            catch (IOException) when (File.Exists(path) || Directory.Exists(path))
+            {
+                // Something took the name in the moment between. What is there is not
+                // this app's, and is left.
+                ClearAway(beside);
+                return false;
+            }
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or NotSupportedException or System.Security.SecurityException)
+        {
+            ClearAway(beside);
+            throw new Failure(exception.Message);
+        }
+        byte[] back;
+        try
+        {
+            back = File.ReadAllBytes(path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            throw new Failure("the file could not be read back: " + exception.Message);
+        }
+        if (!back.AsSpan().SequenceEqual(bytes))
+        {
+            throw new Failure("the file did not read back as it was written.");
+        }
+        return true;
+    }
+
+    // What was being written beside a new file is of no use now. (It is this app's
+    // own, by the name it was given a moment ago, and nothing else is touched.)
+    private static void ClearAway(string beside)
+    {
+        try
+        {
+            File.Delete(beside);
+        }
+        catch (Exception stillThere) when (stillThere is IOException or UnauthorizedAccessException)
+        {
+            // It is named so that it can be told for what it is, and it is no song.
+        }
+    }
 }

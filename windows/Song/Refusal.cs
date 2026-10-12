@@ -66,6 +66,9 @@ public sealed class Refusal : Exception
 
         /// <summary>A file that was to be read as a ChordPro song is not one: it cannot be read, is too large, or has no words in it.</summary>
         NotASong,
+
+        /// <summary>A new song was to be made, and was not: there is no library, the song it was to look like will not do, or its file could not be written.</summary>
+        NotMade,
     }
 
     private Refusal(Why reason, string sentence)
@@ -100,6 +103,28 @@ public sealed class Refusal : Exception
     internal static Refusal NoWordsInIt(string name) => new(Why.NotASong, name + " has no words in it.");
 
     internal static Refusal FileNotWritten(string name, string why) => new(Why.NotSaved, name + " could not be written: " + why);
+
+    // (Of a song made from a ChordPro file: NewSong.cs. NEW sentences, this session's,
+    // but for the second, which is the reference's with what was done after it.)
+    internal static Refusal ProPresenterIsRunningSoNoSongIsMade => new(Why.ProPresenterIsRunning, "ProPresenter is running. Quit it to make a song here. Nothing was made.");
+
+    internal static Refusal NoLibraryToPutItIn => new(Why.NotMade, "There is no library to put the song in. Nothing was made.");
+
+    internal static Refusal NoSlideToModelOn(string model) => new(
+        Why.NotMade,
+        Called(model) + " has no slide with words on it, so a new song cannot be made to look like it. Nothing was made.");
+
+    internal static Refusal WordsCannotBeWritten(string model) => new(
+        Why.NotMade,
+        "The song's words could not be written into a text box like that of " + Called(model, first: false)
+            + ": it is written in a way that cannot be followed here safely. Nothing was made.");
+
+    internal static Refusal SongNotMade(string why) => new(Why.NotMade, "The song could not be made: " + why);
+
+    // A model song by its name, between the quotation marks that curl; or, with no
+    // name, the one the app carries.
+    private static string Called(string model, bool first = true) =>
+        model.Length == 0 ? (first ? "The song this app carries" : "the song this app carries") : (char)0x201C + model + (char)0x201D;
 
     internal static Refusal WordsDiffer => new(
         Why.WordsDiffer,

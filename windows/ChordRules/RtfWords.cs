@@ -532,6 +532,90 @@ public static class RtfWords
         return string.Equals(Read(made), standIns, StringComparison.Ordinal) ? made : null;
     }
 
+    /// <summary>
+    /// A new RTF for a text box that is given other words altogether: the opening of
+    /// the RTF it has (or of another's), up to where its words begin, which is its
+    /// fonts, its colours and how its words are set; then these words; then as many
+    /// closing braces as that opening left open. spec/09-chordpro-files.md, rule 12:
+    /// for a song made from a ChordPro file, whose slides are copies of a slide that
+    /// is known to be good, with the song's own words in them.
+    ///
+    /// How the words are written:
+    ///   - a line break as a backslash and a line feed, which is how ProPresenter
+    ///     writes the end of every line;
+    ///   - a backslash and the two curly brackets with a backslash before them;
+    ///   - every other character of ASCII that can be seen, and the space, as itself;
+    ///   - anything else (a letter with an accent, a curly apostrophe, a tab, half of
+    ///     an emoji) as Apple's text system writes any character above ASCII: a
+    ///     backslash, "uc0", a backslash, "u", the number of its UTF-16 unit, never
+    ///     negative, and a space to end it.
+    ///
+    /// If the opening ends in a control word that has no space of its own, and the
+    /// words begin with a plain character, a space is put between: the first letters
+    /// would otherwise be read as more of that word.
+    ///
+    /// Nothing, if the RTF has no character at all to say where its words begin; or if
+    /// what was made does not read back as exactly these words. Whoever asks refuses
+    /// the change on nothing.
+    /// </summary>
+    public static byte[]? WithWords(ReadOnlySpan<byte> modelBytes, string words)
+    {
+        var model = modelBytes.ToArray();
+        var reader = new Reader(model);
+        reader.Read();
+        if (reader.Where.Count == 0)
+        {
+            return null;
+        }
+        var first = reader.Where[0];
+        var put = WordsWritten(words);
+        var made = new List<byte>(first.From + put.Count + first.Depth + 1);
+        made.AddRange(model.AsSpan(0, first.From));
+        if (first.From > 0 && put.Count > 0 && put[0] != Backslash && IsLetterOrDigit(model[first.From - 1]))
+        {
+            made.Add(0x20);
+        }
+        made.AddRange(put);
+        made.AddRange(Enumerable.Repeat((byte)'}', first.Depth));
+        byte[] whole = [.. made];
+        return string.Equals(Read(whole), words, StringComparison.Ordinal) ? whole : null;
+    }
+
+    // The bytes a text box's words are written with (WithWords).
+    private static List<byte> WordsWritten(string words)
+    {
+        var bytes = new List<byte>(words.Length + 16);
+        foreach (var unit in words)
+        {
+            if (unit == Text.LineBreak)
+            {
+                bytes.Add(Backslash);
+                bytes.Add(0x0A);
+            }
+            else if (unit is (char)0x5C or '{' or '}')
+            {
+                bytes.Add(Backslash);
+                bytes.Add((byte)unit);
+            }
+            else if (unit >= 0x20 && unit < 0x7F)
+            {
+                bytes.Add((byte)unit);
+            }
+            else
+            {
+                bytes.Add(Backslash);
+                bytes.AddRange("uc0"u8);
+                bytes.Add(Backslash);
+                bytes.Add((byte)'u');
+                bytes.AddRange(Encoding.ASCII.GetBytes(((int)unit).ToString(CultureInfo.InvariantCulture)));
+                bytes.Add(0x20);
+            }
+        }
+        return bytes;
+    }
+
+    private static bool IsLetterOrDigit(byte one) => one is (>= (byte)'a' and <= (byte)'z') or (>= (byte)'A' and <= (byte)'Z') or (>= (byte)'0' and <= (byte)'9');
+
     // Where a line of the plain text is: from its first unit, to one past its last.
     // Nothing for a line that is not there, or is empty.
     private static (int Start, int End)? LineOf(string text, int line)

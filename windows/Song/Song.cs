@@ -50,23 +50,30 @@
 // `MoveBack` and `FoldIn`, each one save and one step of undo. And the mark that says a
 // song wants mending is with the other marks, in Marks.cs.)
 //
+// And ChordPro files (spec/09-chordpro-files.md):
+//
+//   ChordProFile.cs     a ChordPro file read from a disk as a song, and a song written
+//                       as one
+//   NewSong.cs          a new song made from such a file: a copy of a song that is known
+//                       to be good, with the file's parts, words and chords in it
+//
+// (What a ChordPro file says is the rules' to read, `Chords.ParseSong`; and so is the
+// writing of new words into a text box's RTF, `RtfWords.WithWords`.)
+//
 // The Mac app's is mac/Core/Sources/Song, file for file under the same names as far as
-// it has got (it has nothing of spec/08 yet), and what it has was ported from it with
-// the reference beside (reference/simple-presenter/src/presentationeditor.cpp), so that
-// the two apps do the same thing to a file. The type is `OpenSong`, not `Song`: a type
+// it has got (it has nothing of spec/08 or spec/09 yet), and what it has was ported
+// from it with the reference beside
+// (reference/simple-presenter/src/presentationeditor.cpp), so that the two apps do the
+// same thing to a file. The type is `OpenSong`, not `Song`: a type
 // named as its namespace is makes trouble. "The song that is open" is what the page
 // calls it.
-//
-// What is to come here, and when (spec/11-plan.md):
-//
-//   M9  a song made from a ChordPro file, and written out as one
 //
 // What holds for every line written here (AGENTS.md, "What must stay true"):
 //
 //   - A song's file is never left worse than it was found. Every write parses the
 //     whole file, changes only what the change is about, and writes the whole thing
 //     back with everything else as it came. Never build a file from the parts this
-//     app knows.
+//     app knows. (A NEW song is not built from them either: NewSong.cs.)
 //   - The words of a song are not this app's to change. Only chords are.
 //   - Nothing is written while ProPresenter is running, nor before a copy of the file
 //     has been kept.

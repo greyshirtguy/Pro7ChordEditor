@@ -5,7 +5,8 @@
   (spec/05-song-and-saving.md); finding ProPresenter's libraries and listing them
   (spec/06-library.md); the copies kept before a file is changed
   (spec/07-backups.md); the checks for what the first editor left in files
-  (spec/08-repair.md).
+  (spec/08-repair.md); a ChordPro file read and written, and a new song made from one
+  (spec/09-chordpro-files.md).
 
   It stands on the rules (ChordRules) and on the reader of the file (ProFormat). It is
   built for plain .NET, where there is no WPF: what a click does to a song is worked
@@ -17,8 +18,8 @@
   things worth trying by themselves.
 
   Song.cs is the way in, and lists the files: the song itself (milestone M2), the
-  library (M3), the copies (M4), the two editors as far as they are rules (M5, M6), and
-  the checks and the mending (M8).
+  library (M3), the copies (M4), the two editors as far as they are rules (M5, M6),
+  the checks and the mending (M8), and ChordPro files (M9).
 -->
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -28,6 +29,16 @@
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Pro7ChordEditor.Song.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+      The song the app carries, for a new song to be made to look like when the person
+      picks none of their own (spec/09-chordpro-files.md, rule 10). It is the one file
+      of the test data that ProPresenter itself wrote, and there is one copy of it in
+      the repository: here it is only pointed at. Whether it is the one to carry is
+      the maintainer's to say (NOTES.md).
+    -->
+    <EmbeddedResource Include="..\..\testdata\files\made-by-propresenter\Rock Of Ages (Toplady).pro" LogicalName="Pro7ChordEditor.Song.CarriedModel.pro" Link="CarriedModel.pro" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
