@@ -1510,6 +1510,46 @@ names. What to know before changing any of it:
   not asked about are as they were. It closed with nothing wrong, and what it left
   in the app's own folder on this PC was taken away again by its exact paths. The
   window came after twenty-five seconds, with the PC busy at other things.
+- **How the proofs were shown to bite**, as before: each rule of the mending broken
+  in one small way in turn, in clones made for it, and the tests run after each.
+  - **The logic, 73 ways** (`Checks.cs`, `Folding.cs`, `Marks.cs`,
+    `SongAsItWouldBe.cs`, and what of `OpenSong.cs`, `Reading.cs`, `AppData.cs` and
+    `ChordsInABox.cs` the mending added): 46 were caught at once. Twenty-two were
+    not, and each was given a case, after which all twenty-two were caught: every
+    action of a cue that is a slide being checked and mended; the key held against
+    the chords being the one they are written in, not the one they are shown in;
+    when a key is said to be the old editor's doing (two ways); the song as it would
+    be, that it is not the song as it is and takes no change (three); **a song's
+    marks, all ten ways of them**, which had been held only where the window's tests
+    happened to look; marks kept by an earlier reading of the files; a plan's
+    likelier key; words that differ only in their capitals; and the keeping of the
+    copy's own file before its chords are put in (two). Three cannot be told (a text
+    with no RTF checked too, which has no words to find anything in; every slide
+    counted as changed by a mending, where one that is not is put back as it was; a
+    box with no chords written again, which writes nothing). **One showed a line of
+    the app to do nothing**: the chords handed to the editors were put in order of
+    place a second time, and with that taken out no test said so, rightly, since a
+    place brought onto a character is never brought past one that was after it. The
+    line was taken out, and `Reading.ChordsHanded` says why it is not there. One was
+    a change that changes nothing, to see the driver tell.
+  - **The window's, 155 ways** (`LibraryModel.Mending.cs`, `LibraryModel.Folding.cs`,
+    what of `LibraryModel.cs` the mending added, and the views: the song's pane, the
+    lists, the two panels, the window's keys, the strip of the sheet, the settings):
+    134 were caught at once. Seven were given cases and are caught: Move the Chords
+    pressed from the song as it is; the song that is open refused by Mend All; the
+    songs Mend All mended being marked as having copies; no song being judged where
+    none is open; an original's one chord being said as one; a yes that can do
+    nothing by then putting the question away; and Mend All asked a second time
+    being the question again. Thirteen cannot be told: twelve were known beforehand
+    to be the same and say why in the list, and one was found so (a mending that
+    was refused gives no count of chords, so asking besides whether it was refused
+    asks nothing). One was the driver's own.
+  - **A case written for one of these showed what nothing had asked.** While the
+    question "Put this copy's chords into ...?" stands, something else may make the
+    other song another song's words. Yes then opens that song, and the song itself
+    refuses ("The two songs have not the same words ..."), with nothing changed and
+    no copy of either file kept. That is right, and is held now; it was not known
+    until the case for something else was written wrongly first.
 
 ## Left rough, and what to ask
 
