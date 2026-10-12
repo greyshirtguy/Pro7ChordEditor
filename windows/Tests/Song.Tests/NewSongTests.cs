@@ -924,6 +924,17 @@ public sealed class NewSongTests : IDisposable
         });
         Refused("one id for two slides", spoilt => spoilt.Cues.Add(spoilt.Cues[0].Clone()));
         Refused("a slide switched off", spoilt => CuesAsShown(spoilt)[1].IsEnabled = false);
+        // What this app does not show of a file is in the file all the same, and
+        // ProPresenter has it: a slide more that is switched off, and a cue that is no
+        // slide at all. Neither changes how the song reads here.
+        Refused("a slide more, switched off", spoilt =>
+        {
+            var hidden = spoilt.Cues[0].Clone();
+            hidden.Uuid = new RV.UUID { String = OpenSong.NewId("A") };
+            hidden.IsEnabled = false;
+            spoilt.Cues.Add(hidden);
+        });
+        Refused("a cue more, that is no slide", spoilt => spoilt.Cues.Add(new RV.Cue { Uuid = new RV.UUID { String = OpenSong.NewId("A") }, IsEnabled = true }));
         Refused("other words on a slide", spoilt => Text(spoilt, 0).RtfData = ByteString.CopyFrom(RtfWords.WithWords(Text(spoilt, 0).RtfData.Span, "One two three four\nFive six seven nine")!));
         Refused("no words on a slide", spoilt => Text(spoilt, 2).RtfData = ByteString.CopyFrom(RtfWords.WithWords(Text(spoilt, 2).RtfData.Span, "")!));
         Refused("a chord missing", spoilt => Writing.WriteChords(Reading.ChordsOf(Text(spoilt, 0)).Skip(1), Text(spoilt, 0)));
@@ -945,6 +956,20 @@ public sealed class NewSongTests : IDisposable
         });
         Refused("the text box linked to show something else", spoilt =>
             ElementsOf(CuesAsShown(spoilt)[0])[0].DataLinks.Add(new RV.Slide.Types.Element.Types.DataLink { ClockText = new RV.Slide.Types.Element.Types.DataLink.Types.ClockText() }));
+
+        // Where a group begins. It Is Well has two parts of one name, one after the
+        // other: with the second's slide put into the first's group, every slide is
+        // still in a group of the right name, and there are still four groups. Only
+        // the asking where each group begins tells.
+        var well = Song("it-is-well.chordpro");
+        Assert.Equal(["Verse 1", "Chorus", "Chorus", "Bridge"], well.Sections.Select(part => part.Name));
+        var madeWell = NewSong.Made(well, "It Is Well", 4, TestFile(ProPresenters), "", Now);
+        NewSong.Check(madeWell.ToByteArray(), well, "It Is Well", 4);
+        madeWell.CueGroups[1].CueIdentifiers.Add(madeWell.CueGroups[2].CueIdentifiers.Single());
+        madeWell.CueGroups[2].CueIdentifiers.Clear();
+        Assert.Equal(["Verse 1", "Chorus", "Chorus", "Bridge"], Reading.TextBoxes(madeWell, Reading.SlideRows(madeWell)).Select(box => box.Group));
+        Assert.Equal(4, madeWell.CueGroups.Count);
+        Assert.Equal(Refusal.Why.NotMade, Assert.Throws<Refusal>(() => NewSong.Check(madeWell.ToByteArray(), well, "It Is Well", 4)).Reason);
 
         // Bytes that are no presentation at all; and the song held to another's file,
         // or to other lines to a slide than it was made with.
