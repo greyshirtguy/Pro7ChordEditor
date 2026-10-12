@@ -74,7 +74,6 @@ public partial class NewSongPanel : UserControl
         Visibility = Seen(asked is not null);
         if (asked is null)
         {
-            listed = null;
             return;
         }
         showing = true;
@@ -127,7 +126,8 @@ public partial class NewSongPanel : UserControl
     }
 
     // The rows of what was found: what each is, and what the file says of it. Made
-    // again only for another file.
+    // again only for another file's finds, which are another thing than the last's
+    // even where the file is the same one, read again.
     private void List(LibraryModel.NewSongAsked asked)
     {
         if (ReferenceEquals(listed, asked.Found))
