@@ -47,6 +47,9 @@
         <MenuItem Header="_File" SubmenuOpened="TheFileMenuWasOpened">
           <MenuItem Header="Choose _Folder&#x2026;" Click="ChooseAFolder" />
           <Separator />
+          <MenuItem x:Name="BringIn" Header="_New Song from ChordPro File&#x2026;" Click="BringInAFile" />
+          <MenuItem x:Name="WriteOut" Header="Save Song as _ChordPro File&#x2026;" Click="WriteAChordProFile" />
+          <Separator />
           <MenuItem x:Name="Save" Header="_Save" InputGestureText="Ctrl+S" Click="SaveNow" />
           <MenuItem x:Name="Revert" Header="_Revert to as Opened&#x2026;" Click="AskToRevert" />
           <Separator />
@@ -104,5 +107,6 @@
     <views:EarlierVersionsPanel Visibility="Collapsed" />
     <views:QuestionPanel x:Name="Asking" Visibility="Collapsed" />
     <views:MendAllPanel x:Name="MendAll" Visibility="Collapsed" />
+    <views:NewSongPanel x:Name="NewSong" Visibility="Collapsed" />
   </Grid>
 </UserControl>

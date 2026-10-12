@@ -829,4 +829,90 @@ public class PictureTests
         },
         width: 960,
         height: 600);
+
+    // ---- ChordPro files (M9)
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ANewSongFromAChordProFileIsAskedAbout(bool dark) => Draw(
+        "63 a new song from a ChordPro file is asked about, " + In(dark),
+        dark,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.BringIn(ChordProFilesModelTests.ASong("amazing-grace.cho"));
+        });
+
+    [Fact]
+    public void AFileThatIsNoSong() => Draw(
+        "64 a file that is no song",
+        true,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.BringIn(ChordProFilesModelTests.AFile(pc, "Only a heading.cho", "{title: Nothing}\n"));
+        });
+
+    [Fact]
+    public void ANewSongIsNotMadeWhileProPresenterIsRunning() => Draw(
+        "65 a new song is not made while ProPresenter is running",
+        true,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            pc.ProPresenterIsRunning = true;
+            model.ProPresenterMayHaveChanged();
+            model.BringIn(ChordProFilesModelTests.ASong("minor-key.cho"));
+            model.MakeItLookLike(null);
+            model.SetLinesToASlide(1);
+        });
+
+    [Fact]
+    public void WhyASongWasNotMadeIsSaidInThePanel() => Draw(
+        "66 why a song was not made is said in the panel",
+        false,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.BringIn(ChordProFilesModelTests.ASong("holy-holy-holy.txt"));
+            model.MakeItLookLike(pc.Song("Nonsense"));
+            model.MakeTheSong();
+        });
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheSongThatWasMade(bool dark) => Draw(
+        "67 the song that was made, " + In(dark),
+        dark,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.BringIn(ChordProFilesModelTests.ASong("amazing-grace.cho"));
+            model.MakeTheSong();
+        });
+
+    [Fact]
+    public void ANewSongAskedAboutAtTheWindowsSmallest() => Draw(
+        "68 a new song asked about at the window" + (char)0x2019 + "s smallest",
+        true,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.BringIn(ChordProFilesModelTests.ASong("it-is-well.chordpro"));
+            model.NameTheNewSong("It Is Well / with my soul");
+        },
+        width: 640,
+        height: 480);
+
+    [Fact]
+    public void TheSongWrittenAsAChordProFile() => Draw(
+        "69 the song written as a ChordPro file",
+        true,
+        async (pc, model) =>
+        {
+            await ASongOpen(pc, model, "Plain Song");
+            model.WriteAsChordPro(Path.Combine(pc.Documents, "Plain Song.cho"));
+        });
 }

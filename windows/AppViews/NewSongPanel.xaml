@@ -1,0 +1,125 @@
+<!--
+  A new song from a ChordPro file, over the window from the choosing of the file until
+  the song is made or not. spec/09-chordpro-files.md, rule 8: "Choosing a file shows what
+  was found, before anything is made: the title, the artist, the key, each part with how
+  many lines it has, and how many chords in all. With it: the name the song will have,
+  the library it goes into (the one that is open), and how many lines to a slide (two,
+  unless changed)." And rule 10's choice, "Make it look like".
+
+      New song from amazing-grace.cho
+
+      Title    Amazing Grace
+      Artist   John Newton
+      Key      G
+      Parts    Verse 1 (4 lines), Verse 2 (4 lines), Verse 3 (4 lines), Ending (1 line)
+      Chords   40 chords in all
+
+      Name                [ Amazing Grace                         ]
+                          "Songs" has a song named "Amazing Grace" already. This one
+                          will be named "Amazing Grace 2".
+      Library             Songs
+      Lines to a slide    [ 2 v ]  which makes 7 slides
+      Make it look like   [ A song this app carries             v ]
+
+                                               [ Make the Song ]  [ Cancel ]
+
+  A file that is no song says so under the heading, and there is only Close.
+
+  Nothing else in the window can be reached while it is there: the window behind is
+  dimmed. A click on it does nothing while there is something typed here to lose; under
+  a file that is no song it is the same as Close. Esc is Cancel. Enter makes the song:
+  this is a form to be filled in and sent, not a question about something that cannot
+  be taken back (a song made by mistake is one more file, and changes no other).
+
+  It is drawn in the window, as the earlier versions are. The words are LibraryModel's
+  (LibraryModel.ChordProFiles.cs).
+-->
+<UserControl x:Class="Pro7ChordEditor.AppViews.NewSongPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             KeyboardNavigation.TabNavigation="Cycle"
+             KeyboardNavigation.DirectionalNavigation="Cycle">
+  <Grid>
+    <Border Background="#73000000" MouseLeftButtonDown="OutsideWasClicked" />
+    <Border Width="560"
+            MaxWidth="560"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Margin="24"
+            CornerRadius="8"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
+            Background="{DynamicResource ApplicationBackgroundBrush}">
+      <DockPanel Margin="20,18,20,16" LastChildFill="True">
+        <TextBlock x:Name="Heading" DockPanel.Dock="Top" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+          <Button x:Name="Make" Content="Make the Song" IsDefault="True" Click="MakeWasClicked" />
+          <Button x:Name="Other" Margin="8,0,0,0" IsCancel="True" Click="TheOtherWasClicked" />
+        </StackPanel>
+        <TextBlock x:Name="Standing"
+                   DockPanel.Dock="Bottom"
+                   Margin="0,14,0,0"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource SystemFillColorCautionBrush}" />
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+          <!-- (What each row is stands in one column down the whole panel: the two
+               grids share its width.) -->
+          <StackPanel Grid.IsSharedSizeScope="True">
+            <!-- What was found: a row for each thing, made by the code beside. -->
+            <Grid x:Name="Found" Margin="0,12,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="What" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+            </Grid>
+            <Grid x:Name="Form" Margin="0,16,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="What" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <Label Grid.Row="0" Grid.Column="0" Content="_Name" Target="{Binding ElementName=Named}" Padding="0" Margin="0,0,16,0" VerticalAlignment="Center" />
+              <TextBox x:Name="Named" Grid.Row="0" Grid.Column="1" MaxLength="200" TextChanged="TheNameWasTyped" />
+              <TextBlock x:Name="NameNote"
+                         Grid.Row="1"
+                         Grid.Column="1"
+                         Margin="0,5,0,0"
+                         FontSize="12.5"
+                         TextWrapping="Wrap"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+              <TextBlock Grid.Row="2" Grid.Column="0" Text="Library" Margin="0,12,16,0" VerticalAlignment="Center" />
+              <TextBlock x:Name="InLibrary" Grid.Row="2" Grid.Column="1" Margin="0,12,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+              <Label Grid.Row="3" Grid.Column="0" Content="_Lines to a slide" Target="{Binding ElementName=Lines}" Padding="0" Margin="0,12,16,0" VerticalAlignment="Center" />
+              <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,12,0,0">
+                <ComboBox x:Name="Lines" MinWidth="64" SelectionChanged="TheLinesWereChosen" />
+                <TextBlock x:Name="Slides" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+              </StackPanel>
+              <Label Grid.Row="4" Grid.Column="0" Content="Make it look li_ke" Target="{Binding ElementName=Like}" Padding="0" Margin="0,12,16,0" VerticalAlignment="Center" />
+              <ComboBox x:Name="Like"
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Margin="0,12,0,0"
+                        DisplayMemberPath="Name"
+                        TextSearch.TextPath="Name"
+                        IsTextSearchEnabled="True"
+                        MaxDropDownHeight="320"
+                        SelectionChanged="TheLookAlikeWasChosen">
+                <ComboBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                  </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+              </ComboBox>
+            </Grid>
+          </StackPanel>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+  </Grid>
+</UserControl>

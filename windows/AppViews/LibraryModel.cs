@@ -659,8 +659,13 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
             Refused = null;
             refusedForProPresenter = false;
         }
-        // (The sheet draws what can and cannot be done on it now.)
+        // (The sheet draws what can and cannot be done on it now; and the panel of a
+        // new song says whether one can be made.)
         SheetVersion++;
+        if (NewSong is { } asked)
+        {
+            NewSong = asked with { ProPresenterIsRunning = running };
+        }
         return true;
     }
 

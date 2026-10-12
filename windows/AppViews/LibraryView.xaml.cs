@@ -46,6 +46,19 @@ public partial class LibraryView : UserControl
     /// <summary>The panel a question is asked in, over the window: for a test to read and to answer.</summary>
     internal QuestionPanel QuestionPanel => Asking;
 
+    /// <summary>The panel of a new song from a ChordPro file: for a test to read, fill in and click.</summary>
+    internal NewSongPanel NewSongPanel => NewSong;
+
+    /// <summary>The two commands of the File menu that are about ChordPro files, as they are when the menu is opened. For a test.</summary>
+    internal (MenuItem BringIn, MenuItem WriteOut) ChordProCommands
+    {
+        get
+        {
+            TheFileMenuWasOpened(this, new RoutedEventArgs());
+            return (BringIn, WriteOut);
+        }
+    }
+
     /// <summary>
     /// Asks the person for a folder, with the system's own chooser, over the window
     /// this is in. Nothing, if they chose none.
@@ -58,6 +71,48 @@ public partial class LibraryView : UserControl
             Multiselect = false,
         };
         return asking.ShowDialog(Window.GetWindow(from)) == true && asking.FolderName.Length > 0 ? asking.FolderName : null;
+    }
+
+    /// <summary>
+    /// What a ChordPro file is called by. There is no one ending: these are the ones in
+    /// use, and a plain text file may be one too. (Not ".pro", which some use for
+    /// ChordPro: here that is a ProPresenter presentation.)
+    /// </summary>
+    internal const string ChordProFiles = "ChordPro files|*.cho;*.chordpro;*.chopro;*.crd;*.txt|All files|*.*";
+
+    /// <summary>
+    /// Asks the person for a ChordPro file, with the system's own chooser. Nothing, if
+    /// they chose none.
+    /// </summary>
+    internal static string? AskForAChordProFile(DependencyObject from)
+    {
+        var asking = new OpenFileDialog
+        {
+            Title = "Choose a ChordPro file to make a song from",
+            Filter = ChordProFiles,
+            CheckFileExists = true,
+            Multiselect = false,
+        };
+        return asking.ShowDialog(Window.GetWindow(from)) == true && asking.FileName.Length > 0 ? asking.FileName : null;
+    }
+
+    /// <summary>
+    /// Asks the person where a ChordPro file is to be written, with the system's own
+    /// chooser, which asks before a file that is there is written over. Nothing, if they
+    /// chose nowhere.
+    /// </summary>
+    internal static string? AskWhereToWrite(DependencyObject from, string name)
+    {
+        var asking = new SaveFileDialog
+        {
+            Title = "Save the song as a ChordPro file",
+            Filter = "ChordPro files|*.cho|All files|*.*",
+            DefaultExt = Pro7ChordEditor.Song.ChordProFile.Ending,
+            AddExtension = true,
+            FileName = name,
+            OverwritePrompt = true,
+        };
+        return asking.ShowDialog(Window.GetWindow(from)) == true && asking.FileName.Length > 0 ? asking.FileName : null;
     }
 
     // Gives the lists their width for the width the view now has.
@@ -114,6 +169,17 @@ public partial class LibraryView : UserControl
             }
             return held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2 or Key.S;
         }
+        // And so while a new song is being asked about: Esc is its Cancel (or its
+        // Close), and the window's other keys do nothing behind it.
+        if (Model.NewSong is not null)
+        {
+            if (key == Key.Escape && held == ModifierKeys.None)
+            {
+                Model.DontMakeTheSong();
+                return true;
+            }
+            return held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2 or Key.S;
+        }
         // Ctrl with 1 shows the chord sheet and with 2 the ChordPro text, and the
         // keyboard goes to the one shown. Not while something is asked over the window.
         if (held == ModifierKeys.Control && key is Key.D1 or Key.NumPad1 or Key.D2 or Key.NumPad2)
@@ -152,6 +218,25 @@ public partial class LibraryView : UserControl
         }
     }
 
+    // "New Song from ChordPro File...": the system is asked for the file, and the model
+    // reads it and shows what it found. Nothing is made until that has been seen.
+    private void BringInAFile(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanBringInAFile && AskForAChordProFile(this) is { } file)
+        {
+            Model.BringIn(file);
+        }
+    }
+
+    // "Save Song as ChordPro File...": the system is asked where, and the model writes it.
+    private void WriteAChordProFile(object sender, RoutedEventArgs e)
+    {
+        if (Model.CanWriteChordPro && AskWhereToWrite(this, Model.NameForAChordProFile) is { } path)
+        {
+            Model.WriteAsChordPro(path);
+        }
+    }
+
     private void OpenTheSettings(object sender, RoutedEventArgs e) =>
         new SettingsWindow(Model) { Owner = Window.GetWindow(this) }.ShowDialog();
 
@@ -167,6 +252,8 @@ public partial class LibraryView : UserControl
     {
         Save.IsEnabled = Model.Shown is { Problem: null };
         Revert.IsEnabled = Model.CanRevert;
+        BringIn.IsEnabled = Model.CanBringInAFile;
+        WriteOut.IsEnabled = Model.CanWriteChordPro;
     }
 
     private void TheSongMenuWasOpened(object sender, RoutedEventArgs e) => EarlierVersions.IsEnabled = Model.HasEarlierVersions;

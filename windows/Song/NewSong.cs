@@ -167,8 +167,11 @@ public static class NewSong
     /// <summary>How many lines go on a slide unless the person says otherwise (rule 8).</summary>
     public const int UsualLinesToASlide = 2;
 
-    /// <summary>The most lines to a slide that the window lets be asked for. (A part of fewer lines is one slide.)</summary>
-    public const int MostLinesToASlide = 99;
+    /// <summary>
+    /// The most lines to a slide that the window lets be chosen. (More than this is no
+    /// slide to be read; and a part of fewer lines is one slide.)
+    /// </summary>
+    public const int MostLinesToASlide = 12;
 
     private const string Ending = ".pro";
 

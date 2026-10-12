@@ -13,9 +13,10 @@
   What is where:
 
     LibraryModel    everything the window shows and does, with no drawing in it. In
-                    three files: the main one, and what is about mending
-                    (LibraryModel.Mending) and about the old editor's copies
-                    (LibraryModel.Folding)
+                    four files: the main one, and what is about mending
+                    (LibraryModel.Mending), about the old editor's copies
+                    (LibraryModel.Folding) and about ChordPro files
+                    (LibraryModel.ChordProFiles)
     LibraryWindow   the window, which frames LibraryView and tells the model what only
                     a window knows
     LibraryView     what the window holds: its menu, ListsPane at the left, SongPane at
@@ -46,6 +47,8 @@
     QuestionPanel   what is asked before something is done that may not be meant:
                     Revert's question, and the two of putting a copy's chords back
     MendAllPanel    Mend All: its question, how far it has got, and what it did
+    NewSongPanel    a new song from a ChordPro file: what was found in the file, and
+                    what the song is to be named, look like, and have on a slide
     SongLines       a song's lines, to look at: an earlier version of a song
     EarlierVersionsPanel
                     the copies kept of the song that is open, and putting one back
