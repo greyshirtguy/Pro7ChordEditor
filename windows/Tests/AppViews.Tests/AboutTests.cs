@@ -29,12 +29,41 @@ public class AboutTests
         Assert.Equal(("", ""), (AboutTheApp.VersionOf(""), AboutTheApp.BuiltFromOf("")));
 
         // This build's own: the number that Directory.Build.props gives every project.
-        var props = File.ReadAllText(Path.Combine(TestData.Repository, "windows", "Directory.Build.props"));
-        var number = Regex.Match(props, "<Version>([^<]+)</Version>").Groups[1].Value;
+        var number = NumberOfThisBuild();
         Assert.Matches(@"^\d+\.\d+(\.\d+)?$", number);
         Assert.Equal("Version " + number, AboutTheApp.Version);
+        Assert.Equal(number, AboutTheApp.Number);
+        // The one number is what a copy of a song is marked with, too.
+        Assert.Equal(number, LibraryModel.AppVersion);
         Assert.Matches(@"^(Built from [0-9a-f]{7} of its source\.)?$", AboutTheApp.BuiltFrom);
     }
+
+    private static string NumberOfThisBuild()
+    {
+        var props = File.ReadAllText(Path.Combine(TestData.Repository, "windows", "Directory.Build.props"));
+        return Regex.Match(props, "<Version>([^<]+)</Version>").Groups[1].Value;
+    }
+
+    // spec/06-library.md, rule 6d.
+    [Fact]
+    public void TheWindowsTitleIsTheAppsNameAndAfterItInSquareBracketsItsVersion() => Pictures.OnAThreadOfItsOwn(() =>
+    {
+        Assert.Equal("Pro7 Chord Editor [0.2]", AboutTheApp.TitleOf("0.2"));
+        Assert.Equal("Pro7 Chord Editor [1.10.3]", AboutTheApp.TitleOf("1.10.3"));
+        // A build that knows of no version says the name alone.
+        Assert.Equal("Pro7 Chord Editor", AboutTheApp.TitleOf(""));
+        Assert.Equal("0.2", AboutTheApp.NumberOf("0.2+15ac783999e3e9d6987a53dcfc1abef64f387a3c"));
+        Assert.Equal("", AboutTheApp.NumberOf(""));
+
+        // This build's own, and the window's. (The window is made and never shown.)
+        var number = NumberOfThisBuild();
+        Assert.Equal("Pro7 Chord Editor [" + number + "]", AboutTheApp.Title);
+        using var pc = new MadeUpPC();
+        var window = new LibraryWindow(pc.Model());
+        Assert.Equal("Pro7 Chord Editor [" + number + "]", window.Title);
+        Assert.False(window.IsVisible);
+        return Task.CompletedTask;
+    });
 
     [Fact]
     public void TheSettingsSayWhatTheAppIsWhoseItIsAndWhereItsSourceIs() => Pictures.OnAThreadOfItsOwn(() =>

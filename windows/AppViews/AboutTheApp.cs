@@ -11,6 +11,10 @@
 // The version is the build's own (<Version> in Directory.Build.props), which .NET
 // writes into each library with, after a plus sign, the commit it was built from. Both
 // are said: the number, and enough of the commit to tell one build from another.
+//
+// THE WINDOW'S TITLE is made here too: the app's name and, after it in square
+// brackets, the number (spec/06-library.md, rule 6d: "Pro7 Chord Editor [0.2]"). The
+// window only shows it (LibraryWindow.xaml.cs). The Mac's is `AppTitle`.
 
 using System.Reflection;
 
@@ -25,12 +29,18 @@ public static class AboutTheApp
 
     private static readonly string Apostrophe = ((char)0x2019).ToString();
 
-    /// <summary>What the build says it is: "0.1.0+15ac783999e3...", or nothing if it does not say.</summary>
+    /// <summary>What the build says it is: "0.2+15ac783999e3...", or nothing if it does not say.</summary>
     internal static string Written { get; } =
         typeof(AboutTheApp).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "";
 
-    /// <summary>"Version 0.1.0".</summary>
+    /// <summary>The version's number as it is written, "0.2"; or nothing, if the build says none.</summary>
+    public static string Number => NumberOf(Written);
+
+    /// <summary>"Version 0.2".</summary>
     public static string Version => VersionOf(Written);
+
+    /// <summary>What the window's title bar says: "Pro7 Chord Editor [0.2]".</summary>
+    public static string Title => TitleOf(Number);
 
     /// <summary>"Built from 15ac783 of its source.", or nothing where the build does not say what it was built from.</summary>
     public static string BuiltFrom => BuiltFromOf(Written);
@@ -45,12 +55,19 @@ public static class AboutTheApp
 
     public const string WhereItsSourceIs = "What it is made from can be read at";
 
-    internal static string VersionOf(string written)
+    internal static string NumberOf(string written)
     {
         var plus = written.IndexOf('+', StringComparison.Ordinal);
-        var number = plus < 0 ? written : written[..plus];
-        return number.Length == 0 ? "" : "Version " + number;
+        return plus < 0 ? written : written[..plus];
     }
+
+    internal static string VersionOf(string written) => NumberOf(written) is { Length: > 0 } number ? "Version " + number : "";
+
+    /// <summary>
+    /// The window's title for a version: the name and, after it in square brackets, the
+    /// number. A build that knows of no version says the name alone (rule 6d).
+    /// </summary>
+    internal static string TitleOf(string number) => number.Length == 0 ? Name : Name + " [" + number + "]";
 
     internal static string BuiltFromOf(string written)
     {

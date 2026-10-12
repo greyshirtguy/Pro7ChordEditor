@@ -23,11 +23,13 @@
   in its log.
 
   The version. One number for the whole app, said here once: every assembly has it,
-  the app reads its own (AppViews/LibraryModel.cs), and it is written into the index
-  of every copy the app keeps of a song (spec/07-backups.md, rule 8), so that a copy
-  says which app made it. It is 0.1.0 until there is a build worth giving anyone
-  (milestone M5); what it is then, and how it is counted on from there, is the
-  maintainer's to say. (The first editor, in old/, was 0.9.5, and is another program.)
+  the app reads its own (AppViews/AboutTheApp.cs), the window's title says it
+  (spec/06-library.md, rule 6d), and it is written into the index of every copy the
+  app keeps of a song (spec/07-backups.md, rule 8), so that a copy says which app made
+  it. What it is, and how it is counted on, is the maintainer's to say: it was 0.1.0
+  for the first early build, and is 0.2 since 2026-10-12 ("bump to version 0.2"),
+  written with two numbers as the Mac app writes its own. (The first editor, in old/,
+  was 0.9.5, and is another program.)
 
   (global.json, beside this file, is what the `dotnet` command itself is told: how
   tests are run.)
@@ -41,6 +43,6 @@
     <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <DebugType>embedded</DebugType>
-    <Version>0.1.0</Version>
+    <Version>0.2</Version>
   </PropertyGroup>
 </Project>

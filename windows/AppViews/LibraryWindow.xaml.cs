@@ -34,6 +34,8 @@ public partial class LibraryWindow : Window
     public LibraryWindow(LibraryModel model)
     {
         InitializeComponent();
+        // The app's name and, in square brackets, its version (spec/06, rule 6d).
+        Title = AboutTheApp.Title;
         Content = new LibraryView(model);
         Loaded += async (_, _) =>
         {

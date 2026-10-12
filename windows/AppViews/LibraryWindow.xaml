@@ -8,11 +8,14 @@
   The view is put in by the code beside this, which hands it its model.
 
   It opens at 1280 by 800, as the Mac app's does.
+
+  Its title is not here: it is the app's name and its version, "Pro7 Chord Editor
+  [0.2]" (spec/06-library.md, rule 6d), which the code beside this asks of
+  AboutTheApp.
 -->
 <Window x:Class="Pro7ChordEditor.AppViews.LibraryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Pro7 Chord Editor"
         Width="1280"
         Height="800"
         MinWidth="640"

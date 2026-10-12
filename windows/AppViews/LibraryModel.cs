@@ -44,7 +44,6 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using Pro7ChordEditor.ChordRules;
 using Pro7ChordEditor.Song;
 
@@ -118,9 +117,11 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
 
     public static LibraryModel OnThisPC() => new(AppData.OnThisPC(), chosen => PlaceFinder.OnThisPC(chosen), ProPresenterApp.IsRunning, AppVersion);
 
-    /// <summary>The version of the app that is running, as "0.1.0"; "" if it has none.</summary>
-    public static string AppVersion =>
-        Assembly.GetEntryAssembly()?.GetName().Version is { } version ? version.ToString(3) : "";
+    /// <summary>
+    /// The version of the app that is running, as it is written: "0.2"; "" if it has
+    /// none. (The one number that About and the window's title say: AboutTheApp.)
+    /// </summary>
+    public static string AppVersion => AboutTheApp.Number;
 
     /// <summary>
     /// Something here is no longer what it was. It does not say what: whoever shows this
