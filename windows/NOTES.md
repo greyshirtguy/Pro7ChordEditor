@@ -20,7 +20,7 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"). A song made at M9 has still not been opened in ProPresenter; the read-me and the release's page say so |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
 | **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
@@ -2037,9 +2037,42 @@ names. What to know before changing any of it:
   account's name stands by itself fifteen times in the symbols, and in the build
   of 0.2 not once. What is in both is the address the source is published at,
   which is meant.
-- **A zip of 0.2 was made with it on 2026-10-12, and is not given out**:
-  `build\Pro7ChordEditor-windows-0.2.zip`, for the maintainer to try. A release
-  is published on the maintainer's word and not otherwise.
+- **0.2, given out on 2026-10-12** at the maintainer's word ("push and make a 0.2
+  release"), as a pre-release tagged `windows-v0.2`, of the commit `358ddf8`. As
+  0.1.0 was: the commit pushed, and both workflows passed on it (the Windows one
+  ran 738 tests); the zip made by `make-zip.ps1` from that commit, with nothing
+  changed since it; an annotated tag pushed; `gh release create windows-v0.2 <zip>
+  --prerelease --latest=false --verify-tag`; and the zip fetched back from GitHub
+  and held against the one sent, which it is, to the byte. The page's "latest" is
+  still the first editor, 0.9.5.
+- **What was known of 0.2 when it was given out**, and is said on its page: it
+  starts, and its window's title is "Pro7 Chord Editor [0.2]" (the published file
+  was started once and closed again: the next note); it names no folder of this
+  PC; **dragging a chord from the strip had been done by the tests only, and by no
+  hand on Windows that this session knows of**; and no song made from a ChordPro
+  file had been opened in ProPresenter.
+- **The release of 0.1.0 is still on the page**, with the zip that names the folder
+  it was built in. The Mac's 0.1 was taken down for the same, on the maintainer's
+  word. For the Windows one that word has not been given, so it has been left, and
+  the maintainer asked.
+- **Seeing that the build starts opened the maintainer's own library, which a
+  session is not to do.** The published file was started once, minimised, its
+  window's title read, and closed again when asked to; no key and no pointer was
+  sent to it. Until this day the app found no library on this PC ("ProPresenter 22
+  keeps no `.pro` files"), and a session could start it and find nothing. **The
+  maintainer has since chosen a folder of their own in it**, which the app
+  remembers; so the build that was started listed that place and read its songs
+  to mark them. **Nothing was changed**: the app writes a song only when a chord
+  on it is changed, and nothing was asked of it. But `AGENTS.md` says not to open
+  the maintainer's library with a build that can write unless they say to, and
+  this did; and the last lines of the app's log, read afterwards to see that it
+  had started, name a song of that library (they are repeated nowhere).
+  **So, from now on: a session does not start the app on this PC, and does not
+  read the app's log here, unless the maintainer says to.** The app keeps what it
+  remembers where Windows says an app's own things go, and nothing a session can
+  set moves that for one start. (**A proposal, for both apps and so for `spec/`**:
+  a way to start the app with its own things somewhere else, for trying a build
+  without the folders that were chosen in the real one.)
 
 ### At the chord from the strip
 
