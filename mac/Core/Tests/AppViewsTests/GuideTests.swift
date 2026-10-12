@@ -41,8 +41,37 @@ struct GuideTests {
         let folder = try #require(GuideFiles.folder, "the guide's folder was not found beside the tests")
         #expect(try Data(contentsOf: folder.appendingPathComponent(GuideFiles.wordsName)) == original)
         let guide = try asTheSpecHasIt()
-        #expect(GuideFiles.guide == guide.said(on: Guide.mac))
-        #expect(GuideFiles.guide != nil)
+        #expect(GuideFiles.guide == guide.said(on: "mac"))
+        // In the Mac's words and not Windows': Command, and never Ctrl.
+        let shown = try #require(GuideFiles.guide).everySentence.joined(separator: "\n")
+        #expect(shown.contains("Command+C") && !shown.contains("Ctrl"))
+    }
+
+    @Test("A key's name is put in wherever it stands, in every part of the guide; and every part is among what there is to read, in the order it is read")
+    func everyPartOfIt() throws {
+        // A guide made up for this, with a name in each of its parts.
+        let made = #"""
+            {"title": "T {k}", "first": {"heading": "H {k}", "points": ["P1 {k}", "P2 {k}"]},
+             "sections": [
+               {"heading": "S1 {k}", "lead": "L {k}", "picture": "one", "paragraphs": ["A {k}", "B {k}"],
+                "items": [{"lead": "I1 {k}", "text": "X1 {k}", "picture": "two"}, {"lead": "I2 {k}", "text": "X2 {k}"}], "sample": "[C]sample"},
+               {"heading": "S2 {k}", "items": [{"lead": "I3 {k}", "text": "X3 {k}", "picture": "three"}]}],
+             "foot": "F {k}", "pictures": {"one": "one {k}", "two": "two {k}", "three": "three {k}"},
+             "names": {"here": {"k": "KEY"}, "there": {"k": "OTHER"}}}
+            """#
+        let guide = try #require(Guide.read(Data(made.utf8)))
+        #expect(guide.everySentence == ["T {k}", "H {k}", "P1 {k}", "P2 {k}", "S1 {k}", "L {k}", "A {k}", "B {k}", "I1 {k}", "X1 {k}", "I2 {k}", "X2 {k}",
+                                        "[C]sample", "S2 {k}", "I3 {k}", "X3 {k}", "F {k}"])
+        #expect(guide.picturesNamed == ["one", "two", "three"])
+        let here = guide.said(on: "here")
+        #expect(here.everySentence == ["T KEY", "H KEY", "P1 KEY", "P2 KEY", "S1 KEY", "L KEY", "A KEY", "B KEY", "I1 KEY", "X1 KEY", "I2 KEY", "X2 KEY",
+                                       "[C]sample", "S2 KEY", "I3 KEY", "X3 KEY", "F KEY"])
+        #expect(here.pictures == ["one": "one KEY", "two": "two KEY", "three": "three KEY"])
+        #expect(here.picturesNamed == ["one", "two", "three"])
+        #expect(here.sections[0].items?.map(\.picture) == ["two", nil])
+        // Each platform has its own, and the other's is not put in.
+        #expect(guide.said(on: "there").title == "T OTHER")
+        #expect(guide.said(on: "nowhere") == guide)
     }
 
     @Test("The guide's folder is found in the app as Xcode builds it and beside the tests as the package manager builds them; and where there is none, nothing is found")
