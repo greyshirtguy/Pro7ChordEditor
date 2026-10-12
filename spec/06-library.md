@@ -263,8 +263,10 @@ words; dropping a `.pro` file on the window to open it.
 On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in
 `%LOCALAPPDATA%\Pro7ChordEditor`:
 
-- its settings: the folders chosen, the place and library last open (`settings.json`),
-  and the window's size, which the system keeps for it;
+- its settings: the folders chosen, the place and library last open, how the window
+  was left (the sizes of the words, the colours of chords, where the bar between the
+  lists is), and whether the guide has been shown ([13-guide.md](13-guide.md), rule 2):
+  all in `settings.json`; and the window's size, which the system keeps for it;
 - the marks it has worked out (rule 10; `marks.json`);
 - the copies of files ([07-backups.md](07-backups.md));
 - a log of what it did, a line for each thing, with the names of files and never the

@@ -22,6 +22,8 @@ the list of those things. Anything not on it is to be the same.
 | Open on what is at the spot | Return | Enter, F2 |
 | Redo | Shift+Command+Z | Ctrl+Y, Ctrl+Shift+Z |
 | Menus | A menu bar with every command in it, its shortcut beside it | The same commands in the window's own menu |
+| The guide ([13](13-guide.md)), asked for from the keys | Command+?, which is the Mac's key for help. It is Help > Pro7 Chord Editor Guide, where macOS would otherwise say the app has no help | F1, which is Windows'. The same under Help in the window's own menu |
+| The guide's pictures, and its names for the keys | Of the Mac app's sheet, with the Mac's arrow drawn in for the pointer. Command, Option, Return | Of the Windows app's sheet, with Windows' arrow. Ctrl, Enter |
 | Settings | A Settings window (Command+comma) | A settings page or dialog |
 | The app's own data | `~/Library/Application Support/Pro7ChordEditor` | `%LOCALAPPDATA%\Pro7ChordEditor` |
 | Looks | The system's controls, fonts and colours for lists, buttons and fields. Dark and light as the system is | The same, in the system's own style |
@@ -146,7 +148,9 @@ with the typing bubble open and "D/" typed; with a chord being dragged; a song w
 line of chords alone; the ChordPro editor. Then **open the PNGs and look at them**
 beside `spec/pictures`. Do this after every change to how something is drawn, and say
 in your report that you did and what you saw. Pictures do not go in the repository
-unless the maintainer wants some for the README.
+unless the maintainer wants some for the README; **but for the guide's**, which are
+part of the app, are kept in its folder, and are held by a test to what the app draws
+([13-guide.md](13-guide.md), rules 13 to 15).
 
 What a picture cannot tell (does the spot keep up with the pointer, does a drag feel
 right, is typing quick) only a person can. Say plainly which things you have only
@@ -170,6 +174,15 @@ seen in a picture and ask the maintainer to try them.
   for.)
 - **Windows**: a self-contained `.exe` in a `.zip` on the Releases page, as the old
   editor was.
+- **The README at the top of the repository says where each app is downloaded**, in
+  the first thing a visitor reads after what the app is: a table, "Try it", with a
+  link for the Mac and a link for Windows that each fetch the newest file of that app
+  straight away. GitHub's own "Latest" can name only one release, and while the new
+  apps are given out as pre-releases it names the old Windows editor; so the README,
+  not that label, is the way in. **Whoever publishes a release of an app brings that
+  app's row of the table up to date in the same push**: the link, the version, the
+  size. (The maintainer, 2026-10-12: "an obvious answer to someone who wants to try
+  it out: links to both releases".)
 - **Every push** should build both apps and run both sets of tests on GitHub's own
   Mac and Windows machines (`.github/workflows`). That is the referee the two apps
   share: neither can drift from the vectors without it showing. Set it up in the

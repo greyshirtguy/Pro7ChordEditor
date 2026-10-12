@@ -56,6 +56,16 @@ until `sheet-model.json` passes.
 
 M7 to M9 can change order to suit what the maintainer wants next.
 
+**Asked for since, and no milestone of the plan.** Each is built by both apps, when
+its turn comes, from the page that has it:
+
+| | Page |
+| --- | --- |
+| One of the key's chords dragged out of the strip onto a word | [03](03-chord-sheet.md), "A chord dragged out of the strip" |
+| The app's version in the window's title | [06](06-library.md), rule 6d |
+| The guide: one page on how chords are put on, shown once and under Help | [13](13-guide.md), with its words in [guide.json](guide.json) |
+| Where each app is downloaded, in the README at the top | [10](10-platforms.md), "Getting it to other people" |
+
 ## What the maintainer is asked for along the way
 
 - **Before M3**, on the Mac: leave to read (only read) ProPresenter's own settings,

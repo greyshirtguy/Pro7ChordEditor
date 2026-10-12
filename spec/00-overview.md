@@ -47,6 +47,8 @@ a way to find and mend what an earlier chord editor did to some files.
    right. ([08-repair.md](08-repair.md))
 8. **Makes a new song from a ChordPro file**, and writes one out.
    ([09-chordpro-files.md](09-chordpro-files.md))
+9. **Says how chords are put on**, on one page of its own that opens the first time
+   the app is started and is under Help ever after. ([13-guide.md](13-guide.md))
 
 ## What it does not do
 
@@ -85,6 +87,7 @@ By the maintainer, on 2026-10-10 ([12-origin.md](12-origin.md) has the words):
 | [10-platforms.md](10-platforms.md) | What is the Mac's own way and what is Windows', how each project is laid out, how an agent sees what it has drawn, signing |
 | [11-plan.md](11-plan.md) | The milestones, and what to say to start a session |
 | [12-origin.md](12-origin.md) | The maintainer's own words that the editor was built from |
+| [13-guide.md](13-guide.md) | The guide the app shows: when, how it is laid out, how its pictures are made. Its words are [guide.json](guide.json), which both apps carry |
 
 ## Known, guessed, and new
 

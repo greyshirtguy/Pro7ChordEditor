@@ -165,7 +165,9 @@ Vectors: `sheet-model.json`, `rows`.
 14. The strip across the top has, at its left, the key's seven chords as small buttons,
     each with its number 1 to 7 in grey before its name, to be clicked (rule 24) or
     dragged onto a word (rule 46a); and at its right two round
-    buttons, − and +, that zoom (rule 14b). If the song states no key, the chords are
+    buttons, − and +, that zoom (rule 14b), and a little apart from them a third,
+    with a question mark on it, that shows the guide
+    ([13-guide.md](13-guide.md), rule 3). If the song states no key, the chords are
     C's, and before the two buttons the strip says "The song names no key: pick the
     one its chords are in", where there is room for it. **The key is not picked
     here**: it is picked in the song's header over the sheet
