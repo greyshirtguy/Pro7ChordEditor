@@ -827,7 +827,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     func droppedOfKey(_ name: String, at point: NSPoint, shift: Bool) -> Bool {
         guard let sheet else { return false }
         let put = carriedOfKey(name, to: point, shift: shift) && sheet.dropOfKey()
-        sheet.carryOff()
+        // (The line may have a chord more, or a blank slide its first: laid out again.)
         sync()
         return put
     }
@@ -865,9 +865,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         // (The first time it is found near an edge the clock is only started.)
         let passed = carriedScrolledAt.map { min(0.2, max(0, time - $0)) } ?? 0
         carriedScrolledAt = time
-        let top = max(0, min(seen.minY + depth * Self.carriedFastest * passed, bounds.height - seen.height))
-        if abs(top - seen.minY) >= 0.5 {
-            scroll(NSPoint(x: seen.minX, y: top))
+        let by = depth * Self.carriedFastest * passed
+        if abs(by) >= 0.5 {
+            // (What it is seen through stops it at the sheet's top and its bottom.)
+            scroll(NSPoint(x: seen.minX, y: seen.minY + by))
         }
     }
 

@@ -211,6 +211,9 @@ struct ChordFromTheStripTests {
         #expect(sheet.rows[alone].chords.map(\.name) == wanted)
         #expect(canvas.droppedOfKey(name, at: try #require(canvas.point(over: Spot(row: alone, at: names.count * 2))), shift: false))
         #expect(sheet.rows[alone].chords.map(\.name) == wanted + [name])
+        // The sheet is laid out again for the line as it now is: a bubble for each of
+        // its chords, the new one among them.
+        #expect(canvas.laid[alone].placed.xs.count == names.count + 1)
         let read = ChordSheet(song: try OpenSong(opening: mac.place.appendingPathComponent("Libraries/Songs/\(song).pro")))
         #expect(read.rows[alone].chords == sheet.rows[alone].chords && model.refusal == nil)
     }
@@ -253,6 +256,17 @@ struct ChordFromTheStripTests {
         let now = try chords(of: Self.second, in: mac, song: "Amazing Grace")
         #expect(now.contains(Chord(at: 5, name: fourth.name)) && now.contains(Chord(at: 13, name: "Bm7")))
         #expect(!fourth.carrying && sheet.dragged == nil)
+
+        // The system ends it while the chord is still shown over a place, and tells
+        // only the strip (at Esc, say): nothing is left looking as if it were carried,
+        // and the window is told to draw the sheet again.
+        fourth.pressed(at: NSPoint(x: 5, y: 5))
+        #expect(fourth.pulled(to: NSPoint(x: 5, y: 12)))
+        #expect(canvas.draggingUpdated(dragged) == .copy && sheet.dragged != nil)
+        let drawn = model.sheetVersion
+        fourth.carryingEnded()
+        #expect(sheet.dragged == nil && model.sheetVersion > drawn && !fourth.carrying)
+        #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace") == now)
 
         // While ProPresenter is running: refused in the song's own sentence, and the
         // system is told that nothing was done (the picture then goes back).
@@ -331,6 +345,29 @@ struct ChordFromTheStripTests {
         odd.draggingLocation = place
         #expect(canvas.draggingEntered(odd) == [] && !canvas.performDragOperation(odd))
         #expect(try mac.bytes(of: "Amazing Grace") == before && !model.canUndo)
+    }
+
+    @Test("Let go, as the system tells the sheet of it: the chord goes to the character under the pointer, or with Shift held to the start of its word")
+    func letGoWithShift() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        let (canvas, window) = view(for: model)
+        defer { window.close() }
+        let sheet = try #require(model.sheet)
+        let line = try row(Self.second, of: model)
+        let grip = KeyChordGrip(frame: NSRect(x: 0, y: 0, width: 40, height: 26))
+        grip.name = try #require(sheet.inKey.dropFirst(2).first)
+        let carried = try pasteboard(carrying: grip)
+        defer { carried.releaseGlobally() }
+        let dragged = Dragged(carried, over: window)
+        dragged.draggingLocation = canvas.convert(try #require(canvas.point(over: Spot(row: line, at: 7))), to: nil)
+        canvas.shiftIsHeld = { false }
+        #expect(canvas.performDragOperation(dragged))
+        #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace").filter { $0.name == grip.name }.map(\.at) == [7])
+        canvas.shiftIsHeld = { true }
+        dragged.draggingLocation = canvas.convert(try #require(canvas.point(over: Spot(row: line, at: 16))), to: nil)
+        #expect(canvas.performDragOperation(dragged))
+        #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace").filter { $0.name == grip.name }.map(\.at) == [7, 13])
     }
 
     @Test("Held near the bottom of what is seen, the sheet scrolls down, and near the top, up: by the time that has passed, faster the nearer the edge, and never past its ends. Not upwards on the chord's way in from the strip")
@@ -415,6 +452,17 @@ struct ChordFromTheStripTests {
         held(300)
         clock += 0.1
         #expect(canvas.visibleRect.minY == 0)
+
+        // Taken off the sheet and brought over it again, it comes in over the top
+        // afresh: the sheet does not scroll up under it this time either.
+        canvas.draggingExited(dragged)
+        canvas.scroll(NSPoint(x: 0, y: 200))
+        held(4, entering: true)
+        clock += 0.1
+        held(4)
+        clock += 0.1
+        held(4)
+        #expect(canvas.visibleRect.minY == 200)
     }
 
     // ---- The strip's end
@@ -459,6 +507,16 @@ struct ChordFromTheStripTests {
         grip.pressed(at: NSPoint(x: 10, y: 10))
         grip.released(at: NSPoint(x: 10, y: 10))
         #expect(clicks == 2)
+        // So it is even if the system never said that a carrying had ended: a button
+        // is not left dead.
+        grip.pressed(at: NSPoint(x: 10, y: 10))
+        #expect(grip.pulled(to: NSPoint(x: 10, y: 20)) && grip.carrying)
+        grip.pressed(at: NSPoint(x: 10, y: 10))
+        #expect(!grip.carrying)
+        grip.released(at: NSPoint(x: 10, y: 10))
+        #expect(clicks == 3)
+        clicks = 2
+        lifts = 1
 
         // What the system is handed.
         let item = grip.carried()
@@ -484,6 +542,36 @@ struct ChordFromTheStripTests {
         grip.mouseDragged(with: try mouse(.leftMouseDragged, at: NSPoint(x: 60, y: 0), in: window))
         #expect(begun.count == 1 && lifts == 2 && clicks == 3)
         #expect((begun.first?.item as? NSPasteboardItem)?.string(forType: .chordOfTheKey) == "F#m")
+    }
+
+    @Test("What lies over a button is seen through; but it shades the button while it is held down, and makes it faint while its chord is out being carried")
+    func whatTheGripDraws() throws {
+        let grip = KeyChordGrip(frame: NSRect(x: 0, y: 0, width: 40, height: 26))
+        /// The middle of the grip, and its corner, as it draws itself: red, green, blue
+        /// and how much is there, each out of 255.
+        func drawn() throws -> (middle: [Int], corner: [Int]) {
+            let picture = try #require(grip.bitmapImageRepForCachingDisplay(in: grip.bounds))
+            // (A picture got so is not always clear to begin with.)
+            picture.bitmapData.map { $0.update(repeating: 0, count: picture.bytesPerRow * picture.pixelsHigh) }
+            grip.cacheDisplay(in: grip.bounds, to: picture)
+            func at(_ x: Int, _ y: Int) throws -> [Int] {
+                let colour = try #require(picture.colorAt(x: x, y: y)?.usingColorSpace(.sRGB))
+                return [colour.redComponent, colour.greenComponent, colour.blueComponent, colour.alphaComponent].map { Int(($0 * 255).rounded()) }
+            }
+            return (try at(picture.pixelsWide / 2, picture.pixelsHigh / 2), try at(0, 0))
+        }
+        #expect(try drawn().middle[3] == 0)
+        // Held down: a shade of black, and the button's rounded corners left alone.
+        grip.pressed(at: NSPoint(x: 10, y: 10))
+        var seen = try drawn()
+        #expect(seen.middle[3] > 40 && seen.middle[3] < 70 && seen.corner[3] == 0, "\(seen)")
+        // Its chord out being carried: most of the strip's own colour over it.
+        #expect(grip.pulled(to: NSPoint(x: 10, y: 20)))
+        seen = try drawn()
+        #expect(seen.middle[3] > 140 && seen.middle[3] < 165 && seen.corner[3] == 0, "\(seen)")
+        // And seen through again when it is over.
+        grip.carryingEnded()
+        #expect(try drawn().middle[3] == 0)
     }
 
     @Test("Each of the strip's seven buttons has one over it, of its own chord and its own size, that says the button's three ways; a click through it puts the chord on the spot; and its picture is the button's. So in a strip too narrow for them all, where they scroll")
