@@ -13,21 +13,49 @@ words, and lets them be put on, moved and changed.
 > library, and quit ProPresenter before using it. It has nothing to do with Renewed
 > Vision, the makers of ProPresenter.
 
+## Try it
+
+| | Download | It needs |
+| --- | --- | --- |
+| **Mac** | **[Pro7ChordEditor-mac-0.2.dmg](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/mac-v0.2/Pro7ChordEditor-mac-0.2.dmg)** (5 MB) | macOS 15 or later, on a Mac with Apple's own chip or Intel's. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/mac-v0.2) |
+| **Windows** | **[Pro7ChordEditor-windows-0.2.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/windows-v0.2/Pro7ChordEditor-windows-0.2.zip)** (60 MB) | Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/windows-v0.2) |
+
+These are early builds of the new editor, version 0.2 of each. Before you use one:
+
+- **Keep a backup of your ProPresenter library, and quit ProPresenter first.**
+- **Try it on a copy.** Copy one folder out of ProPresenter's `Libraries` to somewhere
+  else, and open the copy with Choose Folder.
+- **Neither is signed yet**, so macOS and Windows each stop it the first time it is
+  opened, and have to be told to go on. The page of each download says how, and so
+  does the read-me inside it.
+
+How chords are put on with it is on one page: [the guide](spec/13-guide.md#the-words).
+(From its next build on, the Mac app opens that page by itself the first time it is
+started; the Windows app is to do the same.)
+
+**Not the one GitHub calls "Latest".** The Releases page can give that label to one
+release, and it has it on 0.9.5 of the first editor: a Windows program of another
+design, which these are to replace. It is
+[still there](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v0.9.5) and works as it did, with the faults it is known to
+have ([`spec/08-repair.md`](spec/08-repair.md)). The new Windows build finds what it
+left in a song and mends it.
+
 ## Where things stand
 
 | | |
 | --- | --- |
-| **Windows** | The first editor, version 0.9.5, is in [`windows/old/`](windows/old/README.md) and on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page. It works by typing chords in square brackets among the words. It has known faults and is being replaced by the new editor: [`windows/`](windows/README.md) says how far that has got. An early build of it is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page, marked as such. It is not signed, so Windows has to be told to run it: the read-me that comes with it says how |
-| **Mac** | The new editor, being built first: [`mac/`](mac/README.md) says how far it has got. Early builds, when there are any, are on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page, marked as such. They are not yet signed by Apple, so macOS has to be told to open them: the read-me that comes with one says how |
-| **The new editor, for both** | Planned in full in [`spec/`](spec/00-overview.md). Built for the Mac as far as the two ways of putting chords on; and for Windows as far as making a song from a ChordPro file |
+| **Mac** | Built as far as the two ways of putting chords on, chords where there are no words, and the guide. Not yet: mending what the first editor left in songs, and making a song from a ChordPro file. [`mac/`](mac/README.md) has the rest |
+| **Windows** | Built as far as making a song from a ChordPro file, and it mends what the first editor left. [`windows/`](windows/README.md) has the rest |
+| **The first editor** | Version 0.9.5, for Windows, in [`windows/old/`](windows/old/README.md). It works by typing chords in square brackets among the words |
+| **What both are built to** | [`spec/`](spec/00-overview.md), page by page |
 
-## What the new one is to be
+## What the new one is
 
 The chord editor that was built for
 [Simple Presenter](https://github.com/greyshirtguy/Simple-Presenter), a presenter for
 Linux, lifted out and made again natively for the Mac and for Windows:
 
-![The chord sheet: a song laid out as one sheet, each slide's lines in a card, with chords in bubbles over the words and the key's own chords numbered 1 to 7 along the top](spec/pictures/chord-editor.png)
+![The chord sheet of the Mac app: across its top the seven chords of the song's key, numbered 1 to 7; under them two slides of Amazing Grace, with their chords in bubbles over the words, and the spot, an orange outline with a plus in it, over the word the pointer is on](mac/Core/Sources/AppViews/Guide/point-and-press.png)
 
 - **The whole song on one sheet**, each slide's lines in a card, with a spot that
   follows the pointer to show where the next chord will go.
@@ -40,8 +68,8 @@ Linux, lifted out and made again natively for the Mac and for Windows:
 - **Or type the lot as ChordPro**, `[G]Amazing [C]grace`, as the first editor did.
 - **Every change saved at once into the song's own file**, with a copy of the file
   kept first, out of sight, and a way back to any of them.
-- **Songs the first editor left wrong are found and mended.**
-- **A ChordPro file, from SongSelect say, made into a song.**
+- **Songs the first editor left wrong are found and mended.** (On Windows so far.)
+- **A ChordPro file, from SongSelect say, made into a song.** (On Windows so far.)
 
 ## This repository
 

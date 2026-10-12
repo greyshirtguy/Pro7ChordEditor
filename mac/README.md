@@ -10,7 +10,9 @@ as ChordPro text, its chords in square brackets among its words, to be typed in.
 Chords can be put where there are no words: on an intro's line of chords, and on a
 slide that is blank. Each change is saved as it is made, with a copy of the file as
 it was kept first, which can be seen and put back. A song's key can be set, and the
-key ProPresenter shows it in. Nothing is saved while ProPresenter is running.
+key ProPresenter shows it in. Nothing is saved while ProPresenter is running. A guide
+to all of it, one page with pictures of the app's own sheet, opens the first time the
+app is started, and is under Help ever after.
 
 Not yet: mending songs the old Windows editor damaged; ChordPro files; an icon.
 
@@ -28,6 +30,11 @@ mac/make-dmg.sh        # builds the app as a Release and writes mac/build/Pro7Ch
 The image holds the app, a way to Applications to drag it onto, and
 [a read-me](dmg/Read%20Me%20First.txt). The version is the app's own, in the Xcode
 project.
+
+When an image is put on the Releases page, the Mac's row of "Try it" in
+[the README at the top](../README.md) is brought up to date in the same push: the
+link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
+"Getting it to other people").
 
 **It is not yet signed with a Developer ID, nor checked by Apple** (notarized): that
 waits on the maintainer's developer account. So on another Mac, once the image has
@@ -51,6 +58,7 @@ Nothing has to be installed first, and the `proto/` submodule is not needed to b
 | `Core/` | A Swift package: the rules of chords (`ChordRules`), the reader of ProPresenter's files (`ProFormat`, generated), the song and the library (`Song`), and the window (`AppViews`) |
 | `Core/generate-proto.sh` | Makes `ProFormat` again from the `proto/` submodule. Needs `brew install protobuf swift-protobuf` |
 | `Core/Sources/AppViews` | The window: what it shows and what a click does. A library too, so that the tests can draw it into pictures |
+| `Core/Sources/AppViews/Guide` | The guide's words, a copy of [`spec/guide.json`](../spec/guide.json), and its pictures, which a test draws and holds to what the app draws now ([`spec/13-guide.md`](../spec/13-guide.md)) |
 | `App/` | The app itself: the few lines that start it |
 | `Pro7ChordEditor.xcodeproj` | Builds the app |
 | `make-dmg.sh`, `dmg/` | Makes the disk image the app is given out in, and the read-me that goes in it |
