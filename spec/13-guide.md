@@ -229,6 +229,12 @@ This page is in the Help menu, and behind the ? at the right of the strip.
   at the next start it is not asked for. With settings from before there was a guide,
   it is asked for once, and everything else that was kept is afterwards as it was, to
   the last thing. With settings that cannot be read, it is asked for.
+- Nothing but the guide's opening writes that it was shown: what the app remembers
+  before its first start (a folder chosen, say) does not, and the guide still opens.
+- Each picture is on the page where the words have it. (The Mac app first held this
+  by counting the colours of the page as drawn, and a page with a picture left out
+  passed. It is told now by how much of the sheet's own dark is on a light page:
+  three pictures' worth, one, or none.)
 - The window, drawn into pictures and looked at: as it opens, in the light and in the
   dark; made narrow; and the whole page.
 - By hand, since no test has an app to open a window in: that it opens at the first

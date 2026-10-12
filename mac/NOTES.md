@@ -1373,6 +1373,23 @@ more.)
 - **Xcode's bundle for a package's resources and `swift build`'s are not laid out
   alike**: `Core_AppViews.bundle/Contents/Resources/Guide` in the app,
   `Core_AppViews.bundle/Guide` beside the tests. Seen by building both and looking.
+- **A test cannot press the ? in the strip.** It is a button of SwiftUI's, and in a
+  window that is never shown SwiftUI tells what reads the screen aloud nothing of
+  its buttons (asked, the strip said it had no children), so there is nothing to
+  press. That the button is there is held by the guide's own pictures, which have
+  it in them; that it asks for the guide is one line, and a hand's to try. (The
+  seven chords beside it are pressed by the tests through the view of AppKit that
+  lies over each, which is there for dragging and not for the tests.)
+- **Broken on purpose, 46 ways, after it was built** (what is shown once and what
+  is remembered, each part of the words and the names put in them, where the
+  guide's folder is found, the window with and without its guide and its pictures,
+  and the look of the sheet changed by a hair). All are caught now. Three kinds
+  were not, as built, and each got a test: what is remembered before the first
+  start saying that the guide was shown; a picture that is not there being said to
+  be somewhere; and a page drawn without its pictures, which a count of colours
+  had passed (it is told now by how much of the sheet's own dark is on the page).
+  A colour of the sheet changed by one step in 255, a letter a point larger, and
+  the ? taken out of the strip each fail the test that holds the guide's pictures.
 
 ### Rules the vectors did not hold, and what became of them
 
