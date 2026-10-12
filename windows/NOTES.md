@@ -20,7 +20,8 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; whether to pay to have the file signed; and the version's number. **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"). A song made at M9 has still not been opened in ProPresenter; the read-me and the release's page say so |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"). A song made at M9 has still not been opened in ProPresenter; the read-me and the release's page say so |
+| **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -277,9 +278,9 @@ And at M4, likewise this session's, and the maintainer's to change:
     name is that in the computer's own time, as the page asks. A name that says an
     hour the clocks skip in spring (no copy is made in one, but a name can be typed)
     is read as the hour after, and not as no copy.
-33. **The app's version is 0.1.0**, said once (`Directory.Build.props`), as the Mac's
-    first build is 0.1. A copy's index records it. What it is when there is a build
-    worth giving anyone, the maintainer says.
+33. **The app's version is said once** (`Directory.Build.props`). A copy's index
+    records it. It was 0.1.0 for the first early build, as the Mac's was 0.1, and is
+    0.2 since the maintainer said so (decision 120).
 34. **Earlier Versions is a panel over the window, not a window of its own**: the
     window is dimmed behind it, and Esc, Done or a click on the dimmed part puts it
     away (`spec/07`, rule 17). So a test draws it as it draws the rest, and it cannot
@@ -757,6 +758,44 @@ ProPresenter is for.
     (Windows says them only of a file that came through a browser). The page asks
     that the README "say exactly what the person will see": the maintainer is
     asked to hold those lines against what Windows does say.
+116. **One of the key's chords can be dragged out of the strip onto a word**
+    (`spec/03`, rules 46a to 46h; the maintainer's, "The Mac app drag and drop is
+    finish - let's implment it here"). It is built to the page and to the Mac's
+    decisions 60 and 61, and in what it does to a song nothing is otherwise here.
+117. **It is carried by Windows' own dragging** (`spec/10`, the table:
+    `DragDrop.DoDragDrop`), with Windows' own pointers for "this can be put here"
+    and "it cannot". Mine, each to be said otherwise:
+    - **no picture of the chord goes with the pointer**, as one does on the Mac:
+      Windows gives a plain drag none, and the table asks for none. What shows the
+      chord is the lit bubble on the sheet, where it would land;
+    - **the button is faint while its chord is out** (0.45 of itself), as the Mac's
+      is, so that it can be seen which was picked up;
+    - **what is carried is the chord's name under a kind of this app's own, with
+      this run of the app's number in it**. So no other program takes it, and
+      neither does a second copy of this app that happens to be open: the Mac's
+      "offered to this app only", which Windows has no word for;
+    - **all the system is told may be done with it is "copy"**, which is Windows'
+      word for putting a thing somewhere without taking it from where it was;
+    - **Shift is what Windows says is held as it tells the sheet of the chord**, at
+      each move and at the letting go; Ctrl is not asked (rule 46g).
+118. **Under a chord held at an edge the sheet scrolls by the Mac's numbers**: from
+    36 of the edge, at most 520 pixels a second, by the clock, a long wait counting
+    as a fifth of a second, by whole pixels with the rest owed. They are the Mac's
+    guesses and nobody has tried them here. **A chord dragged along the sheet
+    scrolls it as it did** (16 at each move of the pointer, and not while it is
+    held still: "Left rough"): that is another rule's, and was left alone.
+119. **The window's title is made where About's version is** (`AboutTheApp.Title`;
+    `spec/06`, rule 6d, new, for both apps), and the window only shows it. A build
+    that says no version says the name alone, as the page has it.
+120. **Version 0.2, written with two numbers** ("it will also bump to version 0.2"),
+    as the Mac writes its own: `<Version>0.2</Version>`. The first early build was
+    0.1.0, with three. So the title says "[0.2]", About says "Version 0.2", the zip
+    is `Pro7ChordEditor-windows-0.2.zip`, and a tag of it would be `windows-v0.2`.
+    **The number on the copies kept of a song is now the same one** ("0.2"; it was
+    worked out another way and would have said "0.2.0").
+121. **The app that is given out is built so that it names no folder of the PC it
+    was built on, and the script refuses one that does** ("At M10": the build of
+    0.1.0 that was given out names one). As the Mac's script since its 0.2.
 
 ## How it is laid out, and why
 
@@ -1072,6 +1111,28 @@ names. What to know before changing any of it:
 - `AppViews/AboutTheApp.cs` has the words and the version; `AboutSettings.xaml`
   shows them, as the fourth tab of `SettingsView`. `AboutTests` holds them word for
   word.
+
+### A chord from the strip (after M10 was begun)
+
+- **In `Song`**: four functions at the foot of `ChordSheet.cs`, the Mac's:
+  `LiftOfKey`, `Carry(name, row, at)`, `CarryOff` and `DropOfKey`. A chord from the
+  strip is held as one dragged from nowhere on the sheet (its row is -1), and only
+  while it is over a place.
+- **In `LibraryModel`**: `LiftOfKey` and `CarriedOfKeyEnded`, which tell the window.
+- **The strip's end** is in `ChordSheetView.xaml.cs`: `ChordPressed` and
+  `ChordPulled`, which the mouse's handlers on each button call, and `Carry`, which
+  is `DragDrop.DoDragDrop` unless a test has put its own there.
+- **The sheet's end** is in `ChordSheetCanvas.cs`: the four things Windows tells a
+  view (`OnDragEnter`, `OnDragOver`, `OnDragLeave`, `OnDrop`) read the name and the
+  place out of what they are handed and call `CarriedIn`, `CarriedOver`,
+  `CarriedAway` and `LetGo`; those call `CarriedOfKey` and `DroppedOfKey`, which are
+  the Mac's two, and `ScrollIfCarriedNearAnEdge`.
+- **The tests**: `Song.Tests` has the Mac's two of the model (`ChordSheetTests` and
+  `ChordSheetOnAFileTests`, `OneOfTheKeysChordsCarriedInFromTheStrip...`);
+  `AppViews.Tests/ChordFromTheStripTests` has the window's eight, and
+  `ChordSheetWindowTests` one in a real window. Picture 71 is the chord over a word.
+- **The title and the version**: `AboutTheApp.cs` (`Number`, `Title`), shown by
+  `LibraryWindow.xaml.cs`; `AboutTests` holds both.
 
 ## What was found out
 
@@ -1945,6 +2006,110 @@ names. What to know before changing any of it:
 - **The Mac's release still says "The new editor is not yet built for Windows"**,
   at the foot of its page. It is that release's own text; it has been left, and the
   maintainer told.
+- **The build of 0.1.0 that was given out names the folder it was built in**, and
+  so the name of the maintainer's account on this PC (the folder is in that
+  account's own). Found on 2026-10-12, when the Mac's session had found the same
+  of its own 0.1 and written it down. **Where**: in the debugging symbols that each
+  of the app's five libraries carries inside it, so that the log can say which line
+  an error came from; they say where every file the library was made from lay.
+  **They are packed**, so a search of the file for the folder's name finds nothing,
+  which is how it was missed: unpacked, the account's name is in each of the five,
+  as a part of the paths and in the line that says where the source is on GitHub.
+  Nothing else of the PC is in it, and nothing of any song. **What it gives away
+  is small** (the account's name is the first letters of the name the repository
+  is published under), but it was given out without being looked for. **The zip of
+  0.1.0 on the Releases page still has it**: whether that zip stays is the
+  maintainer's to say.
+- **Since then `make-zip.ps1` builds the app afresh with
+  `ContinuousIntegrationBuild`**, which is .NET's own way of writing every such
+  path from the top of the source ("/_/windows/AppViews/X.cs") and not from the top
+  of the disk; **and looks into what it built**: the file as it lies, and each set
+  of symbols unpacked, for the home folder of whoever builds and for the folder the
+  source is in, and in the symbols for the account's own name where it stands by
+  itself. If any is found, or fewer than the five sets of symbols are, no zip is
+  made. A build for trying things keeps the real paths, which a debugger wants.
+- **The check was seen to refuse and to pass.** The part of the script that looks
+  into the app, run on the app out of the 0.1.0 zip, refuses it, for both reasons
+  (a folder of this PC in a library's symbols; the account's name by itself in
+  them). Run on the build of 0.2 it finds nothing, in the file as it lies or in
+  its five sets of symbols. A second look, made another way (a few lines of
+  Python that unpack the symbols themselves), agrees: in the build of 0.1.0 the
+  account's name stands by itself fifteen times in the symbols, and in the build
+  of 0.2 not once. What is in both is the address the source is published at,
+  which is meant.
+- **A zip of 0.2 was made with it on 2026-10-12, and is not given out**:
+  `build\Pro7ChordEditor-windows-0.2.zip`, for the maintainer to try. A release
+  is published on the maintainer's word and not otherwise.
+
+### At the chord from the strip
+
+- **What Windows does between the strip and the sheet is run by no test, and cannot
+  be here.** `DragDrop.DoDragDrop` reads the real mouse on the real screen and does
+  not come back until a real button is let go. The tests stand on each side of it:
+  they press a button and pull, and take what it would hand the system; and they
+  tell the sheet what the system would. That Windows, given the one, does the other
+  is its oldest road, and here it is still only read about.
+- **But the sheet is told as WPF tells it.** WPF lets nobody else make what it hands
+  a view when something is dragged over it (`DragEventArgs` has no constructor that
+  can be called by name). The tests find the one it has by its shape, make one, and
+  raise WPF's own event with it on the sheet: so the sheet's four handlers are run,
+  Shift and Ctrl are read from where Windows says them, and what the sheet answers
+  is read from where Windows reads it. If WPF changes how it makes one, the helper
+  says so in words (`Told`, in `ChordFromTheStripTests`).
+- **Where the pointer is on the sheet does not change when the sheet scrolls under
+  it, as WPF says it.** The first build asked where the pointer was a second time,
+  after scrolling, to find what had come under it. WPF gives the same point both
+  times: it says where the pointer was on the sheet when the system last spoke, not
+  where it is on the screen. So the chord would have been shown one telling behind,
+  at the place that had been there. The sheet now says how far it went, and the
+  place shown is that much further down. Found by reading, before any hand; a test
+  holds it (the place shown is the one under the pointer after each asking, and in
+  the test the sheet scrolls another place under it dozens of times).
+- **The model tells the window at once here**, where the Mac's is drawn a turn
+  later. So picking a chord up closes the bubble before the system has the chord,
+  and the Mac's "lay the sheet out as it comes over" is not wanted, and is not
+  here.
+- **In a real window a button keeps the mouse while it is pressed**, as the sheet
+  does. It gives it back before its chord is handed over, so that it is no longer a
+  button held down, and no click comes of the letting go. One test in a real window
+  holds that (the others have no window, and so no mouse to keep).
+- **What is drawn of a carried chord is held by the sheet's own dots**: drawn
+  otherwise than the spot alone, and again as the spot alone once it is over no
+  place or the carrying is over. Only the dots of what is seen of the sheet are
+  held, so that the button gone faint is not taken for it.
+- **How the tests were shown to bite**: 109 breakages, one at a time, in scratch
+  clones, after the commits: eighteen of the model's four functions and the two
+  rules they changed, and ninety-one of the window's model, the strip's end, the
+  sheet's end with each of its four handlers, the title and the version. Against
+  the tests of the sheet's model, of the chord from the strip, of the real window
+  and of About, and no others (so a breakage that only some other test tells
+  counts as not told). **Ninety-five were told as the tests stood. Nine were not,
+  and each was given a case**, and is told now:
+  - that a chord from the strip is carried still when the sheet is read again with
+    its place there (the rule that lets it go when its place has gone, broken so
+    that it was let go at every reading, passed);
+  - that picking one up closes a bubble with nothing typed in it. With something
+    typed the song changes, and that tells the window; with nothing typed only the
+    picking up does, and no test had an empty bubble;
+  - that over another chord's bubble it goes to the character under the pointer,
+    and not to that chord's place;
+  - that a chord lifted from the sheet is not taken for one from the strip;
+  - that the sheet's element lays itself out again after one is let go on it, of
+    a sheet that nothing else tells the window about (with the window's model
+    listening, the model's telling does it too);
+  - that Shift is read from the first the sheet hears of the chord;
+  - that what the sheet says it went is nothing, at its two ends. (As the sheet is
+    laid out, no place is near enough to either end for the chord to be shown
+    wrongly there; the test asks the sheet what it says);
+  - that told twice before the window has laid itself out, it has gone both times;
+  - and that the numbers it scrolls by are the Mac's.
+  **Five are not told, and are not expected to be**: what is owed is kept
+  on leaving an edge, or on coming over the sheet (less than a pixel, each); a
+  clock that goes backwards (the one it has does not); the window told again of
+  what it has already drawn; and the chord put on as a name already in the song is
+  rather than as a typed one, which for a chord is the same.
+- **The build of 0.1.0 that was given out names the folder it was built in**: see
+  "At M10".
 
 ### What the maintainer found by hand
 
@@ -1981,6 +2146,35 @@ names. What to know before changing any of it:
 
 ## Left rough, and what to ask
 
+- **Nobody has dragged a chord out of the strip.** No test can ("At the chord from
+  the strip"), and a session does not move the maintainer's mouse. What a hand is
+  asked to try, on a COPY of a library:
+  - press on one of the strip's seven and pull: the pointer is to be Windows'
+    barred circle while it is over the strip, and its arrow with a plus over a
+    word, where the chord's name is to show in a lit bubble. Let go there, the
+    chord is on the word, and Ctrl+Z takes it off again;
+  - over the bare sheet between the slides, a slide's frame or its foot, the lists,
+    the header, another program: the barred circle and no bubble, and let go there
+    nothing happens. Esc while it is carried: nothing happens, and nothing is left
+    lit on the sheet;
+  - a press that is let go without a pull is still the click it was;
+  - onto a line of chords alone, in a chord's place and past the last; and onto a
+    blank slide;
+  - Shift held while it is carried: the bubble is to go to the start of the word
+    (**a guess**: that Windows tells the sheet of Shift pressed while the pointer
+    lies still. It may not until the pointer next moves);
+  - held near the bottom of what is seen of the sheet, and then near the top: the
+    sheet is to scroll, faster the nearer the edge, **and to go on scrolling while
+    the pointer is held still** (**a guess**: it does only if Windows goes on
+    telling the sheet of a chord that is not moving, which is how it is said to
+    behave and has not been seen here); and it is not to scroll up as the chord
+    first comes down from the strip. Whether 520 pixels a second is a speed that
+    can be steered is the maintainer's to say, for both apps (rule 46f);
+  - with a chord half typed in the bubble: picking one up from the strip is to keep
+    what was typed and close the bubble, wherever the one picked up then goes;
+  - the button faint while its chord is out, and itself again after;
+  - pointing at a button: its tip says its three ways;
+  - and the window's title bar: "Pro7 Chord Editor [0.2]".
 - **Nobody has seen the window.** Every picture is of the view the window holds,
   drawn with no window. What only a hand and an eye at the PC can tell, and the
   maintainer is asked to try:
