@@ -106,8 +106,13 @@ public sealed partial class LibraryModel
             }
         }
 
-        /// <summary>What is said in place of a refusal while ProPresenter is running.</summary>
-        public string? Standing => Problem ?? (ProPresenterIsRunning && Found is not null ? "ProPresenter is running. Quit it to make a song here." : null);
+        /// <summary>
+        /// What is said over the buttons: why the file is no song, or why the song was
+        /// not made. While ProPresenter is running it is that, whatever was refused
+        /// before: it is why the button is greyed, and what was refused is said again
+        /// once ProPresenter is quit.
+        /// </summary>
+        public string? Standing => ProPresenterIsRunning && Found is not null ? "ProPresenter is running. Quit it to make a song here." : Problem;
 
         /// <summary>Whether "Make the Song" can be pressed.</summary>
         public bool CanMake => Found is not null && !ProPresenterIsRunning;

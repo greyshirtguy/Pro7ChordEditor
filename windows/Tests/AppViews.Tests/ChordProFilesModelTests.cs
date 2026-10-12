@@ -335,9 +335,19 @@ public class ChordProFilesModelTests
         Assert.True(model.NewSong.CanMake);
         Assert.Equal(before, Everything(pc));
         Assert.Contains("A song was not made from plain-song.cho.", pc.Log, StringComparison.Ordinal);
+        // ProPresenter is started while that is said: what is said is why the button
+        // is greyed now. Quit, and what was refused is said again.
+        var refused = model.NewSong.Problem;
+        pc.ProPresenterIsRunning = true;
+        model.ProPresenterMayHaveChanged();
+        Assert.Equal(("ProPresenter is running. Quit it to make a song here.", false, refused), (model.NewSong!.Standing, model.NewSong.CanMake, model.NewSong.Problem));
+        pc.ProPresenterIsRunning = false;
+        model.ProPresenterMayHaveChanged();
+        Assert.Equal((refused, true), (model.NewSong!.Standing, model.NewSong.CanMake));
         // Another is chosen: what was said is said no longer.
         model.MakeItLookLike(pc.Song("Amazing Grace"));
         Assert.Null(model.NewSong!.Problem);
+        Assert.Null(model.NewSong.Standing);
 
         // Like a song taken out of the library since the panel came.
         model.MakeItLookLike(pc.Song("It Is Well"));
