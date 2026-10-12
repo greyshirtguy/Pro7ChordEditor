@@ -1,5 +1,5 @@
 {
-    "about": "What the chord sheet does with a song. `songs` are the songs these are made on, as the document hands them over: one entry for each text box that has words, with `row` the slide it is on (counted from 0), its words and its chords (each `at` counted along the whole text box, a line break being one), and for a blank slide one entry with no words and `blank` set (in the song `bare`, with no `element` either: a slide that has no text box, which Simple Presenter gives one when a chord is put there and an app that makes no text boxes leaves out; the id of the box it adds is its own to make, and stands here as a sentence in brackets). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. `edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step of undo with the change before it) and the song afterwards. In all of them `row` in a spot is the sheet's row, and `row` in what is asked is the slide. Some strings hold characters that cannot be seen: U+200B and U+2001.",
+    "about": "What the chord sheet does with a song. `songs` are the songs these are made on, as the document hands them over: one entry for each text box that has words, with `row` the slide it is on (counted from 0), its words and its chords (each `at` counted along the whole text box, a line break being one), and for a blank slide one entry with no words and `blank` set (in the song `bare`, with no `element` either: a slide that has no text box, which Simple Presenter gives one when a chord is put there and an app that makes no text boxes leaves out; the id of the box it adds is its own to make, and stands here as a sentence in brackets). `rows`: the sheet's rows made of each song (a row for the name of a group, and one for each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. `edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step of undo with the change before it) and the song afterwards. In `copyPaste`, `pasted` is what the paste itself answers: `did`, how many lines had their chords replaced (`lines`) and how many chords were put on them (`chords`), how many chords had no word to go on and were left out (`leftOut`), how many lines were passed over for being of the other kind than what was copied for them (`passedOver`) and how many the document refused (`refused`); and `said`, the sentence it says of that. In all of them `row` in a spot is the sheet's row, and `row` in what is asked is the slide. Some strings hold characters that cannot be seen: U+200B and U+2001.",
     "madeBy": "tools/make-vectors/sheet.js, by running the functions of Simple Presenter's qml/ChordSheet.qml and qml/chordlayout.js themselves. Do not edit by hand: run it again.",
     "songs": {
         "grace": {
@@ -356,6 +356,91 @@
                             "name": "A"
                         }
                     ],
+                    "blank": false
+                }
+            ]
+        },
+        "ends": {
+            "key": "D",
+            "textBoxes": [
+                {
+                    "row": 0,
+                    "slideId": "slide-0",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "A",
+                    "text": "Holy holy holy\n",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ],
+                    "blank": false
+                },
+                {
+                    "row": 1,
+                    "slideId": "slide-1",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": false,
+                    "label": "",
+                    "element": "B",
+                    "text": "Lord God Almighty\n\n\n",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 18,
+                            "name": "A"
+                        }
+                    ],
+                    "blank": false
+                }
+            ]
+        },
+        "lead": {
+            "key": "D",
+            "textBoxes": [
+                {
+                    "row": 0,
+                    "slideId": "slide-0",
+                    "group": "Verse 1",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "A",
+                    "text": "​ ​\nHoly holy holy",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        },
+                        {
+                            "at": 9,
+                            "name": "A"
+                        }
+                    ],
+                    "blank": false
+                },
+                {
+                    "row": 1,
+                    "slideId": "slide-1",
+                    "group": "Verse 2",
+                    "groupColor": "",
+                    "groupStart": true,
+                    "label": "",
+                    "element": "B",
+                    "text": "Lord God Almighty\nEarly in the morning",
+                    "chords": [],
                     "blank": false
                 }
             ]
@@ -1018,6 +1103,177 @@
                     "last": true
                 }
             ]
+        },
+        {
+            "song": "ends",
+            "mostLines": 2,
+            "used": [
+                "D",
+                "G",
+                "A"
+            ],
+            "rows": [
+                {
+                    "kind": "group",
+                    "name": "Verse 1",
+                    "color": "",
+                    "row": 0
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 0,
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 1,
+                    "last": true
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 0,
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 2
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 1,
+                    "row": 1,
+                    "element": "B",
+                    "text": "",
+                    "start": 18,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "A"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": false,
+                    "count": 2,
+                    "last": true
+                }
+            ]
+        },
+        {
+            "song": "lead",
+            "mostLines": 2,
+            "used": [
+                "D",
+                "G",
+                "A"
+            ],
+            "rows": [
+                {
+                    "kind": "group",
+                    "name": "Verse 1",
+                    "color": "",
+                    "row": 0
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 0,
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​",
+                    "start": 0,
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        }
+                    ],
+                    "alone": true,
+                    "blank": false,
+                    "first": true,
+                    "count": 2
+                },
+                {
+                    "kind": "line",
+                    "block": 0,
+                    "line": 1,
+                    "row": 0,
+                    "element": "A",
+                    "text": "Holy holy holy",
+                    "start": 4,
+                    "chords": [
+                        {
+                            "at": 5,
+                            "name": "A"
+                        }
+                    ],
+                    "alone": false,
+                    "blank": false,
+                    "first": false,
+                    "count": 2,
+                    "last": true
+                },
+                {
+                    "kind": "group",
+                    "name": "Verse 2",
+                    "color": "",
+                    "row": 1
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 0,
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty",
+                    "start": 0,
+                    "chords": [],
+                    "alone": false,
+                    "blank": false,
+                    "first": true,
+                    "count": 2
+                },
+                {
+                    "kind": "line",
+                    "block": 1,
+                    "line": 1,
+                    "row": 1,
+                    "element": "B",
+                    "text": "Early in the morning",
+                    "start": 18,
+                    "chords": [],
+                    "alone": false,
+                    "blank": false,
+                    "first": false,
+                    "count": 2,
+                    "last": true
+                }
+            ]
         }
     ],
     "wordStarts": [
@@ -1433,6 +1689,91 @@
                 0,
                 5,
                 9
+            ]
+        },
+        {
+            "song": "ends",
+            "row": 0,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "ends",
+            "row": 1,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                10
+            ]
+        },
+        {
+            "song": "ends",
+            "row": 2,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                9
+            ]
+        },
+        {
+            "song": "ends",
+            "row": 3,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "lead",
+            "row": 0,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "lead",
+            "row": 1,
+            "usable": true,
+            "out": [
+                0,
+                2,
+                4
+            ]
+        },
+        {
+            "song": "lead",
+            "row": 2,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                10
+            ]
+        },
+        {
+            "song": "lead",
+            "row": 3,
+            "usable": false,
+            "out": []
+        },
+        {
+            "song": "lead",
+            "row": 4,
+            "usable": true,
+            "out": [
+                0,
+                5,
+                9
+            ]
+        },
+        {
+            "song": "lead",
+            "row": 5,
+            "usable": true,
+            "out": [
+                0,
+                6,
+                9,
+                13
             ]
         }
     ],
@@ -2401,6 +2742,90 @@
                 {
                     "row": 2,
                     "at": 2
+                },
+                {
+                    "row": 2,
+                    "at": 0
+                },
+                {
+                    "row": 1,
+                    "at": 10
+                },
+                {
+                    "row": 1,
+                    "at": 5
+                },
+                {
+                    "row": 1,
+                    "at": 0
+                }
+            ]
+        },
+        {
+            "song": "ends",
+            "start": null,
+            "keys": [
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right",
+                "Right"
+            ],
+            "spots": [
+                {
+                    "row": 1,
+                    "at": 0
+                },
+                {
+                    "row": 1,
+                    "at": 5
+                },
+                {
+                    "row": 1,
+                    "at": 10
+                },
+                {
+                    "row": 2,
+                    "at": 0
+                },
+                {
+                    "row": 2,
+                    "at": 5
+                },
+                {
+                    "row": 2,
+                    "at": 9
+                },
+                {
+                    "row": 2,
+                    "at": 9
+                },
+                {
+                    "row": 2,
+                    "at": 9
+                }
+            ]
+        },
+        {
+            "song": "ends",
+            "start": {
+                "row": 2,
+                "at": 9
+            },
+            "keys": [
+                "Left",
+                "Left",
+                "Left",
+                "Left",
+                "Left"
+            ],
+            "spots": [
+                {
+                    "row": 2,
+                    "at": 5
                 },
                 {
                     "row": 2,
@@ -8405,7 +8830,19 @@
                     "text": "Amen\nAmen and amen",
                     "chords": []
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 4,
+                    "leftOut": 0,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "4 chords put on the line."
+                ]
+            }
         },
         {
             "song": "grace",
@@ -8542,7 +8979,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 3,
+                    "leftOut": 1,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "3 chords put on the line. 1 had no word to go on, and was left out."
+                ]
+            }
         },
         {
             "song": "grace",
@@ -8658,7 +9107,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 1,
+                    "leftOut": 2,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "1 chord put on the line. 2 had no word to go on, and were left out."
+                ]
+            }
         },
         {
             "song": "grace",
@@ -8889,7 +9350,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 4,
+                    "chords": 6,
+                    "leftOut": 2,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "6 chords put on 4 lines. 2 had no word to go on, and were left out."
+                ]
+            }
         },
         {
             "song": "grace",
@@ -9091,7 +9564,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 3,
+                    "chords": 6,
+                    "leftOut": 2,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "6 chords put on 3 lines. 2 had no word to go on, and were left out."
+                ]
+            }
         },
         {
             "song": "grace",
@@ -9223,7 +9708,19 @@
                     "text": "Amen\nAmen and amen",
                     "chords": []
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 4,
+                    "leftOut": 0,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "4 chords put on the line."
+                ]
+            }
         },
         {
             "song": "intro",
@@ -9298,7 +9795,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 0,
+                    "chords": 0,
+                    "leftOut": 0,
+                    "passedOver": 1,
+                    "refused": 0
+                },
+                "said": [
+                    "Nothing was put here: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none."
+                ]
+            }
         },
         {
             "song": "intro",
@@ -9373,7 +9882,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 0,
+                    "chords": 0,
+                    "leftOut": 0,
+                    "passedOver": 1,
+                    "refused": 0
+                },
+                "said": [
+                    "Nothing was put here: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none."
+                ]
+            }
         },
         {
             "song": "intro",
@@ -9469,7 +9990,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 3,
+                    "leftOut": 0,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "3 chords put on the line."
+                ]
+            }
         },
         {
             "song": "odd",
@@ -9562,7 +10095,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 2,
+                    "leftOut": 0,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "2 chords put on the line."
+                ]
+            }
         },
         {
             "song": "blank",
@@ -9635,7 +10180,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 0,
+                    "chords": 0,
+                    "leftOut": 0,
+                    "passedOver": 1,
+                    "refused": 0
+                },
+                "said": [
+                    "Nothing was put here: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none."
+                ]
+            }
         },
         {
             "song": "blank",
@@ -9699,7 +10256,19 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 0,
+                    "chords": 0,
+                    "leftOut": 0,
+                    "passedOver": 1,
+                    "refused": 0
+                },
+                "said": [
+                    "Nothing was put here: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none."
+                ]
+            }
         },
         {
             "song": "intro",
@@ -9787,7 +10356,110 @@
                         }
                     ]
                 }
-            ]
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 3,
+                    "leftOut": 0,
+                    "passedOver": 0,
+                    "refused": 0
+                },
+                "said": [
+                    "3 chords put on the line."
+                ]
+            }
+        },
+        {
+            "song": "lead",
+            "title": "a whole group whose first line is a line of chords alone, onto lines of words: that line is passed over, and the first change made is not joined to what went before",
+            "copyAt": {
+                "row": 1,
+                "at": 0
+            },
+            "wholeGroup": true,
+            "copied": {
+                "lines": [
+                    {
+                        "alone": [
+                            "D",
+                            "G"
+                        ]
+                    },
+                    [
+                        {
+                            "word": 1,
+                            "offset": 0,
+                            "name": "A"
+                        }
+                    ]
+                ]
+            },
+            "said": [
+                "3 chords copied from 2 lines: Ctrl+V puts them on the lines from the spot's on, word for word"
+            ],
+            "pasteAt": {
+                "row": 4,
+                "at": 0
+            },
+            "asked": [
+                {
+                    "ask": "setChords",
+                    "row": 1,
+                    "element": "B",
+                    "chords": [
+                        {
+                            "at": 24,
+                            "name": "A"
+                        }
+                    ],
+                    "joined": false
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​\nHoly holy holy",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "G"
+                        },
+                        {
+                            "at": 9,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Lord God Almighty\nEarly in the morning",
+                    "chords": [
+                        {
+                            "at": 24,
+                            "name": "A"
+                        }
+                    ]
+                }
+            ],
+            "pasted": {
+                "did": {
+                    "lines": 1,
+                    "chords": 1,
+                    "leftOut": 0,
+                    "passedOver": 1,
+                    "refused": 0
+                },
+                "said": [
+                    "1 chord put on the line. 1 line was passed over: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none."
+                ]
+            }
         }
     ]
 }

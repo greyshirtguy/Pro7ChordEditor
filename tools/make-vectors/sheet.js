@@ -20,6 +20,12 @@
 //   - the window: where things are on the screen, the box a chord is typed in. Nothing
 //     recorded here depends on those, and what does (the arrow keys Up and Down, which
 //     go by where the words are drawn) is left out and described in spec/ instead.
+//     Since Simple Presenter's sheet became a grid of slides that zooms (its version
+//     0.89, after the Mac app's), working out where each slide goes is a part of
+//     reading the song again there: the functions that do it (`layOut` and those it
+//     calls, `reveal`, `bringIntoView`, `resize`) are put aside here once the file's
+//     functions are in, each for one that does nothing, and nothing recorded changes
+//     for it.
 //
 // What is recorded is what the sheet ASKS of the document for each thing done to it,
 // and where it leaves the spot. That is the part a port has to get the same.
@@ -149,11 +155,10 @@ function makeEditor(blocks, key) {
         // A line with NO chord is one zero-width space, whatever it hung its chords on,
         // so that it is still a line of chords alone and a chord can be put on it
         // again. Decided by the maintainer on 2026-10-12, for Simple Presenter and the
-        // two apps alike (spec/01-file-format.md, "Chords with no words"). At the
-        // commit of Simple Presenter that reference/ holds, setChordsAlone still leaves
-        // such a line with no stand-in at all, which in a box with other lines is an
-        // empty line that takes nothing; this stand-in went first, and
-        // sheet-model.json was made again with it.
+        // two apps alike (spec/01-file-format.md, "Chords with no words"). This stand-in
+        // went first, and sheet-model.json was made again with it while Simple
+        // Presenter's setChordsAlone still left such a line with no stand-in at all.
+        // It has the rule since its version 0.89, as reference/ now holds it.
         //
         // (A zero-width space and not the plain space the line may have had: a text
         // box left holding one plain space and no chord is, as a song is read, a stray
@@ -244,10 +249,15 @@ function makeSheet(blocks, key) {
     const editor = makeEditor(blocks, key)
     const sheet = {
         editor,
-        Chords: { isPlaceholders, isChord: name => noteLength(name) > 0 && couldBecome(name), tidied },
+        // (`copiedText` is what the system has as last copied, by which the sheet tells
+        // whether a line's chords are still the last thing copied anywhere. Here nothing
+        // is ever copied anywhere else.)
+        Chords: { isPlaceholders, isChord: name => noteLength(name) > 0 && couldBecome(name), tidied, copiedText: () => "" },
         rows: [], blocks: [], used: [], mostLines: 1,
         spotRow: -1, spotAt: 0, typing: false, typingRow: -1, typingAt: 0,
-        laid: 0, dragged: null, copied: null,
+        laid: 0, dragged: null, copied: null, copiedOver: "", picking: false,
+        // Where the slides and their lines are drawn: nowhere, here.
+        lines: [], cells: [], columns: 1, pageWidth: 0, pageHeight: 0, zoom: 0.8, usualZoom: 0.8, times: 0.8,
         // Nothing is drawn here: no row has an item, and the view has nowhere to scroll.
         list: { itemAt: () => null },
         flick: { contentY: 0, height: 100000, contentHeight: 100000 },
@@ -258,12 +268,18 @@ function makeSheet(blocks, key) {
         said: [],
         failures: [],
         rowPicked() {},
+        zoomEdited() {},
         Math, JSON, Array, Map, Object,
     }
     sheet.told = message => sheet.said.push(message)
     sheet.failed = error => sheet.failures.push(error)
     vm.createContext(sheet)
     vm.runInContext(sheetSource, sheet)
+    // Nothing is drawn here: what works out where things go, and scrolls to them, does
+    // nothing. (A checkout from before the sheet was a grid has none of these, and
+    // loses nothing by being given them.)
+    for (const drawing of ["layOut", "measure", "arrange", "reveal", "bringIntoView", "resize"])
+        sheet[drawing] = () => {}
     sheet.reload()
     return sheet
 }
@@ -384,6 +400,36 @@ const SONGS = {
             block(1, "B", "Verse 1", false, "Lord God Almighty", [{ at: 0, name: "A" }]),
         ],
     },
+    // Words that end with line breaks (spec/03-chord-sheet.md, rule 2a): the empty
+    // lines a box's words end with get no row, but for one a chord stands on, which is
+    // kept with any before it. The first slide's words end with one line break, and
+    // have one row. The second's end with three, with a chord on the second of them:
+    // the line of words, and the empty line the chord is on, and no more. Row 0 is the
+    // name "Verse 1", row 1 the first slide's line, row 2 the second slide's line of
+    // words and row 3 its empty line, which has the chord and takes no spot. (Simple
+    // Presenter leaves such lines off its sheet since its version 0.89; before that
+    // it gave each a row, and this song was waited for.)
+    "ends": {
+        key: "D",
+        blocks: [
+            block(0, "A", "Verse 1", true, "Holy holy holy\n", [{ at: 0, name: "D" }]),
+            block(1, "B", "Verse 1", false, "Lord God Almighty\n\n\n", [{ at: 0, name: "G" }, { at: 18, name: "A" }]),
+        ],
+    },
+    // A group whose first line is a line of chords alone, over a line of words in the
+    // same text box; and a group of two lines of words. For a whole group copied and
+    // pasted onto lines of words: its first line is passed over, and the change that
+    // is then the first to be made is not joined to whatever was done before the paste
+    // (spec/03-chord-sheet.md, rule 52). Row 0 is the name "Verse 1", row 1 its line
+    // of chords alone and row 2 its line of words; row 3 is "Verse 2", and rows 4 and
+    // 5 its two lines.
+    "lead": {
+        key: "D",
+        blocks: [
+            block(0, "A", "Verse 1", true, placeholders(2, ZW) + "\nHoly holy holy", [{ at: 0, name: "D" }, { at: 2, name: "G" }, { at: 9, name: "A" }]),
+            block(1, "B", "Verse 2", true, "Lord God Almighty\nEarly in the morning", []),
+        ],
+    },
 }
 
 // A scenario that names a row which is no line of words was written wrongly: say so,
@@ -393,8 +439,13 @@ function mustBeLine(sheet, spot, what) {
         throw new Error(what + ": row " + spot.row + " is not a line of the song")
 }
 
+// (Without `made`: which reading of the song a row was made in, by which what is drawn
+// for a row tells whether its place has been worked out yet. It is nothing of the song.)
 function rowsOf(sheet) {
-    return JSON.parse(JSON.stringify(sheet.rows))
+    return JSON.parse(JSON.stringify(sheet.rows)).map(row => {
+        delete row.made
+        return row
+    })
 }
 
 function write(name, about, body) {
@@ -461,6 +512,8 @@ model.walks = [
     walk("bare", null, Array(4).fill("Right")),
     walk("under", null, Array(8).fill("Right")),
     walk("under", { row: 3, at: 0 }, Array(6).fill("Left")),
+    walk("ends", null, Array(8).fill("Right")),
+    walk("ends", { row: 2, at: 9 }, Array(5).fill("Left")),
 ]
 
 // One change at a time: what the document is asked, and the song after it
@@ -599,8 +652,12 @@ function copyPaste(name, title, from, whole, to) {
     const said = sheet.said.slice()
     sheet.setSpot(to.row, to.at)
     sheet.editor.calls = []
-    sheet.paste()
-    return { song: name, title, copyAt: from, wholeGroup: whole, copied, said, pasteAt: to, asked: sheet.editor.calls, songAfter: chordsOfSong(sheet) }
+    sheet.said = []
+    // What came of the paste, as the sheet counts it, and the sentence it says of it.
+    // (A checkout from before the sheet said anything of a paste answers nothing.)
+    const did = sheet.paste()
+    return { song: name, title, copyAt: from, wholeGroup: whole, copied, said, pasteAt: to, asked: sheet.editor.calls, songAfter: chordsOfSong(sheet),
+             pasted: did === undefined ? null : { did: JSON.parse(JSON.stringify(did)), said: sheet.said.slice() } }
 }
 model.copyPaste = [
     copyPaste("grace", "one line onto another, word for word", { row: 1, at: 0 }, false, { row: 6, at: 0 }),
@@ -616,6 +673,8 @@ model.copyPaste = [
     copyPaste("blank", "words onto a blank slide: nothing", { row: 3, at: 0 }, false, { row: 1, at: 0 }),
     copyPaste("blank", "a blank slide's none, onto words: nothing", { row: 1, at: 0 }, false, { row: 3, at: 0 }),
     copyPaste("intro", "a line of chords alone onto a line it empties and fills again: the same chords", { row: 1, at: 0 }, false, { row: 1, at: 0 }),
+    copyPaste("lead", "a whole group whose first line is a line of chords alone, onto lines of words: that line is passed over, and the first change made is not joined to what went before",
+              { row: 1, at: 0 }, true, { row: 4, at: 0 }),
 ]
 
 write("sheet-model.json",
@@ -627,7 +686,11 @@ write("sheet-model.json",
       + "each line of each text box). `wordStarts`, `stops`, `stopAt`: where the spot can stand. `walks`: where the arrow keys take it. "
       + "`edits`, `typing`, `copyPaste`: for each thing done, what the document is ASKED (setChords: this text box now has these chords, "
       + "each `at` along the whole box; setChordsAlone: this line of chords with no words now has these, by name; `joined`: it is one step "
-      + "of undo with the change before it) and the song afterwards. In all of them `row` in a spot is the sheet's row, and `row` in what "
+      + "of undo with the change before it) and the song afterwards. In `copyPaste`, `pasted` is what the paste itself answers: `did`, how "
+      + "many lines had their chords replaced (`lines`) and how many chords were put on them (`chords`), how many chords had no word to "
+      + "go on and were left out (`leftOut`), how many lines were passed over for being of the other kind than what was copied for them "
+      + "(`passedOver`) and how many the document refused (`refused`); and `said`, the sentence it says of that. In all of them `row` in a "
+      + "spot is the sheet's row, and `row` in what "
       + "is asked is the slide. Some strings hold characters that cannot be seen: U+200B and U+2001.",
       model)
 

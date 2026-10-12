@@ -19,7 +19,8 @@ it; [`spec/02-chord-rules.md`](../spec/02-chord-rules.md) says which rule each h
 | `stand-ins-in-rtf.json` | The bytes a text box's RTF becomes when a line of chords alone is given more stand-ins or fewer, and the RTF made for a box that has no words ([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with no words") | `tools/standins.py`, likewise |
 
 The first three rows are a record of what Simple Presenter does. The last three are of
-rules that are new here.
+rules that are new here. (Of the last, Simple Presenter has the first part too since
+2026-10-12, ported from `tools/standins.py` and held to the same file.)
 
 Some strings hold characters that cannot be seen: U+200B (a zero-width space) and
 U+2001 (an em quad). Compare strings unit by unit.
@@ -90,10 +91,13 @@ Presentations, as `.pro` files.
   lines in one box. The words are Toplady's still, the chords are made up, and made
   again it is the same file to the byte.
 
-  **It is not in `as-read-by-simple-presenter.json`**: it was made after that was,
-  by a tool that runs anywhere, and Simple Presenter runs only where it is built.
-  `expected/Chords With No Words.json` has what is in it. When the vectors are next
-  made again on that machine, read this file there too.
+  It is in `as-read-by-simple-presenter.json` since 2026-10-12 (below), and
+  `expected/Chords With No Words.json` has what is in it, by the tool that reads it
+  through `protoc`. The two agree: the same words and the same chords in the same
+  places. (Simple Presenter hands over twelve entries and that tool lists eleven
+  text boxes, the twelfth being the slide with nothing on it, which has no text box;
+  and of the eleven, the box that holds a stray space is handed over as a blank
+  slide's.)
 - **`expected/`**: what is in each file.
   - `<name>.json`: its words and every chord with its range as the file has it, by
     `tools/look.py --json`, which reads the file through `protoc`.
@@ -217,17 +221,72 @@ are Simple Presenter's as they were. What changed is in this repository:
   hangs its chords on plain spaces, the RTF it becomes as one zero-width space,
   which is now asked of it.
 
-**Simple Presenter itself has not got the rule yet.** At the commit `reference/`
-holds, `PresentationEditor::setChordsAlone` still leaves a line with no chord
-with no stand-in at all. It is the maintainer's to pass on, and when it is done there the
-vectors made on that machine should come out as these are.
+**Simple Presenter itself had not got the rule then.** It has it since its version
+0.89, and the vectors made on that machine came out as these are (below).
+
+## Made again on 2026-10-12, on the Linux machine: from Simple Presenter as it now is
+
+Simple Presenter took back what the two apps had found (its version 0.89) and, in the
+change after it, changes a line of chords alone where it stands in the RTF
+([`reference/README.md`](../reference/README.md) has the whole of it, and the commit).
+`reference/` was brought up to that commit and everything here that is made from
+Simple Presenter was made again from it. Nothing was edited by hand.
+
+**Not one case that was there came out differently.** That is the finding: the sheet
+that was rewritten there as a grid, and the song that now keeps a stand-in on a line
+that loses its last chord, answer every case as the vectors the two apps are held to
+already had it, the nine made on the Mac with a stand-in for that rule among them.
+
+- **The rules' answers** (`tools/make-vectors`, from its C++): all twelve files and
+  `rtf-text.json` the same to the byte.
+- **`layout.json`**: the same to the byte.
+- **`sheet-model.json`**: every case that was there the same. Added to it:
+  - `pasted`, in each case of `copyPaste`: what the sheet's `paste` answers
+    (`did`: how many lines had their chords replaced, how many chords were put on
+    them, how many were left out for having no word to go on, how many lines were
+    passed over for being of the other kind, how many the song refused) and what it
+    says of it (`said`), which are the counts and the sentences of
+    [`spec/03`](../spec/03-chord-sheet.md), rule 52a. Nothing held these before.
+  - a seventh song, `ends`: a text box whose words end with one line break, and one
+    whose words end with three with a chord on the second
+    ([`spec/03`](../spec/03-chord-sheet.md), rule 2a), with its rows, its stops and
+    two walks. It was wanted (below) and waited for Simple Presenter to leave such
+    lines off its sheet.
+  - an eighth song, `lead`: a group whose first line is a line of chords alone, over
+    a line of words, and a group of two lines of words; with its rows and stops, and
+    one case of `copyPaste`: the whole first group pasted onto the second. Its first
+    line is passed over, and the one change then made is not joined to what was done
+    before the paste ([`spec/03`](../spec/03-chord-sheet.md), rule 52). It was wanted
+    too, and waited for Simple Presenter to do as that rule says.
+
+  **Neither app's tests have been run against the two new songs**: they read
+  whatever songs the file has, so these are cases each has yet to meet.
+- **`tools/make-vectors/sheet.js`** was changed for the sheet as it now is: working
+  out where the slides go is a part of reading the song again there, so the functions
+  that do it are put aside for ones that do nothing, as the window always was; a row
+  is recorded without `made`, which is that drawing's bookkeeping; and the sheet is
+  told nothing has been copied elsewhere on the computer. It still runs on the sheet
+  as it was at `1311d80`, and gives what it gave.
+- **`stand-ins-in-rtf.json`** and **`key-fit.json`**, by `tools/standins.py` and
+  `tools/keyfit.py`: the same to the byte, as they must be, neither reading anything
+  of Simple Presenter's. Simple Presenter's own port of the first
+  (`reference/simple-presenter/src/rtfstandins.cpp`) gives the bytes of all 383
+  cases of `inPlace`, and has no result for the same 68. It has nothing for
+  `fromAnOpening`: it still writes a blank slide's first chords with its own writer.
+- **`files/expected/as-read-by-simple-presenter.json`**: the eleven files that were
+  in it are read as they were, and Chords With No Words is in it now.
+- **Not made again**: the clean presentations (`files/made-by-simple-presenter`),
+  whose ids and times would come out other bytes that say the same, and what
+  `tools/make-fixtures.py` makes of them, nothing it reads having changed.
+
+**One thing was found that the vectors do not hold and the pages do not settle**: what
+becomes of the other ranges of a text box when a line of its stand-ins is made longer
+or shorter. [`spec/01-file-format.md`](../spec/01-file-format.md) has it under "Where
+Simple Presenter differs", with what real songs have. It wants the maintainer's word,
+and then a vector.
 
 **Still wanted**
 
-- Chords With No Words (`files/shaped-as-real-ones`) read by Simple Presenter into
-  `as-read-by-simple-presenter.json`, the next time the Linux machine makes that.
-  (A song with a blank slide that ProPresenter itself made, which stood here, is no
-  longer wanted: that file has one, made to the shape of the real ones.)
 - **RTF as ProPresenter on Windows writes it**, with a character above ASCII in it,
   for `rtf-text.json` and `stand-ins-in-rtf.json`. Every sample of both is Apple's
   way of writing, or made up. If Windows writes a character to stand in after each
@@ -253,15 +312,12 @@ vectors made on that machine should come out as these are.
     case there moves the first to the end, which adding it at the end also gives);
   - in `copyPaste`, a line with two chords on one word, pasted onto a line whose
     word there is one letter long: both land on it, and the first is the one put;
-  - in `copyPaste`, a whole group whose first line is a line of chords alone, pasted
-    onto lines of words. (The reference joins the first change it then makes to
-    whatever was done before the paste; [`spec/03`](../spec/03-chord-sheet.md), rule
-    52, says what these apps do instead. So this one is first Simple Presenter's to
-    put right, if the maintainer agrees it is wrong.)
-  - in `rows`, a text box whose words end with one line break, and one whose words
-    end with three with a chord on the second: once Simple Presenter leaves such
-    lines off its sheet as these apps do ([`spec/03`](../spec/03-chord-sheet.md),
-    rule 2a).
+  - (in `copyPaste`, a whole group whose first line is a line of chords alone,
+    pasted onto lines of words, stood here, waiting for Simple Presenter to be put
+    right: it is the song `lead` now.)
+  - (in `rows`, a text box whose words end with one line break, and one whose words
+    end with three with a chord on the second, stood here: it is the song `ends`
+    now.)
 - Rules that no case holds, each found by breaking the Windows app's port of the
   rules one rule at a time (2026-10-12: 162 breakages, of which a vector caught 129;
   it has cases of its own for these, `NotHeldByVectorsTests`, their answers read from

@@ -702,6 +702,218 @@
       ]
     },
     {
+      "file": "Chords With No Words.pro",
+      "key": "",
+      "textBoxes": [
+        {
+          "slide": 0,
+          "group": "Verse 1",
+          "startsItsGroup": true,
+          "element": "A23BA4B4-2BD0-4A87-97F4-386FC010BEED",
+          "words": "",
+          "chords": [],
+          "blank": true
+        },
+        {
+          "slide": 1,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "FC6106D8-CF8A-491E-80B6-ACBDD936C229",
+          "words": "Let the water and the blood\nFrom thy wounded side which flowed",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 2,
+          "group": "Verse 1",
+          "startsItsGroup": false,
+          "element": "DCA104E7-FC2C-4B25-9E76-7FB687906001",
+          "words": "Be of sin the double cure\nSave from wrath and make me pure",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 3,
+          "group": "Verse 2",
+          "startsItsGroup": true,
+          "element": "E9A8E1B1-7214-40A6-93C1-A0C915CC1422",
+          "words": "​ ​ ​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "E"
+            },
+            {
+              "at": 2,
+              "name": "B"
+            },
+            {
+              "at": 4,
+              "name": "C#m"
+            },
+            {
+              "at": 6,
+              "name": "A"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 4,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "3597DE0D-D492-4FB2-98A1-1AD663333344",
+          "words": "Could my zeal no respite know\nCould my tears forever flow",
+          "chords": [],
+          "blank": false
+        },
+        {
+          "slide": 5,
+          "group": "Verse 2",
+          "startsItsGroup": false,
+          "element": "EB8540F0-9E4E-4246-A17D-FC82831F605A",
+          "words": "     ",
+          "chords": [
+            {
+              "at": 0,
+              "name": "E"
+            },
+            {
+              "at": 2,
+              "name": "A"
+            },
+            {
+              "at": 4,
+              "name": "B7"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 6,
+          "group": "Verse 3",
+          "startsItsGroup": true,
+          "element": "51C0AF50-4E4D-43EF-B6E0-87B3A2BC1DA6",
+          "words": " ",
+          "chords": [
+            {
+              "at": 0,
+              "name": "E"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 7,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "97B59C9D-2073-4ECC-BCB1-C59DEC08A0B1",
+          "words": "Naked come to thee for dress\n   ",
+          "chords": [
+            {
+              "at": 0,
+              "name": "E"
+            },
+            {
+              "at": 11,
+              "name": "A"
+            },
+            {
+              "at": 29,
+              "name": "B"
+            },
+            {
+              "at": 31,
+              "name": "E"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 8,
+          "group": "Verse 3",
+          "startsItsGroup": false,
+          "element": "2634E065-393A-4158-AA42-3CB4AC7611CB",
+          "words": "     \nFoul I to the fountain fly\nWash me Savior or I die",
+          "chords": [
+            {
+              "at": 0,
+              "name": "A"
+            },
+            {
+              "at": 2,
+              "name": "B"
+            },
+            {
+              "at": 4,
+              "name": "E"
+            },
+            {
+              "at": 11,
+              "name": "C#m"
+            },
+            {
+              "at": 33,
+              "name": "A"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 9,
+          "group": "Verse 4",
+          "startsItsGroup": true,
+          "element": "C37CCC58-5B04-4A95-84A8-9DE2B4E8EE0B",
+          "words": "​ ​ ​ ​\n​ ​",
+          "chords": [
+            {
+              "at": 0,
+              "name": "E"
+            },
+            {
+              "at": 2,
+              "name": "B"
+            },
+            {
+              "at": 4,
+              "name": "C#m"
+            },
+            {
+              "at": 6,
+              "name": "A"
+            },
+            {
+              "at": 8,
+              "name": "E"
+            },
+            {
+              "at": 10,
+              "name": "B"
+            }
+          ],
+          "blank": false
+        },
+        {
+          "slide": 10,
+          "group": "Verse 4",
+          "startsItsGroup": false,
+          "element": "4B191138-2B4B-4CF2-B3F1-F5714599A0CB",
+          "words": "",
+          "chords": [],
+          "blank": true
+        },
+        {
+          "slide": 11,
+          "group": "Verse 4",
+          "startsItsGroup": false,
+          "element": "",
+          "words": "",
+          "chords": [],
+          "blank": true
+        }
+      ]
+    },
+    {
       "file": "Holy Holy Holy.pro",
       "key": "",
       "textBoxes": [
