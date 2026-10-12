@@ -2055,9 +2055,10 @@ names. What to know before changing any of it:
   are gone from the Releases page, and the zip's address answers that there is
   nothing there. GitHub counted one download of it, which is the one this session
   made to hold it against what was sent. The tag `windows-v0.1.0` stays, for what
-  the history and these notes say of it; a tag holds no zip. A copy of that zip is
-  still in `windows\build` on this PC, which git leaves alone, and is not to be
-  given to anyone.
+  the history and these notes say of it; a tag holds no zip. The copy of that zip
+  that was in `windows\build` on this PC was deleted the same day, at the
+  maintainer's word, and with it the copies a session had kept in its own scratch
+  folder: no copy of that build is known of on this PC.
 - **Seeing that the build starts opened the maintainer's own library, which a
   session is not to do.** The published file was started once, minimised, its
   window's title read, and closed again when asked to; no key and no pointer was
