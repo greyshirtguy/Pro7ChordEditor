@@ -309,10 +309,12 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// While the two are the same, a line's chords are the last thing that was copied.
     var whatWasCopiedLast: () -> Int = { NSPasteboard.general.changeCount }
     private var copiedWhen: Int?
-    /// While one of the key's chords is carried over the sheet: when the sheet last
-    /// scrolled under it, and whether it has been clear of the top of what is seen
-    /// since it came over.
-    private var carriedScrolledAt: TimeInterval?
+    /// While one of the key's chords is carried over the sheet and held near its top
+    /// or bottom edge: when the view was last asked about it there, and how far the
+    /// sheet is still owed (it goes by whole points; the rest waits). And whether the
+    /// chord has been clear of the top of what is seen since it came over.
+    private var carriedAskedAt: TimeInterval?
+    private var carriedOwed = 0.0
     private var carriedClearOfTheTop = false
     /// What the time is, in seconds, and whether Shift is held: asked of the system,
     /// which is not told either while a thing is dragged. (The tests answer for it.)
@@ -857,18 +859,27 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         } else if point.y < seen.minY + near, carriedClearOfTheTop {
             depth = -min(1, (seen.minY + near - point.y) / near)
         }
-        let time = now()
         guard depth != 0 else {
-            carriedScrolledAt = nil
+            carriedAskedAt = nil
+            carriedOwed = 0
             return
         }
-        // (The first time it is found near an edge the clock is only started.)
-        let passed = carriedScrolledAt.map { min(0.2, max(0, time - $0)) } ?? 0
-        carriedScrolledAt = time
-        let by = depth * Self.carriedFastest * passed
-        if abs(by) >= 0.5 {
+        // The first time it is found near an edge the clock is only started. After
+        // that the sheet is owed what the time since the view was last asked comes
+        // to (a long wait counting as a fifth of a second, so that it never jumps),
+        // and goes the nearest whole number of points to what it is owed. The rest
+        // is owed still (or was lent): so being asked very often, each time too soon
+        // for a point, is not being asked in vain. (What a view is seen through scrolls by whole points
+        // anyway, and would round each small step up or away.)
+        let time = now()
+        let passed = carriedAskedAt.map { min(0.2, max(0, time - $0)) } ?? 0
+        carriedAskedAt = time
+        carriedOwed += depth * Self.carriedFastest * passed
+        let whole = carriedOwed.rounded()
+        if whole != 0 {
+            carriedOwed -= whole
             // (What it is seen through stops it at the sheet's top and its bottom.)
-            scroll(NSPoint(x: seen.minX, y: seen.minY + by))
+            scroll(NSPoint(x: seen.minX, y: seen.minY + whole))
         }
     }
 
@@ -892,7 +903,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
         // (Picking the chord up kept a chord that was being typed: its bubble goes.)
         sync()
-        carriedScrolledAt = nil
+        carriedAskedAt = nil
+        carriedOwed = 0
         carriedClearOfTheTop = false
         return carried(by: sender)
     }

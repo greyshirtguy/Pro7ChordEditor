@@ -427,6 +427,19 @@ struct ChordFromTheStripTests {
         clock += 30
         held(300)
         #expect(abs(canvas.visibleRect.minY - min(room, then + SheetCanvas.carriedFastest * 0.2)) < 1)
+        // Asked very often, each time too soon for the sheet to go a whole point, it
+        // goes all the same as the time adds up: 40 askings a thousandth of a second
+        // apart, barely into the edge, are 40 thousandths at a tenth of its fastest,
+        // which is two points and a little owed.
+        canvas.scroll(NSPoint(x: 0, y: 200))
+        held(150)
+        held(300 - SheetCanvas.carriedNear * 0.9)
+        for _ in 0..<40 {
+            clock += 0.001
+            held(300 - SheetCanvas.carriedNear * 0.9)
+        }
+        #expect(abs(canvas.visibleRect.minY - (200 + SheetCanvas.carriedFastest * 0.1 * 0.04)) < 0.6, "\(canvas.visibleRect.minY)")
+
         // Never past the end.
         for _ in 0..<40 {
             clock += 0.2
