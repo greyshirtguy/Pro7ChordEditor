@@ -32,6 +32,11 @@
 //   - The empty lines a text box's words END with get no row, unless a chord stands on
 //     one (the maintainer's, 2026-10-11). The reference gives each a row.
 //
+// And one thing is here that the reference has not: one of the key's chords carried in
+// from the strip and let go on a place (the page, "A chord dragged out of the strip";
+// the maintainer's, 2026-10-12). It is `liftOfKey`, `carry(_:over:_:)`, `carryOff` and
+// `dropOfKey`, at the foot, and what it asks of the song is what a key's `put` asks.
+//
 // What is drawn where is not here. The two things that go by where the words are on
 // the screen (which place is under the pointer, and which stop is nearest above or
 // below) are handed a `SheetMeasure`, so that the window's answers and the tests' come
@@ -176,7 +181,9 @@ public final class ChordSheet {
     /// Goes up each time the bubble is opened: what tells a chord's typing from the
     /// next one's at the same place.
     public private(set) var typingsBegun = 0
-    /// A chord being dragged: where from, and its name.
+    /// A chord being dragged: where from, and its name. One of the key's chords carried
+    /// in from the strip is from nowhere on the sheet (its row is -1), and is held here
+    /// only while it is over a place that can take it.
     public private(set) var dragged: (from: Spot, name: String)?
     public private(set) var copied: [CopiedLine]?
     /// The slide that is picked: the one the spot was last moved to by the keys or a
@@ -273,8 +280,13 @@ public final class ChordSheet {
         if typing && !usable(typingAt.row) {
             typing = false
         }
-        if let lifted = dragged, chordAt(lifted.from.row, lifted.from.at) != lifted.name {
-            dragged = nil
+        if let lifted = dragged {
+            // The chord that was lifted has gone from where it was; or the place one
+            // from the strip was over has.
+            let gone = lifted.from.row >= 0 ? chordAt(lifted.from.row, lifted.from.at) != lifted.name : !usable(spot.row)
+            if gone {
+                dragged = nil
+            }
         }
     }
 
@@ -871,15 +883,61 @@ public final class ChordSheet {
         setSpot(index, at)
     }
 
-    /// It is let go: it moves to the spot, or with `copy` another is put there.
+    /// It is let go: it moves to the spot, or with `copy` another is put there. (One
+    /// that came from the strip is put there, whatever `copy` is: rule 46g.)
     public func drop(copy: Bool) {
         guard let lifted = dragged else { return }
+        guard lifted.from.row >= 0 else {
+            dropOfKey()
+            return
+        }
         dragged = nil
         move(from: lifted.from, to: spot, copy: copy)
     }
 
     public func dropNowhere() {
         dragged = nil
+    }
+
+    // ---- A chord carried in from the strip (rules 46a to 46g)
+
+    /// One of the key's chords is picked up from the strip, to be carried to a place.
+    /// A chord that is being typed is kept first, as it is when the sheet is left for
+    /// anything else: so one of these can be carried while another is typed, which a
+    /// chord of the sheet's own cannot.
+    public func liftOfKey() {
+        settle()
+    }
+
+    /// It is over a place: the spot goes there and shows its name, as for a chord
+    /// lifted from the sheet. Only a chord is carried so, and never while one is
+    /// being typed (picking it up ended that).
+    public func carry(_ name: String, over index: Int, _ at: Int) {
+        guard !typing, usable(index), Chords.isChord(name) else {
+            carryOff()
+            return
+        }
+        dragged = (Spot(row: -1, at: 0), name)
+        setSpot(index, at)
+    }
+
+    /// It is over a place no longer: bare sheet, a frame, the strip, anything else. No
+    /// place shows it, and let go now it is put nowhere. (A chord lifted from the
+    /// sheet is not let go of by this.)
+    public func carryOff() {
+        if let lifted = dragged, lifted.from.row < 0 {
+            dragged = nil
+        }
+    }
+
+    /// It is let go. Over a place it is put there, as its key would have put it with
+    /// the spot there, in place of whatever chord is there; anywhere else nothing is
+    /// done. Answers whether the song took it.
+    @discardableResult
+    public func dropOfKey() -> Bool {
+        guard let lifted = dragged, lifted.from.row < 0 else { return false }
+        dragged = nil
+        return put(spot.row, spot.at, lifted.name)
     }
 }
 

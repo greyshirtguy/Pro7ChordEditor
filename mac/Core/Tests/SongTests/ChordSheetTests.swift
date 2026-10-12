@@ -591,6 +591,112 @@ struct ChordSheetTests {
         #expect(sheet.dragged == nil && song.asked.isEmpty)
     }
 
+    @Test("Mine, not a vector. One of the key's chords carried in from the strip: over a place the spot goes with it; let go there it is put on as its key would put it, in place of what is there; off the places it is put nowhere; and picking it up keeps a chord that was being typed (rules 46a to 46g)")
+    func carriedInFromTheStrip() throws {
+        // (In G the key's chords are G, Am, Bm, C, D, Em and F#dim.)
+        let (sheet, song) = try vectors.sheet("grace")
+        sheet.setSpot(4, 0)
+        sheet.carry("C", over: 2, 5)
+        #expect(sheet.dragged?.name == "C" && sheet.dragged?.from.row == -1 && sheet.spot == Spot(row: 2, at: 5))
+        // While it is carried the spot is its own, and not the pointer's.
+        sheet.pointerOver(4, 0)
+        #expect(sheet.spot == Spot(row: 2, at: 5))
+        #expect(sheet.dropOfKey())
+        #expect(sheet.dragged == nil && sheet.chordAt(2, 5) == "C" && sheet.spot == Spot(row: 2, at: 5))
+        // One change, joined to nothing: and it is what the key 4 asks with the spot there.
+        let (keyed, keyedSong) = try vectors.sheet("grace")
+        keyed.setSpot(2, 5)
+        keyed.putOfKey(4)
+        #expect(song.asked.count == 1 && song.asked == keyedSong.asked && song.asked[0].hasSuffix("joined false"))
+
+        // In place of the chord that is there (rule 43).
+        sheet.carry("Em", over: 1, 8)
+        #expect(sheet.dropOfKey() && sheet.rows[1].chords.map(\.name).sorted() == ["C", "Em", "G", "G"])
+
+        // Off the places nothing shows it, and let go it is put nowhere.
+        song.asked = []
+        sheet.carry("D", over: 7, 4)
+        sheet.carryOff()
+        #expect(sheet.dragged == nil && !sheet.dropOfKey())
+        // A row that is a group's name, a row there is not, and a name that is no chord.
+        sheet.carry("D", over: 7, 4)
+        sheet.carry("D", over: 5, 0)
+        #expect(sheet.dragged == nil)
+        sheet.carry("D", over: 99, 0)
+        #expect(sheet.dragged == nil)
+        sheet.carry("Hello", over: 7, 4)
+        #expect(sheet.dragged == nil && !sheet.dropOfKey())
+        #expect(song.asked.isEmpty && sheet.chordAt(7, 4).isEmpty)
+
+        // The key that copies a chord as it is dragged changes nothing here (rule 46g).
+        sheet.carry("D", over: 7, 4)
+        sheet.drop(copy: true)
+        #expect(sheet.dragged == nil && sheet.chordAt(7, 4) == "D" && song.asked.count == 1)
+
+        // A chord lifted from the sheet is not let go of by what is for one from the
+        // strip, nor put on by it.
+        sheet.lift(7, 4)
+        sheet.carryOff()
+        #expect(sheet.dragged?.from == Spot(row: 7, at: 4))
+        #expect(!sheet.dropOfKey() && sheet.dragged != nil)
+        sheet.dropNowhere()
+
+        // While another chord is being typed nothing is carried; but picking one up
+        // keeps what was typed and closes the bubble, and then it is (rule 46e). The
+        // two are two changes, neither joined to the other.
+        song.asked = []
+        sheet.setSpot(6, 5)
+        sheet.startTyping(seed: "B")
+        sheet.type("Bm7")
+        sheet.carry("C", over: 9, 0)
+        #expect(sheet.dragged == nil && sheet.typing)
+        sheet.liftOfKey()
+        #expect(!sheet.typing && sheet.chordAt(6, 5) == "Bm7" && song.asked.count == 1)
+        sheet.carry("C", over: 9, 0)
+        #expect(sheet.dropOfKey() && sheet.chordAt(9, 0) == "C")
+        #expect(song.asked.count == 2 && song.asked[1].hasSuffix("joined false"))
+        // Picked up with nothing typed: nothing is kept, and the bubble is closed.
+        sheet.setSpot(8, 0)
+        sheet.startTyping()
+        sheet.liftOfKey()
+        #expect(!sheet.typing && sheet.chordAt(8, 0).isEmpty && song.asked.count == 2)
+
+        // On a line of chords alone it takes the place of the chord whose place it is
+        // over, or past the last is one more (rule 22); on a blank slide, and on a
+        // slide with no text box, it is the first.
+        let (intro, introSong) = try vectors.sheet("intro")
+        intro.carry("Bm", over: 1, 2)
+        #expect(intro.dropOfKey() && intro.rows[1].chords.map(\.name) == ["D", "Bm", "A"])
+        intro.carry("G", over: 1, 6)
+        #expect(intro.dropOfKey() && intro.rows[1].chords == [Chord(at: 0, name: "D"), Chord(at: 2, name: "Bm"), Chord(at: 4, name: "A"), Chord(at: 6, name: "G")])
+        #expect(introSong.asked.count == 2 && introSong.asked.allSatisfy { $0.hasPrefix("setChordsAlone") && $0.hasSuffix("joined false") })
+        let (blank, _) = try vectors.sheet("blank")
+        blank.carry("C", over: 1, 0)
+        #expect(blank.dropOfKey() && blank.rows[1].chords == [Chord(at: 0, name: "C")] && !blank.rows[1].blank)
+        let (bare, _) = try vectors.sheet("bare")
+        bare.carry("C", over: 2, 0)
+        #expect(bare.dropOfKey() && bare.rows[2].chords == [Chord(at: 0, name: "C")])
+
+        // What the song refuses is said, and is answered as not put on.
+        struct No: Error {}
+        let (refusing, refusingSong) = try vectors.sheet("grace")
+        var said = 0
+        refusing.refused = { _ in said += 1 }
+        refusingSong.refusing = No()
+        refusing.carry("C", over: 2, 5)
+        #expect(!refusing.dropOfKey() && said == 1 && refusing.chordAt(2, 5).isEmpty && refusing.dragged == nil)
+
+        // The place it was over goes, the song having been changed under it: it is
+        // carried no longer.
+        let two = StandInSong([TextBox(slide: 0, element: "A", words: "Holy holy", chords: []), TextBox(slide: 1, element: "B", words: "Lord God", chords: [])], key: "C")
+        let short = ChordSheet(song: two)
+        short.carry("F", over: 1, 0)
+        #expect(short.dragged != nil)
+        two.textBoxes.removeLast()
+        short.reload()
+        #expect(short.dragged == nil && short.spot.row == -1)
+    }
+
     @Test("Mine, not a vector. A name the song already has that is no chord is moved, copied and pasted as it is; only what is typed must be a chord")
     func notAChord() throws {
         let boxes = [TextBox(slide: 0, element: "A", words: "Holy holy holy\nLord God Almighty",

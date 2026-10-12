@@ -126,6 +126,74 @@ struct ChordSheetOnAFileTests {
         #expect(said.isEmpty, "\(said)")
     }
 
+    @Test("One of the key's chords carried in from the strip and let go on a place is in the file, as its key would have put it with the spot there: on a word, on a line of chords alone in a chord's place and past the last, on a blank slide, on a slide with no text box. Each is one step of undo, to the byte. Let go off the places, or while ProPresenter is running, the file is not touched")
+    func carriedInFromTheStrip() throws {
+        let bench = try Workbench()
+        let song = try bench.open(ChordsWithNoWordsTests.shaped)
+        let bytes = try Data(contentsOf: song.url)
+        let sheet = ChordSheet(song: song)
+        var said: [String] = []
+        sheet.refused = { said.append("\($0)") }
+        let name = try #require(sheet.inKey.dropFirst(3).first)
+        let words = try wordsRow(of: sheet)
+        let at = try #require(sheet.stops(words).first { sheet.chordAt(words, $0).isEmpty })
+        let four = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 3 && sheet.rows[$0].alone })
+        let first = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 0 && sheet.rows[$0].blank })
+        let last = try #require(sheet.rows.indices.first { sheet.rows[$0].slide == 11 && sheet.rows[$0].blank })
+        #expect(sheet.rows[four].chords.count == 4 && song.textBoxes[11].element.isEmpty)
+
+        /// The song as it is read from its file: each box's words and chords. (Not its
+        /// boxes' ids: the box a slide with none is given has a new one each time.)
+        func read() throws -> [String] {
+            try OpenSong(opening: song.url).textBoxes.map { "\($0.slide) \($0.words.units) \($0.chords)" }
+        }
+
+        for (row, place) in [(words, at), (four, 2), (four, 8), (first, 0), (last, 0)] {
+            sheet.carry(name, over: row, place)
+            #expect(sheet.spot == Spot(row: row, at: place))
+            #expect(sheet.dropOfKey(), "row \(row), place \(place)")
+            #expect(sheet.chordAt(row, place) == name && sheet.spot == Spot(row: row, at: place))
+            let carried = try read()
+            #expect(try Data(contentsOf: song.url) != bytes)
+            try song.undo()
+            #expect(!song.canUndo)
+            #expect(try Data(contentsOf: song.url) == bytes)
+            sheet.reload()
+            // The key 4, with the spot there, makes the same of the file.
+            sheet.setSpot(row, place)
+            sheet.putOfKey(4)
+            #expect(try read() == carried, "row \(row), place \(place)")
+            try song.undo()
+            #expect(try Data(contentsOf: song.url) == bytes)
+            sheet.reload()
+        }
+        // In a chord's place it took that chord's; past the last it was one more.
+        sheet.carry(name, over: four, 2)
+        sheet.dropOfKey()
+        #expect(sheet.rows[four].chords.map(\.name) == ["E", name, "C#m", "A"])
+        sheet.carry(name, over: four, 8)
+        sheet.dropOfKey()
+        #expect(sheet.rows[four].chords.map(\.name) == ["E", name, "C#m", "A", name])
+        try song.undo()
+        try song.undo()
+        #expect(!song.canUndo)
+        sheet.reload()
+
+        // Let go off the places: nothing is asked of the song at all.
+        sheet.carry(name, over: words, at)
+        sheet.carryOff()
+        #expect(!sheet.dropOfKey())
+        #expect(try Data(contentsOf: song.url) == bytes && !song.canUndo && said.isEmpty)
+
+        // While ProPresenter is running it is refused like any change, in the song's
+        // own sentence, and the file is as it was.
+        bench.proPresenterIsRunning = true
+        sheet.carry(name, over: words, at)
+        #expect(!sheet.dropOfKey())
+        #expect(said.count == 1 && sheet.chordAt(words, at).isEmpty && sheet.dragged == nil)
+        #expect(try Data(contentsOf: song.url) == bytes)
+    }
+
     @Test("The last chord taken off a line of chords alone that has words over it: the line is one zero-width space, its row is there still with the spot on it, and a chord is put on it again. So for one that is the whole of its slide")
     func theLastChordOfALineUnderWords() throws {
         let bench = try Workbench()
