@@ -28,6 +28,30 @@ import AppKit
 import Song
 import SwiftUI
 
+/// What the window's title bar says: the app's name and, after it in square brackets,
+/// its version, so that whoever uses a build, or shows one, sees which it is
+/// (spec/06-library.md, rule 6d; the maintainer's, 2026-10-12).
+public enum AppTitle {
+    public static let name = "Pro7 Chord Editor"
+
+    /// A build that knows of no version says the name alone.
+    public static func of(version: String) -> String {
+        version.isEmpty ? name : "\(name) [\(version)]"
+    }
+
+    /// The version of the app that is running, as it says it of itself to macOS
+    /// (MARKETING_VERSION in the Xcode project), or "" where it says none: under the
+    /// tests, which are no app.
+    public static var versionOfThisApp: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
+    }
+
+    /// The title of the app that is running.
+    public static var ofThisApp: String {
+        of(version: versionOfThisApp)
+    }
+}
+
 public struct LibraryWindow: View {
     @Bindable private var model: LibraryModel
 

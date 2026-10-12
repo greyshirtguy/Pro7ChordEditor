@@ -23,6 +23,16 @@ struct WindowListsTests {
         #expect(ListsLook.top(share: 0.5, of: 250) == ListsLook.leastLibraries)
     }
 
+    @Test("The window's title is the app's name and, after it in square brackets, its version; a build that knows of no version says the name alone (rule 6d)")
+    func theTitle() {
+        #expect(AppTitle.of(version: "0.2") == "Pro7 Chord Editor [0.2]")
+        #expect(AppTitle.of(version: "1.10.3") == "Pro7 Chord Editor [1.10.3]")
+        #expect(AppTitle.of(version: "") == "Pro7 Chord Editor")
+        // The app that is running: whatever it says its version is. (Here that is the
+        // tests' own runner, which is no app of ours: only that the two agree is held.)
+        #expect(AppTitle.ofThisApp == AppTitle.of(version: AppTitle.versionOfThisApp))
+    }
+
     @Test("The bar says how many songs the library has, and how many of them are listed where the list is narrowed")
     func whatTheBarSays() {
         #expect(ListsLook.count(shown: 8, of: 8) == "8 SONGS")

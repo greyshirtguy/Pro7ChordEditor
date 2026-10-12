@@ -193,7 +193,7 @@ public final class LibraryModel {
     }
 
     public static func onThisMac() -> LibraryModel {
-        LibraryModel(appData: .onThisMac(), appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
+        LibraryModel(appData: .onThisMac(), appVersion: AppTitle.versionOfThisApp,
                      finder: { PlaceFinder.onThisMac(chosen: $0) }, proPresenterIsRunning: ProPresenterApp.isRunning)
     }
 
