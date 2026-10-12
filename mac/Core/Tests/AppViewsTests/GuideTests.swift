@@ -259,6 +259,20 @@ struct GuideTests {
         #expect(mac.appData.settings.guideShown == true)
     }
 
+    @Test("Nothing but its being shown says that the guide was shown: what the app remembers before its first start does not")
+    func notSaidShownBeforeItIs() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        // A folder is chosen, and so remembered, before the window has started.
+        model.add(folder: mac.place.appendingPathComponent("Libraries/Songs", isDirectory: true))
+        #expect(mac.appData.settings.chosenFolders.count == 1)
+        #expect(mac.appData.settings.guideShown == nil)
+        await model.start()
+        #expect(model.guideAsked == 1)
+        #expect(mac.appData.settings.guideShown == true)
+        #expect(mac.appData.settings.chosenFolders.count == 1)
+    }
+
     @Test("Whoever had the app before it had a guide is shown it once too, and what the app kept for them is as it was")
     func shownOnceToWhoeverHadTheApp() async throws {
         let mac = try MadeUpMac()
