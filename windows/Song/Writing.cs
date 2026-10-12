@@ -148,19 +148,15 @@ internal static class SongFile
                 file.Write(bytes);
                 file.Flush(flushToDisk: true);
             }
-            if (File.Exists(path) || Directory.Exists(path))
-            {
-                ClearAway(beside);
-                return false;
-            }
             try
             {
+                // (Not asked first whether the name is free: the moving is the asking,
+                // and is one step, so nothing can take the name in between.)
                 File.Move(beside, path, overwrite: false);
             }
             catch (IOException) when (File.Exists(path) || Directory.Exists(path))
             {
-                // Something took the name in the moment between. What is there is not
-                // this app's, and is left.
+                // The name is taken. What is there is not this app's, and is left.
                 ClearAway(beside);
                 return false;
             }

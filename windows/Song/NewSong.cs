@@ -215,7 +215,9 @@ public static class NewSong
                 gap = true;
                 continue;
             }
-            if (gap && tidy.Length > 0)
+            // (White space before the first character is a space here too, and is
+            // taken off below with whatever else is at the ends.)
+            if (gap)
             {
                 tidy.Append(' ');
             }

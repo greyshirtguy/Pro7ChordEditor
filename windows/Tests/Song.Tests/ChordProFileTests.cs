@@ -197,6 +197,13 @@ public sealed class ChordProFileTests : IDisposable
             """.ReplaceLineEndings("\n"),
             ChordProFile.TextOf(song.Name, song.Key, song.TextBoxes));
 
+        // A song whose first slides are in no group: they are parted from the heading
+        // as a group's are, by one empty line, and from each other by one.
+        TextBox Loose(int slide, string words) => new(slide, "", null, false, "id", words, [], false);
+        Assert.Equal(
+            "{title: Loose}\n\nOne\nTwo\n\nThree\n\n{comment: Chorus}\nFour\n",
+            ChordProFile.TextOf("Loose", "", [Loose(0, "One\nTwo"), Loose(1, "Three"), new TextBox(2, "Chorus", null, true, "id", "Four", [], false)]));
+
         // A song that states no key has no line for one; and what is in a heading is on
         // one line and cannot end it.
         var keyless = new OpenSong(InTestData("Holy Holy Holy.pro"));

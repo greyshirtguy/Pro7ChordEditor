@@ -196,7 +196,7 @@ public sealed class NewSongTests : IDisposable
 
         // The names Windows keeps for devices cannot be a file's: such a song has a
         // number from the first.
-        foreach (var device in (string[])["Con", "PRN", "aux", "Nul", "COM1", "com9", "Lpt1", "LPT0"])
+        foreach (var device in (string[])["Con", "PRN", "aux", "Nul", "COM1", "com9", "Lpt1", "LPT0", "COM" + (char)0xB9, "lpt" + (char)0xB2, "Com" + (char)0xB3])
         {
             Assert.Equal(device + " 2", NewSong.FreeName(device, library));
         }
@@ -476,6 +476,8 @@ public sealed class NewSongTests : IDisposable
         // first; and a chord of the model's.
         words.Element_.Text.Attributes.CustomAttributes.Add(Said(5, 9));
         words.Element_.Text.Attributes.CustomAttributes.Add(Said(0, 4, "Chord of the model"));
+        // (And something said of no stretch at all, at the start.)
+        words.Element_.Text.Attributes.CustomAttributes.Add(Said(0, 0));
         // A second text box with words of its own, and a chord.
         var second = Another("AAAAAAAA-0000-4000-8000-000000000001", "Second language", "Zweite Sprache of the model");
         second.Element_.Text.Attributes.CustomAttributes.Add(Said(0, 27));
@@ -495,6 +497,13 @@ public sealed class NewSongTests : IDisposable
                 Uuid = new RV.UUID { String = "AAAAAAAA-0000-4000-8000-000000000004" },
                 ElementUUID = new RV.UUID { String = "AAAAAAAA-0000-4000-8000-000000000003" },
             },
+            // (How it goes off names it in small letters: the same id.)
+            BuildOut = new RV.Slide.Types.Element.Types.Build
+            {
+                Uuid = new RV.UUID { String = "AAAAAAAA-0000-4000-8000-000000000006" },
+                ElementUUID = new RV.UUID { String = "aaaaaaaa-0000-4000-8000-000000000003" },
+            },
+            ChildBuilds = { new RV.Slide.Types.Element.Types.ChildBuild { Uuid = new RV.UUID { String = "AAAAAAAA-0000-4000-8000-000000000007" }, Index = 1 } },
         };
         elements.Add(shape);
         shown.BaseSlide.ElementBuildOrder.Add(new RV.UUID { String = "AAAAAAAA-0000-4000-8000-000000000004" });
@@ -629,16 +638,19 @@ public sealed class NewSongTests : IDisposable
             Assert.Equal(RV.Graphics.Types.Text.Types.Attributes.Types.Capitalization.SmallCaps, stray.Attributes.CustomAttributes.Single().Capitalization);
 
             // The ids. New: the cue's, its action's, its slide's, each of the five
-            // elements' and the shape's build's. The build still names the shape, and
-            // the order of builds still names the build. What names a thing that is
-            // not on the slide (a timer) is left.
+            // elements', and each of the shape's three builds'. The builds still name
+            // the shape (the one that named it in small letters too), and the order of
+            // builds still names the build. What names a thing that is not on the
+            // slide (a timer) is left.
             var shape = elements[3];
             Assert.Equal(shape.Element_.Uuid, shape.BuildIn.ElementUUID);
+            Assert.Equal(shape.Element_.Uuid, shape.BuildOut.ElementUUID);
             Assert.Equal(shape.BuildIn.Uuid, shown.BaseSlide.ElementBuildOrder.Single());
+            Assert.Equal(3, new[] { shape.BuildIn.Uuid.String, shape.BuildOut.Uuid.String, shape.ChildBuilds.Single().Uuid.String }.Distinct().Count());
             Assert.Equal(elements[0].Element_.Uuid, elements[0].DataLinks[0].VisibilityLink.Conditions.Single().ElementVisibility.OtherElementUuid);
             Assert.Equal("AAAAAAAA-0000-4000-8000-00000000000E", elements[0].DataLinks[1].VisibilityLink.Conditions.Single().TimerVisibility.TimerUuid.String);
             var ids = IdsIn(cue).Distinct().Where(id => id != "AAAAAAAA-0000-4000-8000-00000000000E").ToList();
-            Assert.Equal(9, ids.Count);
+            Assert.Equal(11, ids.Count);
             Assert.DoesNotContain(ids, modelsIds.Contains);
             Assert.All(ids, id => Assert.True(seen.Add(id), "an id is in two slides"));
         }
@@ -714,12 +726,56 @@ public sealed class NewSongTests : IDisposable
         Assert.Equal("The outro's box", NameOfTheBox(fromChordsAlone));
         Assert.Equal("One two", RtfWords.Read(ElementsOf(fromChordsAlone.Cues.Single()).Single().Element_.Text.RtfData.Span));
 
+        // A slide of chords alone is passed over for one with words to read that
+        // comes after it.
+        var introFirst = new RV.Presentation { Name = "Intro first" };
+        introFirst.Cues.Add(outro.Clone());
+        introFirst.Cues.Add(CuesAsShown(chordsAlone)[0].Clone());
+        ElementsOf(introFirst.Cues[0]).Single().Element_.Name = "The intro's box";
+        ElementsOf(introFirst.Cues[1]).Single().Element_.Name = "The verse's box";
+        Assert.Equal("The verse's box", NameOfTheBox(NewSong.Made(song, "New", 2, introFirst, "Intro first", Now)));
+
+        // A text box that shows something else by a link is never the one given the
+        // words, though it comes first on the slide and has words in it.
+        var linkedFirst = TestFile("Plain Song.pro");
+        foreach (var cue in linkedFirst.Cues)
+        {
+            var linked = ElementsOf(cue).Single().Clone();
+            linked.Element_.Uuid = new RV.UUID { String = OpenSong.NewId("A") };
+            linked.Element_.Name = "Shows a clock";
+            linked.DataLinks.Add(new RV.Slide.Types.Element.Types.DataLink { ClockText = new RV.Slide.Types.Element.Types.DataLink.Types.ClockText() });
+            ElementsOf(cue).Insert(0, linked);
+        }
+        var besideALinkedBox = NewSong.Made(song, "New", 2, linkedFirst, "Plain Song", Now);
+        var boxes = ElementsOf(besideALinkedBox.Cues.Single());
+        Assert.Equal(["Shows a clock", "Lyrics"], boxes.Select(box => box.Element_.Name));
+        Assert.Equal("One two", RtfWords.Read(boxes[1].Element_.Text.RtfData.Span));
+        Assert.Equal(RtfWords.Read(ElementsOf(CuesAsShown(linkedFirst)[0])[0].Element_.Text.RtfData.Span), RtfWords.Read(boxes[0].Element_.Text.RtfData.Span));
+
+        // A model whose slide has no id is copied all the same, and each copy has one,
+        // by which its group names it.
+        var noId = TestFile("Plain Song.pro");
+        foreach (var cue in noId.Cues)
+        {
+            cue.Uuid = null;
+        }
+        noId.CueGroups.Clear();
+        var withIds = NewSong.Made(SongOf("Verse 1\nOne\nTwo\nThree\n"), "New", 2, noId, "Plain Song", Now);
+        Assert.Equal(2, withIds.Cues.Select(cue => cue.Uuid.String).Where(id => id.Length == 36).Distinct().Count());
+        Assert.Equal(withIds.Cues.Select(cue => cue.Uuid.String), withIds.CueGroups.Single().CueIdentifiers.Select(id => id.String));
+
+        // And a model with no chord chart of its own is given none.
+        Assert.Null(only.ChordChart);
+        Assert.Null(fromChordsAlone.ChordChart);
+        Assert.Null(fromChordsAlone.Timeline);
+
         // And a model with no text at all cannot be one: refused, and it says which.
         var none = new RV.Presentation { Name = "Nothing" };
         none.Cues.Add(new RV.Cue { IsEnabled = true });
         var refused = Assert.Throws<Refusal>(() => NewSong.Made(song, "New", 2, none, "Nothing", Now));
         Assert.Equal(Refusal.Why.NotMade, refused.Reason);
         Assert.Equal((char)0x201C + "Nothing" + (char)0x201D + " has no slide with words on it, so a new song cannot be made to look like it. Nothing was made.", refused.Sentence);
+        Assert.StartsWith("The song this app carries has no slide with words on it, ", Assert.Throws<Refusal>(() => NewSong.Made(song, "New", 2, none, "", Now)).Sentence, StringComparison.Ordinal);
         // (A song whose only slide is blank is such a one.)
         var blank = TestFile("Blank Slides.pro");
         var justTheIntro = new RV.Presentation { Name = "Blank" };
@@ -754,6 +810,7 @@ public sealed class NewSongTests : IDisposable
         Assert.Equal(new RV.Presentation.Types.CCLI { SongTitle = "A Title" }, Of("{title: A Title}\n{ccli: CCLI 22025}").Ccli);
         Assert.Equal(0u, Of("{ccli: 99999999999}").Ccli.SongNumber);
         Assert.Equal(0u, Of("{ccli: -5}").Ccli.SongNumber);
+        Assert.Equal(0u, Of("{ccli: +22025}").Ccli.SongNumber);
         Assert.Equal(4294967295u, Of("{ccli: 4294967295}").Ccli.SongNumber);
         // A file that says none of them: nothing of the model's is left in the block,
         // which is there because the model has one.
@@ -875,10 +932,18 @@ public sealed class NewSongTests : IDisposable
         Assert.Equal(Refusal.Why.CannotBeRead, gone.Reason);
         Assert.StartsWith("Gone.pro could not be read as a ProPresenter presentation: ", gone.Sentence, StringComparison.Ordinal);
 
-        // A song like one with no words on any slide.
-        var empty = new RV.Presentation { Name = "Empty" };
-        var noWords = Assert.Throws<Refusal>(() => NewSong.Make(song, "Plain Song", 2, new ModelSong("Empty", empty.ToByteArray()), library, () => false));
+        // A song like one with no words on any slide: it is named as its file is,
+        // without the ending.
+        var empty = bench.FileOf("No words at all.pro", new RV.Presentation { Name = "Empty" }.ToByteArray());
+        var noWords = Assert.Throws<Refusal>(() => NewSong.Make(song, "Plain Song", 2, ModelSong.Read(empty), library, () => false));
         Assert.Equal(Refusal.Why.NotMade, noWords.Reason);
+        Assert.StartsWith((char)0x201C + "No words at all" + (char)0x201D + " has no slide with words on it, ", noWords.Sentence, StringComparison.Ordinal);
+
+        // A name too long for a file to have: the system says so, and nothing is left.
+        var tooLong = Assert.Throws<Refusal>(() => NewSong.Make(song, new string('a', 400), 2, ModelSong.OfTheApp, library, () => false));
+        Assert.Equal(Refusal.Why.NotMade, tooLong.Reason);
+        Assert.StartsWith("The song could not be made: ", tooLong.Sentence, StringComparison.Ordinal);
+        Assert.True(tooLong.Sentence.Length > "The song could not be made: ".Length);
 
         // And a file with no words in it makes no song.
         Assert.Equal(Refusal.Why.NotASong, Assert.Throws<Refusal>(() => NewSong.Make(SongOf("{title: Nothing}\n"), "Nothing", 2, ModelSong.OfTheApp, library, () => false)).Reason);

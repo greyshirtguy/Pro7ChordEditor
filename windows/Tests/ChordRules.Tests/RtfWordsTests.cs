@@ -204,6 +204,9 @@ public class RtfWordsTests
         var words = "A{b}" + (char)0x5C + "c\n" + (char)0xE9;
         byte[] expected = [.. opening, .. "A"u8, 0x5C, .. "{b"u8, 0x5C, .. "}"u8, 0x5C, 0x5C, .. "c"u8, 0x5C, 0x0A, 0x5C, .. "uc0"u8, 0x5C, .. "u233 }"u8];
         Assert.Equal(expected, RtfWords.WithWords(model, words));
+        // So is anything of ASCII that cannot be seen: a tab, and the rubout at its end.
+        byte[] unseen = [.. opening, .. "a"u8, 0x5C, .. "uc0"u8, 0x5C, .. "u9 b"u8, 0x5C, .. "uc0"u8, 0x5C, .. "u127 ~}"u8];
+        Assert.Equal(unseen, RtfWords.WithWords(model, new(['a', (char)0x09, 'b', (char)0x7F, '~']))!);
         // A unit of the upper half is written as it is, and never as a negative number.
         byte[] high = [.. opening, 0x5C, .. "uc0"u8, 0x5C, .. "u55356 "u8, 0x5C, .. "uc0"u8, 0x5C, .. "u57225 }"u8];
         Assert.Equal(high, RtfWords.WithWords(model, new([(char)0xD83C, (char)0xDF89])));
