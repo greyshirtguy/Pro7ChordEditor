@@ -431,7 +431,7 @@ public class MendingViewTests
         settings.Show("Mending");
         Pictures.LayOut(settings, 960, 600);
         var tabs = (TabControl)settings.FindName("Sections");
-        Assert.Equal(["Chords", "Mending", "Backups"], tabs.Items.OfType<TabItem>().Select(tab => (string)tab.Header));
+        Assert.Equal(["Chords", "Mending", "Backups", "About"], tabs.Items.OfType<TabItem>().Select(tab => (string)tab.Header));
         var mending = settings.MendingSwitch;
         Assert.Same(mending, tabs.SelectedContent);
         Assert.False(mending.Switch.IsChecked);
