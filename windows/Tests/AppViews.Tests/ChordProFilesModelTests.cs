@@ -248,6 +248,17 @@ public class ChordProFilesModelTests
         model.MakeTheSong();
         Assert.Equal(pc.Song("One - More"), model.SongId);
         Assert.Equal(Q("One - More") + " was made from amazing-grace.cho: 4 parts, 4 slides, 40 chords.", model.Notice);
+
+        // The name it was said it would have is taken by something else while the
+        // panel is being read: it is given the next number, by the name that was
+        // typed, and what is said afterwards is the name it has.
+        model.BringIn(ASong("amazing-grace.cho"));
+        Assert.Equal("Amazing Grace 3", model.NewSong!.WillBeNamed);
+        File.WriteAllBytes(Path.Combine(pc.Place, "Libraries", "Songs", "Amazing Grace 3.pro"), TestData.InFiles("made-by-simple-presenter/Plain Song.pro"));
+        model.MakeTheSong();
+        Assert.Equal(pc.Song("Amazing Grace 4"), model.SongId);
+        Assert.StartsWith(Q("Amazing Grace 4") + " was made from amazing-grace.cho: ", model.Notice, StringComparison.Ordinal);
+        Assert.Equal(TestData.InFiles("made-by-simple-presenter/Plain Song.pro"), File.ReadAllBytes(Path.Combine(pc.Place, "Libraries", "Songs", "Amazing Grace 3.pro")));
     });
 
     [Fact]
