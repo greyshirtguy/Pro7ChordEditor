@@ -20,7 +20,7 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
 | **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
@@ -2017,9 +2017,8 @@ names. What to know before changing any of it:
   as a part of the paths and in the line that says where the source is on GitHub.
   Nothing else of the PC is in it, and nothing of any song. **What it gives away
   is small** (the account's name is the first letters of the name the repository
-  is published under), but it was given out without being looked for. **The zip of
-  0.1.0 on the Releases page still has it**: whether that zip stays is the
-  maintainer's to say.
+  is published under), but it was given out without being looked for. The release
+  of 0.1.0 was taken off the Releases page for it the same day (below).
 - **Since then `make-zip.ps1` builds the app afresh with
   `ContinuousIntegrationBuild`**, which is .NET's own way of writing every such
   path from the top of the source ("/_/windows/AppViews/X.cs") and not from the top
@@ -2051,10 +2050,14 @@ names. What to know before changing any of it:
   PC; **dragging a chord from the strip had been done by the tests only, and by no
   hand on Windows that this session knows of**; and no song made from a ChordPro
   file had been opened in ProPresenter.
-- **The release of 0.1.0 is still on the page**, with the zip that names the folder
-  it was built in. The Mac's 0.1 was taken down for the same, on the maintainer's
-  word. For the Windows one that word has not been given, so it has been left, and
-  the maintainer asked.
+- **0.1.0 was taken down on 2026-10-12**, once 0.2 was out, at the maintainer's
+  word ("yes take 0.1.0 down"), as the Mac's 0.1 had been: the release and its zip
+  are gone from the Releases page, and the zip's address answers that there is
+  nothing there. GitHub counted one download of it, which is the one this session
+  made to hold it against what was sent. The tag `windows-v0.1.0` stays, for what
+  the history and these notes say of it; a tag holds no zip. A copy of that zip is
+  still in `windows\build` on this PC, which git leaves alone, and is not to be
+  given to anyone.
 - **Seeing that the build starts opened the maintainer's own library, which a
   session is not to do.** The published file was started once, minimised, its
   window's title read, and closed again when asked to; no key and no pointer was
