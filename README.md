@@ -17,9 +17,9 @@ words, and lets them be put on, moved and changed.
 
 | | |
 | --- | --- |
-| **Windows** | The first editor, version 0.9.5, is in [`windows/old/`](windows/old/README.md) and on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page. It works by typing chords in square brackets among the words. It has known faults and is to be replaced |
+| **Windows** | The first editor, version 0.9.5, is in [`windows/old/`](windows/old/README.md) and on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page. It works by typing chords in square brackets among the words. It has known faults and is being replaced by the new editor: [`windows/`](windows/README.md) says how far that has got. An early build of it is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page, marked as such. It is not signed, so Windows has to be told to run it: the read-me that comes with it says how |
 | **Mac** | The new editor, being built first: [`mac/`](mac/README.md) says how far it has got. Early builds, when there are any, are on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page, marked as such. They are not yet signed by Apple, so macOS has to be told to open them: the read-me that comes with one says how |
-| **The new editor, for both** | Planned in full in [`spec/`](spec/00-overview.md). Built for the Mac as far as the two ways of putting chords on; begun for Windows |
+| **The new editor, for both** | Planned in full in [`spec/`](spec/00-overview.md). Built for the Mac as far as the two ways of putting chords on; and for Windows as far as making a song from a ChordPro file |
 
 ## What the new one is to be
 

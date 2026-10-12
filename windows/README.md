@@ -25,8 +25,10 @@ that song's slides for each of the new one's. A song can be written out as a Cho
 file too. **No song made this way has yet been opened in ProPresenter**
 ([`NOTES.md`](NOTES.md)).
 
-**There is nothing here to download yet, and it has not been tried on a real library:
-do not use it on yours.**
+**An early build is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page**, marked as a
+pre-release: a zip with the app as one file, and a read-me. **It has been tried by hand
+only briefly.** Keep a backup of your library, quit ProPresenter first, and try it on a
+copy of a library before your own: the read-me says how.
 
 Under what is seen it has the rules of chords, held to the same answers as the Mac
 app's, and the song itself: a file opened, its chords and its keys changed, each change

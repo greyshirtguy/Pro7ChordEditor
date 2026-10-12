@@ -20,7 +20,7 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; whether to pay to have the file signed; the version's number; and **a release, which nobody is to make before a song made at M9 has been opened in ProPresenter and the app has been tried on a copy of a real library** |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; whether to pay to have the file signed; and the version's number. **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"). A song made at M9 has still not been opened in ProPresenter; the read-me and the release's page say so |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -1914,6 +1914,38 @@ names. What to know before changing any of it:
       holding the pipe it was reading. It now starts each run so that it can stop
       that run and what it started, and nothing else.
 
+### At M10
+
+- **Given out on 2026-10-12** as a pre-release on the Releases page, tagged
+  `windows-v0.1.0`, the maintainer having said "can you make an early build and release":
+  the zip that `make-zip.ps1` made of the app as it was at that tag (`8e64039`, the
+  commit that put the click right), fifty-seven megabytes. A pre-release, and not
+  the page's "latest", which is still the first editor, 0.9.5.
+- **How**, as the Mac's was: the commit pushed, and both workflows passed on it
+  (the Windows one ran 725 tests, the two in a real window among them, so GitHub's
+  machine does show a window and let a view keep the mouse); an annotated tag
+  pushed; `gh release create windows-v0.1.0 <zip> --prerelease --latest=false
+  --verify-tag`, with notes that say what the read-me says; and the zip then fetched
+  back from GitHub and held against the one sent, which it is, to the byte.
+  **A release is published on the maintainer's word and not otherwise.**
+- **The tag is `windows-v0.1.0`** and the Mac's is `mac-v0.1`: each is its app's own
+  version as that app writes it (.NET writes three numbers). The tags 0.93 to
+  v0.9.5 are the first editor's.
+- **What was given out before it was known**, and is said on the release's page and
+  in the read-me: it had been tried by hand once, briefly, on one PC with Windows
+  11; no song made from a ChordPro file had been opened in ProPresenter; and the RTF
+  that ProPresenter for Windows writes has still not been looked at by a session
+  ("Left rough"). What the maintainer's quick try was on is not known here.
+- **Not checked: what Windows says of the file.** "Windows protected your PC",
+  "More info" and "Run anyway" are in the read-me and on the release's page from
+  what is known of Windows. They show only for a file that came through a browser,
+  and to see them is to be asked a question on the maintainer's own screen. **The
+  maintainer is asked to download the zip from the Releases page once, start it,
+  and say whether the words are those.**
+- **The Mac's release still says "The new editor is not yet built for Windows"**,
+  at the foot of its page. It is that release's own text; it has been left, and the
+  maintainer told.
+
 ### What the maintainer found by hand
 
 - **2026-10-12, the first try of a build: a click on the sheet did nothing.**
@@ -2157,8 +2189,9 @@ names. What to know before changing any of it:
   app and its window have .NET's own); **the words** of About and of the read-me
   (decisions 113 and 115); **what Windows says of the unsigned file**, to be seen
   and the read-me held to it; **the version**, which says 0.1.0 as the Mac's early
-  build says 0.1; whether to sign; the top-level `README.md`'s lines about the
-  Windows app; and **the release itself**. The zip is fifty-seven megabytes, most
+  build says 0.1; whether to sign; and a release that is not an early one. (An
+  early build is out: "At M10". The top-level `README.md`'s row for Windows says
+  so, and where the new editor is.) The zip is fifty-seven megabytes, most
   of it .NET (the file inside is a hundred and thirty-six); making it smaller is
   not begun. The first start of a new build took twenty-four seconds on this PC
   with other work going on and under two after that: the read-me says "some
