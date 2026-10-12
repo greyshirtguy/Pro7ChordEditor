@@ -406,5 +406,45 @@ struct GuideTests {
         }
         #expect(GuidePicture.image("no such picture") == nil)
         #expect(GuideFiles.picture("no such picture") == nil)
+
+        // The pictures are on the page, each where the words have it. Told by the
+        // sheet's own dark, which is a little blue and which nothing else on a light
+        // page is: the whole page has some three times as much of it as the page
+        // with only the first section's picture, and a page with none has none.
+        func sheetDark(_ guide: Guide) throws -> Int {
+            let page = GuidePage(guide: guide, chordColour: .systemOrange).frame(width: GuideLook.width).padding(GuideLook.margin)
+                .background(Color.white).environment(\.colorScheme, .light)
+            let size = NSHostingView(rootView: page).fittingSize
+            let host = NSHostingView(rootView: page)
+            let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
+            window.appearance = NSAppearance(named: .aqua)
+            window.contentView = host
+            host.frame = NSRect(origin: .zero, size: size)
+            host.layoutSubtreeIfNeeded()
+            Self.turn()
+            let picture = try #require(host.bitmapImageRepForCachingDisplay(in: host.bounds))
+            host.cacheDisplay(in: host.bounds, to: picture)
+            var dark = 0
+            for x in stride(from: 3, to: picture.pixelsWide, by: 6) {
+                for y in stride(from: 3, to: picture.pixelsHigh, by: 6) {
+                    guard let colour = picture.colorAt(x: x, y: y)?.usingColorSpace(.sRGB) else { continue }
+                    let (red, green, blue) = (colour.redComponent * 255, colour.greenComponent * 255, colour.blueComponent * 255)
+                    if max(red, green, blue) < 64, blue - red >= 2.5 { dark += 1 }
+                }
+            }
+            return dark
+        }
+        var onlyTheFirst = guide
+        var withNone = guide
+        for index in guide.sections.indices {
+            onlyTheFirst.sections[index].items = guide.sections[index].items?.map { Guide.Item(lead: $0.lead, text: $0.text, picture: nil) }
+            withNone.sections[index].items = onlyTheFirst.sections[index].items
+            withNone.sections[index].picture = nil
+        }
+        #expect(guide.picturesNamed.count == 3 && onlyTheFirst.picturesNamed.count == 1 && withNone.picturesNamed.isEmpty)
+        let (all, one, zero) = (try sheetDark(guide), try sheetDark(onlyTheFirst), try sheetDark(withNone))
+        #expect(zero == 0, "a page with no picture has \(zero) dots of the sheet's dark")
+        #expect(one > 1500, "the first section's picture is \(one) dots of the sheet's dark")
+        #expect(Double(all) > 2.6 * Double(one) && Double(all) < 3.4 * Double(one), "\(all) dots of the sheet's dark with three pictures, \(one) with one")
     }
 }
