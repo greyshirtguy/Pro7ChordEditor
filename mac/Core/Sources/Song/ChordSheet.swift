@@ -765,11 +765,21 @@ public final class ChordSheet {
     /// Ends the typing. With a name, that chord goes on the place it was being typed
     /// for; with none, nothing is changed (Esc). `onward` then moves the spot on from
     /// that place to the next word (Tab), wherever the pointer has been meanwhile.
+    ///
+    /// With a name that is empty, the box was kept with nothing in it, and that is
+    /// taken at its word: no chord is to be there, and the one that is goes. (Rule
+    /// 35a, the maintainer's, 2026-10-13: until then an empty box that was kept
+    /// changed nothing, so a chord whose name had been cleared came back.) Where
+    /// there is no chord, there is nothing to take and nothing is changed.
     public func finishTyping(_ name: String?, onward: Bool) {
         let at = typingAt
         typing = false
-        if let name, !name.isEmpty {
-            put(at.row, at.at, name)
+        if let name {
+            if name.isEmpty {
+                take(at.row, at.at)
+            } else {
+                put(at.row, at.at, name)
+            }
         }
         if onward {
             setSpot(at.row, at.at)

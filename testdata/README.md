@@ -295,6 +295,12 @@ and then a vector.
   no words", step 7).
 - A test file whose chords are not in order of place in the file: the Mac app's notes
   say no file here would notice that rule being left out.
+- In `sheet-model.json`, `typing`: a box opened on a chord, emptied, and kept (by
+  Enter, by a click on another place, by a click on the bare sheet), which takes the
+  chord off; and the same ended with Esc, which does not
+  ([`spec/03`](../spec/03-chord-sheet.md), rule 35a, new on 2026-10-13). It waits for
+  Simple Presenter to do as that rule says: the Mac app has cases of its own for it
+  meanwhile (`ChordSheetTests`, "Kept with nothing in the box").
 - In `songs/headings.cho`, a second chord on the line that has two spaces after its
   first (`[G]  Two spaces after the [C]chord`). As it is, the line's one chord is at
   the start, which is where it would be whether or not chords moved with the words

@@ -536,6 +536,62 @@ struct ChordSheetTests {
         #expect(song.asked.count == 1)
     }
 
+    @Test("Mine, not a vector. Kept with nothing in the box, the chord that was there goes: by Enter, by a click on another place, by a click on the bare sheet; Esc changes nothing; and where there was no chord, nothing is asked (rule 35a)")
+    func keptEmpty() throws {
+        // Enter.
+        var (sheet, song) = try vectors.sheet("grace")
+        sheet.setSpot(1, 8)
+        sheet.startTyping()
+        sheet.type("")
+        #expect(sheet.press(.enter))
+        #expect(!sheet.typing && sheet.chordAt(1, 8).isEmpty && sheet.chordAt(1, 0) == "G")
+        #expect(song.asked.count == 1)
+
+        // A click on another place: the one goes, and the bubble opens on the other.
+        (sheet, song) = try vectors.sheet("grace")
+        sheet.pick(1, 8)
+        sheet.type("")
+        sheet.pick(2, 5)
+        #expect(sheet.typing && sheet.typingAt == Spot(row: 2, at: 5) && sheet.chordAt(1, 8).isEmpty)
+        #expect(song.asked.count == 1)
+
+        // A click on the bare sheet.
+        (sheet, song) = try vectors.sheet("grace")
+        sheet.pick(1, 8)
+        sheet.type("")
+        sheet.settle()
+        #expect(!sheet.typing && sheet.chordAt(1, 8).isEmpty && song.asked.count == 1)
+
+        // Esc: the chord is as it was, and the song was asked nothing.
+        (sheet, song) = try vectors.sheet("grace")
+        sheet.pick(1, 8)
+        sheet.type("")
+        #expect(sheet.press(.escape))
+        #expect(!sheet.typing && sheet.chordAt(1, 8) == "G7" && song.asked.isEmpty)
+
+        // Opened and kept with its name untouched: nothing is taken off.
+        (sheet, song) = try vectors.sheet("grace")
+        sheet.pick(1, 8)
+        #expect(sheet.press(.enter))
+        #expect(sheet.chordAt(1, 8) == "G7")
+
+        // Where there is no chord, an empty box kept asks the song nothing.
+        (sheet, song) = try vectors.sheet("grace")
+        sheet.pick(1, 13)
+        #expect(sheet.entry.text.isEmpty)
+        #expect(sheet.press(.enter))
+        #expect(!sheet.typing && song.asked.isEmpty)
+
+        // On a line of chords alone, the one cleared goes and the others close up.
+        (sheet, song) = try vectors.sheet("intro")
+        let alone = try #require(sheet.rows.firstIndex { $0.kind == .line && $0.alone && $0.chords.count >= 2 })
+        let names = sheet.rows[alone].chords.map(\.name)
+        sheet.pick(alone, 0)
+        sheet.type("")
+        #expect(sheet.press(.enter))
+        #expect(sheet.rows[alone].chords.map(\.name) == Array(names.dropFirst()))
+    }
+
     @Test("Mine, not a vector. 1 to 7 put the key's chord on the spot; while a chord is typed, where the typing was, in place of what was typed (rules 24 and 39)")
     func oneToSeven() throws {
         let (sheet, _) = try vectors.sheet("grace")
