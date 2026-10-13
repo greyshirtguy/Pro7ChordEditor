@@ -9,6 +9,9 @@
 //     them, in order of place, each with the range the rules give it (Chords.ranges).
 //     In every song from Multitracks looked at, that is the order the file has them in
 //     already, so a box given the chords it had is, entry for entry, what it was.
+//   - The one thing done to an entry that is not a chord: where a line of chords alone
+//     is made longer or shorter, the ends of its range go with the words
+//     (`moveOtherRanges`), as Simple Presenter moves them.
 //   - The file is never half written. The whole message is written to a new file beside
 //     the song's own, pushed out of the system's keeping onto the disk, and put in the
 //     place of the old one in one step. Then it is read back, and must be byte for byte
@@ -37,6 +40,40 @@ func write(chords: [Chord], into text: inout RVData_Graphics.Text) {
         entries.append(entry)
     }
     text.attributes.customAttributes = entries
+}
+
+/// What a box says of a range of its words, and is not a chord, goes with the words
+/// when a line of chords alone in it is made longer or shorter: `lineStart` is where
+/// that line began, `was` how long it was and `now` how long it is.
+///
+/// A text box has custom attributes that are no chords: "these are in capitals", a
+/// font's first size, a gradient. Most boxes that hold a line of chords alone, as
+/// Multitracks makes them, say of all their words that they are in capitals. Left as it
+/// was, that range would stop short of a stand-in put in, and with a chord taken off
+/// would end past the last of the words. So each end of each such range is moved as
+/// RTFWords.placeAfter says, which is what Simple Presenter does and A GUESS at what
+/// ProPresenter does (decided by the maintainer on 2026-10-13: "let's copy simple
+/// presenter for now").
+///
+/// Nothing else of such an entry changes, none is added, taken away or put in another
+/// place in the list, and one that has no range is not given one. An end that is where
+/// it was is not written again. (The chords' own ranges are written afresh by
+/// `write(chords:into:)`, after this.)
+func moveOtherRanges(of text: inout RVData_Graphics.Text, lineStart: Int, was: Int, now: Int) {
+    guard was != now else { return }
+    for index in text.attributes.customAttributes.indices {
+        let entry = text.attributes.customAttributes[index]
+        if case .chord? = entry.attribute { continue }
+        guard entry.hasRange else { continue }
+        let start = RTFWords.placeAfter(Int(entry.range.start), lineStart: lineStart, was: was, now: now)
+        let end = RTFWords.placeAfter(Int(entry.range.end), lineStart: lineStart, was: was, now: now)
+        if start != Int(entry.range.start) {
+            text.attributes.customAttributes[index].range.start = Int32(start)
+        }
+        if end != Int(entry.range.end) {
+            text.attributes.customAttributes[index].range.end = Int32(end)
+        }
+    }
 }
 
 /// A song's file on disk.

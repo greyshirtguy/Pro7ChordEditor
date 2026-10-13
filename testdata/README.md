@@ -295,6 +295,16 @@ and then a vector.
   no words", step 7).
 - A test file whose chords are not in order of place in the file: the Mac app's notes
   say no file here would notice that rule being left out.
+- `placeAfter`: where the ends of a text box's other ranges go when a line of chords
+  alone in it is made longer or shorter
+  ([`spec/01-file-format.md`](../spec/01-file-format.md), "The box's other ranges",
+  decided on 2026-10-13: the apps now do as Simple Presenter does). A vector made
+  from Simple Presenter's own `rtfstandins::placeAfter`, by `tools/make-vectors`.
+  Until there is one, the cases are those of its own test
+  (`reference/simple-presenter/tests/tst_rtfstandins.cpp`), which the Mac app's
+  tests have taken over as they stand (`StandInsInRTFTests`); and what the song
+  itself then writes is held on Chords With No Words, every box of which says of
+  all its words that they are in capitals (`ChordsWithNoWordsTests`).
 - In `sheet-model.json`, `typing`: a box opened on a chord, emptied, and kept (by
   Enter, by a click on another place, by a click on the bare sheet), which takes the
   chord off; and the same ended with Esc, which does not

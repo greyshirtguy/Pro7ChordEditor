@@ -530,7 +530,7 @@ And the same day, on how someone new is to find out what the sheet can do:
     leaves them, as the pages say, so a range over the whole line ends past the
     words once a chord is taken off. Said to the maintainer, with what this
     session would do: follow Simple Presenter, so that no range is ever written
-    that ends past the words.
+    that ends past the words. (**Settled on 2026-10-13**: decision 79.)
 72. **An empty box that is kept takes the chord off** (`spec/03`, rule 35a, new: the
     maintainer's, 2026-10-13). One line of `ChordSheet.finishTyping`: a name that is
     empty takes, where it used to do nothing. No vector is contradicted, and none
@@ -585,6 +585,23 @@ And the same day, on how someone new is to find out what the sheet can do:
     latest; its text says at the top where Windows' downloads are meanwhile. **To
     say to the maintainer**: that this is so, and that it can be made a pre-release
     again until both are there.
+79. **A text box's other ranges go with the words** when a line of chords alone in
+    it is made longer or shorter (`spec/01`, "The box's other ranges"; the
+    maintainer's, 2026-10-13: "let's copy simple presenter for now"). What was
+    open under decision 71. Each end of each range that is no chord is moved as
+    Simple Presenter's `placeAfter` moves it (`RTFWords.placeAfter`, and
+    `moveOtherRanges` in `Writing.swift`, asked by `OpenSong` only where the line's
+    RTF is changed). **A guess at what ProPresenter does**, as the page says. No
+    vector holds it: the cases are the reference's own test's, taken over as they
+    stand, and a vector is asked for in `testdata/README.md`. On Chords With No
+    Words, every box of which is in capitals over all its words, a chord more,
+    fewer or none on each line leaves the box in capitals over all its words
+    still; left out, that fails 52 times over. **Up to 1.0.0 this app left such a
+    range as it was**, so a song whose line of chords alone it made shorter has a
+    range that ends past its words. Nothing looks for that or mends it; what
+    ProPresenter makes of it is not known. `AGENTS.md` said that a write changes,
+    for such a line, "the characters they hang on" and nothing else; a few words
+    were added to it so that it is still true.
 
 ## How it is laid out, and why
 

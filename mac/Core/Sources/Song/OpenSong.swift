@@ -278,6 +278,9 @@ public final class OpenSong {
             if new != old {
                 guard let rtf = RTFWords.rtf(text.rtfData, withLine: line, become: new) else { throw Refusal.cannotBeWritten }
                 text.rtfData = Data(rtf)
+                // What the box says of a range of its words ("these are in capitals")
+                // goes with the words, as the chords of the lines below do.
+                moveOtherRanges(of: &text, lineStart: start, was: old.length, now: new.length)
             }
             for (n, name) in names.enumerated() {
                 kept.append(Chord(at: start + n * 2, name: name))

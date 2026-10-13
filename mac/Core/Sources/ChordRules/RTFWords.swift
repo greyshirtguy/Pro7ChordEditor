@@ -405,4 +405,31 @@ extension RTFWords {
         guard words(ofRTF: made).units == standIns.units else { return nil }
         return made
     }
+
+    /// Where a place in the words is, once a line of them that began at `lineStart` and
+    /// was `was` units long has been made `now` units long by putting units on its end
+    /// or taking them off it: which is what a run of stand-ins made longer or shorter
+    /// is. The reference's `rtfstandins::placeAfter`, and held to its own tests' cases.
+    ///
+    /// It is for what a text box keeps beside its words that is said of a range of them
+    /// and is not a chord: "these are in capitals". A range is two such places, its
+    /// start and its end.
+    ///
+    ///   - A place at the line's old end, or past it, moves by as much as the line grew
+    ///     or shrank. So a range that ended with the line, or went on past it, still
+    ///     does; one that began after the line is over the same words as before; and a
+    ///     range over all the words is over all of them still.
+    ///   - A place before the line's old end stays; or, where the line has shrunk and
+    ///     what the place was on is gone, comes back to the line's new end.
+    ///
+    /// It is what a text system does with what is set on characters when more are
+    /// typed after them, and so what ProPresenter is taken to do, WHICH IS A GUESS
+    /// (spec/01-file-format.md, "Chords with no words").
+    public static func placeAfter(_ place: Int, lineStart: Int, was: Int, now: Int) -> Int {
+        if place >= lineStart + was {
+            return place + (now - was)
+        }
+        // (Only where the line has shrunk is anything before its old end past its new one.)
+        return min(place, lineStart + min(was, now))
+    }
 }

@@ -6,6 +6,10 @@
 //   - a blank slide whose chords are taken off again in the same sitting leaves the
 //     file byte for byte what it was.
 //
+// And, since 2026-10-13: what a box says of a range of its words ("these are in
+// capitals") goes with the words when a line of chords alone in it is made longer or
+// shorter, as Simple Presenter has it.
+//
 // (The third, that a song so changed opens in ProPresenter with its chords in place,
 // is not a thing a test can tell: it is asked of the maintainer.)
 //
@@ -43,14 +47,36 @@ struct ChordsWithNoWordsTests {
 
     /// A message with one text box's words and chords made another's: what a change of
     /// chords with no words may change, and nothing else.
-    private func with(wordsAndChordsOf id: String, from other: RVData_Presentation, in made: RVData_Presentation) throws -> RVData_Presentation {
+    ///
+    /// `line`: a line of chords alone in the box, that began at `start`, has been made
+    /// `now` long from `was`. Then what the box says of a range of its words that is
+    /// no chord has gone with the words, and that is the one other thing that may have
+    /// changed: each end of each such range, and nothing else of the entry. (Said here
+    /// in this test's own words, and not by asking the code that is being tried: a
+    /// place at the line's old end or past it has moved by as much as the line grew or
+    /// shrank; one before it has stayed, unless the line now ends before it, and then
+    /// it is the line's new end.)
+    private func with(wordsAndChordsOf id: String, from other: RVData_Presentation, in made: RVData_Presentation,
+                      line: (start: Int, was: Int, now: Int)? = nil) throws -> RVData_Presentation {
         var made = made
         let here = try #require(place(of: id, in: made))
         let there = try #require(place(of: id, in: other))
         let theirs = other.cues[there.cue].actions[there.action].slide.presentation.baseSlide.elements[there.element].element.text
+        var others = entries(at: here, in: made).filter { !isChord($0) }
+        if let line {
+            func moved(_ place: Int32) -> Int32 {
+                let place = Int(place)
+                return Int32(place >= line.start + line.was ? place + line.now - line.was : min(place, line.start + line.now))
+            }
+            for index in others.indices where others[index].hasRange {
+                let range = others[index].range
+                if moved(range.start) != range.start { others[index].range.start = moved(range.start) }
+                if moved(range.end) != range.end { others[index].range.end = moved(range.end) }
+            }
+        }
         made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.rtfData = theirs.rtfData
         made.cues[here.cue].actions[here.action].slide.presentation.baseSlide.elements[here.element].element.text.attributes.customAttributes
-            = entries(at: here, in: made).filter { !isChord($0) } + theirs.attributes.customAttributes.filter(isChord)
+            = others + theirs.attributes.customAttributes.filter(isChord)
         return made
     }
 
@@ -143,7 +169,21 @@ struct ChordsWithNoWordsTests {
                     let span = try #require(RTFWords.span(ofLine: line, of: was))
                     #expect(Array(made.prefix(span.lowerBound)) == Array(was.prefix(span.lowerBound)), "\(path), slide \(box.slide), line \(line), to \(count): before the line")
                     #expect(Array(made.suffix(was.count - span.upperBound)) == Array(was.suffix(was.count - span.upperBound)), "\(path), slide \(box.slide), line \(line), to \(count): after the line")
-                    #expect(try with(wordsAndChordsOf: box.element, from: after, in: before) == after, "\(path), slide \(box.slide), line \(line), to \(count): something else changed")
+                    // (But this: what the box says of a range of its words has gone with
+                    // the words.)
+                    #expect(try with(wordsAndChordsOf: box.element, from: after, in: before, line: (start, old.length, new.length)) == after, "\(path), slide \(box.slide), line \(line), to \(count): something else changed")
+                    if path == Self.shaped {
+                        // Every box of this file says of all its words that they are in
+                        // capitals, as most that hold a line of chords alone do in real
+                        // songs. It says so of all of them still: not of one fewer, with
+                        // a chord put on, and not of words that are no longer there.
+                        let others = entries(at: here, in: after).filter { !isChord($0) }
+                        let whole = now.words.length
+                        #expect(others.count == 1 && others.allSatisfy { $0.range.start == 0 && Int($0.range.end) == whole }, "\(path), slide \(box.slide), line \(line), to \(count): in capitals from \(others.map { "\($0.range.start) to \($0.range.end)" }), of \(whole)")
+                        if case .capitalization? = others.first?.attribute {} else {
+                            Issue.record("the range was to be the one that says capitals")
+                        }
+                    }
 
                     // And it is one step, that undo takes back to the byte.
                     try song.undo()

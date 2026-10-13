@@ -199,7 +199,9 @@ custom_attributes {
 
 - The list holds other things too (capitals, a font's first size, a gradient). An
   entry is a chord if its `chord` field is the one that is set. The others are not to
-  be touched or reordered.
+  be touched or reordered, with one exception: where a
+  [line of chords alone](#the-boxs-other-ranges) is made longer or shorter, the ends
+  of their ranges go with the words.
 - `chord` is the chord's name as it is to be read, in the song's **original key**
   whatever key it is shown in. It is free text. Most are chords; some are not ("N.C.",
   or `C /// | Am ///` typed by someone to show bars). Whatever it is, it is kept as it
@@ -269,6 +271,9 @@ one case where the app writes words. When it does:
   U+200B where it has no chord**, so that it is a line of chords alone still;
 - the chords of the line go on places 0, 2, 4 ... of it, and the chords of the lines
   after it move by as many places as the line grew or shrank;
+- what the box says of a range of its words that is not a chord ("these are in
+  capitals") has the ends of that range go with the words:
+  [the box's other ranges](#the-boxs-other-ranges);
 - every other line of the box, and all its format, stays as it was.
 
 To the letter:
@@ -313,8 +318,8 @@ model and writing the whole RTF again in its own words. **Do not copy that.** It
 an app that edits text anyway; here it would rewrite the RTF of someone's library for
 the sake of one line. Instead change the RTF **in place**. (Simple Presenter does so
 too since the change that followed its version 0.89, by these same steps and held to
-the same vectors: `reference/simple-presenter/src/rtfstandins.h`. It differs in two
-things, both said after the steps.)
+the same vectors: `reference/simple-presenter/src/rtfstandins.h`. It differs in one
+thing, said after the steps.)
 
 1. Read the RTF, keeping for every unit of its plain text the bytes it was written
    with: a plain character's one byte; a control word's backslash, letters, number
@@ -354,28 +359,9 @@ would do the same to those after it; so such a line is refused. What ProPresente
 Windows writes is **not known** ([Not known](#not-known)): if it is that, these steps
 are to be widened when a file of it has been seen, in both apps and in the vectors.
 
-**Where Simple Presenter differs**, having these steps too:
-
-- Where there is no result it does not refuse. It has a writer of RTF, and writes the
-  text box's words again whole as it did before, and says so in its log. The apps,
-  which have none, refuse.
-- **The other ranges of the box go with the words there, and here they do not.**
-  Besides its chords a text box has custom attributes that are said of a range of its
-  words and are not chords ("these are in capitals"), and these pages leave every one
-  of them as it is ([Never touched](#never-touched)). A line of stand-ins made longer
-  or shorter leaves such a range where the words no longer are: one over all the
-  words stops short of the stand-in put in, or, with a chord taken off, **ends past
-  the last of the words**. **Known**, of real songs (the Linux machine, 2026-10-12,
-  read and not changed): of 164 text boxes with a line of chords alone in 120
-  presentations, 96 have such a range, every one of them capitals over all the words
-  of a box that holds nothing but the line. Simple Presenter moves the ends of these
-  ranges with the words (`rtfstandins::placeAfter`: a place at the line's old end or
-  past it moves by as much as the line grew or shrank; one before it stays, or comes
-  back to the line's new end if what it was on is gone), which is what a text system
-  does when characters are typed after others, and **a guess** at what ProPresenter
-  does. What ProPresenter makes of a range that ends past the words is **not known**.
-  It is the maintainer's to say whether the apps are to do the same; until then the
-  three do not write the same file for these boxes, in that one field.
+**Where Simple Presenter differs**, having these steps too: where there is no result
+it does not refuse. It has a writer of RTF, and writes the text box's words again
+whole as it did before, and says so in its log. The apps, which have none, refuse.
 
 `testdata/vectors/stand-ins-in-rtf.json` has RTF in every shape real songs were found
 to have, and in some they were not, each with the bytes it becomes for a number of
@@ -395,6 +381,76 @@ test of its own (`NSAttributedString`); on Windows there is no such second reade
 to ask. **Seen**, by the maintainer in ProPresenter on 2026-10-12, of chords put on
 with the Mac app: "They showed". (ProPresenter does more with a text box than read
 its RTF, which is why it had to be looked at there.)
+
+### The box's other ranges
+
+**Decided by the maintainer on 2026-10-13**, as Simple Presenter does it: "let's copy
+simple presenter for now". (Until then the apps left these ranges as they were, and
+the three did not write the same file for such a box, in this one field.)
+
+Besides its chords a text box has custom attributes that are said of a range of its
+words and are not chords: "these are in capitals", a gradient over some of them. A
+line of stand-ins made longer or shorter would leave such a range where the words no
+longer are: one over all the words would stop short of the stand-in put in, or, with
+a chord taken off, **end past the last of the words**. So when the text of a line of
+chords alone is changed by the steps above, **each end of each such range goes with
+the words**. For a line that began at `lineStart` and was `was` units long, and is now
+`now` units long, a place in the words becomes (`placeAfter`):
+
+- at the line's old end (`lineStart + was`) or past it: the place, moved by as much as
+  the line grew or shrank (`now - was`);
+- before that: the place as it was; or, if the line now ends before it, the line's new
+  end (`lineStart + now`).
+
+So a range that ended with the line, or went on past it, still does; one that began
+after the line is over the same words as before; and a range over all the words is
+over all of them still.
+
+To the letter:
+
+- It is done to every entry of `custom_attributes` that is not a chord and has a
+  `range`: to its `start` and to its `end`, each by itself. Nothing else of the entry
+  changes; none is added, taken away or put elsewhere in the list; and an entry that
+  has no `range` is not given one.
+- It is done when the line's text is changed, and only then. Chords renamed on the
+  stand-ins they have change no range but their own.
+- It is not done where a blank slide is given its first chords, or a text box
+  ([below](#chords-onto-a-blank-slide)): what such a box keeps for stretches of its
+  text stays as it was, as that section says. From then on its line is a line of
+  chords alone like any other, and this rule is kept for it.
+- Undo puts the ranges back with everything else, and so does a
+  [change of mind](#a-change-of-mind).
+
+As it comes out, for a line of two chords alone (three units) that begins at 6, after
+six units of words and before a line break at 9 and more words from 10 to 14:
+
+| A place at | With a chord more (now 5) | With a chord fewer (now 1) |
+| --- | --- | --- |
+| 0, or 5 | the same | the same |
+| 6 | 6 | 6 |
+| 7 | 7 | 7 |
+| 8 | 8 | 7 |
+| 9 | 11 | 7 |
+| 10 | 12 | 8 |
+| 14 | 16 | 12 |
+
+and for a box that holds nothing but the line (from 0), in capitals from 0 to 3: from
+0 to 5 with a chord more, and from 0 to 1 with a chord fewer, or with none.
+
+**Known**, of real songs (the Linux machine, 2026-10-12, read and not changed): of
+164 text boxes with a line of chords alone in 120 presentations, 96 have such a
+range, every one of them capitals over all the words of a box that holds nothing but
+the line. Moving a range so is what a text system does when characters are typed
+after others, and **a guess** at what ProPresenter does. What ProPresenter makes of a
+range that ends past the words is **not known**; so neither is what it makes of a
+song whose line of chords alone was made shorter by the Mac app up to its version
+1.0.0, or by the Windows app before it had this rule, which left the range as it was.
+Nothing looks for such a range or mends it.
+
+No vector holds this yet (`testdata/README.md`, "Still wanted"). Until one does, the
+cases are those of Simple Presenter's own test of `placeAfter`
+(`reference/simple-presenter/tests/tst_rtfstandins.cpp`), which both apps' tests
+take over as they stand.
 
 ### Chords onto a blank slide
 
@@ -557,7 +613,8 @@ guess**: it has not been tried in ProPresenter.
 
 1. Read the whole file into the message, as it is on disk now.
 2. Change only what the change is about: a box's chord entries, `music`, or the RTF of
-   a line of chords alone.
+   a line of chords alone (and with that, where [the box's other
+   ranges](#the-boxs-other-ranges) end).
 3. Serialise the whole message and write it to a new file in the same folder, then put
    that in the place of the old one in one step (`FileManager.replaceItemAt` on the
    Mac, `File.Replace` on Windows), so that the song is never half written.
@@ -570,7 +627,8 @@ Before the first of these for a file, a copy of it as it was is kept
 ## Never touched
 
 - The words, and their RTF (but for a line of chords alone).
-- Every custom attribute that is not a chord, and the order of those.
+- Every custom attribute that is not a chord, and the order of those (but for the
+  ends of its range, where a line of chords alone is made longer or shorter).
 - Every field of the file not named on this page: slides, groups, arrangements, media,
   actions, looks, `name`, `uuid`, the dates, the CCLI block, `chord_chart`.
 - The file's name and place. A change is saved into the song's own file. (The old

@@ -287,4 +287,49 @@ struct OpeningOfAnRTFTests {
         }
         #expect(made > 20)
     }
+
+    // ---- What is said of a range of the words goes with the words
+    //
+    // RTFWords.placeAfter, which is the reference's `rtfstandins::placeAfter`. No vector
+    // holds it yet (testdata/README.md, "Still wanted"): these are the cases of the
+    // reference's own tests, reference/simple-presenter/tests/tst_rtfstandins.cpp, each
+    // with the answer it has there.
+
+    @Test("A range over all the words is over all of them still")
+    func overAllTheWords() {
+        // A text box that holds two chords alone (three units), in capitals from 0 to 3
+        #expect(RTFWords.placeAfter(0, lineStart: 0, was: 3, now: 5) == 0)
+        #expect(RTFWords.placeAfter(3, lineStart: 0, was: 3, now: 5) == 5)    // a chord more
+        #expect(RTFWords.placeAfter(3, lineStart: 0, was: 3, now: 1) == 1)    // a chord fewer
+        #expect(RTFWords.placeAfter(3, lineStart: 0, was: 3, now: 3) == 3)    // the same number, hung on another character
+        // The last chord gone from a line on plain spaces: one zero-width space is left
+        #expect(RTFWords.placeAfter(1, lineStart: 0, was: 1, now: 1) == 1)
+    }
+
+    @Test("A range that begins after the line is over the same words as before")
+    func afterTheLine() {
+        // "Words" and a break (six units), then two chords alone from 6 to 9, a break,
+        // and "more" from 10 to 14
+        #expect(RTFWords.placeAfter(10, lineStart: 6, was: 3, now: 5) == 12)
+        #expect(RTFWords.placeAfter(14, lineStart: 6, was: 3, now: 5) == 16)
+        #expect(RTFWords.placeAfter(10, lineStart: 6, was: 3, now: 1) == 8)
+        #expect(RTFWords.placeAfter(14, lineStart: 6, was: 3, now: 1) == 12)
+        // (One that begins at the break after the line begins there still.)
+        #expect(RTFWords.placeAfter(9, lineStart: 6, was: 3, now: 5) == 11)
+        #expect(RTFWords.placeAfter(9, lineStart: 6, was: 3, now: 1) == 7)
+    }
+
+    @Test("A place before the line's end stays, or comes back to the line's new end if what it was on is gone")
+    func beforeTheLinesEnd() {
+        // The words above the line, and the line's own first stand-in
+        #expect(RTFWords.placeAfter(0, lineStart: 6, was: 3, now: 5) == 0)
+        #expect(RTFWords.placeAfter(5, lineStart: 6, was: 3, now: 1) == 5)
+        #expect(RTFWords.placeAfter(6, lineStart: 6, was: 3, now: 1) == 6)
+        #expect(RTFWords.placeAfter(7, lineStart: 6, was: 3, now: 5) == 7)
+        // On the line, where the line has shrunk: what it was on is gone
+        #expect(RTFWords.placeAfter(7, lineStart: 6, was: 3, now: 1) == 7)
+        #expect(RTFWords.placeAfter(8, lineStart: 6, was: 3, now: 1) == 7)
+        #expect(RTFWords.placeAfter(8, lineStart: 6, was: 5, now: 3) == 8)
+        #expect(RTFWords.placeAfter(10, lineStart: 6, was: 5, now: 3) == 9)
+    }
 }

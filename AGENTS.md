@@ -27,7 +27,8 @@ These are not style. A change that breaks one of them is wrong however well it w
 1. **A song's file is never left worse than it was found.** A `.pro` file holds far
    more than this app understands. Every write parses the whole file, changes only what
    the change is about (a text box's chords, the song's key, and for a line of chords
-   with no words the characters they hang on), and writes the whole thing back with
+   with no words the characters they hang on, with where the box's other ranges over
+   them end), and writes the whole thing back with
    everything else as it came, fields this app has never heard of included. Never build
    a file from the parts you know. The file is written beside itself and swapped in, a
    copy of what it was is kept first ([spec/07-backups.md](spec/07-backups.md)), and

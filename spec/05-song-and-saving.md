@@ -89,6 +89,9 @@ Request 2, to the letter:
 - A chord that stands on the line, or on the line break that ends it, is one of the
   line's, and is replaced by the names. One before the line stays; one after it
   moves by as much as the line grew or shrank.
+- Where the line's text is changed, what the box says of a range of its words that
+  is not a chord has the ends of that range go with the words
+  ([01-file-format.md](01-file-format.md), The box's other ranges).
 - No names for a blank slide is nothing to do, whether it has a box or none: nothing
   is written, and nothing is made.
 - An empty `element` for a slide that is not a blank slide with no box (it has a box
