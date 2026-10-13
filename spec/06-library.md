@@ -284,9 +284,11 @@ words; dropping a `.pro` file on the window to open it.
 ## Settings
 
 20a. The settings are in sections, each with its own name:
-    - **Chords**: the colour of a chord's name on the chord sheet (as it comes,
-      `#ffd9a8`) and the colour of a chord in the ChordPro text (as it comes, the
-      system's orange, or `#ff9500` where a system has none). Each is chosen with the
+    - **Chords**: the colour of a chord's name on the chord sheet (as it comes, the
+      sheet's orange, `#ff8a1f`: the maintainer's, 2026-10-14, "lets make the default
+      chord color orange now"; until then it was Simple Presenter's pale `#ffd9a8`,
+      which Simple Presenter still has) and the colour of a chord in the ChordPro
+      text (as it comes, the system's orange, or `#ff9500` where a system has none). Each is chosen with the
       system's own colour picker, has a button, "Usual Colour", that puts back the
       one it came with, and is shown beside it as it will look: a chord in its bubble
       over a word, and a line of ChordPro. They are only how this app draws a chord:

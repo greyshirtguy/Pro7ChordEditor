@@ -413,20 +413,20 @@ struct PictureTests {
     }
 
     /// Puts the pointer on a place of the sheet in a window that has been laid out,
-    /// as the mouse would, with Option held or not; and gives the window a moment to
+    /// as the mouse would, with Command held or not; and gives the window a moment to
     /// say what it then has to say.
-    private func point(at spot: Spot, onItsChord: Bool = false, optionHeld: Bool = false, in window: NSView) {
+    private func point(at spot: Spot, onItsChord: Bool = false, commandHeld: Bool = false, in window: NSView) {
         guard let canvas = canvas(in: window), let point = canvas.point(over: spot, onItsChord: onItsChord) else {
             Issue.record("the window has no sheet, or the sheet no such place")
             return
         }
         canvas.pointerMoved(to: point, shift: false)
-        canvas.modifiers(optionHeld ? [.option] : [])
+        canvas.modifiers(commandHeld ? [.command] : [])
         RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.2))
         window.layoutSubtreeIfNeeded()
     }
 
-    @Test("The line of hints under the sheet: what it says for each thing that can be going on, in the light and the dark, and where there is little room; and the window with the pointer on a word, its line highlighted, with Option held, narrow, and on a line of chords alone")
+    @Test("The line of hints under the sheet: what it says for each thing that can be going on, in the light and the dark, lit, and where there is little room; and the window with the pointer on a word, its line highlighted, on a chord, with Command held, narrow, over the key's chords, and on a line of chords alone")
     func theLineOfHints() async throws {
         let mac = try macWithHistory()
         let model = await modelWithASongOpen(mac, editor: .sheet)
@@ -434,19 +434,23 @@ struct PictureTests {
         let cases: [(String, [SheetHints.Hint])] = [
             ("the pointer on a chord", SheetHints.hints(.onChord)),
             ("on a place with no chord", SheetHints.hints(.onPlace)),
-            ("Option or Command held", SheetHints.hints(.onPlace, held: true)),
-            ("held, the line has chords", SheetHints.hints(.onPlace, held: true, paste: Paste(lines: 1, replaces: true))),
-            ("held, a verse copied", SheetHints.hints(.onPlace, held: true, paste: Paste(lines: 4, replaces: true))),
+            ("Command held", SheetHints.hints(.onPlace, command: true)),
+            ("held, the line has chords", SheetHints.hints(.onPlace, command: true, paste: Paste(lines: 1, replaces: true))),
+            ("held, a verse copied", SheetHints.hints(.onPlace, command: true, paste: Paste(lines: 4, replaces: true))),
             ("a chord being typed", SheetHints.hints(.typing(onChord: false, empty: false))),
             ("the box cleared, on a chord", SheetHints.hints(.typing(onChord: true, empty: true))),
-            ("a chord being carried", SheetHints.hints(.carrying)),
-            ("carried, with Option held", SheetHints.hints(.carrying, held: true)),
+            ("a chord being carried", SheetHints.hints(.carrying(fromStrip: false))),
+            ("carried, with Option held", SheetHints.hints(.carrying(fromStrip: false), option: true)),
+            ("carried from the strip", SheetHints.hints(.carrying(fromStrip: true))),
+            ("over the key's chords", SheetHints.strip),
             ("ProPresenter running", SheetHints.cannotChange),
             ("nobody at the sheet", SheetHints.idle),
         ]
         /// Every case, each fitted into this much room as the line under the sheet
-        /// fits it, with what it is a case of before it.
-        func all(room: Double) -> some View {
+        /// fits it and on the line's own ground, with what it is a case of before
+        /// it. `lit`: how much the ground is lit, as it is for a moment when what is
+        /// said has just changed.
+        func all(room: Double, lit: Double = 0) -> some View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(cases.enumerated()), id: \.offset) { _, one in
                     let fit = HintFit.fit(one.1, in: room)
@@ -456,25 +460,31 @@ struct PictureTests {
                             .foregroundStyle(.tertiary)
                             .frame(width: 190, alignment: .leading)
                         HintRow(hints: one.1, fit: fit)
-                            .frame(width: room, height: HintFit.height(of: fit), alignment: .leading)
+                            .padding(.horizontal, HintFit.sides)
+                            .frame(width: room + 2 * HintFit.sides, height: HintFit.height(of: fit), alignment: .leading)
                             .clipped()
+                            .background(HintGround(said: [], shown: lit))
                     }
-                    .padding(.horizontal, 12)
-                    Divider()
+                    .padding(.leading, 12)
+                    Color(nsColor: .windowBackgroundColor).frame(height: 3)
                 }
                 Spacer(minLength: 0)
             }
             .background(Color(nsColor: .windowBackgroundColor))
         }
         // (Tall enough for three of the rows to be two lines.)
-        let tall = Double(cases.count) * 31 + 80
-        try draw(all(room: 946), named: "45 the line of hints, all it says", size: NSSize(width: 190 + 24 + 946, height: tall))
-        try draw(all(room: 946), named: "46 the line of hints, in the dark", size: NSSize(width: 190 + 24 + 946, height: tall), dark: true)
+        let tall = Double(cases.count) * 33 + 80
+        func wide(_ room: Double) -> NSSize { NSSize(width: 190 + 12 + room + 2 * HintFit.sides, height: tall) }
+        try draw(all(room: 946), named: "45 the line of hints, all it says", size: wide(946))
+        try draw(all(room: 946), named: "46 the line of hints, in the dark", size: wide(946), dark: true)
+        // As it is for a moment when what it says has just changed: lit.
+        try draw(all(room: 946, lit: 1), named: "60 the line of hints, lit", size: wide(946))
+        try draw(all(room: 946, lit: 1), named: "61 the line of hints, lit, in the dark", size: wide(946), dark: true)
         // With less room: the last hints are left off; the two sentences on copying
         // go one under the other, and then are drawn smaller.
-        try draw(all(room: 720), named: "53 the line of hints, with 720 of room", size: NSSize(width: 190 + 24 + 720, height: tall))
-        try draw(all(room: 560), named: "54 the line of hints, with 560 of room", size: NSSize(width: 190 + 24 + 560, height: tall))
-        try draw(all(room: 340), named: "59 the line of hints, with 340 of room", size: NSSize(width: 190 + 24 + 340, height: tall))
+        try draw(all(room: 720), named: "53 the line of hints, with 720 of room", size: wide(720))
+        try draw(all(room: 560), named: "54 the line of hints, with 560 of room", size: wide(560))
+        try draw(all(room: 340), named: "59 the line of hints, with 340 of room", size: wide(340))
 
         // In the window: under the sheet, over the quiet line.
         let sheet = try #require(model.sheet)
@@ -485,17 +495,32 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "48 the sheet, the pointer on a word", size: Self.sheetSize) { window in
             point(at: Spot(row: second, at: 13), in: window)
         }
-        // And with Option held: how that line's chords are copied, and pasted onto it.
-        try draw(LibraryWindow(model: model), named: "49 the sheet, Option held", size: Self.sheetSize, dark: true) { window in
-            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        // The pointer on a chord: that it can be dragged, and a copy of it.
+        let chord = try #require(sheet.rows[first].chords.dropFirst().first)
+        try draw(LibraryWindow(model: model), named: "62 the sheet, the pointer on a chord", size: NSSize(width: 1280, height: 800)) { window in
+            point(at: Spot(row: first, at: chord.at), onItsChord: true, in: window)
         }
-        try draw(LibraryWindow(model: model), named: "55 the sheet, Option held, at the size the app opens at", size: NSSize(width: 1280, height: 800)) { window in
-            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        // And with Command held: how that line's chords are copied, and pasted onto it.
+        try draw(LibraryWindow(model: model), named: "49 the sheet, Command held", size: Self.sheetSize, dark: true) { window in
+            point(at: Spot(row: first, at: 8), commandHeld: true, in: window)
         }
-        try draw(LibraryWindow(model: model), named: "56 the sheet, Option held, in a narrow window", size: NSSize(width: 900, height: 560)) { window in
-            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        try draw(LibraryWindow(model: model), named: "55 the sheet, Command held, at the size the app opens at", size: NSSize(width: 1280, height: 800)) { window in
+            point(at: Spot(row: first, at: 8), commandHeld: true, in: window)
         }
-        model.holds(false)
+        try draw(LibraryWindow(model: model), named: "56 the sheet, Command held, in a narrow window", size: NSSize(width: 900, height: 560)) { window in
+            point(at: Spot(row: first, at: 8), commandHeld: true, in: window)
+        }
+        model.holds(command: false, option: false)
+        // The pointer over the key's chords at the top of the sheet.
+        model.sheetIs(.nothing)
+        model.pointerIsOverTheKeyChords(true)
+        try draw(LibraryWindow(model: model), named: "63 the sheet, the pointer over the key's chords", size: NSSize(width: 1280, height: 800))
+        // (A window that goes takes the pointer off its strip with it: so it is put
+        // there again for the next.)
+        #expect(!model.overKeyChords)
+        model.pointerIsOverTheKeyChords(true)
+        try draw(LibraryWindow(model: model), named: "64 the same, in the dark", size: NSSize(width: 1280, height: 800), dark: true)
+        model.pointerIsOverTheKeyChords(false)
         // The highlighted line in another colour, chosen in the settings.
         model.setSheetLineColour("#5fd0ff")
         try draw(LibraryWindow(model: model), named: "57 the sheet, another colour for the highlighted line", size: Self.sheetSize) { window in
@@ -516,9 +541,9 @@ struct PictureTests {
         let shaped = try #require(model.sheet)
         let alone = try #require(shaped.rows.firstIndex { $0.alone && !$0.blank && !$0.chords.isEmpty }, "the song was to have a line of chords alone")
         try draw(LibraryWindow(model: model), named: "58 a line of chords alone, highlighted", size: Self.sheetSize) { window in
-            point(at: Spot(row: alone, at: 0), onItsChord: true, optionHeld: true, in: window)
+            point(at: Spot(row: alone, at: 0), onItsChord: true, commandHeld: true, in: window)
         }
-        model.holds(false)
+        model.holds(command: false, option: false)
     }
 
     @Test("Chords with no words: the song in the shapes real ones have, as it is; with chords put on its three blank slides and on its lines of chords alone; and that as ChordPro text")

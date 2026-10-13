@@ -848,6 +848,28 @@ struct ChordSheetTests {
         #expect(song.asked == ["setChords slide 3 box \"D\" [\"A\"@6] joined false"])
     }
 
+    @Test("Mine, not a vector. What a paste keeps is the WORD each chord was on, and how far into it: so between two lines of other words the chords do not keep their places along the line. (The maintainer's own example, of 2026-10-14, who expected the places kept. Open: spec/03, under rule 52b)")
+    func whatAPasteKeeps() throws {
+        let boxes = [
+            TextBox(slide: 0, group: "Verse 1", startsItsGroup: true, element: "A", words: "Amazing grace how sweet the sound",
+                    chords: [Chord(at: 1, name: "G"), Chord(at: 8, name: "G7"), Chord(at: 18, name: "C"), Chord(at: 28, name: "G")]),
+            TextBox(slide: 1, group: "Verse 1", element: "B", words: "I once was lost but now am found"),
+        ]
+        let song = StandInSong(boxes, key: "G")
+        let sheet = ChordSheet(song: song)
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        // The first word (a letter into it), the second, the fourth and the sixth.
+        #expect(sheet.copied == [.words([.init(word: 0, offset: 1, name: "G"), .init(word: 1, offset: 0, name: "G7"),
+                                         .init(word: 3, offset: 0, name: "C"), .init(word: 5, offset: 0, name: "G")])])
+        sheet.setSpot(2, 0)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 1, chords: 4))
+        // Onto the first word, which is one letter and so takes it on that letter;
+        // the second, the fourth and the sixth: "I", "once", "lost", "now". Their
+        // places along the line were 1, 8, 18 and 28.
+        #expect(sheet.rows[2].chords == [Chord(at: 0, name: "G"), Chord(at: 2, name: "G7"), Chord(at: 11, name: "C"), Chord(at: 20, name: "G")])
+    }
+
     @Test("Mine, not a vector. Whether a paste would take chords off: only where a line that what was copied would go onto has chords of its own; a line that would be passed over loses nothing; and nothing is asked of the song to find out")
     func whetherAPasteWouldReplace() throws {
         let standIns = Chords.placeholders(2)

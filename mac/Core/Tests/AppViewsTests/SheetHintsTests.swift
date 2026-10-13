@@ -60,47 +60,84 @@ struct SheetHintsTests {
 
     // ---- What is said
 
-    @Test("On a chord, the first thing said is that Delete takes it off; on a place with none, that 1 to 7 put one on")
+    @Test("On a chord, the first thing said is that Delete takes it off, and the third that it can be dragged, and a copy of it with Option; on a place with none, that 1 to 7 put one on. Nothing is said there of Option")
     func whereTheSpotIs() {
         let onChord = SheetHints.hints(.onChord)
-        #expect(onChord.first == Hint([SheetHints.delete], "takes this chord off"))
-        #expect(onChord.map(\.says) == ["takes this chord off", "change it", "drag it to another word", "click to type over it"])
+        #expect(onChord.first == Hint([SheetHints.delete], "Takes this chord off"))
+        #expect(onChord.map(\.says) == ["Takes this chord off", "Change it",
+                                        "You can drag this chord to move it anywhere. (Hold Option to drag a copy)", "Click to type over it"])
+        #expect(onChord[2].keys.isEmpty)
         let onPlace = SheetHints.hints(.onPlace)
-        #expect(onPlace.first == Hint(["1 \u{2013} 7"], "put one of the key\u{2019}s chords here"))
-        #expect(onPlace.count == 3 && onPlace[2].keys == [SheetHints.option])
+        #expect(onPlace == [Hint(["1 \u{2013} 7"], "Put one of the key\u{2019}s chords here"), Hint(["A \u{2013} G"], "Or a click: type one")])
+        // (On every word of every line it used to say to hold Option, to see how a
+        // line's chords are copied. Option no longer shows that; and what Option
+        // does do is said where it does it, on a chord.)
+        #expect(!onPlace.contains { $0.keys.contains(SheetHints.option) || $0.says.contains("Option") })
         // Not the same line for the two, nor for either and nothing.
         #expect(onChord != onPlace && SheetHints.hints(.nothing) != onPlace && SheetHints.hints(.nothing) != onChord)
         // None of these is needed whatever the room: the last are left off first.
         #expect((onChord + onPlace).allSatisfy { !$0.needed && $0.lead.isEmpty })
+        // Option held, and no chord being carried: nothing else is said for it.
+        #expect(SheetHints.hints(.onChord, option: true) == onChord && SheetHints.hints(.onPlace, option: true) == onPlace)
+    }
+
+    @Test("Every hint begins with a capital, as a sentence does")
+    func sentenceCase() {
+        typealias Paste = SheetHints.Paste
+        let every: [[Hint]] = [
+            SheetHints.hints(.onChord), SheetHints.hints(.onPlace),
+            SheetHints.hints(.typing(onChord: false, empty: false)), SheetHints.hints(.typing(onChord: true, empty: true)),
+            SheetHints.hints(.carrying(fromStrip: false)), SheetHints.hints(.carrying(fromStrip: false), option: true),
+            SheetHints.hints(.carrying(fromStrip: true)),
+            SheetHints.hints(.onPlace, command: true), SheetHints.hints(.onChord, command: true, paste: Paste(lines: 3, replaces: true)),
+            SheetHints.strip, SheetHints.idle, SheetHints.cannotChange,
+        ]
+        for hints in every {
+            #expect(!hints.isEmpty)
+            for hint in hints {
+                // What is read first: the words before the keys, where there are
+                // any, and else what the keys do.
+                let first = hint.lead.isEmpty ? hint.says : hint.lead
+                #expect(first.first?.isUppercase == true, "\(hint.read)")
+                // And nothing shouts: no word of it is all capitals but a key's name.
+                #expect(!hint.says.split(separator: " ").contains { $0.count > 3 && $0 == $0.uppercased() && $0.contains(where: \.isLetter) }, "\(hint.read)")
+            }
+        }
     }
 
     @Test("While a chord is typed: what Return, Tab and Esc do with it; and with the box empty on a chord, that Return takes the chord off")
     func whileTyping() {
         let typing = SheetHints.hints(.typing(onChord: false, empty: false))
-        #expect(typing.prefix(2) == [Hint([SheetHints.enter], "keeps it"), Hint([SheetHints.tab], "keeps it and goes on to the next word")])
-        #expect(typing.contains(Hint([SheetHints.escape], "throws it away")))
+        #expect(typing.prefix(2) == [Hint([SheetHints.enter], "Keeps it"), Hint([SheetHints.tab], "Keeps it and goes on to the next word")])
+        #expect(typing.contains(Hint([SheetHints.escape], "Throws it away")))
         // The same whatever is in the box, but for the one case: nothing in it, on a
         // chord.
         #expect(SheetHints.hints(.typing(onChord: true, empty: false)) == typing)
         #expect(SheetHints.hints(.typing(onChord: false, empty: true)) == typing)
         let cleared = SheetHints.hints(.typing(onChord: true, empty: true))
-        #expect(cleared.prefix(2) == [Hint([SheetHints.enter], "takes this chord off"), Hint([SheetHints.escape], "leaves it as it was")])
+        #expect(cleared.prefix(2) == [Hint([SheetHints.enter], "Takes this chord off"), Hint([SheetHints.escape], "Leaves it as it was")])
         // What is held makes no difference while a chord is typed: Command+V there is
-        // the box's own.
-        #expect(SheetHints.hints(.typing(onChord: true, empty: true), held: true) == cleared)
+        // the box's own. Nor does the pointer being over the key's chords.
+        #expect(SheetHints.hints(.typing(onChord: true, empty: true), command: true, option: true) == cleared)
+        #expect(SheetHints.hints(.typing(onChord: true, empty: true), overStrip: true) == cleared)
     }
 
-    @Test("While a chord is carried: that letting go moves it and Option leaves a copy; with Option held, that it will be a copy")
+    @Test("While a chord is carried: that letting go moves it and Option leaves a copy; with Option held, that it will be a copy. One of the key's chords, out of the strip: that letting go puts it there, whatever is held")
     func whileCarrying() {
-        #expect(SheetHints.hints(.carrying) == [Hint("Let go on a word to move it there"), Hint([SheetHints.option], "held as you let go, leaves a copy behind")])
-        #expect(SheetHints.hints(.carrying, held: true) == [Hint("Let go on a word to put a copy there")])
+        #expect(SheetHints.hints(.carrying(fromStrip: false)) == [Hint("Let go on a word to move it there"), Hint([SheetHints.option], "Held as you let go, leaves a copy behind")])
+        #expect(SheetHints.hints(.carrying(fromStrip: false), option: true) == [Hint("Let go on a word to put a copy there")])
+        // (Command changes nothing of it.)
+        #expect(SheetHints.hints(.carrying(fromStrip: false), command: true) == SheetHints.hints(.carrying(fromStrip: false)))
+        let fromStrip = [Hint("Let go on a word to put this chord there")]
+        #expect(SheetHints.hints(.carrying(fromStrip: true)) == fromStrip)
+        #expect(SheetHints.hints(.carrying(fromStrip: true), command: true, option: true, overStrip: true) == fromStrip)
     }
 
-    @Test("With Option or Command held, at a line: how its chords are copied and pasted, in the maintainer's words, the keys by their signs; and that a paste replaces, where the line it would go onto has chords")
+    @Test("With Command held, at a line: how its chords are copied and pasted, in the maintainer's words, the keys by their signs; and that a paste replaces, where the line it would go onto has chords. Option does not bring it up")
     func copying() {
         typealias Paste = SheetHints.Paste
         for situation in [SheetHints.Situation.onChord, .onPlace] {
-            let held = SheetHints.hints(situation, held: true)
+            let held = SheetHints.hints(situation, command: true)
             #expect(held == [Hint(lead: "Press", ["\u{2318}C"], "to copy all chords on the highlighted line.", needed: true),
                              Hint(lead: "Press", ["\u{2318}V"], "to paste previously copied chords to the highlighted line", needed: true)])
             // As it is read: the two sentences that were asked for.
@@ -108,18 +145,22 @@ struct SheetHintsTests {
                 == "Press \u{2318}C to copy all chords on the highlighted line. Press \u{2318}V to paste previously copied chords to the highlighted line")
             // The line it would go onto has chords: it says they will be replaced.
             for paste in [Paste(lines: nil, replaces: true), Paste(lines: 1, replaces: true)] {
-                let replacing = SheetHints.hints(situation, held: true, paste: paste)
+                let replacing = SheetHints.hints(situation, command: true, paste: paste)
                 #expect(replacing[0] == held[0])
                 #expect(replacing[1].says == "to paste previously copied chords to the highlighted line (Replaces existing chords)")
             }
-            #expect(SheetHints.hints(situation, held: true, paste: Paste(lines: 1, replaces: false)) == held)
+            #expect(SheetHints.hints(situation, command: true, paste: Paste(lines: 1, replaces: false)) == held)
             // A whole verse was copied: it goes onto as many lines as it has.
-            #expect(SheetHints.hints(situation, held: true, paste: Paste(lines: 4, replaces: false))[1].says
+            #expect(SheetHints.hints(situation, command: true, paste: Paste(lines: 4, replaces: false))[1].says
                 == "to paste previously copied chords to the highlighted line and the lines after it")
-            #expect(SheetHints.hints(situation, held: true, paste: Paste(lines: 4, replaces: true))[1].says
+            #expect(SheetHints.hints(situation, command: true, paste: Paste(lines: 4, replaces: true))[1].says
                 == "to paste previously copied chords to the highlighted line and the lines after it (Replaces existing chords)")
             // Not held, what a paste would do changes nothing that is said.
             #expect(SheetHints.hints(situation, paste: Paste(lines: 4, replaces: true)) == SheetHints.hints(situation))
+            // Option alone does not bring it up (it did, for a day); with Command
+            // it is Command's.
+            #expect(SheetHints.hints(situation, option: true) == SheetHints.hints(situation))
+            #expect(SheetHints.hints(situation, command: true, option: true) == held)
         }
     }
 
@@ -127,15 +168,26 @@ struct SheetHintsTests {
     func nobodyAtTheSheet() {
         #expect(SheetHints.idle == [Hint("Point at a word or a chord, and this line says what the keys do there.")])
         #expect(SheetHints.hints(.nothing) == SheetHints.idle)
-        #expect(SheetHints.hints(.nothing, held: true) == SheetHints.idle)
-        #expect(SheetHints.hints(.nothing, held: true, paste: SheetHints.Paste(lines: 2, replaces: true)) == SheetHints.idle)
+        #expect(SheetHints.hints(.nothing, command: true, option: true) == SheetHints.idle)
+        #expect(SheetHints.hints(.nothing, command: true, paste: SheetHints.Paste(lines: 2, replaces: true)) == SheetHints.idle)
+    }
+
+    @Test("With the pointer over the key's chords in the strip: that they can be dragged down onto a slide, whatever the spot was left on and whatever is held; but not while a chord is typed or carried")
+    func overTheKeysChords() {
+        #expect(SheetHints.strip == [Hint("You can drag these down to the text on any slide")])
+        for situation in [SheetHints.Situation.nothing, .onChord, .onPlace] {
+            #expect(SheetHints.hints(situation, overStrip: true) == SheetHints.strip)
+            #expect(SheetHints.hints(situation, command: true, option: true, overStrip: true) == SheetHints.strip)
+        }
+        #expect(SheetHints.hints(.typing(onChord: false, empty: true), overStrip: true) != SheetHints.strip)
+        #expect(SheetHints.hints(.carrying(fromStrip: false), overStrip: true) != SheetHints.strip)
     }
 
     // ---- How what is said is fitted into the line
 
     @Test("With room for all its hints the line says them all, side by side; with less, the last are left off one at a time, and the first is always said. The line is no taller for it")
     func fittedSideBySide() {
-        for hints in [SheetHints.hints(.onChord), SheetHints.hints(.onPlace), SheetHints.hints(.typing(onChord: false, empty: false)), SheetHints.hints(.carrying)] {
+        for hints in [SheetHints.hints(.onChord), SheetHints.hints(.onPlace), SheetHints.hints(.typing(onChord: false, empty: false)), SheetHints.hints(.carrying(fromStrip: false))] {
             let all = HintFit.width(of: hints, size: 1)
             #expect(HintFit.fit(hints, in: all) == HintFit.Fit(count: hints.count, stacked: false, size: 1))
             #expect(HintFit.fit(hints, in: 5000).count == hints.count)
@@ -152,14 +204,14 @@ struct SheetHintsTests {
         }
         #expect(HintFit.fit([], in: 500).count == 0)
         // What a row of hints is: its hints, and eighteen between each two.
-        let two = SheetHints.hints(.carrying)
+        let two = SheetHints.hints(.carrying(fromStrip: false))
         #expect(HintFit.width(of: two, size: 1) == HintFit.width(of: two[0], size: 1) + 18 + HintFit.width(of: two[1], size: 1))
     }
 
     @Test("The two sentences on copying and pasting are never left off: side by side where there is room; else one under the other, the line two lines tall; then smaller, a step at a time; and at the smallest, cut off")
     func theTwoSentences() {
         typealias Fit = HintFit.Fit
-        let hints = SheetHints.hints(.onPlace, held: true, paste: SheetHints.Paste(lines: 1, replaces: true))
+        let hints = SheetHints.hints(.onPlace, command: true, paste: SheetHints.Paste(lines: 1, replaces: true))
         #expect(hints.count == 2 && hints.allSatisfy(\.needed))
         let both = HintFit.width(of: hints, size: 1)
         let longer = max(HintFit.width(of: hints[0], size: 1), HintFit.width(of: hints[1], size: 1))
@@ -184,9 +236,10 @@ struct SheetHintsTests {
     func asWideAsItIsDrawn() {
         let every: [[Hint]] = [
             SheetHints.hints(.onChord), SheetHints.hints(.onPlace), SheetHints.hints(.typing(onChord: false, empty: false)),
-            SheetHints.hints(.typing(onChord: true, empty: true)), SheetHints.hints(.carrying), SheetHints.hints(.carrying, held: true),
-            SheetHints.hints(.onPlace, held: true), SheetHints.hints(.onPlace, held: true, paste: SheetHints.Paste(lines: 4, replaces: true)),
-            SheetHints.idle, SheetHints.cannotChange,
+            SheetHints.hints(.typing(onChord: true, empty: true)), SheetHints.hints(.carrying(fromStrip: false)),
+            SheetHints.hints(.carrying(fromStrip: false), option: true), SheetHints.hints(.carrying(fromStrip: true)),
+            SheetHints.hints(.onPlace, command: true), SheetHints.hints(.onPlace, command: true, paste: SheetHints.Paste(lines: 4, replaces: true)),
+            SheetHints.strip, SheetHints.idle, SheetHints.cannotChange,
         ]
         for hints in every {
             for size in HintFit.sizes {
@@ -198,7 +251,7 @@ struct SheetHintsTests {
             }
         }
         // And one under another, each is as tall as was allowed for it.
-        let two = SheetHints.hints(.onPlace, held: true)
+        let two = SheetHints.hints(.onPlace, command: true)
         for size in HintFit.sizes {
             let fit = HintFit.Fit(count: 2, stacked: true, size: size)
             let drawn = Double(NSHostingView(rootView: HintRow(hints: two, fit: fit)).fittingSize.height)
@@ -233,9 +286,15 @@ struct SheetHintsTests {
         #expect(sheet.press(.escape))
 
         sheet.lift(row, chord.at)
-        #expect(SheetHints.situation(of: sheet, attending: false) == .carrying)
+        #expect(SheetHints.situation(of: sheet, attending: false) == .carrying(fromStrip: false))
         sheet.dropNowhere()
-        #expect(SheetHints.situation(of: sheet, attending: true) != .carrying)
+        #expect(SheetHints.situation(of: sheet, attending: true) == .onPlace)
+        // One of the key's chords, carried in from the strip over a place; and
+        // carried off the places again, which is nothing to say of the sheet.
+        sheet.carry("Em", over: row, bare)
+        #expect(SheetHints.situation(of: sheet, attending: false) == .carrying(fromStrip: true))
+        sheet.carryOff()
+        #expect(SheetHints.situation(of: sheet, attending: false) == .nothing)
 
         // What a paste would do. Nothing copied yet: it would replace where the
         // spot's line has chords, which is all there is to go by.
@@ -306,7 +365,7 @@ struct SheetHintsTests {
 
         canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: row, at: chord.at), onItsChord: true)), shift: false)
         #expect(model.sheetSituation == .onChord && canvas.attending)
-        #expect(model.sheetHints.first == Hint([SheetHints.delete], "takes this chord off"))
+        #expect(model.sheetHints.first == Hint([SheetHints.delete], "Takes this chord off"))
         #expect(canvas.highlighted == row)
         canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: row, at: bare))), shift: false)
         #expect(model.sheetSituation == .onPlace && canvas.highlighted == row)
@@ -322,21 +381,24 @@ struct SheetHintsTests {
         // With nobody at the sheet, a key held says nothing of copying: there is no
         // highlighted line for it to be about.
         canvas.modifiers([.command])
-        #expect(model.modifierHeld && model.sheetHints == SheetHints.idle)
+        #expect(model.commandHeld && !model.optionHeld && model.sheetHints == SheetHints.idle)
         canvas.modifiers([])
 
-        // Option, and Command, held and let go, at a line that has chords.
+        // Command held and let go, at a line that has chords: the two sentences.
         canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: row, at: bare))), shift: false)
-        canvas.modifiers([.option])
-        #expect(model.modifierHeld && model.sheetHints.map(\.keys) == [["\u{2318}C"], ["\u{2318}V"]])
+        canvas.modifiers([.command])
+        #expect(model.commandHeld && model.sheetHints.map(\.keys) == [["\u{2318}C"], ["\u{2318}V"]])
         #expect(model.sheetHints.map(\.read).joined(separator: " ")
             == "Press \u{2318}C to copy all chords on the highlighted line. Press \u{2318}V to paste previously copied chords to the highlighted line (Replaces existing chords)")
         canvas.modifiers([])
-        #expect(!model.modifierHeld && model.sheetHints.first?.keys == ["1 \u{2013} 7"])
+        #expect(!model.commandHeld && model.sheetHints.first?.keys == ["1 \u{2013} 7"])
+        // Option held there: nothing of copying, which only Command brings up now.
+        canvas.modifiers([.option])
+        #expect(model.optionHeld && !model.commandHeld && model.sheetHints == SheetHints.hints(.onPlace))
         canvas.modifiers([.command, .shift])
-        #expect(model.modifierHeld)
+        #expect(model.commandHeld && !model.optionHeld)
         canvas.modifiers([.shift])
-        #expect(!model.modifierHeld)
+        #expect(!model.commandHeld && !model.optionHeld)
 
         // At a line that has no chord, a paste replaces nothing, and the hint does
         // not say it would: before anything is copied, and after.
@@ -377,7 +439,7 @@ struct SheetHintsTests {
         sheet.type("")
         canvas.sync()
         #expect(model.sheetSituation == .typing(onChord: true, empty: true))
-        #expect(model.sheetHints.first == Hint([SheetHints.enter], "takes this chord off"))
+        #expect(model.sheetHints.first == Hint([SheetHints.enter], "Takes this chord off"))
         // (The line of the typing is the highlighted one.)
         #expect(canvas.highlighted == row)
         #expect(sheet.press(.enter))
@@ -385,9 +447,61 @@ struct SheetHintsTests {
         #expect(sheet.chordAt(row, chord.at).isEmpty && !sheet.typing)
 
         // The app is left with a key held: it is taken as let go.
-        model.holds(true)
-        model.holds(false)
-        #expect(!model.modifierHeld)
+        model.holds(command: true, option: true)
+        model.holds(command: false, option: false)
+        #expect(!model.commandHeld && !model.optionHeld)
+
+        // One of the key's chords carried in from the strip, over a word: the line
+        // says what letting go would do; carried off the words, it says so no more.
+        let over = try #require(canvas.point(over: Spot(row: row, at: bare)))
+        #expect(canvas.carriedOfKey("Em", to: over, shift: false))
+        #expect(model.sheetSituation == .carrying(fromStrip: true))
+        #expect(model.sheetHints == [Hint("Let go on a word to put this chord there")])
+        #expect(!canvas.carriedOfKey("Em", to: nil, shift: false))
+        #expect(model.sheetSituation != .carrying(fromStrip: true))
+    }
+
+    @Test("The pointer over the key's chords in the strip: the line says they can be dragged down onto a slide, until the pointer leaves them; while ProPresenter is running it says only that nothing can be changed")
+    func overTheStrip() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        #expect(!model.overKeyChords && model.sheetHints == SheetHints.idle)
+        // What lies under the strip's chords says so, as AppKit tells it.
+        var said: [Bool] = []
+        let watch = PointerWatch.Watch(frame: NSRect(x: 0, y: 0, width: 300, height: 26))
+        watch.over = { over in
+            said.append(over)
+            model.pointerIsOverTheKeyChords(over)
+        }
+        let moved = try #require(NSEvent.enterExitEvent(with: .mouseEntered, location: .zero, modifierFlags: [], timestamp: 0, windowNumber: 0, context: nil,
+                                                        eventNumber: 0, trackingNumber: 0, userData: nil))
+        watch.mouseEntered(with: moved)
+        #expect(model.overKeyChords && model.sheetHints == SheetHints.strip)
+        #expect(model.sheetHints.map(\.read) == ["You can drag these down to the text on any slide"])
+        // (It takes no click: what is over it has those.)
+        #expect(watch.hitTest(NSPoint(x: 5, y: 5)) == nil)
+        // Whatever the spot was left on, and whatever is held.
+        model.sheetIs(.onChord)
+        model.holds(command: true, option: false)
+        #expect(model.sheetHints == SheetHints.strip)
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        #expect(model.sheetHints == SheetHints.cannotChange)
+        mac.proPresenterIsRunning = false
+        model.proPresenterMayHaveChanged()
+        model.holds(command: false, option: false)
+        watch.mouseExited(with: moved)
+        #expect(!model.overKeyChords && model.sheetHints == SheetHints.hints(.onChord))
+        #expect(said == [true, false])
+        // Taken out of a window with the pointer still over it: it has left.
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 300, height: 100), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.contentView?.addSubview(watch)
+        watch.mouseEntered(with: moved)
+        #expect(model.overKeyChords)
+        watch.removeFromSuperview()
+        #expect(!model.overKeyChords)
+        window.close()
     }
 
     @Test("While ProPresenter is running the line says that nothing can be changed, whatever is under the pointer")
@@ -399,7 +513,7 @@ struct SheetHintsTests {
         mac.proPresenterIsRunning = true
         model.proPresenterMayHaveChanged()
         #expect(model.sheetHints == SheetHints.cannotChange)
-        model.holds(true)
+        model.holds(command: true, option: true)
         #expect(model.sheetHints == SheetHints.cannotChange)
     }
 

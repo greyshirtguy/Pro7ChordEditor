@@ -59,7 +59,10 @@ enum SheetLook {
     static let card = colour(0x222428)
     static let words = colour(0xe6e6e6)
     static let accent = colour(0xff8a1f)
-    static let chordName = colour(0xffd9a8)
+    /// A chord's name, as it comes: the sheet's orange. (The maintainer's,
+    /// 2026-10-14: "lets make the default chord color orange now". Until then it was
+    /// the reference's pale `#ffd9a8`.)
+    static let chordName = colour(0xff8a1f)
     static let bubble = colour(0x34363c)
     static let bubbleEdge = colour(0x5c5f66)
     static let lit = colour(0x4a3a26)
@@ -237,7 +240,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         /// line of hints under it; and whether Option or Command is held down, which
         /// that line answers to.
         var situation: (SheetHints.Situation, SheetHints.Paste) -> Void = { _, _ in }
-        var held: (Bool) -> Void = { _ in }
+        var held: (_ command: Bool, _ option: Bool) -> Void = { _, _ in }
 
         /// As the window wires them.
         @MainActor
@@ -250,7 +253,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                  canRedo: { [model] in model.canRedo },
                  zoom: { [model] in model.zoomSheet($0) },
                  situation: { [model] in model.sheetIs($0, paste: $1) },
-                 held: { [model] in model.holds($0) })
+                 held: { [model] in model.holds(command: $0, option: $1) })
         }
     }
 
@@ -279,9 +282,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         sheet.flatMap { SheetHints.line(of: $0, attending: attending) }
     }
 
-    /// Option or Command went down or came up, anywhere in the app.
+    /// Command or Option went down or came up, anywhere in the app.
     func modifiers(_ flags: NSEvent.ModifierFlags) {
-        asks.held(flags.contains(.option) || flags.contains(.command))
+        asks.held(flags.contains(.command), flags.contains(.option))
     }
 
     // The keys that are held are watched for the whole app while the sheet is in a
@@ -294,7 +297,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             self.flagsWatch = nil
         }
         guard window != nil else {
-            asks.held(false)
+            asks.held(false, false)
             return
         }
         flagsWatch = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
@@ -945,6 +948,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             sheet.carryOff()
         }
         needsDisplay = true
+        // (The line of hints says what letting go would do, while it would do
+        // something.)
+        tell()
         return sheet.dragged.map { $0.from.row < 0 } ?? false
     }
 
@@ -1095,18 +1101,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let shift = flags.contains(.shift)
         let typed = event.charactersIgnoringModifiers?.lowercased() ?? ""
         if flags.contains(.command) {
-            // (Option held shows the hint for copying and pasting, and may well be
-            // down still when the keys it names are pressed: they do the same with
-            // it. For the rest, Option makes it another key, which is not the
-            // sheet's.)
-            if flags.contains(.option) {
-                guard flags.isSubset(of: [.command, .shift, .option]) else { return nil }
-                switch typed {
-                case "c": return (.copy(wholeGroup: shift), shift)
-                case "v" where !shift: return (.paste, false)
-                default: return nil
-                }
-            }
+            // (With Option as well it is another key, which is not the sheet's. For
+            // a day, 2026-10-13, Command+C and Command+V did the same with Option
+            // held, Option being what then brought up the hint that names them. Only
+            // Command brings it up now, so there is nothing to forgive.)
             guard flags.isSubset(of: [.command, .shift]) else { return nil }
             switch typed {
             case "c": return (.copy(wholeGroup: shift), shift)
@@ -1544,6 +1542,57 @@ final class SheetScroll: NSScrollView {
     }
 }
 
+/// Says when the pointer comes over what this lies under, and when it leaves: by a
+/// tracking area, which is AppKit's and is told of both at once. It takes no click
+/// and draws nothing.
+struct PointerWatch: NSViewRepresentable {
+    var over: (Bool) -> Void
+
+    final class Watch: NSView {
+        var over: (Bool) -> Void = { _ in }
+        private var tracking: NSTrackingArea?
+
+        override func updateTrackingAreas() {
+            super.updateTrackingAreas()
+            if let tracking {
+                removeTrackingArea(tracking)
+            }
+            let area = NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self)
+            addTrackingArea(area)
+            tracking = area
+        }
+
+        override func mouseEntered(with event: NSEvent) {
+            over(true)
+        }
+
+        override func mouseExited(with event: NSEvent) {
+            over(false)
+        }
+
+        // (Taken out of its window with the pointer still over it, it would never
+        // be told that the pointer had left.)
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if window == nil {
+                over(false)
+            }
+        }
+
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
+    }
+
+    func makeNSView(context: Context) -> Watch {
+        let watch = Watch()
+        watch.over = over
+        return watch
+    }
+
+    func updateNSView(_ watch: Watch, context: Context) {
+        watch.over = over
+    }
+}
+
 /// The sheet in the window.
 struct ChordSheetCanvasView: NSViewRepresentable {
     var model: LibraryModel
@@ -1693,6 +1742,9 @@ struct SheetStrip: View {
             }
         }
         .fixedSize()
+        // (While the pointer is over them, the line of hints says they can be
+        // dragged.)
+        .background(PointerWatch { model.pointerIsOverTheKeyChords($0) })
     }
 
     /// What one of the key's chords says of itself when it is pointed at (spec/03,

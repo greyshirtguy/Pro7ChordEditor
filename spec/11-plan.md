@@ -70,7 +70,9 @@ its turn comes, from the page that has it:
 | An empty box that is kept takes the chord off | [03](03-chord-sheet.md), rule 35a |
 | The menus kept to what is of use; no Save in them; closing the window quits (Mac) | [10](10-platforms.md), "Where each follows its platform"; [06](06-library.md), rule 12a |
 | A title over the choice of place; Earlier Versions in a colour, with a song's picture | [06](06-library.md), rule 7; [07](07-backups.md), rule 15 |
-| The line of hints under the sheet, and the highlighted line with its colour in the settings. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints"; [06](06-library.md), rule 20a |
+| The line of hints under the sheet, blue and lighting up as it changes, and the highlighted line with its colour in the settings. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints"; [06](06-library.md), rule 20a |
+| A chord's name on the sheet is orange as it comes | [06](06-library.md), rule 20a |
+| **Open, the maintainer's**: whether a paste of a line's chords keeps the words they were on, as it does, or their places along the line | [03](03-chord-sheet.md), under rule 52b |
 | A text box's other ranges go with the words when a line of chords alone is made longer or shorter, as Simple Presenter has it | [01](01-file-format.md), "The box's other ranges" |
 | The edge between the lists and the song starts half way between its least and its most, and is a bar that is seen | [06](06-library.md), rule 6a |
 | Nothing in the window keeps the pointer waiting | [06](06-library.md), rule 6e |

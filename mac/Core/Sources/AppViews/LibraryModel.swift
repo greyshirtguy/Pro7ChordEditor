@@ -191,14 +191,17 @@ public final class LibraryModel {
     }
 
     /// What is going on in the sheet, as its view says it; what a paste there would
-    /// do; and whether Option or Command is held down: what the line of hints under
-    /// the sheet goes by (SheetHints.swift). None of it is anything of the song's.
+    /// do; whether Command is held down, and Option; and whether the pointer is over
+    /// the key's chords in the strip: what the line of hints under the sheet goes by
+    /// (SheetHints.swift). None of it is anything of the song's.
     public private(set) var sheetSituation = SheetHints.Situation.nothing
     public private(set) var sheetPaste = SheetHints.Paste()
-    public private(set) var modifierHeld = false
-    /// The same three as they were last said, kept where nothing watches them
+    public private(set) var commandHeld = false
+    public private(set) var optionHeld = false
+    public private(set) var overKeyChords = false
+    /// The first four as they were last said, kept where nothing watches them
     /// (`sheetIs` has why).
-    @ObservationIgnored private var told = (situation: SheetHints.Situation.nothing, paste: SheetHints.Paste(), held: false)
+    @ObservationIgnored private var told = (situation: SheetHints.Situation.nothing, paste: SheetHints.Paste(), command: false, option: false)
     /// How long what the sheet said stays on the quiet line.
     public var sayingLasts: Duration = .seconds(6)
 
@@ -270,7 +273,7 @@ public final class LibraryModel {
     /// What the line of hints under the sheet says just now.
     public var sheetHints: [SheetHints.Hint] {
         guard canChange else { return SheetHints.cannotChange }
-        return SheetHints.hints(sheetSituation, held: modifierHeld, paste: sheetPaste)
+        return SheetHints.hints(sheetSituation, command: commandHeld, option: optionHeld, paste: sheetPaste, overStrip: overKeyChords)
     }
 
     /// The sheet's view says what is going on in it, and what a paste there would do.
@@ -293,11 +296,22 @@ public final class LibraryModel {
         }
     }
 
-    /// Option or Command went down, or came up.
-    public func holds(_ held: Bool) {
-        if told.held != held {
-            told.held = held
-            modifierHeld = held
+    /// Command or Option went down, or came up.
+    public func holds(command: Bool, option: Bool) {
+        if told.command != command {
+            told.command = command
+            commandHeld = command
+        }
+        if told.option != option {
+            told.option = option
+            optionHeld = option
+        }
+    }
+
+    /// The pointer has come over the key's chords in the strip, or has left them.
+    public func pointerIsOverTheKeyChords(_ over: Bool) {
+        if overKeyChords != over {
+            overKeyChords = over
         }
     }
 

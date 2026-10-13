@@ -426,7 +426,7 @@ struct ChordProTypingTests {
         sheetWindow.contentView = scroll
         defer { sheetWindow.close() }
         scroll.canvas.show(model.sheet, scale: model.sheetZoom)
-        #expect(ChordColour.written(scroll.canvas.chordColour) == "#ffd9a8")
+        #expect(ChordColour.written(scroll.canvas.chordColour) == "#ff8a1f")
         model.setSheetChordColour("#00ff88")
         scroll.canvas.chordColour = try #require(ChordColour.colour(model.sheetChordColour))
         #expect(ChordColour.written(scroll.canvas.entry.field.textColor ?? .black) == "#00ff88")

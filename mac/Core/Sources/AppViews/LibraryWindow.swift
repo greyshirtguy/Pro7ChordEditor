@@ -130,7 +130,7 @@ public struct LibraryWindow: View {
             model.settle()
             // (A key held down as the app is left is let go where this app cannot
             // see it.)
-            model.holds(false)
+            model.holds(command: false, option: false)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
             model.settle()

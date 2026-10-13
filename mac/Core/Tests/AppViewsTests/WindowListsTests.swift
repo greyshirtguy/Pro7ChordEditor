@@ -68,7 +68,10 @@ struct WindowListsTests {
     @Test("A colour is kept as it is written, #rrggbb, and drawn as that; what is not so written is no colour")
     func coloursAsTheyAreWritten() {
         #expect(ChordColour.written(NSColor(srgbRed: 1, green: 0.5, blue: 0, alpha: 1)) == "#ff8000")
-        #expect(ChordColour.written(SheetLook.chordName) == "#ffd9a8")
+        // (A chord's name on the sheet, as it comes: the sheet's orange, since the
+        // maintainer's "lets make the default chord color orange now" of 2026-10-14.
+        // Until then it was the reference's "#ffd9a8".)
+        #expect(ChordColour.written(SheetLook.chordName) == "#ff8a1f")
         let back = ChordColour.colour("#ffd9a8")?.usingColorSpace(.sRGB)
         #expect(abs((back?.greenComponent ?? 0) - 217.0 / 255) < 0.001 && back?.redComponent == 1)
         #expect(ChordColour.colour("ffd9a8") == nil && ChordColour.colour("#ffd9a") == nil && ChordColour.colour("#gggggg") == nil)

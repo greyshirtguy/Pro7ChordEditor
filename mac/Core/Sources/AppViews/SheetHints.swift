@@ -6,20 +6,27 @@
 // using the sheet for two days: "I did not realise I could hover and press delete".)
 // So it says less, and says what goes with what is under the pointer:
 //
-//   on a chord            Delete takes it off; 1 to 7 change it; it can be dragged; a
-//                         click opens it to be typed over;
+//   on a chord            Delete takes it off; 1 to 7 change it; it can be dragged,
+//                         and with Option a copy of it; a click opens it to be typed
+//                         over;
 //   on a place with none  1 to 7 put one on; a letter or a click types one;
 //   while one is typed    what Return, Tab and Esc do with it. With the box empty on
 //                         a chord, that Return takes the chord off;
-//   while one is carried  that letting go moves it, and Option leaves a copy;
-//   with Option held,     the copying of a line's chords onto another: Command+C and
-//   or Command            Command+V, which no picture on the sheet shows;
+//   while one is carried  that letting go moves it, and Option leaves a copy; or, for
+//                         one of the key's chords from the strip, puts it there;
+//   with Command held     the copying of a line's chords onto another: Command+C and
+//                         Command+V, which no picture on the sheet shows;
+//   over the key's chords that they can be dragged down onto a slide;
 //   the pointer elsewhere where to point to be told.
 //
 // It says them when they are of use, and at no other time. (For a day it also went
 // through ten tips, one every nine seconds, while the pointer was elsewhere. The
 // maintainer, having tried it: "love how they appear at the right time - lets drop the
 // randomly timed tips".)
+//
+// Each begins with a capital, as a sentence does (the maintainer's, 2026-10-14: "Let's
+// sentence case the tips"), whether or not it is a whole sentence: most are what a key
+// does, said after the key.
 //
 // THE HIGHLIGHTED LINE. The copying is of a line and onto a line, and the hint for it
 // has to say which. So the line the person is at is drawn in a colour of its own on
@@ -43,8 +50,9 @@ public enum SheetHints {
         /// A chord is being typed: whether there is a chord at that place already,
         /// and whether the box has nothing in it.
         case typing(onChord: Bool, empty: Bool)
-        /// A chord is being carried, from the sheet or out of the strip.
-        case carrying
+        /// A chord is being carried: one of the sheet's own, picked up from its
+        /// word; or one of the key's, out of the strip.
+        case carrying(fromStrip: Bool)
         /// The spot is on a chord.
         case onChord
         /// The spot is on a place that has none.
@@ -115,7 +123,7 @@ public enum SheetHints {
             let at = sheet.typingAt
             return .typing(onChord: !sheet.chordAt(at.row, at.at).isEmpty, empty: sheet.entry.text.isEmpty)
         }
-        if sheet.dragged != nil { return .carrying }
+        if let carried = sheet.dragged { return .carrying(fromStrip: carried.from.row < 0) }
         guard attending, sheet.usable(sheet.spot.row) else { return .nothing }
         return sheet.chordAt(sheet.spot.row, sheet.spot.at).isEmpty ? .onPlace : .onChord
     }
@@ -145,41 +153,58 @@ public enum SheetHints {
     }
 
     /// What to say: the first is the one most worth reading, and where there is not
-    /// room for all of them the last are left off. `held`: Option or Command is down.
-    /// `paste`: what a paste would do just now.
-    public static func hints(_ situation: Situation, held: Bool = false, paste: Paste = Paste()) -> [Hint] {
+    /// room for all of them the last are left off.
+    ///
+    ///   - `command`, `option`: whether each of those keys is down. Command brings
+    ///     up the copying of a line's chords, and nothing else does (the
+    ///     maintainer's, 2026-10-14; for a day Option did too). Option says what a
+    ///     chord that is being carried will do when it is let go.
+    ///   - `paste`: what a paste would do just now.
+    ///   - `overStrip`: the pointer is over the key's chords in the strip.
+    public static func hints(_ situation: Situation, command: Bool = false, option: Bool = false, paste: Paste = Paste(), overStrip: Bool = false) -> [Hint] {
         switch situation {
         case .typing(onChord: true, empty: true):
-            return [Hint([enter], "takes this chord off"),
-                    Hint([escape], "leaves it as it was"),
-                    Hint("or type the chord that is to be here")]
+            return [Hint([enter], "Takes this chord off"),
+                    Hint([escape], "Leaves it as it was"),
+                    Hint("Or type the chord that is to be here")]
         case .typing:
-            return [Hint([enter], "keeps it"),
-                    Hint([tab], "keeps it and goes on to the next word"),
-                    Hint(["\u{2191}", "\u{2193}"], "choose from what is offered"),
-                    Hint([escape], "throws it away"),
-                    Hint("a click on another word keeps it too")]
+            return [Hint([enter], "Keeps it"),
+                    Hint([tab], "Keeps it and goes on to the next word"),
+                    Hint(["\u{2191}", "\u{2193}"], "Choose from what is offered"),
+                    Hint([escape], "Throws it away"),
+                    Hint("A click on another word keeps it too")]
+        case .carrying(fromStrip: true):
+            return [Hint("Let go on a word to put this chord there")]
         case .carrying:
-            return held
+            return option
                 ? [Hint("Let go on a word to put a copy there")]
                 : [Hint("Let go on a word to move it there"),
-                   Hint([option], "held as you let go, leaves a copy behind")]
-        case .onChord:
-            if held { return copying(paste) }
-            return [Hint([delete], "takes this chord off"),
-                    Hint([numbers], "change it"),
-                    Hint("drag it to another word"),
-                    Hint("click to type over it")]
-        case .onPlace:
-            if held { return copying(paste) }
-            return [Hint([numbers], "put one of the key\u{2019}s chords here"),
-                    Hint([letters], "or a click: type one"),
-                    Hint([option], "hold, to copy a line\u{2019}s chords onto another")]
-        case .nothing:
-            // (Whatever is held: there is no highlighted line to speak of.)
-            return idle
+                   Hint([Self.option], "Held as you let go, leaves a copy behind")]
+        case .onChord, .onPlace, .nothing:
+            // (The pointer over the strip is not over the sheet: what is said of the
+            // spot, which is only where it was left, gives way.)
+            if overStrip { return strip }
+            if situation == .nothing {
+                // (Whatever is held: there is no highlighted line to speak of.)
+                return idle
+            }
+            if command { return copying(paste) }
+            if situation == .onChord {
+                return [Hint([delete], "Takes this chord off"),
+                        Hint([numbers], "Change it"),
+                        Hint(dragging),
+                        Hint("Click to type over it")]
+            }
+            return [Hint([numbers], "Put one of the key\u{2019}s chords here"),
+                    Hint([letters], "Or a click: type one")]
         }
     }
+
+    /// What is said of dragging a chord, while the pointer is on one: the
+    /// maintainer's words (2026-10-14). It took the place of two things: "drag it to
+    /// another word", and, said on every word of every line, that Option held shows
+    /// how a line's chords are copied, which Option no longer does.
+    static let dragging = "You can drag this chord to move it anywhere. (Hold Option to drag a copy)"
 
     /// The copying of a line's chords onto another, which is done with keys alone and
     /// so is seen nowhere on the sheet. The words are the maintainer's (2026-10-13):
@@ -195,6 +220,11 @@ public enum SheetHints {
         return [Hint(lead: "Press", [command + "C"], "to copy all chords on the highlighted line.", needed: true),
                 Hint(lead: "Press", [command + "V"], "to paste previously copied chords \(onto)" + (paste.replaces ? " (Replaces existing chords)" : ""), needed: true)]
     }
+
+    /// What is said while the pointer is over the key's chords in the strip at the
+    /// top of the sheet. The maintainer's (2026-10-14): "You can drag these down the
+    /// text on any slide", with the "to" that was wanting.
+    public static let strip = [Hint("You can drag these down to the text on any slide")]
 
     /// What is said while the person is not at the sheet: where to point to be told.
     public static let idle = [Hint("Point at a word or a chord, and this line says what the keys do there.")]

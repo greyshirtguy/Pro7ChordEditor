@@ -466,14 +466,30 @@ that a test can reach, and the maintainer's hand for the rest.
 This is how a second verse gets the chords of the first. Vectors: `sheet-model.json`,
 `copyPaste`.
 
+**Raised by the maintainer on 2026-10-14, and not decided**: whether rules 48 and 50
+keep the right thing. Their words: "copy and paste sometimes seems the drop the chords
+in different place (text ranges) ... the positions all are wrong (they seem to be
+reduced in offset)". What was seen is the rule as it stands, and the test song
+Amazing Grace shows it too. The chords of "Amazing grace how sweet the sound" are on
+its letters 1, 8, 18 and 28: its first word, its second, its fourth and its sixth. Pasted onto "I once was lost
+but now am found" they went onto that line's first, second, fourth and sixth words,
+which are its letters 0, 2, 11 and 20: each a word sooner than a singer wants them
+(once, lost, now, found), because "Amazing" is one word where the other line has
+three. Keeping the letters instead (1, 8, 18, 28) would put them on the space after
+"I", in "was", in "but" and in "found". Neither is what is sung; no rule knows where
+the beats fall. What the person expected was the same places along the line. It is
+theirs to say which a paste is to keep. Whichever it is, it is Simple Presenter's to
+change first, the vectors being made from it, and then both apps'.
+
 ## The line of hints
 
 **New, and being tried on the Mac** (the maintainer's, 2026-10-13, who after two days
 with the sheet "did not realise I could hover and press delete"). Its words are not
 settled: **Windows and Simple Presenter are to wait** until this paragraph says the
-maintainer has agreed them. (It has been tried once, and changed the same day: no
-tips by the clock, other words for the copying, and the highlighted line. Rules 53b,
-53d, 53f and 53g.)
+maintainer has agreed them. (It has been tried three times and changed each time, the
+last on 2026-10-14: its words, what brings up the copying, and how it looks. The
+maintainer then: "I hope all these animations, nice looking UI works in Windows!". So
+what is here is meant for Windows too, once it is settled.)
 
 53a. Under the sheet, over the quiet line ([06-library.md](06-library.md), rule 12),
     is one line that says **what the keys and the mouse do just now, where the spot
@@ -491,18 +507,24 @@ tips by the clock, other words for the copying, and the highlighted line. Rules 
     | When | It says |
     | --- | --- |
     | ProPresenter is running | Nothing can be changed here while ProPresenter is running. |
-    | A chord is being typed, the box is empty, and there is a chord at that place | **Enter** takes this chord off · **Esc** leaves it as it was · or type the chord that is to be here |
-    | A chord is being typed, otherwise | **Enter** keeps it · **Tab** keeps it and goes on to the next word · **Up, Down** choose from what is offered · **Esc** throws it away · a click on another word keeps it too |
-    | A chord is being carried | Let go on a word to move it there · **the key that copies** held as you let go, leaves a copy behind. (With that key held: Let go on a word to put a copy there) |
-    | The person is at the sheet, and the key that copies as it drags, or the key for shortcuts, is held (Option or Command; Ctrl) | Press **Ctrl+C** to copy all chords on the highlighted line. · Press **Ctrl+V** to paste previously copied chords to the highlighted line; and after that, where it would take chords off, " (Replaces existing chords)" (rule 53g) |
-    | The spot is on a chord, and the person is at the sheet | **Delete** takes this chord off · **1 – 7** change it · drag it to another word · click to type over it |
-    | The spot is on a place with no chord, and the person is at the sheet | **1 – 7** put one of the key's chords here · **A – G** or a click: type one · **the key that copies**: hold, to copy a line's chords onto another |
+    | A chord is being typed, the box is empty, and there is a chord at that place | **Enter** Takes this chord off · **Esc** Leaves it as it was · Or type the chord that is to be here |
+    | A chord is being typed, otherwise | **Enter** Keeps it · **Tab** Keeps it and goes on to the next word · **Up, Down** Choose from what is offered · **Esc** Throws it away · A click on another word keeps it too |
+    | One of the key's chords is being carried in from the strip, over a place | Let go on a word to put this chord there |
+    | A chord of the sheet's own is being carried | Let go on a word to move it there · **the key that copies** Held as you let go, leaves a copy behind. (With that key held: Let go on a word to put a copy there) |
+    | The pointer is over the key's chords in the strip | You can drag these down to the text on any slide |
+    | The person is at the sheet, and the key for shortcuts is held (Command; Ctrl) | Press **Ctrl+C** to copy all chords on the highlighted line. · Press **Ctrl+V** to paste previously copied chords to the highlighted line; and after that, where it would take chords off, " (Replaces existing chords)" (rule 53g) |
+    | The spot is on a chord, and the person is at the sheet | **Delete** Takes this chord off · **1 – 7** Change it · You can drag this chord to move it anywhere. (Hold Option to drag a copy) · Click to type over it |
+    | The spot is on a place with no chord, and the person is at the sheet | **1 – 7** Put one of the key's chords here · **A – G** Or a click: type one |
     | Otherwise | Point at a word or a chord, and this line says what the keys do there. |
 
-    The words for copying and pasting are the maintainer's (2026-10-13): "Press ⌘-c
-    to copy all chords on the highlighted line. Press ⌘-v to paste previously copied
-    chords to the highlighted line", with " (Replaces existing chords)" after it
-    "when the target line has any chords".
+    The maintainer's own words among these: the two sentences on copying and pasting
+    (2026-10-13: "Press ⌘-c to copy all chords on the highlighted line. Press ⌘-v to
+    paste previously copied chords to the highlighted line", with " (Replaces
+    existing chords)" after it "when the target line has any chords"); what is said
+    of dragging a chord (2026-10-14: "You can drag this chord to move it anywhere.
+    (Hold Option to drag a copy)", where Windows names its own key that copies); and
+    what is said over the key's chords ("You can drag these down the text on any
+    slide", with the "to" that was wanting).
 53c. **The person is at the sheet** while the pointer is over a place of a line, and
     from when a key moves the spot or acts on it until the pointer next moves. With
     the pointer over the bare sheet between the slides, or out of the sheet, the
@@ -514,7 +536,9 @@ tips by the clock, other words for the copying, and the highlighted line. Rules 
     they appear at the right time - lets drop the randomly timed tips".)
 53e. The keys are named as the platform names them
     ([10-platforms.md](10-platforms.md)): on the Mac by the signs its menus and its
-    keyboard have for them, on Windows in words.
+    keyboard have for them, on Windows in words. **Every hint begins with a
+    capital**, as a sentence does, whether or not it is a whole sentence (the
+    maintainer's, 2026-10-14: "Let's sentence case the tips").
 53f. **The highlighted line.** The line the person is at has its words in a colour of
     its own: as it comes the sheet's orange, `#ff8a1f`, and chosen in the settings
     ([06-library.md](06-library.md), rule 20a). The maintainer's, 2026-10-13: "we
@@ -532,6 +556,11 @@ tips by the clock, other words for the copying, and the highlighted line. Rules 
     rule that stands where their words would be takes the colour, and is twice as
     thick.
 53g. **What the hint says of a paste**, to the letter:
+    - It is said while the key for shortcuts is held, and for no other key. (For a
+      day the key that copies as it drags brought it up as well, Option on the Mac,
+      and every word of every line said to hold it. The maintainer, 2026-10-14:
+      "The Copy and paste message tips should only appear when holding Command".
+      Nothing on the line now says to hold it: it is the key about to be pressed.)
     - " (Replaces existing chords)" is said where a paste now would take chords off
       a line: where any line that what was copied would go onto (rules 50 and 51)
       has chords of its own. A line that would be passed over, being of the other
@@ -543,8 +572,27 @@ tips by the clock, other words for the copying, and the highlighted line. Rules 
       one line.)
     - Ctrl+Shift+C itself is said nowhere on the line now. The guide has it
       ([13-guide.md](13-guide.md)).
-    - On the Mac the two keys do the same with Option held as well: Option is what
-      brings the hint up, and may well be down still when the keys are pressed.
+53h. **How it looks: blue, to be seen, and it lights up when what it says changes.**
+    The maintainer's, 2026-10-14: "Let's make the tips MORE visible! - I'm thinking a
+    light blue theme down there! (and maybe make it light up with a residual fading
+    glow (1-2 seconds) when the tip text changes). Make the key shapes a bit brighter
+    or different color to stand out a little!" As built on the Mac, where which blues
+    was the session's choice:
+
+    | | System light | System dark |
+    | --- | --- | --- |
+    | The line's ground | `#dcebff` | `#1d477c` |
+    | Lit, when what it says has just changed | `#9ccbff` | `#3a82e0` |
+    | Its words | `#17375e` | `#e3efff` |
+    | A key: its fill, its edge, its sign | `#ffffff`, `#3f86e3`, `#0b4190` | `#4f90e6`, `#b4d4ff`, `#ffffff` |
+    | The line along its top | `#9fc4f2` | `#3565a3` |
+
+    When what the line says changes it goes to the lit colour in about a tenth of a
+    second, stays a quarter of a second, and fades back over a little more than a
+    second. A change while it is lit lights it again. It does not light up where the
+    person has asked the system for less motion. Nothing is laid out again by it,
+    and it must cost little: the pointer crossing chords changes the words many
+    times a second ([06-library.md](06-library.md), rule 6e).
 
 What is said for a copy (rule 49) and a paste (rule 52a) is still said on the quiet
 line, for a few seconds, the key in it named the same way.

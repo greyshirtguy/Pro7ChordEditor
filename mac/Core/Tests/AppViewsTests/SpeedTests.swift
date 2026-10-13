@@ -123,6 +123,37 @@ struct SpeedTests {
         #expect(model.sheetHints == SheetHints.hints(.onPlace))
     }
 
+    @Test("The line of hints lighting up, and fading over a second or two, keeps the main thread at work for a small part of that time")
+    func theLineLightingUp() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        await model.start()
+        model.choose(library: mac.library("Songs"))
+        await model.marksAreWorkedOut()
+        model.open(song: mac.song("Amazing Grace"))
+        model.show(editor: .sheet)
+        let (host, window) = window(on: model, size: NSSize(width: 1280, height: 800))
+        defer {
+            window.contentView = nil
+            window.close()
+        }
+        wait(0.3)
+        settle(host)
+        // Two seconds with nothing going on, and then the two seconds after what
+        // the line says has changed, in which it lights up and fades.
+        var before = Self.atWork()
+        wait(2)
+        let idle = Self.atWork() - before
+        model.sheetIs(.onChord)
+        before = Self.atWork()
+        wait(2)
+        let lit = Self.atWork() - before
+        // (It is 130 on the Mac this was written on: a little over a thousandth of a
+        // second for each time the screen is drawn while it fades. Were anything in
+        // the window measured again each time, it would be many times that.)
+        #expect(lit < 800, "the line lighting up kept the main thread \(lit) thousandths of a second at work in two seconds (\(idle) with nothing going on)")
+    }
+
     // ---- What is only measured
 
     /// A long song: the test file Amazing Grace eight times over, 56 slides, put among

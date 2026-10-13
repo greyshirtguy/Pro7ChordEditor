@@ -44,8 +44,8 @@ struct SongPane: View {
                     ChordSheetCanvasView(model: model, version: model.sheetVersion, scale: model.sheetZoom, chordColour: model.sheetChordColour,
                                          lineColour: model.sheetLineColour)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    Divider()
                     // What the keys and the mouse do just now, where the spot is.
+                    // (It has a line of its own along its top.)
                     SheetHintBar(model: model)
                 } else if let chordPro = model.chordPro {
                     // One line of help over the text; or, in a warmer colour, why this
@@ -245,7 +245,7 @@ enum HintFit {
     /// How wide a key is drawn: its sign and the room either side of it, and never
     /// less than a key is.
     static func width(ofKey key: String, size: Double) -> Double {
-        max(20 * size, width(of: key, size: keySize * size, weight: .medium) + 10 * size)
+        max(20 * size, width(of: key, size: keySize * size, weight: .semibold) + 10 * size)
     }
 
     /// How wide one hint is: its words before its keys, its keys, and what it says.
@@ -314,6 +314,9 @@ extension EnvironmentValues {
 /// How tall it is, is worked out (HintFit) and not asked of what is in it: so a change
 /// in what it says, which is as often as the pointer crosses a chord, has nothing
 /// else in the window measured again unless the line itself is to be taller.
+///
+/// It is blue, to be seen, and lights up when what it says changes (HintLook has the
+/// colours and whose asking that was; HintGround, the lighting up).
 struct SheetHintBar: View {
     var model: LibraryModel
     @Environment(\.songWidth) private var width
@@ -328,7 +331,79 @@ struct SheetHintBar: View {
             // the right, and pushes nothing about.)
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: HintFit.height(of: fit), maxHeight: HintFit.height(of: fit), alignment: .leading)
             .clipped()
-            .background(Color(nsColor: .windowBackgroundColor))
+            .background(HintGround(said: hints.map(\.read)))
+            .overlay(alignment: .top) { HintLook.line.frame(height: 1) }
+    }
+}
+
+/// The colours of the line of hints: blue, a light one where the system is light and
+/// a deeper one where it is dark, with its keys brighter than its ground so that they
+/// stand out. The maintainer's, 2026-10-14: "Let's make the tips MORE visible! - I'm
+/// thinking a light blue theme down there! (and maybe make it light up with a
+/// residual fading glow (1-2 seconds) when the tip text changes). Make the key shapes
+/// a bit brighter or different color to stand out a little!" Which blues is this
+/// session's, to be changed.
+enum HintLook {
+    static func colour(light: UInt32, dark: UInt32) -> Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            SheetLook.colour(appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light)
+        })
+    }
+
+    /// The line's ground, and what it is lit to when what it says has just changed.
+    static let ground = colour(light: 0xdcebff, dark: 0x1d477c)
+    static let lit = colour(light: 0x9ccbff, dark: 0x3a82e0)
+    /// The line drawn along its top.
+    static let line = colour(light: 0x9fc4f2, dark: 0x3565a3)
+    static let words = colour(light: 0x17375e, dark: 0xe3efff)
+    /// A key: what it is filled with, its edge, and the sign on it.
+    static let key = colour(light: 0xffffff, dark: 0x4f90e6)
+    static let keyEdge = colour(light: 0x3f86e3, dark: 0xb4d4ff)
+    static let keySign = colour(light: 0x0b4190, dark: 0xffffff)
+
+    /// How long the line takes to light up, how long it stays lit, and how long it
+    /// takes to fade: a little over a second and a half in all.
+    static let rises = 0.12
+    static let stays = 0.25
+    static let fades = 1.3
+}
+
+/// The ground of the line of hints, which lights up when what the line says changes
+/// and fades back over a second or two.
+///
+/// What is animated is how much of the lit colour shows over the ground, and nothing
+/// that anything is laid out by: so the line lighting up costs the window no measuring.
+/// Where the person has asked the system for less motion, it does not light up.
+struct HintGround: View {
+    /// What the line says, as it would be read out.
+    var said: [String]
+    /// For the pictures the tests draw, which cannot wait for it: lit this much.
+    var shown: Double?
+
+    @State private var lit = false
+    @State private var fading: Task<Void, Never>?
+    @Environment(\.accessibilityReduceMotion) private var still
+
+    var body: some View {
+        ZStack {
+            HintLook.ground
+            HintLook.lit
+                .opacity(shown ?? (lit ? 1 : 0))
+        }
+        .onChange(of: said) {
+            guard !still, shown == nil else { return }
+            fading?.cancel()
+            withAnimation(.easeOut(duration: HintLook.rises)) {
+                lit = true
+            }
+            fading = Task { @MainActor in
+                try? await Task.sleep(for: .seconds(HintLook.rises + HintLook.stays))
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeOut(duration: HintLook.fades)) {
+                    lit = false
+                }
+            }
+        }
     }
 }
 
@@ -371,27 +446,28 @@ struct HintRow: View {
     private func words(_ words: String, size: Double) -> some View {
         Text(words)
             .font(.system(size: HintFit.wordSize * size))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(HintLook.words)
             .lineLimit(1)
             .fixedSize()
     }
 }
 
-/// A key, drawn as one: its sign in a small box with rounded corners.
+/// A key, drawn as one: its sign in a small box with rounded corners, brighter than
+/// the line it is on, so that the keys are what is seen first.
 struct KeyCap: View {
     var key: String
     var size = 1.0
 
     var body: some View {
         Text(key)
-            .font(.system(size: HintFit.keySize * size, weight: .medium))
-            .foregroundStyle(.primary.opacity(0.85))
+            .font(.system(size: HintFit.keySize * size, weight: .semibold))
+            .foregroundStyle(HintLook.keySign)
             .lineLimit(1)
             .fixedSize()
             .padding(.horizontal, 5 * size)
             .frame(minWidth: 20 * size, minHeight: 19 * size)
-            .background(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).fill(Color.primary.opacity(0.07)))
-            .overlay(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).stroke(Color.primary.opacity(0.28)))
+            .background(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).fill(HintLook.key))
+            .overlay(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).stroke(HintLook.keyEdge))
     }
 }
 
