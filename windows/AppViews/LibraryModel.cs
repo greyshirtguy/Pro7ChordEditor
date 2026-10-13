@@ -609,6 +609,10 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         ProPresenterIsRunning = askWhetherProPresenterIsRunning();
         appData.Log("Started. " + Number(Places.Count) + " places found, " + Number(Libraries.Count) + " libraries in the one open.");
         Changed();
+        // The guide opens by itself once, at the app's first start on this PC: now,
+        // with the libraries found, and without waiting for the songs' marks
+        // (spec/13-guide.md, rule 2).
+        ShowTheGuideIfItNeverWas(settings.GuideShown == true);
         await MarksAreWorkedOutAsync();
     }
 
@@ -1742,6 +1746,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         LastLibrary = LibraryId,
         ListsSplit = ListsSplit == UsualListsSplit ? null : ListsSplit,
         ListsWidth = ListsWidth == ListsLook.UsualWidth ? null : ListsWidth,
+        GuideShown = guideShown ? true : null,
         TextZoom = TextZoom == UsualTextZoom ? null : TextZoom,
         SheetZoom = SheetZoom == UsualSheetZoom ? null : SheetZoom,
         SheetChordColour = SheetChordColour,

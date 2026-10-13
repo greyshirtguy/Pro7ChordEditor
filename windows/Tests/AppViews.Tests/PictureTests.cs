@@ -635,6 +635,45 @@ public class PictureTests
             return Task.CompletedTask;
         });
 
+    // ---- The guide (spec/13-guide.md: "The window, drawn into pictures and looked at:
+    // as it opens, in the light and in the dark; made narrow; and the whole page")
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheGuideAsItOpens(bool dark) => DrawView(
+        "77 the guide as it opens, " + In(dark),
+        dark,
+        _ => Task.FromResult<FrameworkElement>(new GuideView()),
+        width: 780,
+        height: 820);
+
+    [Fact]
+    public void TheGuideMadeNarrow() => DrawView(
+        "78 the guide made narrow",
+        false,
+        _ => Task.FromResult<FrameworkElement>(new GuideView()),
+        width: 460,
+        height: 700);
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheWholeOfTheGuidesPage(bool dark) => DrawView(
+        "79 the whole of the guide" + (char)0x2019 + "s page, " + In(dark),
+        dark,
+        _ => Task.FromResult<FrameworkElement>(new GuideView()),
+        width: 780,
+        height: 3050);
+
+    [Fact]
+    public void TheGuideInAWideWindow() => DrawView(
+        "80 the guide in a wide window",
+        true,
+        _ => Task.FromResult<FrameworkElement>(new GuideView()),
+        width: 1300,
+        height: 820);
+
     // (spec/03, rule 46b: the lit bubble with the chord's name, where it would land.
     // What the system itself shows meanwhile, its pointer, no picture here can have.)
     [Fact]

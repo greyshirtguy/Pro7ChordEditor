@@ -44,6 +44,7 @@ public partial class ChordSheetView : UserControl
     public ChordSheetView()
     {
         InitializeComponent();
+        Guide.ToolTip = GuideView.Tip;
         // (For its scroll bars: the sheet is dark whatever the system is.)
         Look.Wear(Scroll, dark: true);
         Sheet.Scroll = Scroll;
@@ -250,6 +251,9 @@ public partial class ChordSheetView : UserControl
         }
         NoKey.Visibility = seen ? Visibility.Visible : Visibility.Collapsed;
     }
+
+    // The ? at the right of the strip: the guide, which the window opens.
+    private void TheGuideWasAskedFor(object sender, RoutedEventArgs e) => model?.ShowGuide();
 
     private void SmallerWasClicked(object sender, RoutedEventArgs e) => model?.ZoomSheet(-1);
 

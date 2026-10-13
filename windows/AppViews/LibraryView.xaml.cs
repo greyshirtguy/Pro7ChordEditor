@@ -31,6 +31,7 @@ public partial class LibraryView : UserControl
         // (The panes have it from here: what a view is handed, those in it are handed
         // too.)
         DataContext = model;
+        ShowGuide = model.ShowGuide;
         leftAt = model.ListsWidth;
         SizeChanged += (_, _) => LayOut();
         // The model says how wide the lists were left: when the app starts, what was
@@ -47,10 +48,11 @@ public partial class LibraryView : UserControl
     }
 
     /// <summary>
-    /// Shows the guide, in a window of its own beside this one (spec/13-guide.md). The
-    /// window sets it; a view in no window has none to show.
+    /// Asks for the guide, which is a window of its own beside this one
+    /// (spec/13-guide.md): the model is told, and the window that holds this view opens
+    /// it. (A test puts its own here.)
     /// </summary>
-    public Action ShowGuide { get; set; } = () => { };
+    public Action ShowGuide { get; set; }
 
     /// <summary>The edge between the lists and the song: for a test to drag.</summary>
     internal GridSplitter TheEdge => Edge;

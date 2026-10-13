@@ -89,6 +89,17 @@
     <Resource Include="..\App\ChordEditor.ico" Link="ChordEditor.ico" />
   </ItemGroup>
   <ItemGroup>
+    <!--
+      The guide's words and its pictures (spec/13-guide.md), carried inside this
+      library under the names "Guide/guide.json", "Guide/typing.png" and so on: so they
+      are wherever the app is, in the one file it is given out as and under the tests.
+      guide.json is a copy of spec/guide.json, the same to the byte, which a test
+      holds; the pictures are drawn by the tests from this app's own sheet.
+    -->
+    <EmbeddedResource Include="Guide\guide.json" LogicalName="Guide/guide.json" />
+    <EmbeddedResource Include="Guide\*.png" LogicalName="Guide/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
     <ProjectReference Include="..\Song\Song.csproj" />
   </ItemGroup>

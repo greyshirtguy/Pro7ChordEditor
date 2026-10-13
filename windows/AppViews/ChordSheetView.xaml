@@ -4,7 +4,9 @@
   (spec/03-chord-sheet.md, rules 14 and 14a).
 
     the strip   the key's own chords on the keys 1 to 7, which can be clicked there too;
-                and at its right the two buttons that make the words smaller and larger.
+                and at its right the two buttons that make the words smaller and larger,
+                and a little apart from them a third, with a question mark on it, that
+                shows the guide (spec/13-guide.md, rule 3).
                 The key itself is set in the song's header, over this, and nowhere else.
                 Nothing in the strip is ever squeezed or wrapped: where the pane is too
                 narrow for the chords and what is said of a song with no key, that is
@@ -108,6 +110,14 @@
                   ToolTip="Larger words. Ctrl with the plus key does the same; Ctrl with 0 is the usual size."
                   AutomationProperties.Name="Larger words">
             <Path Data="M0,4 L8,4 M4,0 L4,8" Width="8" Height="8" Stroke="#E6E6E6" StrokeThickness="1.7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+          </Button>
+          <!-- (Its tip is the guide's own sentence, put there by the code beside this.) -->
+          <Button x:Name="Guide"
+                  Style="{StaticResource Round}"
+                  Margin="16,0,0,0"
+                  Click="TheGuideWasAskedFor"
+                  AutomationProperties.Name="The guide">
+            <TextBlock Text="?" FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13.5" FontWeight="Bold" Foreground="#E6E6E6" Margin="0,-1,0,0" />
           </Button>
         </StackPanel>
         <TextBlock x:Name="NoKey"

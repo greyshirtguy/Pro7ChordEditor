@@ -51,5 +51,43 @@ public partial class LibraryWindow : Window
         Closing += (_, _) => model.Settle();
         looking.Tick += async (_, _) => await model.LookForProPresenterAsync();
         Closed += (_, _) => looking.Stop();
+
+        // The guide is a window of its own, opened whenever the model says it is
+        // wanted: because it was asked for, or because this is the app's first start
+        // on this PC (spec/13-guide.md). Closing this window ends the program, and so
+        // the guide goes with it.
+        model.GuideWanted += ShowTheGuide;
+        Closed += (_, _) =>
+        {
+            model.GuideWanted -= ShowTheGuide;
+            guide?.Close();
+        };
+    }
+
+    // The guide's window, while it is open. There is one of it.
+    private GuideWindow? guide;
+
+    // Opens the guide beside this window; or, if it is open already, brings it to the
+    // front.
+    private void ShowTheGuide()
+    {
+        if (guide is not null)
+        {
+            if (guide.WindowState == WindowState.Minimized)
+            {
+                guide.WindowState = WindowState.Normal;
+            }
+            guide.Activate();
+            return;
+        }
+        guide = new GuideWindow((LibraryModel)((LibraryView)Content).DataContext);
+        guide.Closed += (_, _) => guide = null;
+        var here = WindowState == WindowState.Maximized ? SystemParameters.WorkArea : new Rect(Left, Top, ActualWidth, ActualHeight);
+        var at = GuideWindow.PlaceBeside(here, SystemParameters.WorkArea, new Size(guide.Width, Math.Min(guide.Height, SystemParameters.WorkArea.Height)));
+        guide.WindowStartupLocation = WindowStartupLocation.Manual;
+        guide.Left = at.X;
+        guide.Top = at.Y;
+        guide.Height = Math.Min(guide.Height, SystemParameters.WorkArea.Height);
+        guide.Show();
     }
 }
