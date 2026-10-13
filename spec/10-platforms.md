@@ -25,8 +25,14 @@ the list of those things. Anything not on it is to be the same.
 | The guide ([13](13-guide.md)), asked for from the keys | Command+?, which is the Mac's key for help. It is Help > Pro7 Chord Editor Guide, where macOS would otherwise say the app has no help | F1, which is Windows'. The same under Help in the window's own menu |
 | The guide's pictures, and its names for the keys | Of the Mac app's sheet, with the Mac's arrow drawn in for the pointer. Command, Option, Return | Of the Windows app's sheet, with Windows' arrow. Ctrl, Enter |
 | Settings | A Settings window (Command+comma) | A settings page or dialog |
+| The app's icon | `mac/App/ChordEditor.icns`, in the app as it is and named as its icon in the app's `Info.plist` | `windows/App/ChordEditor.ico`: the program's own icon, and its window's |
 | The app's own data | `~/Library/Application Support/Pro7ChordEditor` | `%LOCALAPPDATA%\Pro7ChordEditor` |
 | Looks | The system's controls, fonts and colours for lists, buttons and fields. Dark and light as the system is | The same, in the system's own style |
+
+The icon is one picture on both, the maintainer's own (2026-10-13), each app having
+it in its platform's kind of file, as it was given. `pictures/ChordEditor.png` at the
+top of the repository is the same picture, for the README. Neither app makes the icon
+from anything: a new one is three new files.
 
 The sheet itself is drawn by the app and looks the same on both: dark, with the
 colours of [03-chord-sheet.md](03-chord-sheet.md). (Whether it should have a light
@@ -183,6 +189,19 @@ seen in a picture and ask the maintainer to try them.
   app's row of the table up to date in the same push**: the link, the version, the
   size. (The maintainer, 2026-10-12: "an obvious answer to someone who wants to try
   it out: links to both releases".)
+- **One release holds both apps, from 0.3 on.** A release is one tag, `v` and the
+  number (`v0.3`), with two files in it, each named for its app and that number:
+  `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`. So the two
+  apps go by one number ([06-library.md](06-library.md), rule 6d), and a number is
+  used up once either app has been given out under it. Whichever app is ready first
+  makes the release with its own file, and says in its text that the other's is to
+  come; the other adds its file, its part of the text, and its row of "Try it". It
+  is a pre-release still, and GitHub's "Latest" stays on the first editor, until the
+  maintainer says otherwise: with both files in one release that label can name both
+  apps, which it could not while each had a release of its own. (The maintainer,
+  2026-10-13, of the Windows build: it "will get added to the new release". Until
+  then each app had releases of its own and a number of its own: `mac-v0.2`,
+  `windows-v0.2`.)
 - **Every push** should build both apps and run both sets of tests on GitHub's own
   Mac and Windows machines (`.github/workflows`). That is the referee the two apps
   share: neither can drift from the vectors without it showing. Set it up in the

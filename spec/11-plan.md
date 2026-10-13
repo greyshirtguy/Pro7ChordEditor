@@ -65,6 +65,8 @@ its turn comes, from the page that has it:
 | The app's version in the window's title | [06](06-library.md), rule 6d |
 | The guide: one page on how chords are put on, shown once and under Help | [13](13-guide.md), with its words in [guide.json](guide.json) |
 | Where each app is downloaded, in the README at the top | [10](10-platforms.md), "Getting it to other people" |
+| The app's icon | [10](10-platforms.md), "Where each follows its platform" |
+| One release for both apps, under one number | [10](10-platforms.md), "Getting it to other people" |
 
 ## What the maintainer is asked for along the way
 
