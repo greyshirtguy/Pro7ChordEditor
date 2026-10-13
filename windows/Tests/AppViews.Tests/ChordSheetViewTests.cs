@@ -615,6 +615,72 @@ public class ChordSheetViewTests
         Assert.Equal("13:" + offered[1] + " 25:D", hand.ChordsOf("wretch"));
     });
 
+    // spec/03, rule 35a (new on 2026-10-13): a box that is emptied and then kept takes
+    // the chord off, by Enter, by a click on another place and by a click on the bare
+    // sheet; Esc changes nothing. Here with a hand at the window, and what the file
+    // has afterwards. (The sheet's own cases are in Song.Tests, as the Mac's.)
+    [Fact]
+    public void ABoxThatIsEmptiedAndThenKeptTakesTheChordOffTheFileAndEscLeavesItThere() => OnAMadeUpPC(async pc =>
+    {
+        const string without = "1:G 18:C 28:G 59:D";
+        var (model, view, hand) = await Open(pc, "Amazing Grace");
+        var grace = hand.PlaceOf("grace");
+
+        void EmptyTheBoxOnG7()
+        {
+            Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+            hand.Click(grace, onItsChord: true);
+            Assert.Equal("G7", hand.Box.Text);
+            hand.Press(Key.Back);
+            Assert.Equal("", hand.Box.Text);
+            Assert.True(hand.Sheet.Typing);
+            // Nothing is in the file until the box is kept.
+            Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        }
+
+        // Enter. It is one step, that Ctrl+Z takes back.
+        EmptyTheBoxOnG7();
+        Assert.True(hand.Press(Key.Enter));
+        Assert.False(hand.BubbleIsOpen);
+        Assert.Equal(without, InTheFile(0, "Amazing Grace", pc));
+        Assert.True(hand.Press(Key.Z, ModifierKeys.Control));
+        Assert.False(model.CanUndo);
+
+        // Esc: the chord is as it was, and there is nothing to take back.
+        EmptyTheBoxOnG7();
+        Assert.True(hand.Press(Key.Escape));
+        Assert.False(hand.BubbleIsOpen);
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
+
+        // A click on another word: the chord goes, and the bubble opens there.
+        EmptyTheBoxOnG7();
+        hand.Click("wretch");
+        Assert.True(hand.BubbleIsOpen);
+        Assert.Equal(hand.PlaceOf("wretch"), hand.Sheet.TypingAt);
+        Assert.Equal(without, InTheFile(0, "Amazing Grace", pc));
+        Assert.True(hand.Press(Key.Escape));
+        Assert.True(hand.Press(Key.Z, ModifierKeys.Control));
+        Assert.False(model.CanUndo);
+
+        // A click on the bare sheet.
+        EmptyTheBoxOnG7();
+        hand.ClickAt(Hand.BareSheet);
+        Assert.False(hand.BubbleIsOpen);
+        Assert.Equal(without, InTheFile(0, "Amazing Grace", pc));
+        Assert.True(hand.Press(Key.Z, ModifierKeys.Control));
+
+        // And an empty box kept where there is no chord changes nothing: there is
+        // nothing to take back.
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        hand.Click("saved");
+        Assert.Equal("", hand.Box.Text);
+        Assert.True(hand.Press(Key.Enter));
+        Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
+        Assert.False(model.CanUndo);
+        _ = view;
+    });
+
     // ---- Dragging a chord
 
     // The song's next three slides, as the file has them.

@@ -618,6 +618,79 @@ public class ChordSheetTests
         Assert.Single(song.Asked);
     }
 
+    // Kept with nothing in the box, the chord that was there goes: by Enter, by a click
+    // on another place, by a click on the bare sheet. Esc changes nothing; and where
+    // there was no chord, nothing is asked (rule 35a, new on 2026-10-13). MINE, NOT A
+    // VECTOR, there being none until Simple Presenter does as the rule says
+    // (testdata/README.md, "Still wanted"): the Mac's `keptEmpty`, case for case.
+    [Fact]
+    public void KeptWithNothingInTheBoxTheChordThatWasThereGoesAndEscChangesNothing()
+    {
+        // Enter.
+        var (sheet, song) = vectors.Sheet("grace");
+        sheet.SetSpot(1, 8);
+        sheet.StartTyping();
+        sheet.Type("");
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Enter));
+        Assert.False(sheet.Typing);
+        Assert.Equal("", sheet.ChordAt(1, 8));
+        Assert.Equal("G", sheet.ChordAt(1, 0));
+        Assert.Single(song.Asked);
+
+        // A click on another place: the one goes, and the bubble opens on the other.
+        (sheet, song) = vectors.Sheet("grace");
+        sheet.Pick(1, 8);
+        sheet.Type("");
+        sheet.Pick(2, 5);
+        Assert.True(sheet.Typing);
+        Assert.Equal(new Spot(2, 5), sheet.TypingAt);
+        Assert.Equal("", sheet.ChordAt(1, 8));
+        Assert.Single(song.Asked);
+
+        // A click on the bare sheet.
+        (sheet, song) = vectors.Sheet("grace");
+        sheet.Pick(1, 8);
+        sheet.Type("");
+        sheet.Settle();
+        Assert.False(sheet.Typing);
+        Assert.Equal("", sheet.ChordAt(1, 8));
+        Assert.Single(song.Asked);
+
+        // Esc: the chord is as it was, and the song was asked nothing.
+        (sheet, song) = vectors.Sheet("grace");
+        sheet.Pick(1, 8);
+        sheet.Type("");
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Escape));
+        Assert.False(sheet.Typing);
+        Assert.Equal("G7", sheet.ChordAt(1, 8));
+        Assert.Empty(song.Asked);
+
+        // Opened and kept with its name untouched: nothing is taken off.
+        (sheet, song) = vectors.Sheet("grace");
+        sheet.Pick(1, 8);
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Enter));
+        Assert.Equal("G7", sheet.ChordAt(1, 8));
+
+        // Where there is no chord, an empty box kept asks the song nothing.
+        (sheet, song) = vectors.Sheet("grace");
+        sheet.Pick(1, 13);
+        Assert.Equal("", sheet.Entry.Text);
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Enter));
+        Assert.False(sheet.Typing);
+        Assert.Empty(song.Asked);
+
+        // On a line of chords alone, the one cleared goes and the others close up.
+        (sheet, song) = vectors.Sheet("intro");
+        var alone = sheet.Rows.ToList().FindIndex(row => row.Kind == SheetRowKind.Line && row.Alone && row.Chords.Count >= 2);
+        Assert.True(alone >= 0);
+        var names = sheet.Rows[alone].Chords.Select(chord => chord.Name).ToList();
+        sheet.Pick(alone, 0);
+        sheet.Type("");
+        Assert.True(sheet.Press(ChordSheet.EntryKey.Enter));
+        Assert.Equal(names.Skip(1), sheet.Rows[alone].Chords.Select(chord => chord.Name));
+        Assert.Single(song.Asked);
+    }
+
     // 1 to 7 put the key's chord on the spot; while a chord is typed, where the typing
     // was, in place of what was typed (rules 24 and 39).
     [Fact]

@@ -991,14 +991,27 @@ public sealed class ChordSheet
     /// with none, nothing is changed (Esc). <paramref name="onward"/> then moves the spot
     /// on from that place to the next word (Tab), wherever the pointer has been
     /// meanwhile.
+    ///
+    /// With a name that is empty, the box was kept with nothing in it, and that is
+    /// taken at its word: no chord is to be there, and the one that is goes. (spec/03,
+    /// rule 35a, the maintainer's, 2026-10-13: until then an empty box that was kept
+    /// changed nothing, so a chord whose name had been cleared came back.) Where there
+    /// is no chord, there is nothing to take and the song is asked nothing.
     /// </summary>
     public void FinishTyping(string? name, bool onward)
     {
         var at = TypingAt;
         Typing = false;
-        if (!string.IsNullOrEmpty(name))
+        if (name is not null)
         {
-            Put(at.Row, at.At, name);
+            if (name.Length == 0)
+            {
+                Take(at.Row, at.At);
+            }
+            else
+            {
+                Put(at.Row, at.At, name);
+            }
         }
         if (onward)
         {
