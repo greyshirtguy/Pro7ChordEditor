@@ -8,9 +8,17 @@
 	NSDocumentsFolderUsageDescription: ProPresenter keeps its library in the Documents
 	folder, and macOS asks the person, the first time, whether this app may read there.
 	These are the words it shows them under its question (spec/10-platforms.md).
+
+	CFBundleIconFile: the app's icon, which is the file ChordEditor.icns beside this one.
+	It is the maintainer's own picture, given as that file on 2026-10-13, and is in the
+	app as it was given: Xcode copies it into the app's Resources with everything else
+	in this folder, and this names it. (Not an asset catalogue: that would have Xcode
+	make the icon's sizes again from pictures taken out of the file, to no gain.)
 -->
 <plist version="1.0">
 <dict>
+	<key>CFBundleIconFile</key>
+	<string>ChordEditor</string>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>To open the songs in your ProPresenter library.</string>
 </dict>

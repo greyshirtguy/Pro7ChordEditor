@@ -14,7 +14,7 @@ key ProPresenter shows it in. Nothing is saved while ProPresenter is running. A 
 to all of it, one page with pictures of the app's own sheet, opens the first time the
 app is started, and is under Help ever after.
 
-Not yet: mending songs the old Windows editor damaged; ChordPro files; an icon.
+Not yet: mending songs the old Windows editor damaged; ChordPro files.
 
 **It changes the files of a ProPresenter library. Try it on a copy of one first**
 (copy a folder of `Libraries` somewhere, and open the copy with Choose Folder…).
@@ -31,10 +31,14 @@ The image holds the app, a way to Applications to drag it onto, and
 [a read-me](dmg/Read%20Me%20First.txt). The version is the app's own, in the Xcode
 project.
 
-When an image is put on the Releases page, the Mac's row of "Try it" in
+Since 0.3 a release is one for both apps, `v` and the number (`v0.3`), with the Mac's
+image and Windows' zip as its two files. If the Windows app has made it already, the
+image is added to it; if not, it is made with the image, as a pre-release, and its
+text says that Windows' is to come. Either way the Mac's row of "Try it" in
 [the README at the top](../README.md) is brought up to date in the same push: the
 link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
-"Getting it to other people").
+"Getting it to other people"). A release is made, changed or taken down on the
+maintainer's word and not otherwise.
 
 **It is not yet signed with a Developer ID, nor checked by Apple** (notarized): that
 waits on the maintainer's developer account. So on another Mac, once the image has
@@ -59,7 +63,7 @@ Nothing has to be installed first, and the `proto/` submodule is not needed to b
 | `Core/generate-proto.sh` | Makes `ProFormat` again from the `proto/` submodule. Needs `brew install protobuf swift-protobuf` |
 | `Core/Sources/AppViews` | The window: what it shows and what a click does. A library too, so that the tests can draw it into pictures |
 | `Core/Sources/AppViews/Guide` | The guide's words, a copy of [`spec/guide.json`](../spec/guide.json), and its pictures, which a test draws and holds to what the app draws now ([`spec/13-guide.md`](../spec/13-guide.md)) |
-| `App/` | The app itself: the few lines that start it |
+| `App/` | The app itself: the few lines that start it, what it says of itself to macOS, and its icon (`ChordEditor.icns`, the maintainer's own picture) |
 | `Pro7ChordEditor.xcodeproj` | Builds the app |
 | `make-dmg.sh`, `dmg/` | Makes the disk image the app is given out in, and the read-me that goes in it |
 | [`NOTES.md`](NOTES.md) | What was decided and found out on the way, and what is left rough |

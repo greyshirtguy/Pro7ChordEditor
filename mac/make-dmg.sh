@@ -17,7 +17,8 @@
 #      so the folders of the Mac it was built on, the account's name among them.
 #   2. Looks at what it built: its version, that it runs on both kinds of Mac, how it
 #      is signed, that its seal holds, that it has its guide (the words and every
-#      picture they name), and that nothing in it names a folder of this Mac.
+#      picture they name) and its icon, and that nothing in it names a folder of this
+#      Mac.
 #   3. Lays out a folder: the app, a way to Applications to drag it onto, and the
 #      read-me that is kept beside this script (mac/dmg/Read Me First.txt).
 #   4. Makes a compressed image of that folder, mounts the image, and holds the app in
@@ -90,6 +91,14 @@ PICTURES=$(sed -n 's/.*"picture": "\([^"]*\)".*/\1/p' "$GUIDE/guide.json" | sort
 for PICTURE in $PICTURES; do
     [ -s "$GUIDE/$PICTURE.png" ] || { echo "the app has not got the guide's picture $PICTURE.png" >&2; exit 1; }
 done
+# Its icon: the file the app names as its own, in it, and the same to the byte as the
+# one kept beside the app's few lines (mac/App). A build goes through without it, and
+# the app then wears the blank icon macOS gives a program that has none.
+ICON=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIconFile" "$PLIST" 2>/dev/null || true)
+[ -n "$ICON" ] || { echo "the app names no icon (CFBundleIconFile)" >&2; exit 1; }
+ICON="${ICON%.icns}.icns"
+[ -s "$HERE/App/$ICON" ] || { echo "there is no $HERE/App/$ICON, which the app names as its icon" >&2; exit 1; }
+cmp -s "$APP/Contents/Resources/$ICON" "$HERE/App/$ICON" || { echo "the app has not got its icon: $ICON is not in it, or is not the one in $HERE/App" >&2; exit 1; }
 SIGNED=$(codesign -dv "$APP" 2>&1 | sed -n 's/^Signature=//p; s/^Authority=//p' | head -1)
 [ -n "$SIGNED" ] || SIGNED="in a way this script does not know"
 # Nothing in the app is to say where on this Mac it was made: not the home folder of
