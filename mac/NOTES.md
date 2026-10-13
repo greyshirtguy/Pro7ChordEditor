@@ -21,6 +21,7 @@ milestone; put right what has become untrue.
 | The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer.** Its window was opened once, on 2026-10-13, by the 0.3 app shut in from the maintainer's files (decision 70): it opens at the first start and not at the second. Nothing else of it has been tried | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
 | The icon, and version 0.3 (asked for after M7) | Done, 2026-10-13, and given out the same day as the Mac's half of the release `v0.3` | The maintainer's own picture, in the app as the file they gave (decision 68). One release now holds both apps (decision 69) |
 | What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
+| What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1. **Not given out: a build to try is in `mac/build`**, and a release waits for the maintainer's word | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -553,7 +554,9 @@ And the same day, on how someone new is to find out what the sheet can do:
     is not room the last hints are left off, so copy and paste come before the
     whole verse. **Not built, and put to the maintainer as the next thing to try**:
     a small cross on a chord's bubble while the pointer is on it, to take it off
-    with a click.
+    with a click. (**Tried by the maintainer and changed the same day**: decisions
+    81 and 82. The tips by the clock are gone, and so is what is said here of
+    them.)
 74. **The menus are kept to what is of use** (`spec/10`, "Menus"). Out: Save, the
     maintainer's guess that it is not needed; Delete, and what macOS adds to every
     Edit menu. Command+S is still answered, by the window (`WindowKeeper`), and
@@ -602,6 +605,67 @@ And the same day, on how someone new is to find out what the sheet can do:
     ProPresenter makes of it is not known. `AGENTS.md` said that a write changes,
     for such a line, "the characters they hang on" and nothing else; a few words
     were added to it so that it is still true.
+80. **The edge between the lists and the song starts half way between its least and
+    its most, and is the app's own** (`spec/06`, rule 6a). The maintainer asked
+    where it starts and for "about half way between min and max": 345, of 210 and
+    480. **What was found on asking the window itself**: the system's split view
+    (`HSplitView`) had been asked to start the lists 270 wide since M3 and started
+    them **480** wide, in a window of the usual size. It gives each side half the
+    window, up to the lists' most, whatever it is asked; it changes the lists'
+    width as the window's changes; and what it is under SwiftUI will not have its
+    way of holding a width changed (it raises an error, which in the app would be
+    a crash at the start). So the edge is this app's, as the bar between the two
+    lists always was: a line, a few points beside it to drag it by, and the width
+    kept by the model. **Mine, with it**: the lists keep their width as the window
+    is resized; where the edge is left is remembered (`settings.json`,
+    `listsWidth`), as the bar's place is; and clicked twice it goes back to 345.
+    What is dragged lies over the lists' side of the line and none of the song's:
+    the sheet says what shape the pointer is at every move, and would take the
+    edge's away. **By hand only**: the dragging, and the pointer's shape over it.
+81. **The line of hints, tried, and changed the same day** (`spec/03`, rules 53a to
+    53g; still marked there as being tried on the Mac). The maintainer, of 1.0.0:
+    "love how they appear at the right time - lets drop the randomly timed tips",
+    and gave the words for the copying: "Press ⌘-c to copy all chords on the
+    highlighted line. Press ⌘-v to paste previously copied chords to the
+    highlighted line", with " (Replaces existing chords)" after it "when the target
+    line has any chords". Built as said. **Mine, all to be overruled**:
+    - the keys are drawn as the line draws every key, ⌘C and ⌘V in their small
+      boxes, and not written "⌘-c";
+    - with nobody at the sheet the line says one thing that never changes ("Point
+      at a word or a chord, and this line says what the keys do there."), and
+      says it whatever is held: the copying is of the highlighted line, and there
+      is none then;
+    - where a whole verse was copied, the second sentence ends "and the lines
+      after it", since that is where they go; and "(Replaces…)" goes by every
+      line the paste would reach (`ChordSheet.pasteWouldReplace`), a line that
+      would be passed over not counting. With nothing copied yet it goes by the
+      highlighted line alone;
+    - Shift+Command+C is said nowhere on the line now (the guide has it);
+    - the two sentences are never left off for want of room: they go one under
+      the other, the line being two lines while they are said, and then smaller;
+    - Command+C and Command+V do the same with Option held as well. Option is
+      what brings the hint up, and until now a key pressed with it still down did
+      nothing at all.
+82. **The highlighted line** (`spec/03`, rule 53f; the maintainer's: "highlight the
+    hovered/active line of text ... by changing color - default orange (a new
+    setting)"). The words of the line the person is at are drawn in the sheet's
+    orange, `#ff8a1f`, or the colour chosen under Settings > Chords, "The
+    highlighted line". **Mine**: which orange; that while a chord is typed it is
+    the line of the typing, wherever the pointer has gone; that a line of chords
+    alone, having no words, has its rule in the colour and twice as thick; and
+    where the setting stands, between the two colours of chords. One function
+    says which line it is (`SheetHints.line`), for the drawing and for the hint.
+    **The guide's three pictures were made again**: each is of someone at the
+    sheet, so each has its line in orange now (`spec/13`, rule 15). Its words were
+    left alone: they are shared with Windows, which has no such line yet.
+83. **Two sheets on one model never agree, and the tests stopped on it.** Each
+    sheet's view tells the model what is going on in itself. The picture tests
+    left every window they drew open, on one model; with the pointer put over one
+    of them and not another, each told the model otherwise than the last, the
+    model had every window drawn again, and the tests ran for ten minutes at full
+    speed until stopped. The app has one sheet and is not touched by it; the
+    tests now close each window when it is drawn (`PictureTests.draw`), and the
+    sheet's view says why at `tell()`.
 
 ## How it is laid out, and why
 
@@ -1106,8 +1170,9 @@ changing any of it:
   checked with ProPresenter quit and two helpers running.
 - **Drawing the window off the screen** (`spec/10`): `cacheDisplay` of an
   `NSHostingView` in a window never shown draws lists, fields and buttons. A
-  sidebar's see-through material comes out blank, which is why the three panes are
-  plain `HSplitView` panes with grounds of their own and not a `NavigationSplitView`.
+  sidebar's see-through material comes out blank, which is why the panes are plain
+  ones with grounds of their own and not a `NavigationSplitView`. (They were the
+  panes of an `HSplitView` until 2026-10-13: decision 80 has why they are not now.)
 - **A view that scrolls both ways centres what is smaller than itself.** The song is
   given the pane's size as its least size to sit at the top left. Seen in a picture,
   and put right.
@@ -1674,6 +1739,14 @@ the About text, a Developer ID, notarizing) is still to come.
   build 4, from the commit "Version 1.0.0". All 353 tests pass. Started twice,
   shut in as 0.3 was, with a new made-up home: two windows the first time, the
   guide's among them, and one the second.
+- **1.0.1, built on 2026-10-13 and not given out**: it is in `mac/build` for the
+  maintainer to try (`Pro7ChordEditor-mac-1.0.1.dmg`, sha256 `a234835c…9bbe`), and
+  a release waits for their word. Version 1.0.1, build 5: the number is another
+  than 1.0.0's so that the window's title says which build is being tried. All 362
+  tests pass. Started twice, shut in as before, with a new made-up home: two
+  windows the first time, the guide's among them, and one the second; its menus as
+  1.0.0's. What that does not tell is everything this build is for: the edge, the
+  highlighted line and the hints are under "Left rough".
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -1690,12 +1763,30 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **What was built on 2026-10-13 has been used by nobody.** The tests hold what each
-  thing says and does, and pictures of it were looked at; none of it has been under
-  a hand. To try, and to say what is wrong with:
-  1. the line of hints: is it read, and is what it says right, on a chord, on a
-     word, typing, carrying, and with Option or Command held? Does it jump about
-     too much as the pointer moves? Are nine seconds for a tip right?
+- **1.0.1 has been used by nobody** (decisions 79 to 82). To try, and to say what
+  is wrong with:
+  1. the edge between the lists and the song: it starts a little left of where it
+     did; drag it, and see the pointer change over it; make the window wider and
+     narrower, and the lists keep their width; quit and start, and it is where it
+     was left; click it twice, and it is back at its start;
+  2. the highlighted line: the words of the line the pointer is on go orange. Is
+     that too much, as the pointer crosses a slide? Is the spot's own orange
+     outline lost against it? Settings > Chords has its colour;
+  3. hold Option on a line: the two sentences. On a line with chords the second
+     ends "(Replaces existing chords)". In a narrower window they go one under
+     the other, and the sheet is a line shorter while Option is down: does that
+     jar?
+  4. with Option still down, Command+C and Command+V: they work;
+  5. a line of chords with no words: its rule is what goes orange;
+  6. a song whose line of chords alone is given a chord more, or one fewer, **and
+     then looked at in ProPresenter**: the capitals of its box now run to the end
+     of the line as it is (decision 79). What ProPresenter makes of it is a guess.
+- **1.0.0 was tried by the maintainer on 2026-10-13.** What was said of it is in
+  decisions 80 to 82: the hints "appear at the right time", the tips by the clock
+  were not wanted, the copying wanted other words and a line to be about. Of the
+  rest of this list nothing was said, so it stands:
+  1. the line of hints: is what it says right on a chord, on a word, typing and
+     carrying?
   2. click a chord, clear the box, press Return: the chord goes. And clear it and
      click another word;
   3. close the window with the red button, and with Command+W: the app quits, and
