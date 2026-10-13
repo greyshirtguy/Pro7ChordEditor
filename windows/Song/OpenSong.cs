@@ -250,7 +250,10 @@ public sealed class OpenSong : ISheetSong
     ///     another order), only the chord entries change.
     ///   - Otherwise the line's characters are changed in the box's RTF, in place, and
     ///     not another byte of it (RtfWords). This is the one case in which the app
-    ///     writes words.
+    ///     writes words. With it, and only then, what the box says of a range of its
+    ///     words that is no chord ("these are in capitals") has each end of its range
+    ///     go with the words (Writing.MoveOtherRanges; spec/01, "The box's other
+    ///     ranges", decided on 2026-10-13).
     ///   - A blank slide's line: its first chords give its box words, or give the slide
     ///     a box if it has none (an empty <paramref name="element"/>). No chords for a
     ///     blank slide is nothing to do, and nothing is made for it.
@@ -675,6 +678,9 @@ public sealed class OpenSong : ISheetSong
             {
                 var rtf = RtfWords.WithLine(text.RtfData.Span, line, now) ?? throw Refusal.CannotBeWritten;
                 text.RtfData = ByteString.CopyFrom(rtf);
+                // What the box says of a range of its words ("these are in capitals")
+                // goes with the words, as the chords of the lines below do.
+                Writing.MoveOtherRanges(text, start, old.Length, now.Length);
             }
             kept.AddRange(names.Select((name, n) => new Chord(start + n * 2, name)));
             Writing.WriteChords(kept, text);

@@ -506,6 +506,38 @@ public static class RtfWords
     }
 
     /// <summary>
+    /// Where a place in the words is, once a line of them that began at
+    /// <paramref name="lineStart"/> and was <paramref name="was"/> units long has been
+    /// made <paramref name="now"/> units long by putting units on its end or taking
+    /// them off it: which is what a run of stand-ins made longer or shorter is. The
+    /// reference's <c>rtfstandins::placeAfter</c>, and held to its own test's cases,
+    /// there being no vector yet (spec/01-file-format.md, "The box's other ranges").
+    ///
+    /// It is for what a text box keeps beside its words that is said of a range of
+    /// them and is not a chord: "these are in capitals". A range is two such places,
+    /// its start and its end.
+    ///
+    ///   - A place at the line's old end, or past it, moves by as much as the line
+    ///     grew or shrank. So a range that ended with the line, or went on past it,
+    ///     still does; one that began after the line is over the same words as before;
+    ///     and a range over all the words is over all of them still.
+    ///   - A place before the line's old end stays; or, where the line has shrunk and
+    ///     what the place was on is gone, comes back to the line's new end.
+    ///
+    /// It is what a text system does with what is set on characters when more are
+    /// typed after them, and so what ProPresenter is taken to do, WHICH IS A GUESS.
+    /// </summary>
+    public static int PlaceAfter(int place, int lineStart, int was, int now)
+    {
+        if (place >= lineStart + was)
+        {
+            return place + (now - was);
+        }
+        // (Only where the line has shrunk is anything before its old end past its new one.)
+        return Math.Min(place, lineStart + Math.Min(was, now));
+    }
+
+    /// <summary>
     /// A new RTF for a text box that has no words: the opening of another's, up to
     /// where its words begin (its fonts, its colours and how its first words are set),
     /// then these stand-ins, then as many closing braces as that opening left open.

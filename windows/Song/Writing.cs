@@ -10,6 +10,9 @@
 //     them, in order of place, each with the range the rules give it (Chords.Ranges).
 //     In every song from Multitracks looked at, that is the order the file has them in
 //     already, so a box given the chords it had is, entry for entry, what it was.
+//     (One thing of those other attributes does change, and in one case only: where a
+//     line of chords alone is made longer or shorter, the ends of their ranges go
+//     with the words. MoveOtherRanges, below, which says why.)
 //   - The file is never half written. The whole message is written to a new file beside
 //     the song's own, pushed out of the system's keeping onto the disk, and put in the
 //     place of the old one in one step. Then it is read back, and must be byte for byte
@@ -54,6 +57,52 @@ internal static class Writing
         }
         text.Attributes.CustomAttributes.Clear();
         text.Attributes.CustomAttributes.AddRange(entries);
+    }
+
+    /// <summary>
+    /// What a box says of a range of its words, and is not a chord, goes with the
+    /// words when a line of chords alone in it is made longer or shorter:
+    /// <paramref name="lineStart"/> is where that line began, <paramref name="was"/>
+    /// how long it was and <paramref name="now"/> how long it is.
+    ///
+    /// A text box has custom attributes that are no chords: "these are in capitals", a
+    /// gradient. Most boxes that hold a line of chords alone, as Multitracks makes
+    /// them, say of all their words that they are in capitals. Left as it was, that
+    /// range would stop short of a stand-in put in, and with a chord taken off would
+    /// end past the last of the words. So each end of each such range is moved as
+    /// RtfWords.PlaceAfter says, which is what Simple Presenter does and A GUESS at
+    /// what ProPresenter does (decided by the maintainer on 2026-10-13: "let's copy
+    /// simple presenter for now"; spec/01-file-format.md, "The box's other ranges").
+    /// Until then this app left them where they were.
+    ///
+    /// Nothing else of such an entry changes, none is added, taken away or put in
+    /// another place in the list, and one that has no range is not given one. An end
+    /// that is where it was is not written again. (The chords' own ranges are written
+    /// afresh by WriteChords, after this.)
+    /// </summary>
+    internal static void MoveOtherRanges(RV.Graphics.Types.Text text, int lineStart, int was, int now)
+    {
+        if (was == now || text.Attributes is null)
+        {
+            return;
+        }
+        foreach (var entry in text.Attributes.CustomAttributes)
+        {
+            if (Reading.IsAChord(entry) || entry.Range is null)
+            {
+                continue;
+            }
+            var start = RtfWords.PlaceAfter(entry.Range.Start, lineStart, was, now);
+            var end = RtfWords.PlaceAfter(entry.Range.End, lineStart, was, now);
+            if (start != entry.Range.Start)
+            {
+                entry.Range.Start = start;
+            }
+            if (end != entry.Range.End)
+            {
+                entry.Range.End = end;
+            }
+        }
     }
 }
 

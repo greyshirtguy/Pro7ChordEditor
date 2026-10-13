@@ -15,6 +15,15 @@
 // The third, that a song so changed opens in ProPresenter with its chords in place, is
 // the maintainer's to see, once there is a window to put a chord on with.
 //
+// And, since 2026-10-13: what a box says of a range of its words that is no chord
+// ("these are in capitals") has each end of its range go with the words when a line of
+// chords alone in it is made longer or shorter, as Simple Presenter has it
+// (spec/01-file-format.md, "The box's other ranges"). No vector holds that yet. The
+// rule itself is held to the reference's own cases (RtfWordsTests); here, what the song
+// writes: on Chords With No Words, every box of which says of all its words that they
+// are in capitals, and on that file with ranges of my own put in its boxes, whose
+// answers are worked out by hand from the page.
+//
 // (The song's part of this was built at milestone M2 on Windows, the pages having it to
 // the letter by then: windows/NOTES.md.)
 
@@ -99,6 +108,14 @@ public sealed class ChordsWithNoWordsTests : IDisposable
                 }
             }
             NothingElseChanged(fileBefore, Workbench.Read(song.Path), box.Element, line);
+            // Every box of this file says of all its words that they are in capitals,
+            // as most that hold a line of chords alone do in real songs. It says so of
+            // all of them still: not of one fewer, with a chord put on, and not of
+            // words that are no longer there.
+            var others = OthersOf(Workbench.TextOf(Workbench.Read(song.Path), box.Element));
+            var said = Assert.Single(others);
+            Assert.Equal(CustomAttribute.AttributeOneofCase.Capitalization, said.AttributeCase);
+            Assert.Equal((0, after.Words.Length), (said.Range.Start, said.Range.End));
             // And it is in the file, as another reads it.
             Assert.Equal(after.Words, new OpenSong(song.Path).TextBoxes[boxNumber].Words);
             Assert.Equal(after.Chords, new OpenSong(song.Path).TextBoxes[boxNumber].Chords);
@@ -124,6 +141,7 @@ public sealed class ChordsWithNoWordsTests : IDisposable
         var song = bench.Open(Shaped);
         var box = song.TextBoxes[boxNumber];
         var rtf = Workbench.TextOf(Workbench.Read(song.Path), box.Element).RtfData;
+        var others = OthersOf(Workbench.TextOf(Workbench.Read(song.Path), box.Element));
         var had = ChordsOn(box, line).Select(chord => chord.Name).ToList();
 
         song.SetChordsAlone(box.Slide, box.Element, line, had.AsEnumerable().Reverse().Select(name => name + "7").ToList());
@@ -131,6 +149,8 @@ public sealed class ChordsWithNoWordsTests : IDisposable
         Assert.Equal(rtf, Workbench.TextOf(Workbench.Read(song.Path), box.Element).RtfData);
         Assert.Equal(box.Words, song.TextBoxes[boxNumber].Words);
         Assert.Equal(had.AsEnumerable().Reverse().Select(name => name + "7"), ChordsOn(song.TextBoxes[boxNumber], line).Select(chord => chord.Name));
+        // ("Chords renamed on the stand-ins they have change no range but their own.")
+        Assert.Equal(others, OthersOf(Workbench.TextOf(Workbench.Read(song.Path), box.Element)));
 
         // Given the names it has, in the order it has them, nothing is changed at all.
         var again = bench.Open(Shaped);
@@ -168,6 +188,85 @@ public sealed class ChordsWithNoWordsTests : IDisposable
         // stand-in the line has.
         song.SetChordsAlone(box.Slide, box.Element, line, ["Em", "D"]);
         Assert.Equal(Chords.Placeholders(2), Words.Lines(song.TextBoxes[boxNumber].Words)[line]);
+    }
+
+    // ---- The box's other ranges (spec/01-file-format.md)
+    //
+    // MINE, not a vector: there is none yet. The file's own boxes say one thing of a
+    // range, capitals over all their words, which goes right whatever the line's start
+    // is taken to be. So here two boxes of a copy are given ranges of other kinds
+    // first, as a file might have them: over the words above the line, over the words
+    // below it, over part of the line, over the break after it, and one entry that has
+    // no range at all. Each answer was worked out by hand from the page's two
+    // sentences, and is written here as a number.
+    //
+    //   - "Naked come to thee for dress" and under it two chords alone: the line
+    //     begins at 29 and is 3 long, the box 32.
+    //   - Three chords alone and under them two lines of words: the line begins at 0
+    //     and is 5 long, the break after it is at 5, the words go from 6 to 56.
+    [Theory]
+    [InlineData("Naked", 1, 3, "0-34 0-5 29-30 30-34 31-34 none")]
+    [InlineData("Naked", 1, 1, "0-30 0-5 29-30 30-30 30-30 none")]
+    [InlineData("Naked", 1, 0, "0-30 0-5 29-30 30-30 30-30 none")]
+    [InlineData("Foul", 0, 4, "0-58 0-7 2-4 7-8 8-12 35-58 none")]
+    [InlineData("Foul", 0, 2, "0-54 0-3 2-3 3-4 4-8 31-54 none")]
+    [InlineData("Foul", 0, 0, "0-52 0-1 1-1 1-2 2-6 29-52 none")]
+    public void WhatABoxSaysOfARangeOfItsWordsGoesWithTheWordsWhenALineOfChordsAloneGrowsOrShrinks(string which, int line, int chords, string expected)
+    {
+        (int Start, int End)[] ranges = which == "Naked"
+            ? [(0, 32), (0, 5), (29, 30), (30, 32), (31, 32)]
+            : [(0, 56), (0, 5), (2, 4), (5, 6), (6, 10), (33, 56)];
+        var asMade = bench.Open(Shaped);
+        var box = asMade.TextBoxes.Single(one => one.Words.Contains(which, StringComparison.Ordinal));
+        Assert.Equal(which == "Naked" ? 32 : 56, box.Words.Length);
+        Assert.True(Chords.IsPlaceholders(Words.Lines(box.Words)[line]));
+
+        // The file, with those ranges said of that box in the place of its own one:
+        // the first of them capitals, as it was, and the others a size of words, and
+        // last an entry that has no range. Its chords after them, as they were.
+        var file = Workbench.Read(asMade.Path);
+        var text = Workbench.TextOf(file, box.Element);
+        var itsChords = text.Attributes.CustomAttributes.Where(entry => entry.AttributeCase == CustomAttribute.AttributeOneofCase.Chord).Select(entry => entry.Clone()).ToList();
+        var capitals = Assert.Single(OthersOf(text));
+        text.Attributes.CustomAttributes.Clear();
+        foreach (var (start, end) in ranges)
+        {
+            var entry = start == 0 && end == box.Words.Length ? capitals.Clone() : new CustomAttribute { OriginalFontSize = 60 + start };
+            entry.Range = new IntRange { Start = start, End = end };
+            text.Attributes.CustomAttributes.Add(entry);
+        }
+        text.Attributes.CustomAttributes.Add(new CustomAttribute { FontScaleFactor = 0.5 });
+        text.Attributes.CustomAttributes.AddRange(itsChords);
+        var path = bench.FileOf("Ranges.pro", file.ToByteArray());
+        var song = bench.OpenAt(path);
+        var before = Workbench.Read(path);
+        Assert.Equal(box.Chords, song.TextBoxes.Single(one => one.Element == box.Element).Chords);
+
+        string[] names = ["Em", "C", "G/B", "D"];
+        song.SetChordsAlone(box.Slide, box.Element, line, names.Take(chords).ToList());
+
+        var after = Workbench.Read(path);
+        var now = OthersOf(Workbench.TextOf(after, box.Element));
+        Assert.Equal(expected, string.Join(" ", now.Select(entry => entry.Range is { } range ? range.Start + "-" + range.End : "none")));
+        // Nothing else of any of them changed, none was added or taken away, and they
+        // are in the order they were in: with their ranges put back, they are what
+        // they were. (And the chords are after them still.)
+        var was = OthersOf(Workbench.TextOf(before, box.Element));
+        Assert.Equal(was.Count, now.Count);
+        for (var n = 0; n < was.Count; n++)
+        {
+            var put = now[n].Clone();
+            put.Range = was[n].Range?.Clone();
+            Assert.Equal(was[n], put);
+        }
+        var all = Workbench.TextOf(after, box.Element).Attributes.CustomAttributes;
+        Assert.Equal(now, all.Take(now.Count));
+        Assert.All(all.Skip(now.Count), entry => Assert.Equal(CustomAttribute.AttributeOneofCase.Chord, entry.AttributeCase));
+        // The rest of the file, and the RTF outside the line, as they were.
+        NothingElseChanged(before, after, box.Element, line);
+        // Undo puts the ranges back with everything else: the file to the byte.
+        song.Undo();
+        Assert.Equal(file.ToByteArray(), File.ReadAllBytes(path));
     }
 
     // A name that is nothing, or nothing but spaces, is left out: it gets no stand-in,
@@ -465,17 +564,35 @@ public sealed class ChordsWithNoWordsTests : IDisposable
 
     private static int CommonPrefix(byte[] one, byte[] other) => one.AsSpan().CommonPrefixLength(other);
 
+    // What a text box says beside its words that is not a chord, in the file's order.
+    private static List<CustomAttribute> OthersOf(Graphics.Types.Text text) =>
+        text.Attributes is null ? [] : text.Attributes.CustomAttributes.Where(entry => entry.AttributeCase != CustomAttribute.AttributeOneofCase.Chord).ToList();
+
+    // Where a place in the words goes when a line that began at `lineStart` and was
+    // `was` long is `now` long: the two sentences of spec/01, "The box's other ranges",
+    // written out again here and not asked of the code they hold.
+    private static int Gone(int place, int lineStart, int was, int now) =>
+        place >= lineStart + was ? place + (now - was) : Math.Min(place, lineStart + now);
+
     // Between two states of a file, nothing has changed but one text box's RTF and its
     // chord entries: with those two put back as they were, the file is what it was. And
     // of the RTF, where a line is named, not a byte outside that line's own.
+    //
+    // Where a line is named, one thing more may have changed, and must have changed
+    // just so: the ends of the ranges of what the box says that is no chord have gone
+    // with the words, each by itself, and nothing else of those entries.
     private static void NothingElseChanged(Presentation before, Presentation after, string element, int? line)
     {
         var was = Workbench.TextOf(before, element);
         var now = Workbench.TextOf(after.Clone(), element);
         var restored = after.Clone();
         var text = Workbench.TextOf(restored, element);
+        var moved = (Start: 0, Was: 0, Now: 0);
         if (line is { } changedLine)
         {
+            var oldLines = Words.Lines(RtfWords.Read(was.RtfData.ToByteArray()));
+            var newLines = Words.Lines(RtfWords.Read(now.RtfData.ToByteArray()));
+            moved = (oldLines.Take(changedLine).Sum(above => above.Length + 1), oldLines[changedLine].Length, newLines[changedLine].Length);
             var from = RtfWords.SpanOfLine(was.RtfData.Span, changedLine)!.Value;
             var oldRtf = was.RtfData.Span;
             var newRtf = now.RtfData.Span;
@@ -492,8 +609,13 @@ public sealed class ChordsWithNoWordsTests : IDisposable
         else
         {
             text.Attributes ??= new Graphics.Types.Text.Types.Attributes();
-            var others = text.Attributes.CustomAttributes.Where(entry => entry.AttributeCase != CustomAttribute.AttributeOneofCase.Chord).ToList();
-            Assert.Equal(was.Attributes.CustomAttributes.Where(entry => entry.AttributeCase != CustomAttribute.AttributeOneofCase.Chord), others);
+            var others = OthersOf(text);
+            var meant = OthersOf(was).Select(entry => entry.Clone()).ToList();
+            foreach (var entry in meant.Where(entry => entry.Range is not null))
+            {
+                entry.Range = new IntRange { Start = Gone(entry.Range.Start, moved.Start, moved.Was, moved.Now), End = Gone(entry.Range.End, moved.Start, moved.Was, moved.Now) };
+            }
+            Assert.Equal(meant, others);
             text.Attributes.CustomAttributes.Clear();
             text.Attributes.CustomAttributes.AddRange(was.Attributes.CustomAttributes.Select(entry => entry.Clone()));
         }

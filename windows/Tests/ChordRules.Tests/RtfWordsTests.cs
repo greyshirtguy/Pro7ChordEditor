@@ -241,6 +241,69 @@ public class RtfWordsTests
 
     private static string Base64(byte[]? bytes) => bytes is null ? "(refused)" : Convert.ToBase64String(bytes);
 
+    // ---- What is said of a range of the words goes with the words
+    //
+    // RtfWords.PlaceAfter, which is the reference's `rtfstandins::placeAfter`. NO VECTOR
+    // holds it yet (testdata/README.md, "Still wanted"). Until one does, these are the
+    // cases of the reference's own test of it, taken over as they stand, each under
+    // the name it has there (reference/simple-presenter/tests/tst_rtfstandins.cpp): the
+    // answers are the reference's, and none of them is mine.
+
+    [Fact]
+    public void ARangeOverAllTheWordsIsOverAllOfThemStill()
+    {
+        // A text box that holds two chords alone (three units), in capitals from 0 to 3
+        Assert.Equal(0, RtfWords.PlaceAfter(0, 0, 3, 5));
+        Assert.Equal(5, RtfWords.PlaceAfter(3, 0, 3, 5));    // a chord more
+        Assert.Equal(1, RtfWords.PlaceAfter(3, 0, 3, 1));    // a chord fewer
+        Assert.Equal(3, RtfWords.PlaceAfter(3, 0, 3, 3));    // the same number, hung on another character
+        // The last chord gone from a line on plain spaces: one zero-width space is left
+        Assert.Equal(1, RtfWords.PlaceAfter(1, 0, 1, 1));
+    }
+
+    [Fact]
+    public void ARangeThatBeginsAfterTheLineIsOverTheSameWordsAsBefore()
+    {
+        // "Words" and a break (six units), then two chords alone from 6 to 9, a break,
+        // and "more" from 10 to 14
+        Assert.Equal(12, RtfWords.PlaceAfter(10, 6, 3, 5));
+        Assert.Equal(16, RtfWords.PlaceAfter(14, 6, 3, 5));
+        Assert.Equal(8, RtfWords.PlaceAfter(10, 6, 3, 1));
+        Assert.Equal(12, RtfWords.PlaceAfter(14, 6, 3, 1));
+        // (One that begins at the break after the line begins there still.)
+        Assert.Equal(11, RtfWords.PlaceAfter(9, 6, 3, 5));
+        Assert.Equal(7, RtfWords.PlaceAfter(9, 6, 3, 1));
+    }
+
+    [Fact]
+    public void APlaceBeforeTheLinesEndStaysOrComesBackToTheNewEnd()
+    {
+        // The words above the line, and the line's own first stand-in
+        Assert.Equal(0, RtfWords.PlaceAfter(0, 6, 3, 5));
+        Assert.Equal(5, RtfWords.PlaceAfter(5, 6, 3, 1));
+        Assert.Equal(6, RtfWords.PlaceAfter(6, 6, 3, 1));
+        Assert.Equal(7, RtfWords.PlaceAfter(7, 6, 3, 5));
+        // On the line, where the line has shrunk: what it was on is gone
+        Assert.Equal(7, RtfWords.PlaceAfter(7, 6, 3, 1));
+        Assert.Equal(7, RtfWords.PlaceAfter(8, 6, 3, 1));
+        Assert.Equal(8, RtfWords.PlaceAfter(8, 6, 5, 3));
+        Assert.Equal(9, RtfWords.PlaceAfter(10, 6, 5, 3));
+    }
+
+    // The table of spec/01-file-format.md, "The box's other ranges", as it stands
+    // there: a line of two chords alone (three units) that begins at 6, with a chord
+    // more (five units) and with a chord fewer (one).
+    [Fact]
+    public void ThePagesOwnTableOfWhereAPlaceGoes()
+    {
+        (int Place, int More, int Fewer)[] table = [(0, 0, 0), (5, 5, 5), (6, 6, 6), (7, 7, 7), (8, 8, 7), (9, 11, 7), (10, 12, 8), (14, 16, 12)];
+        foreach (var (place, more, fewer) in table)
+        {
+            Assert.Equal(more, RtfWords.PlaceAfter(place, 6, 3, 5));
+            Assert.Equal(fewer, RtfWords.PlaceAfter(place, 6, 3, 1));
+        }
+    }
+
     private static string Units(IEnumerable<char> units) =>
         string.Join(" ", units.Select(unit => ((int)unit).ToString(CultureInfo.InvariantCulture)));
 
