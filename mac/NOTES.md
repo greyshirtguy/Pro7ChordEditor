@@ -20,6 +20,7 @@ milestone; put right what has become untrue.
 | A chord from the strip (asked for after M7) | Built, 2026-10-12, and used by the maintainer the same day: "This is quite nice/exciting". Which of the seven things under "Left rough" were among what was tried was not said | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
 | The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer.** Its window was opened once, on 2026-10-13, by the 0.3 app shut in from the maintainer's files (decision 70): it opens at the first start and not at the second. Nothing else of it has been tried | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
 | The icon, and version 0.3 (asked for after M7) | Done, 2026-10-13, and given out the same day as the Mac's half of the release `v0.3` | The maintainer's own picture, in the app as the file they gave (decision 68). One release now holds both apps (decision 69) |
+| What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -530,6 +531,60 @@ And the same day, on how someone new is to find out what the sheet can do:
     words once a chord is taken off. Said to the maintainer, with what this
     session would do: follow Simple Presenter, so that no range is ever written
     that ends past the words.
+72. **An empty box that is kept takes the chord off** (`spec/03`, rule 35a, new: the
+    maintainer's, 2026-10-13). One line of `ChordSheet.finishTyping`: a name that is
+    empty takes, where it used to do nothing. No vector is contradicted, and none
+    holds it: it is Simple Presenter's to follow, and the case wanted is in
+    `testdata/README.md`. **Mine**: that Tab is left as it was (it takes the first of
+    what is offered, and for an empty box the key's seven always are), and that it
+    goes by what is in the box and not by how the box was opened, as rule 35's
+    Backspace does.
+73. **The line of hints** (`spec/03`, "The line of hints", new, and marked there as
+    being tried on the Mac and not agreed: the others wait). The maintainer's:
+    that the tips have more room, change with what the mouse is doing ("hovering an
+    existing chord it shows Delete to remove"), roll through otherwise, show the
+    copying with Option held, and name the keys by the Command sign. **Mine, all to
+    be overruled**: every word of it; that it is a line of its own over the quiet
+    line, which now says how much there is of the song; that keys are drawn as
+    small keys; that Command held shows the copying as well as Option (it is the
+    key about to be pressed); that a tip stays nine seconds, and they go round in
+    order, not at random; that the hints for the spot are said only while the
+    pointer is over a place or a key has just moved the spot; and that where there
+    is not room the last hints are left off, so copy and paste come before the
+    whole verse. **Not built, and put to the maintainer as the next thing to try**:
+    a small cross on a chord's bubble while the pointer is on it, to take it off
+    with a click.
+74. **The menus are kept to what is of use** (`spec/10`, "Menus"). Out: Save, the
+    maintainer's guess that it is not needed; Delete, and what macOS adds to every
+    Edit menu. Command+S is still answered, by the window (`WindowKeeper`), and
+    says what it said. **Found by having the app write its menus out** (below):
+    what SwiftUI lets an app replace as "save" has Close in it too, so no build
+    until now had File > Close or Command+W, and Close is said again; and with the
+    two commands for tabs gone View had nothing in it, so a menu with nothing to
+    choose is not shown. What is not wanted is hidden, not removed (the head of
+    `AppMenus.swift` says why).
+75. **Closing the window quits the app** (`spec/10`; the maintainer's). The window
+    is told by AppKit when it closes (`WindowKeeper`) and the app is asked to quit,
+    which saves what was being typed as any quitting does. Not by SwiftUI's own
+    word for a view going away, which this session could not be sure is said only
+    then. What is done is handed to the window by the app, and is nothing under
+    the tests, which close a good many windows.
+76. **About is given the app's icon** by name: the one macOS has for the app's own
+    file, which is what the Dock shows. Left to itself the system's About window
+    showed a blank icon in 0.3 (the maintainer's report; why was not found). **Not
+    seen by this session**: no test can open it.
+77. **Earlier Versions is a blue button** (`#2978db`, white words, the picture a
+    song has in the list), **and the top left has a title**, "WORKSPACE OR
+    PROPRESENTER FOLDER" (the maintainer's words). The blue is mine: the colour
+    furthest from the orange that in the same header says which editor is shown.
+    It is drawn by the app (`FilledButton`), because the system's coloured button
+    is grey in any window that has not the keyboard, and in every picture a test
+    draws.
+78. **1.0.0 is GitHub's "Latest" with only the Mac's file in it**, until the Windows
+    app adds its own. The maintainer asked for the release and for it to be the
+    latest; its text says at the top where Windows' downloads are meanwhile. **To
+    say to the maintainer**: that this is so, and that it can be made a pre-release
+    again until both are there.
 
 ## How it is laid out, and why
 
@@ -1597,6 +1652,20 @@ the About text, a Developer ID, notarizing) is still to come.
   What that does not tell: anything of how the guide looks in its window, of
   Help, Command+? or the ? in the strip, or of the Window menu. Those are still
   the maintainer's to try ("Left rough").
+- **1.0.0, given out on 2026-10-13** at the maintainer's word, as the Mac's half of
+  the release `v1.0.0`, which is GitHub's "Latest" (decision 78). Version 1.0.0,
+  build 4, from the commit "Version 1.0.0". All 353 tests pass. Started twice,
+  shut in as 0.3 was, with a new made-up home: two windows the first time, the
+  guide's among them, and one the second.
+- **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
+  program writes its menu bar out as it is after the tidying, once at the start and
+  once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
+  Services, Hide, Hide Others, Show All, Quit); File: Close [Command+W], Revert to
+  as Opened; Edit: Undo, Redo, Cut, Copy, Paste, Select All; Window: Minimize, Zoom,
+  the two windows by name, Bring All to Front; Help: the guide [Command+?]. No
+  View. **The Window menu gives neither window a key**, which settles what was
+  asked under "Left rough" since the guide: Command+1 and Command+2 are the
+  editors' alone.
 - **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
   whose, and that they are here at the maintainer's asking). In a repository that
   is one thing; in an app handed to other people it is another, and is the
@@ -1604,6 +1673,24 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
+- **What was built on 2026-10-13 has been used by nobody.** The tests hold what each
+  thing says and does, and pictures of it were looked at; none of it has been under
+  a hand. To try, and to say what is wrong with:
+  1. the line of hints: is it read, and is what it says right, on a chord, on a
+     word, typing, carrying, and with Option or Command held? Does it jump about
+     too much as the pointer moves? Are nine seconds for a tip right?
+  2. click a chord, clear the box, press Return: the chord goes. And clear it and
+     click another word;
+  3. close the window with the red button, and with Command+W: the app quits, and
+     what was being typed in the ChordPro text is saved. With the guide's window
+     in front, Command+W closes only the guide;
+  4. Command+S: the quiet line says nothing is saved by hand, though no menu has
+     Save;
+  5. the menus, as they are listed under "The disk image"; and whether View comes
+     back with only Enter Full Screen in it, which this session could not see;
+  6. About: does it show the icon?
+  7. the blue of Earlier Versions, in the light and in the dark, and the title over
+     the places.
 - **The icon has been seen in no Dock.** What macOS shows for the built app was
   drawn into a picture and looked at (decision 68). To look at: the Dock, the
   Finder, the app's About window, and the image's own window when it is opened.
