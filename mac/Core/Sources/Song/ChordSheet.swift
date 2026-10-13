@@ -720,6 +720,36 @@ public final class ChordSheet {
         return pasted
     }
 
+    /// Whether a paste now would take chords off a line to put the copied ones on it:
+    /// whether any line that what was copied would go onto has chords of its own
+    /// ("The line's own chords are replaced by these, all of them"). The lines are
+    /// found as `paste` finds them, and one that would be passed over, being of the
+    /// other kind, loses nothing. Nothing is asked of the song. (For the line of
+    /// hints, which says so before the key is pressed.)
+    public var pasteWouldReplace: Bool {
+        guard let copied, usable(spot.row) else { return false }
+        var index = spot.row
+        for line in copied {
+            while index < rows.count && !usable(index) {
+                index += 1
+            }
+            if index >= rows.count {
+                break
+            }
+            let target = rows[index]
+            let ofOneKind: Bool
+            switch line {
+            case .alone: ofOneKind = target.alone
+            case .words: ofOneKind = !target.alone
+            }
+            if ofOneKind && !target.chords.isEmpty {
+                return true
+            }
+            index += 1
+        }
+        return false
+    }
+
     // ---- Typing a chord
 
     /// What the chord being typed might be going to be: the first fourteen.

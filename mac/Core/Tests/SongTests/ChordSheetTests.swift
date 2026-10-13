@@ -848,6 +848,76 @@ struct ChordSheetTests {
         #expect(song.asked == ["setChords slide 3 box \"D\" [\"A\"@6] joined false"])
     }
 
+    @Test("Mine, not a vector. Whether a paste would take chords off: only where a line that what was copied would go onto has chords of its own; a line that would be passed over loses nothing; and nothing is asked of the song to find out")
+    func whetherAPasteWouldReplace() throws {
+        let standIns = Chords.placeholders(2)
+        let boxes = [
+            TextBox(slide: 0, group: "Verse 1", startsItsGroup: true, element: "A", words: "Holy holy holy", chords: [Chord(at: 0, name: "D")]),
+            TextBox(slide: 1, group: "Verse 1", element: "B", words: "Lord God Almighty", chords: [Chord(at: 5, name: "A")]),
+            TextBox(slide: 2, group: "Verse 2", startsItsGroup: true, element: "C", words: "Early in the morning"),
+            TextBox(slide: 3, group: "Verse 2", element: "D", words: "Our song shall rise", chords: [Chord(at: 4, name: "G")]),
+            TextBox(slide: 4, group: "Ending", startsItsGroup: true, element: "E", words: standIns,
+                    chords: [Chord(at: 0, name: "D"), Chord(at: 2, name: "G")]),
+            TextBox(slide: 5, group: "Ending", element: "F", words: Chords.placeholders(1)),
+        ]
+        let song = StandInSong(boxes, key: "D")
+        let sheet = ChordSheet(song: song)
+        // (The rows: 0 the first verse's name, 1 and 2 its lines; 3, and 4 and 5; 6,
+        // and 7 and 8, which are lines of chords alone, the second with none on it.)
+        #expect(sheet.rows.map(\.kind) == [.group, .line, .line, .group, .line, .line, .group, .line, .line])
+        func would(at row: Int) -> Bool {
+            sheet.setSpot(row, 0)
+            return sheet.pasteWouldReplace
+        }
+
+        // Nothing copied yet: nothing would be put on, and so nothing taken off.
+        #expect(!would(at: 1) && !would(at: 4))
+
+        // One line of words copied: onto a line that has chords, yes; onto one that
+        // has none, no; onto a line of chords alone it is passed over, and that line
+        // keeps its chords.
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        #expect(would(at: 1) && would(at: 2) && would(at: 5))
+        #expect(!would(at: 4))
+        #expect(!would(at: 7) && !would(at: 8))
+
+        // A whole verse of two lines: it goes onto the spot's line and the next, so
+        // it is yes from a line that has none if the line after it has.
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: true)
+        #expect(sheet.copied?.count == 2)
+        #expect(would(at: 4))
+        // From the song's last line of words, its second line would go to a line of
+        // chords alone and be passed over: only the first counts.
+        #expect(would(at: 5))
+        // From the last line of all there is one line to go onto, and it is of the
+        // other kind.
+        #expect(!would(at: 8))
+
+        // A line of chords alone copied: onto one that has chords, yes; onto the one
+        // that has none, no; and a line of words keeps its own.
+        sheet.setSpot(7, 0)
+        sheet.copy(whole: false)
+        #expect(would(at: 7) && !would(at: 8))
+        #expect(!would(at: 1) && !would(at: 5))
+
+        // No spot: no.
+        sheet.setSpot(-1, 0)
+        #expect(!sheet.pasteWouldReplace)
+        // And the song was asked nothing by any of it.
+        #expect(song.asked.isEmpty)
+
+        // What it says is what a paste then does: every line it changes that had
+        // chords, it took them off.
+        sheet.setSpot(1, 0)
+        sheet.copy(whole: false)
+        sheet.setSpot(5, 0)
+        #expect(sheet.pasteWouldReplace)
+        #expect(sheet.paste() == ChordSheet.Pasted(lines: 1, chords: 1))
+        #expect(sheet.rows[5].chords == [Chord(at: 0, name: "D")])
+    }
+
     @Test("Mine, not a vector. What the song refuses is said, changes nothing, and is not counted as done")
     func refused() throws {
         struct No: Error {}
