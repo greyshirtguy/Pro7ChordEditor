@@ -300,8 +300,8 @@ words; dropping a `.pro` file on the window to open it.
       sheet's orange, `#ff8a1f`), chosen and put back the same way, and shown as two
       lines of words, the second in the colour. Under its name it says what it is:
       "The line the pointer is on, on the chord sheet: where Ctrl+C copies from and
-      Ctrl+V pastes to." (**New**, 2026-10-13, with the highlighted line, and like it
-      **being tried on the Mac**: the others wait.)
+      Ctrl+V pastes to." (**New**, 2026-10-13, with the highlighted line, and
+      agreed with it on 2026-10-14: the Windows app is to have it.)
     - **Backups**: the copies that are kept, all of them
       ([07-backups.md](07-backups.md), rule 18).
 

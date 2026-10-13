@@ -483,13 +483,13 @@ change first, the vectors being made from it, and then both apps'.
 
 ## The line of hints
 
-**New, and being tried on the Mac** (the maintainer's, 2026-10-13, who after two days
-with the sheet "did not realise I could hover and press delete"). Its words are not
-settled: **Windows and Simple Presenter are to wait** until this paragraph says the
-maintainer has agreed them. (It has been tried three times and changed each time, the
-last on 2026-10-14: its words, what brings up the copying, and how it looks. The
-maintainer then: "I hope all these animations, nice looking UI works in Windows!". So
-what is here is meant for Windows too, once it is settled.)
+**New** (the maintainer's, 2026-10-13, who after two days with the sheet "did not
+realise I could hover and press delete"), **and agreed**: it was tried on the Mac
+three times and changed each time, the last on 2026-10-14 (its words, what brings up
+the copying, and how it looks), and the maintainer then said "tips are fine". **The
+Windows app is to have it as it is here**, rules 53a to 53h, its look and its
+lighting up with it: "I hope all these animations, nice looking UI works in
+Windows!". Whether Simple Presenter is to have it has not been said.
 
 53a. Under the sheet, over the quiet line ([06-library.md](06-library.md), rule 12),
     is one line that says **what the keys and the mouse do just now, where the spot

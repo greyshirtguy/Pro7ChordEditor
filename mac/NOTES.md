@@ -767,6 +767,13 @@ And the same day, on how someone new is to find out what the sheet can do:
     comment, to be taken out of it. **The picture is of 1.0.3, and what the page
     offers to download is 1.0.0**, which has not the blue line of hints nor the
     orange chords: said to the maintainer too.
+90. **The line of hints is agreed** (the maintainer, 2026-10-14, of 1.0.3: "tips are
+    fine"). `spec/03` no longer says it is being tried and that the others are to
+    wait: Windows is to build it as it is there, the highlighted line and its
+    colour with it. What a paste keeps (decision 88) is still open: "I'll think
+    about paste rule". A handover for the Windows session was written for the
+    maintainer to pass on, of everything since that app's 0.2; it is not in the
+    repository, which already says all of it.
 
 ## How it is laid out, and why
 
