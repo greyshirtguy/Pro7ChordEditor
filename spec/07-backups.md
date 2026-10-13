@@ -70,7 +70,13 @@ idea finished. Nothing here has been built or tried.
 ## Seeing them
 
 14. A song that has copies has a mark in the list ([06-library.md](06-library.md)).
-15. The song's header has **Earlier Versions**. It opens a panel over the editor:
+15. The song's header has **Earlier Versions**: a button in a colour of its own (a
+    blue, `#2978db`, its words white), with the picture before it that a song has
+    in the list ([06-library.md](06-library.md), rule 6c). It is the way back, and
+    as one more grey button it was passed over. (The colour and the picture are the
+    maintainer's asking, 2026-10-13: "a nice color", and "the same icon ... that the
+    presentations have in the list". Which blue is the Mac app's choice, and theirs
+    to change.) It opens a panel over the editor:
 
     ```
     Earlier versions of "Amazing Grace"

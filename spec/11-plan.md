@@ -67,6 +67,10 @@ its turn comes, from the page that has it:
 | Where each app is downloaded, in the README at the top | [10](10-platforms.md), "Getting it to other people" |
 | The app's icon | [10](10-platforms.md), "Where each follows its platform" |
 | One release for both apps, under one number | [10](10-platforms.md), "Getting it to other people" |
+| An empty box that is kept takes the chord off | [03](03-chord-sheet.md), rule 35a |
+| The menus kept to what is of use; no Save in them; closing the window quits (Mac) | [10](10-platforms.md), "Where each follows its platform"; [06](06-library.md), rule 12a |
+| A title over the choice of place; Earlier Versions in a colour, with a song's picture | [06](06-library.md), rule 7; [07](07-backups.md), rule 15 |
+| The line of hints under the sheet. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints" |
 
 ## What the maintainer is asked for along the way
 

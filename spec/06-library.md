@@ -113,7 +113,10 @@ song the width they took.)
 7. **Libraries** at the top left: each folder under `Libraries`, by name, whether or
    not it has songs in it yet. The one last used is opened at the start. Over them,
    where there is more than one place (rule 3), a choice of place, and **Choose
-   Folder…**. What is not a folder, or is hidden, is no library.
+   Folder…**; and over those, in the small capitals the list of libraries has for its
+   own title, **"WORKSPACE OR PROPRESENTER FOLDER"**, which says what this top part
+   is. (The title is the maintainer's, 2026-10-13.) What is not a folder, or is
+   hidden, is no library.
 8. **Songs** under the libraries: the library's `.pro` files by name (those directly in it,
    not hidden, and not folders), sorted as the system sorts names, with a search box
    over them that narrows the list as it is typed in: to the names that have what is
@@ -147,8 +150,12 @@ song the width they took.)
     with a plus in it and its tail coming down to a line of words (the sheet's spot);
     for the text, a C in square brackets. (**Changed** on 2026-10-11: it was the
     system's small switch at the header's right, and the maintainer found that the
-    song can be worked on in two ways too easy to miss.) Under the editor, one quiet line says what the keys do, or for
-    a few seconds what just happened ("4 chords copied…", or what went wrong).
+    song can be worked on in two ways too easy to miss.) Under the editor, one quiet line says how much there is of the song ("7 slides, 40
+    chords."), or for a few seconds what just happened ("4 chords copied…", or what
+    went wrong). (Until 2026-10-13 it said, while the sheet was shown, what the keys
+    do, all of it in one sentence. That is now a line of its own over this one, which
+    says what goes with where the spot is: [03-chord-sheet.md](03-chord-sheet.md),
+    "The line of hints".)
     Each key is a picker of the twenty-six keys ([02-chord-rules.md](02-chord-rules.md));
     a song that states no key shows "None" in the first, and its second cannot be set
     until the first is. Where the pane is too narrow for the name to be read beside
@@ -168,7 +175,9 @@ song the width they took.)
       ([04-chordpro-editor.md](04-chordpro-editor.md), rule 13), and the quiet line
       says: "Saved. Every change here is saved as it is made: there is nothing to
       save by hand." While ProPresenter is running it says what the band says, and
-      no more. On the Mac it is File > Save, and Revert is in that menu too.
+      no more. **It is in no menu.** (On the Mac it was File > Save until 2026-10-13.
+      The maintainer: "I am guessing the save menu is not needed". A Save in a menu
+      says there is saving to do.) On the Mac Revert is under File.
 
     **Revert asks first**, because its name alone could be read as taking back the
     last change, which is Undo's, and it may take back an hour's work:

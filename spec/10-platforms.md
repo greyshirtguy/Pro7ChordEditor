@@ -16,12 +16,13 @@ the list of those things. Anything not on it is to be the same.
 | One of the key's chords carried from the strip ([03](03-chord-sheet.md), rule 46b) | The system's drag-and-drop: the button's picture goes with the pointer, with the system's green plus beside the pointer wherever letting go would put the chord on, and slides back to the strip when it is let go anywhere else | The system's drag-and-drop, with its own pointers for "this can be put here" and "it cannot" |
 | Zooming the sheet, and the size of the ChordPro text | Command with minus, plus (or equals) and 0; for the sheet, a pinch on the trackpad too | Ctrl with the same keys; Ctrl with the wheel, if the platform's own views do that |
 | Showing the sheet, and the ChordPro text | Command+1, Command+2 | Ctrl+1, Ctrl+2 |
-| The key that would save | Command+S, which is also File > Save | Ctrl+S |
-| What the quiet line says the keys do | "... Drag moves a chord, with Option copies it ... Command+C and Command+V: a line's chords onto another" | The same with Ctrl for both |
+| The key that would save | Command+S. It is in no menu ([06](06-library.md), rule 12a) | Ctrl+S |
+| The names of the keys in the line of hints ([03](03-chord-sheet.md), rule 53e), and in what a copy says | Their signs: ⌫ for Delete, ↩ for Return, ⇥ for Tab, ⌥ for Option, ⌘C, ⌘V, ⇧⌘C, ⌘Z. The key that brings up the copying is ⌥, or ⌘ | In words: Delete, Enter, Tab, Ctrl+C, Ctrl+V, Ctrl+Shift+C, Ctrl+Z. The key that brings up the copying is Ctrl |
 | Deleting | Either delete key | Delete or Backspace |
 | Open on what is at the spot | Return | Enter, F2 |
 | Redo | Shift+Command+Z | Ctrl+Y, Ctrl+Shift+Z |
-| Menus | A menu bar with every command in it, its shortcut beside it | The same commands in the window's own menu |
+| Menus | A menu bar kept to what the app has a use for. About, which shows the app's icon. File: Close (Command+W), and Revert. No View menu, there being nothing to put in it. Edit: Undo, Redo, Cut, Copy, Paste and Select All, and nothing else: not Delete, which would act on a spot the pointer has left by the time it is in the menu, and not what macOS adds to every Edit menu (Writing Tools, AutoFill, Start Dictation, Emoji & Symbols). No Save. Help: the guide. (The maintainer, 2026-10-13: "lets clean up the menus".) The keys of the sheet are in no menu: the line of hints says them | The same commands in the window's own menu |
+| Closing the window | Quits the app, as for any Mac app of one window. What was being typed is saved first. (The maintainer, 2026-10-13.) The guide's window is closed without that | Ends the program, as it always has |
 | The guide ([13](13-guide.md)), asked for from the keys | Command+?, which is the Mac's key for help. It is Help > Pro7 Chord Editor Guide, where macOS would otherwise say the app has no help | F1, which is Windows'. The same under Help in the window's own menu |
 | The guide's pictures, and its names for the keys | Of the Mac app's sheet, with the Mac's arrow drawn in for the pointer. Command, Option, Return | Of the Windows app's sheet, with Windows' arrow. Ctrl, Enter |
 | Settings | A Settings window (Command+comma) | A settings page or dialog |
@@ -191,7 +192,11 @@ seen in a picture and ask the maintainer to try them.
   it out: links to both releases".)
 - **One release holds both apps, from 0.3 on.** A release is one tag, `v` and the
   number (`v0.3`), with two files in it, each named for its app and that number:
-  `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`. So the two
+  `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`.
+  **From 1.0.0 it is no pre-release, and is the one GitHub calls "Latest"** (the
+  maintainer, 2026-10-13: "release to 1.0.0 (so these new versions become latest
+  release in the repo)"). The number has three parts from there on, and is above
+  the first editor's 0.9.5, so that the newest is not also the lowest. So the two
   apps go by one number ([06-library.md](06-library.md), rule 6d), and a number is
   used up once either app has been given out under it. Whichever app is ready first
   makes the release with its own file, and says in its text that the other's is to

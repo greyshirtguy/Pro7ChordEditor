@@ -295,6 +295,17 @@ Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
     what is typed is not yet a chord, Tab takes the first that is offered.
 34. **Esc** throws the typing away and changes nothing. It is the only thing that does.
 35. **Backspace or Delete in an empty box** takes off the chord at that place.
+35a. **An empty box that is kept takes off the chord at that place too.** Enter, a
+    click on another place and a click on the bare sheet all keep what is in the box
+    (rules 32 and 39), and with nothing in it that is taken at its word: no chord is
+    to be there. Esc still changes nothing. (Tab is as it was: it takes the first of
+    what is offered, rule 33, and for an empty box the key's chords are.) Where
+    there is no chord at that place, nothing is asked of the song. (**New**, the
+    maintainer's, 2026-10-13: "clicking and editing and deleting the chord text and
+    pressing enter or clicking on the next insertion point should delete". Until
+    then an empty box that was kept changed nothing, so a chord whose name had been
+    cleared came back. It is **Simple Presenter's to follow**, and no vector holds
+    it yet: [`testdata/README.md`](../testdata/README.md), "Still wanted".)
 36. A slash on the end of what is kept, typed on the way to a bass note that never
     came, is left off: `G/` is kept as `G`.
 37. What is kept must be a chord (`isChord`). If it is not, nothing is put on.
@@ -454,6 +465,50 @@ that a test can reach, and the maintainer's hand for the rest.
 
 This is how a second verse gets the chords of the first. Vectors: `sheet-model.json`,
 `copyPaste`.
+
+## The line of hints
+
+**New, and being tried on the Mac** (the maintainer's, 2026-10-13, who after two days
+with the sheet "did not realise I could hover and press delete"). Its words are not
+settled: **Windows and Simple Presenter are to wait** until this paragraph says the
+maintainer has agreed them.
+
+53a. Under the sheet, over the quiet line ([06-library.md](06-library.md), rule 12),
+    is one line that says **what the keys and the mouse do just now, where the spot
+    is**. It took the place of one sentence on the quiet line that never changed and
+    said everything at once. Each hint is the keys it is about, drawn as keys, and a
+    few words. Where the line has not room for all its hints, the last are left off,
+    so the first is the one most worth reading.
+53b. What it says, the first that applies:
+
+    | When | It says |
+    | --- | --- |
+    | ProPresenter is running | Nothing can be changed here while ProPresenter is running. |
+    | A chord is being typed, the box is empty, and there is a chord at that place | **Enter** takes this chord off · **Esc** leaves it as it was · or type the chord that is to be here |
+    | A chord is being typed, otherwise | **Enter** keeps it · **Tab** keeps it and goes on to the next word · **Up, Down** choose from what is offered · **Esc** throws it away · a click on another word keeps it too |
+    | A chord is being carried | Let go on a word to move it there · **the key that copies** held as you let go, leaves a copy behind. (With that key held: Let go on a word to put a copy there) |
+    | The key that copies as it drags, or the key for shortcuts, is held (Option or Command; Ctrl) | **Ctrl+C** copies this line's chords · **Ctrl+V** pastes them from this line on, word for word (once some are copied: "pastes the 4 copied from this line on, word for word") · **Ctrl+Shift+C** copies the whole verse's or chorus's |
+    | The spot is on a chord, and the person is at the sheet | **Delete** takes this chord off · **1 – 7** change it · drag it to another word · click to type over it |
+    | The spot is on a place with no chord, and the person is at the sheet | **1 – 7** put one of the key's chords here · **A – G** or a click: type one · **the key that copies**: hold, to copy a line's chords onto another |
+    | Otherwise | a tip (rule 53d) |
+
+53c. **The person is at the sheet** while the pointer is over a place of a line, and
+    from when a key moves the spot or acts on it until the pointer next moves. With
+    the pointer over the bare sheet between the slides, or out of the sheet, the
+    spot is only where it was left, and nothing is said of it.
+53d. **A tip** is one thing worth knowing, and after nine seconds the next, round and
+    round: point at a word and press 1 to 7; point at a chord and press Delete; hold
+    the key that copies to see how a line's chords are copied onto another; drag a
+    chord to another word, and that key copies it; drag one of the seven out of the
+    strip; undo and redo; Shift keeps the spot to the starts of words; the arrow keys
+    move the spot and Enter types a chord there; the keys that show the sheet and
+    the text; the keys that zoom.
+53e. The keys are named as the platform names them
+    ([10-platforms.md](10-platforms.md)): on the Mac by the signs its menus and its
+    keyboard have for them, on Windows in words.
+
+What is said for a copy (rule 49) and a paste (rule 52a) is still said on the quiet
+line, for a few seconds, the key in it named the same way.
 
 ## Undo, and the key
 
