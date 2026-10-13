@@ -141,6 +141,14 @@ public final class LibraryModel {
     /// the songs having the rest: what the bar between them is dragged to.
     public private(set) var listsSplit = LibraryModel.usualListsSplit
     public static let usualListsSplit = 0.36
+    /// How wide those two lists are, the song having the rest of the window: what the
+    /// edge between them and the song is dragged to, between a least and a most. As
+    /// it comes it is half way between the two (the maintainer's, 2026-10-13: "about
+    /// half way between min and max"), whatever the window's width.
+    public private(set) var listsWidth = LibraryModel.usualListsWidth
+    public nonisolated static let leastListsWidth = 210.0
+    public nonisolated static let mostListsWidth = 480.0
+    public nonisolated static let usualListsWidth = (leastListsWidth + mostListsWidth) / 2
     /// Goes up each time the guide is to be shown (spec/13-guide.md): because it was
     /// asked for, by the ? in the strip, or by the app itself, which shows it once, at
     /// its first start on this Mac. The window watches this and opens the guide.
@@ -285,6 +293,7 @@ public final class LibraryModel {
         chosenFolders = settings.chosenFolders.map { URL(fileURLWithPath: $0, isDirectory: true) }
         sheetZoom = Self.nearestZoom(to: settings.sheetZoom ?? Self.usualSheetZoom)
         listsSplit = Self.within(settings.listsSplit ?? Self.usualListsSplit)
+        listsWidth = Self.withinWidths(settings.listsWidth ?? Self.usualListsWidth)
         sheetChordColour = Self.colour(settings.sheetChordColour)
         textChordColour = Self.colour(settings.textChordColour)
         textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
@@ -594,6 +603,19 @@ public final class LibraryModel {
 
     private static func within(_ share: Double) -> Double {
         min(max(share, 0.1), 0.9)
+    }
+
+    /// The edge between the lists and the song was dragged, to where the lists are
+    /// this wide; or, with nothing, put back where it usually is. It is remembered.
+    public func setListsWidth(_ width: Double?) {
+        listsWidth = Self.withinWidths(width ?? Self.usualListsWidth)
+        if started {
+            remember()
+        }
+    }
+
+    private static func withinWidths(_ width: Double) -> Double {
+        min(max(width, leastListsWidth), mostListsWidth)
     }
 
     /// Makes the ChordPro text a step larger (1) or smaller (-1), or its usual size
@@ -1038,6 +1060,7 @@ public final class LibraryModel {
         settings.lastLibrary = libraryID
         settings.sheetZoom = sheetZoom == Self.usualSheetZoom ? nil : sheetZoom
         settings.listsSplit = listsSplit == Self.usualListsSplit ? nil : listsSplit
+        settings.listsWidth = listsWidth == Self.usualListsWidth ? nil : listsWidth
         settings.sheetChordColour = sheetChordColour
         settings.textChordColour = textChordColour
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom

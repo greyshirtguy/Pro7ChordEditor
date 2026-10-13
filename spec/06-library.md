@@ -91,6 +91,19 @@ song the width they took.)
    remembered. The bar says how many songs the list under it has ("8 SONGS", or "3 OF
    8 SONGS" where the list is narrowed), and has a small grip in its middle to show
    that it can be dragged.
+
+   **The edge starts half way between the least width the lists can be given and
+   the most** (the maintainer's, 2026-10-13: "lets make the default about half way
+   between min and max"). On the Mac the two are 210 and 480 points, so the lists
+   start 345 wide, in a window of any width. With it, and **the Mac session's**:
+   the lists keep their width while the window is made wider or narrower, the song
+   having the difference, but for a window so narrow that the song would be left
+   with less than its own least (380), where the lists give way down to theirs;
+   where the edge was left is remembered, as the bar's place is; and clicked twice
+   it goes back to where it starts. (**Found** on the Mac: the system's own split
+   view does none of this. Asked to start the lists at 270, it started them at 480,
+   having given each side half the window up to the lists' most; and it changed the
+   lists' width as the window's changed. So the edge is the app's own there.)
 6b. **The two lists have grounds of different greys**, as in ProPresenter: the
    libraries' the lighter, the songs' the darker, and the bar between them darker
    still. With the system dark they are ProPresenter's own three (`#585858`, `#3e3e3e`

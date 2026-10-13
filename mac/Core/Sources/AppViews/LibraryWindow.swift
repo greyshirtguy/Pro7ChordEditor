@@ -9,7 +9,13 @@
 //                  the libraries' the lighter;
 //   at the right   the song that is open.
 //
-// The edge between the left and the right is dragged too, sideways.
+// The edge between the left and the right is dragged too, sideways. It is this file's
+// own, as the bar between the lists is, and not the system's split view: that one gives
+// each side half the window, up to the most the lists may have, whatever width it is
+// asked to start at (asked for 270, the lists started 480 wide in a window of the usual
+// size), and it changes the lists' width as the window is made wider or narrower. Here
+// the lists start half way between their least and their most, keep that width while
+// the window changes, and are left where they are dragged to, which is remembered.
 //
 // Nothing here is a rule. What is shown comes from LibraryModel, and what the person
 // does is passed on to it.
@@ -61,6 +67,11 @@ public struct LibraryWindow: View {
     /// and nothing to do without it (spec/10-platforms.md). Nothing, where none is
     /// given: under the tests, which close a good many windows.
     private var whenClosed: () -> Void
+    /// While the edge between the lists and the song is being dragged: how wide the
+    /// lists were when the drag began, and how wide the drag has made them.
+    @State private var began: Double?
+    @State private var dragged: Double?
+    @State private var overEdge = false
 
     public init(model: LibraryModel, whenClosed: @escaping () -> Void = {}) {
         self.model = model
@@ -68,11 +79,53 @@ public struct LibraryWindow: View {
     }
 
     public var body: some View {
-        HSplitView {
-            ListsPane(model: model)
-                .frame(minWidth: 210, idealWidth: 270, maxWidth: 480)
-            SongPane(model: model)
-                .frame(minWidth: 380, maxWidth: .infinity)
+        GeometryReader { given in
+            let whole = given.size.width
+            let width = dragged ?? ListsLook.width(asked: model.listsWidth, of: whole)
+            HStack(spacing: 0) {
+                ListsPane(model: model)
+                    .frame(width: width)
+                ListsLook.edge
+                    .frame(width: ListsLook.edgeWidth)
+                SongPane(model: model)
+                    .frame(maxWidth: .infinity)
+            }
+            // What is dragged is wider than the line that is seen: the line, and a
+            // little of the lists beside it. None of the song's part, where the sheet
+            // says what shape the pointer is as it moves and would take this one's
+            // away; and little of the lists', whose scroll bars are at that side.
+            .overlay(alignment: .leading) {
+                Color.clear
+                    .frame(width: ListsLook.edgeGrip)
+                    .contentShape(Rectangle())
+                    .onHover { inside in
+                        guard inside != overEdge else { return }
+                        overEdge = inside
+                        if inside {
+                            NSCursor.resizeLeftRight.push()
+                        } else {
+                            NSCursor.pop()
+                        }
+                    }
+                    .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global)
+                        .onChanged { drag in
+                            let start = began ?? width
+                            began = start
+                            dragged = ListsLook.width(asked: start + drag.translation.width, of: whole)
+                        }
+                        .onEnded { _ in
+                            if let dragged {
+                                model.setListsWidth(dragged)
+                            }
+                            began = nil
+                            dragged = nil
+                        })
+                    // (Twice clicked, it goes back to where it usually is.)
+                    .onTapGesture(count: 2) { model.setListsWidth(nil) }
+                    .help("Drag sideways to give the lists or the song more room.")
+                    .accessibilityLabel("The edge between the lists and the song")
+                    .offset(x: width - ListsLook.edgeGripOverLists)
+            }
         }
         .frame(minWidth: 620, minHeight: 440)
         .background(WindowKeeper(save: { model.saveNow() }, closed: whenClosed).frame(width: 0, height: 0))
@@ -209,6 +262,24 @@ enum ListsLook {
     /// How tall the bar is, and the least height each list is left with: for the
     /// libraries, room for what is over them and three of them; for the songs, for
     /// the search box and the choice over them and a few of them.
+    /// The edge between the lists and the song: the line that is seen, how wide it
+    /// is, and how wide the part of the window is that it can be dragged by.
+    static let edge = grey(light: 0.74, dark: 0.11)
+    static let edgeWidth = 1.0
+    static let edgeGrip = 5.0
+    static let edgeGripOverLists = 4.0
+    /// The least width the song is left with, whatever the lists are asked to be.
+    static let leastSong = 380.0
+
+    /// How wide the lists are, asked to be this wide in a window this wide: never
+    /// less than their least nor more than their most (LibraryModel has both), and
+    /// never so wide that the song is left with less than its own least. (In a
+    /// window too narrow for both, the lists have their least.)
+    static func width(asked: Double, of whole: Double) -> Double {
+        let most = max(LibraryModel.leastListsWidth, min(LibraryModel.mostListsWidth, whole - edgeWidth - leastSong))
+        return min(max(asked, LibraryModel.leastListsWidth), most)
+    }
+
     static let barHeight = 22.0
     static let leastLibraries = 190.0
     /// What stands over the choice of place.

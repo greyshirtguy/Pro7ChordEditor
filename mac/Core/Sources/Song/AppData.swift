@@ -54,6 +54,9 @@ public struct AppData: Sendable {
         /// How much of the height of the two lists at the window's left the libraries
         /// have, from nought to one; nothing if the bar between them was never moved.
         public var listsSplit: Double?
+        /// How wide those two lists are, in points; nothing if the edge between them
+        /// and the song was never moved.
+        public var listsWidth: Double?
         /// Whether the guide has opened by itself, as it does once: at the first start
         /// of the app on this Mac (spec/13-guide.md, rule 2). Nothing if it never has.
         public var guideShown: Bool?
