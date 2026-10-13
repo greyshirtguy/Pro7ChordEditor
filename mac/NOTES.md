@@ -18,7 +18,8 @@ milestone; put right what has become untrue.
 | **M6** The chord sheet | Built, 2026-10-11; **not yet tried by a hand, and not done until the maintainer says it is as quick as Simple Presenter's** | Its model, held to every case of `sheet-model.json` and `layout.json`; drawn as one view, set beside `spec/pictures`; the pointer and the keys; the bubble a chord is typed in; dragging; a line's chords onto another. A switch in the song's header between the sheet and the ChordPro text; a song opens on the sheet. Then, the same day, on the maintainer's trying it: one key picker; the slides laid out as **a grid** in frames of their groups' colours; and **zoom** |
 | **M7** Chords with no words | Built, 2026-10-11. **Seen in ProPresenter by the maintainer, 2026-10-12: "They showed"** (which cases were among what was looked at was not said) | A line of chords alone is given a chord more or a chord fewer by changing that line's bytes in its box's RTF and no others; a blank slide's box is given its words at its first chord; a slide with no text box is given one, a copy of the song's own; and chords taken off again in the same sitting leave the file as it was to the byte. In both editors, whose "not yet" limits are gone. Held to a new vector file, to a test song made in the shapes real ones have, and tried on copies of 425 real songs. The plan's two proofs that a test can make are made, and its third, that ProPresenter shows what was written, the maintainer made. Since then, decision 58: a line that loses its last chord takes chords again |
 | A chord from the strip (asked for after M7) | Built, 2026-10-12, and used by the maintainer the same day: "This is quite nice/exciting". Which of the seven things under "Left rough" were among what was tried was not said | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, "A chord dragged out of the strip"). The model and its tests, the sheet's end and the strip's end of the system's dragging and theirs, a picture |
-| The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer, and its window not yet opened by anyone**: this session does not run the app | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
+| The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer.** Its window was opened once, on 2026-10-13, by the 0.3 app shut in from the maintainer's files (decision 70): it opens at the first start and not at the second. Nothing else of it has been tried | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
+| The icon, and version 0.3 (asked for after M7) | Done, 2026-10-13, and given out the same day as the Mac's half of the release `v0.3` | The maintainer's own picture, in the app as the file they gave (decision 68). One release now holds both apps (decision 69) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -457,7 +458,78 @@ And the same day, on how someone new is to find out what the sheet can do:
     then a build made here says 0.2 in its title and is not the 0.2 on the Releases
     page. **`mac/make-dmg.sh` is not to be run before the number goes up**: it would
     write over `mac/build/Pro7ChordEditor-mac-0.2.dmg`, the copy of what was given
-    out.
+    out. (**No longer so since 2026-10-13**: the number is 0.3, and the script
+    writes a file of that name.)
+68. **The app has an icon: the maintainer's own picture** (2026-10-13: "I have made
+    an icon"), given as three files at the top of the repository, which now are
+    `mac/App/ChordEditor.icns`, `windows/App/ChordEditor.ico` (beside the Windows
+    app's project file, for that session to put to use) and
+    `pictures/ChordEditor.png` (for the README, which shows it over the name).
+    Each is as it was given, to the byte. Mine in it:
+    - **the .icns is used as it is.** The app's `Info.plist` names it
+      (`CFBundleIconFile`), and Xcode copies it into the app because it is in
+      `mac/App`, a folder the project takes whole. An asset catalogue was the other
+      way: Xcode would then make the icon again from pictures taken out of the
+      file. Nothing is gained by that, and the file in the app would no longer be
+      the one given;
+    - **two things hold it**, since a build goes through with the icon gone or
+      misnamed and the app then wears the system's blank one: a test
+      (`TheAppsFolderTests`: what `mac/App` names is there, and is a whole .icns
+      with its largest and smallest pictures) and `mac/make-dmg.sh` (the file is in
+      the built app, the same to the byte);
+    - **`pictures/` is new**, at the top: the README's pictures. The pictures of
+      the apps that the maintainer means to take go there too.
+
+    What was seen of the file, for the maintainer to weigh (said to them, nothing
+    done): it has no picture of its own for 16 and 32 points on a screen that is not
+    fine (it has those sizes only at two dots to the point), so such a screen is
+    shown a larger one made smaller; its shape fills 90% of the picture where
+    Apple's own icons fill 80%, which macOS 26 puts right by cutting every icon to
+    its own shape and macOS 15 does not; and its lower half is close to
+    ProPresenter's own mark, which like the two pictures in the lists
+    (`ListIcons.swift`) is theirs to weigh in something given out.
+69. **One release holds both apps, under one number, from 0.3**
+    (`spec/10-platforms.md`, "Getting it to other people"; `spec/06`, rule 6d). The
+    maintainer, 2026-10-13, asking for "a new build and release": the Windows build
+    "will get added to the new release". So the tag is `v0.3` and not `mac-v0.3`,
+    the Mac's image went into it first, and its text says Windows' is to come.
+    **Mine, and theirs to overrule**: that the two apps then go by one number (a
+    release has one, and a file in it under another would mislead); that it is a
+    pre-release still, with GitHub's "Latest" left on 0.9.5, since moving that label
+    is retiring the first editor in the eyes of whoever lands on the page, and was
+    not asked for. With both files in one release the label can at last name both.
+    (0.3 will sit oddly under 0.9.5 when it does: a number above it, 1.0 say, would
+    not. Said to the maintainer.)
+70. **This session started the app, once, shut in.** Until now it never had: a
+    build that can write is not to open the maintainer's library unless they say so
+    (`AGENTS.md`), and the app opens the library it last had. But a release was
+    asked for of a build whose guide opens by itself at the first start, and
+    nobody had ever opened that window: the app's own log on this Mac shows the
+    maintainer last started it before the guide was built. So the app that is in
+    the 0.3 image was copied to this session's folder and started there under a
+    rule of the system's (`sandbox-exec`) that **denies it every read of the
+    maintainer's home folder and of other disks, and every write to them**, with a
+    made-up home folder that had six of the test songs as its ProPresenter library.
+    The rule was tried first on a shell: it could neither list the home folder nor
+    make a file in it. What was seen is under "The disk image". What it touched
+    outside this session's folder: the system's own record of where the app's main
+    window last was, which it wrote back as it stood. **This is not leave to run
+    the app in the ordinary way**, which stays the maintainer's to give.
+71. **The test data was made again on the Linux machine (2026-10-12), and the Mac's
+    tests failed on GitHub for a day** before this session next ran: they counted
+    the eleven files Simple Presenter had read, and it had read a twelfth, Chords
+    With No Words. Put right in the tests alone; nothing in the app changed. The
+    twelfth is read here as Simple Presenter reads it. What a paste answers and
+    says is held to the vectors' new `pasted`; the two new songs, `ends` and
+    `lead`, passed as they came. (**Fetch before starting, and look at GitHub's
+    builds**: the Windows build is red for the same cause, and is that session's.)
+    One thing in those commits is **open, and the maintainer's**: a text box's
+    other ranges ("these are in capitals") when a line of chords alone is made
+    longer or shorter (`spec/01`, "Where Simple Presenter differs"). This app
+    leaves them, as the pages say, so a range over the whole line ends past the
+    words once a chord is taken off. Said to the maintainer, with what this
+    session would do: follow Simple Presenter, so that no range is ever written
+    that ends past the words.
 
 ## How it is laid out, and why
 
@@ -1508,6 +1580,23 @@ the About text, a Developer ID, notarizing) is still to come.
   into a folder of this session's and not into `mac/build` (decision 67 says why).
 - **The README at the top names each download** ("Try it"). When an image is put on
   the Releases page, the Mac's row there is changed in the same push.
+- **0.3, given out on 2026-10-13** at the maintainer's word ("a new build and
+  release with this"), as the Mac's half of the release `v0.3` (decision 69), a
+  pre-release. Version 0.3, build 3, built from the commit "Version 0.3". Checked
+  as 0.2 was, by the script, and besides: it has its icon, the file given, and
+  macOS shows that icon for the app at every size from 16 points to 256 (drawn
+  into a picture and looked at); all 337 tests pass. **And it was started**
+  (decision 70), which no build given out before was by this session:
+  - at the first start it found the made-up library, listed it, and opened two
+    windows: the main one, and one of 780 by 820 at the top right of the screen
+    the main one was on, which is the guide as the app asks for it. Its settings
+    then said the guide had been shown, and its log said so;
+  - at the second start it opened one window, and its log said nothing of the
+    guide.
+
+  What that does not tell: anything of how the guide looks in its window, of
+  Help, Command+? or the ? in the strip, or of the Window menu. Those are still
+  the maintainer's to try ("Left rough").
 - **The two pictures in the lists are ProPresenter's** (`ListIcons.swift` says
   whose, and that they are here at the maintainer's asking). In a repository that
   is one thing; in an app handed to other people it is another, and is the
@@ -1515,10 +1604,14 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **The guide's window has been opened by nobody** (decision 64): this session does
-  not run the app, and no test has an app to open a window in. Its page was drawn
-  into pictures and looked at, light and dark, wide and narrow. To try, and to say
-  of each what is odd:
+- **The icon has been seen in no Dock.** What macOS shows for the built app was
+  drawn into a picture and looked at (decision 68). To look at: the Dock, the
+  Finder, the app's About window, and the image's own window when it is opened.
+- **The guide's window has been seen by nobody** (decision 64). It was opened once
+  by the app shut in (decision 70), which told that it opens at the first start
+  (1, below) and not at the second (3), and no more. Its page was drawn into
+  pictures and looked at, light and dark, wide and narrow. To try, and to say of
+  each what is odd:
   1. start the app: the guide opens, once the libraries are listed, in front of the
      main window and towards the top right of the screen. (It will, the first time,
      on a Mac that had the app before: nothing says yet that it was shown.) Is that
