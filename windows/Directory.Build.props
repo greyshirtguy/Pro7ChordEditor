@@ -27,9 +27,10 @@
   (spec/06-library.md, rule 6d), and it is written into the index of every copy the
   app keeps of a song (spec/07-backups.md, rule 8), so that a copy says which app made
   it. What it is, and how it is counted on, is the maintainer's to say: it was 0.1.0
-  for the first early build, and is 0.2 since 2026-10-12 ("bump to version 0.2"),
-  written with two numbers as the Mac app writes its own. (The first editor, in old/,
-  was 0.9.5, and is another program.)
+  for the first early build, 0.2 from 2026-10-12 ("bump to version 0.2"), and is
+  1.0.3 since 2026-10-14 ("build 1.0.3"), which is the Mac app's number: the two apps
+  go by one number, of three parts from 1.0.0 on (spec/10-platforms.md, "Getting it
+  to other people"). (The first editor, in old/, was 0.9.5, and is another program.)
 
   (global.json, beside this file, is what the `dotnet` command itself is told: how
   tests are run.)
@@ -43,6 +44,6 @@
     <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
     <ImplicitUsings>enable</ImplicitUsings>
     <DebugType>embedded</DebugType>
-    <Version>0.2</Version>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 </Project>
