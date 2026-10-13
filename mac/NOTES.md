@@ -22,6 +22,7 @@ milestone; put right what has become untrue.
 | The icon, and version 0.3 (asked for after M7) | Done, 2026-10-13, and given out the same day as the Mac's half of the release `v0.3` | The maintainer's own picture, in the app as the file they gave (decision 68). One release now holds both apps (decision 69) |
 | What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
 | What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1. **Not given out: a build to try is in `mac/build`**, and a release waits for the maintainer's word | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
+| The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2. **Not given out: a build to try is in `mac/build`** | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -666,6 +667,46 @@ And the same day, on how someone new is to find out what the sheet can do:
     speed until stopped. The app has one sheet and is not touched by it; the
     tests now close each window when it is drawn (`PictureTests.draw`), and the
     sheet's view says why at `tell()`.
+84. **The window was slow, and it was the song's header** (`spec/06`, rule 6e, new;
+    "What made the window slow", below, has what was measured and how). The
+    maintainer, of 1.0.1: "the insert cursor is pretty laggy now", the same for a
+    chord being dragged, and of every build that the edge between the two parts
+    was slow to drag with a song open and smooth with none. One cause for all of
+    it. What was done:
+    - **the header is laid out once** (`SongHeader.swift`): its parts are each made
+      once, and where they go is arithmetic (`HeaderArrangement`), where it was
+      three arrangements for SwiftUI to choose from. Its three arrangements are
+      what they were, but for this: Earlier Versions is no longer squeezed to its
+      picture alone where the row is tight, which it was, against the rule that
+      nothing but the name is cut short;
+    - **the strip of the key's chords** and **the line of hints** the same: one
+      arrangement each, what fits worked out (`SheetStrip.saysNoKey`, `HintFit`);
+    - **the header and the quiet line are views of their own**, so that a change
+      to one is not the whole of the song's part worked out again;
+    - **the sheet's view is no longer brought up to date by its own saying** of
+      what is going on (`LibraryModel.sheetIs` has how that came about);
+    - **the sheet measures its lines once** for a song as it is, and a sheet that
+      is only made wider or narrower puts its slides in rows again and measures
+      nothing.
+    **Tried and taken out again**, each measured: drawing only the rows of slides
+    the pointer had left and come to (the system then copies its picture of the
+    whole sheet first, which took longer than drawing it); keeping drawn only what
+    is seen of the sheet (no difference that could be measured off the screen);
+    and laying the hints over a room that never changes (two lines of them were
+    then hidden behind the sheet).
+85. **The edge between the lists and the song is a bar that is seen, and AppKit's**
+    (`spec/06`, rule 6a; `EdgeGrip`). The maintainer, of the hairline of 1.0.1: "a
+    bit hard to grab ... it might be too narrow? or take too long to show the mouse
+    cursor change?". Both: it was five points of nothing to be seen, and SwiftUI
+    said the pointer was over it a moment late. Now it is eight points wide, of
+    the colour of the bar between the two lists, with a grip in its middle; every
+    point of it takes the mouse; and the pointer's shape over it is the system's
+    to keep (a cursor rectangle), which changes as the pointer crosses its edge.
+    It lies over neither part of the window. **Mine**: that it is a bar and not a
+    wider invisible strip beside a hairline, and its width. The maintainer offered
+    the system's own divider back; it was not taken up, because the system's
+    cannot be told where to start (decision 80), and what made dragging slow was
+    not the divider. **By hand only**: how it is to grab.
 
 ## How it is laid out, and why
 
@@ -1600,6 +1641,62 @@ more.)
   A colour of the sheet changed by one step in 255, a letter a point larger, and
   the ? taken out of the strip each fail the test that holds the guide's pictures.
 
+### What made the window slow (2026-10-13)
+
+The maintainer found 1.0.1 slow under the pointer, and every build slow when the
+edge between the two parts was dragged with a song open. Nothing had ever timed the
+window. It is timed now by `SpeedTests` (`mac/README.md` has the line that runs
+it): the window off the screen at 1920 by 1050, a song of 56 slides in it, and the
+main thread's own time at work measured for each thing done. Thousandths of a
+second, at one dot to the point:
+
+| | 1.0.0 | 1.0.1 | Now |
+| --- | --- | --- | --- |
+| The pointer moved a step over the sheet: usually | 1.5 | 1.4 | 1.5 |
+| ... one time in ten, more than | 100 | 183 | 7 |
+| ... at worst | 200 | 251 | 11 |
+| A chord dragged a step: at worst | 98 | 105 | 9 |
+| The edge moved a step, no song open | 7 | 6 | 6 |
+| ... the sheet shown | 204 | 69 | 15 |
+| ... the ChordPro text shown | 174 | 49 | 12 |
+
+- **One cause for nearly all of it: the song's header.** It was written as three
+  arrangements (one row, two, three) for SwiftUI to choose the first that fits
+  (`ViewThatFits`). To choose, SwiftUI builds the arrangements it is not showing,
+  measures them and throws them away, and it does so again every time the view is
+  laid out. Each arrangement had the two pickers of twenty-six keys in it, and a
+  picker's list of what can be chosen is costly to build: 100 to 200 thousandths
+  of a second for the header, each time.
+- **And it was laid out often.** At every step of the edge being dragged, as it
+  must be. And at every change in what the line of hints under the sheet says:
+  the line's size was asked of what was in it, so a change in it had everything
+  beside it in the song's part of the window measured again, the header among
+  them. The hints change as often as the pointer crosses a chord. That is the
+  stall the maintainer felt: it was there in 1.0.0, at about a tenth of a second,
+  and 1.0.1 nearly doubled it (one window where the system's split view had been
+  two, so more was measured each time; and the line of hints no longer a fixed
+  height).
+- **Found by sampling the test as it ran** (`sample`, which comes with macOS, on
+  the process for five seconds): the time was under `SizeFittingLayoutComputer`,
+  which is `ViewThatFits`, and under it `PlatformItemListReader`, which is a
+  picker's list. Reasoning about the code had not found it, and had suspected
+  the drawing.
+- **A thing READ while a view is brought up to date is watched for that view.**
+  The sheet's view says what is going on in it whenever it is brought up to date;
+  the model, to put down only what had changed, read what it had; so the sheet's
+  view was brought up to date, and marked to be drawn again whole, at every
+  change of the hints: by its own saying. What was last said is now kept a second
+  time where nothing watches it.
+- **What is left is drawing.** A step of the pointer draws the sheet again, which
+  is 3 thousandths of a second for what is seen of this song, and 7 at two dots
+  to the point. A step of the edge with the sheet shown is mostly that. On a
+  screen of two dots to the point the window off the screen takes 30 to 45 to
+  draw the whole sheet, seen or not, some steps of the pointer; whether a window
+  on the screen does the same could not be told from here, and the two things
+  tried against it changed nothing that could be measured (decision 84).
+- **Not measured, because it cannot be from a test**: the screen itself, and how
+  any of it feels.
+
 ### Rules the vectors did not hold, and what became of them
 
 At M1, breaking the rules one at a time found nineteen that no vector held. Each was
@@ -1747,6 +1844,12 @@ the About text, a Developer ID, notarizing) is still to come.
   windows the first time, the guide's among them, and one the second; its menus as
   1.0.0's. What that does not tell is everything this build is for: the edge, the
   highlighted line and the hints are under "Left rough".
+- **1.0.2, built on 2026-10-13 and not given out**: in `mac/build` for the
+  maintainer to try (`Pro7ChordEditor-mac-1.0.2.dmg`, sha256 `d2530164…d972`), and
+  a release waits for their word. Version 1.0.2, build 6. All 373 tests pass.
+  Started twice, shut in, with a new made-up home: two windows the first time and
+  one the second; its menus as before. What it is for, the window's speed and the
+  edge, is not a thing that told: "Left rough".
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -1763,8 +1866,17 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **1.0.1 has been used by nobody** (decisions 79 to 82). To try, and to say what
-  is wrong with:
+- **1.0.2 has been used by nobody** (decisions 84 and 85). To try:
+  1. the pointer over the sheet, and a chord dragged: is it as quick as 1.0.0 was,
+     or quicker? It was timed off the screen; on it, only a hand can tell;
+  2. the edge between the lists and the song, with a song open, on the sheet and
+     on the ChordPro text: is it smooth? Is the bar easy to grab, and does the
+     pointer change shape as soon as it is over it? Is a bar that is seen what is
+     wanted there, or was a hairline?
+  3. the song's header in a narrow window: the name and the switch, and under them
+     the keys; narrower still, three rows. Is anything out of place?
+- **1.0.1 was tried by the maintainer on 2026-10-13**, who found it slow (above).
+  Of the rest of what it brought nothing was said, so this stands:
   1. the edge between the lists and the song: it starts a little left of where it
      did; drag it, and see the pointer change over it; make the window wider and
      narrower, and the lists keep their width; quit and start, and it is where it
