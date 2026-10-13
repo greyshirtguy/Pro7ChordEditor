@@ -21,9 +21,9 @@ milestone; put right what has become untrue.
 | The guide (asked for after M7) | Built, 2026-10-12. **Not yet seen by the maintainer.** Its window was opened once, on 2026-10-13, by the 0.3 app shut in from the maintainer's files (decision 70): it opens at the first start and not at the second. Nothing else of it has been tried | One page on how chords are put on, in a window of its own: opened by the app once, at its first start on a Mac, and after that under Help and behind a ? at the right of the strip (`spec/13-guide.md`, new). Its words are `spec/guide.json`, which both apps carry a copy of; its three pictures are of the Mac's own sheet, drawn by a test and held to what the app draws now. With it: the README at the top says where each app is downloaded |
 | The icon, and version 0.3 (asked for after M7) | Done, 2026-10-13, and given out the same day as the Mac's half of the release `v0.3` | The maintainer's own picture, in the app as the file they gave (decision 68). One release now holds both apps (decision 69) |
 | What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
-| What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1. **Not given out: a build to try is in `mac/build`**, and a release waits for the maintainer's word | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
-| The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2. **Not given out: a build to try is in `mac/build`** | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
-| The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3. **Not given out: a build to try is in `mac/build`** | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
+| What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
+| The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
+| The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -766,7 +766,8 @@ And the same day, on how someone new is to find out what the sheet can do:
     Windows one is that session's to add: the line for it is in the README, in a
     comment, to be taken out of it. **The picture is of 1.0.3, and what the page
     offers to download is 1.0.0**, which has not the blue line of hints nor the
-    orange chords: said to the maintainer too.
+    orange chords: said to the maintainer too. (No longer so: 1.0.3 was given out
+    the same day, decision 91.)
 90. **The line of hints is agreed** (the maintainer, 2026-10-14, of 1.0.3: "tips are
     fine"). `spec/03` no longer says it is being tried and that the others are to
     wait: Windows is to build it as it is there, the highlighted line and its
@@ -774,6 +775,35 @@ And the same day, on how someone new is to find out what the sheet can do:
     about paste rule". A handover for the Windows session was written for the
     maintainer to pass on, of everything since that app's 0.2; it is not in the
     repository, which already says all of it.
+91. **1.0.3 is given out** (the maintainer, 2026-10-14: "Okay let's release 1.0.3"),
+    as the Mac's half of the release `v1.0.3`, which is GitHub's "Latest" now;
+    1.0.0's page is still there under it. 1.0.1 and 1.0.2 were builds to try and
+    were never given out: what they brought went out in this. "The disk image" has
+    what was checked. **Mine, and the maintainer's to overrule**:
+    - **the image is not, byte for byte, the one that was tried; the app in it
+      is.** The read-me that goes into the image still said "An icon" under "Not
+      in it yet", as it had in the images of 0.3 and 1.0.0, the app having had its
+      icon since 0.3: found on reading the image through before it went out. The
+      line was taken out and the image made again by the script. The app in it
+      was held against the app in the image the maintainer tried: the same, file
+      for file, and the same number on its seal. The image that was tried is kept
+      beside it, named as not given out;
+    - **the tag is on the commit of that read-me**, and not on "Version 1.0.3":
+      three commits on, none of which changes a file the app is built from. The
+      tag was pushed by itself first, so that GitHub's Mac build ran on that very
+      commit before anything was put on the page;
+    - **the release's text says "The Windows app's is to be added"**, and not a
+      Windows build "of 1.0.3": the number that app is next built under is the
+      maintainer's to tell its session;
+    - **it says what changed in a song's file since 1.0.0** (decision 79), and
+      that a song in which 1.0.0 took a chord off a line of chords alone is not
+      looked for or mended;
+    - **1.0.0's page was left as it is.** Its text still says that the Windows
+      build of 1.0.0 is to be added, which will not now be so under that number. A
+      release is changed on the maintainer's word: said to them;
+    - **the README's sentences round "Try it"** no longer name a number for the
+      Windows app that it has not got, and say that the release GitHub calls
+      "Latest" is to hold both downloads and so far has the Mac's.
 
 ## How it is laid out, and why
 
@@ -1917,10 +1947,26 @@ the About text, a Developer ID, notarizing) is still to come.
   Started twice, shut in, with a new made-up home: two windows the first time and
   one the second; its menus as before. What it is for, the window's speed and the
   edge, is not a thing that told: "Left rough".
-- **1.0.3, built on 2026-10-14 and not given out**: in `mac/build` for the
-  maintainer to try (`Pro7ChordEditor-mac-1.0.3.dmg`, sha256 `12a8819e…2c47`), and
-  a release waits for their word. All 378 tests pass. Version 1.0.3, build 7. Started twice, shut in, with a new made-up
-  home: two windows the first time and one the second.
+- **1.0.3, given out on 2026-10-14** at the maintainer's word ("Okay let's release
+  1.0.3"), as the Mac's half of the release `v1.0.3`, GitHub's "Latest" (decision
+  91). Version 1.0.3, build 7. The image is `Pro7ChordEditor-mac-1.0.3.dmg`,
+  sha256 `7faaf6dc…bfab`, made by the script from the commit the tag is on.
+  **It is the second image of 1.0.3.** The first (sha256 `12a8819e…2c47`, built on
+  2026-10-14 from what was committed half a minute later) is the one the
+  maintainer tried, and the one this session started twice, shut in, with a new
+  made-up home: two windows the first time and one the second. It is kept in
+  `mac/build` as `Pro7ChordEditor-mac-1.0.3 (tried, not given out).dmg`. The two
+  differ by one line of the read-me (decision 91). **The app in the one is the app
+  in the other**: both images mounted and the two apps compared, the same file
+  for file, the same number on the seal (`codesign`'s CDHash), and that app the
+  same again as the copy that was started. Checked besides, of what was given
+  out: the script's own checks; the words of the hints as they are now, found in
+  the program; all 378 tests, against the optimised code as well as the other;
+  GitHub's Mac build on the tag; and the file fetched back from the Releases page
+  and held against the one sent. **Not done again**: the app was not started from
+  the second image, being the app that was; and nobody has gone through the
+  read-me's steps for opening it with an image that came through a browser,
+  which macOS 26 was last seen to follow for 0.1.
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -1937,7 +1983,14 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **1.0.3 has been used by nobody** (decisions 86 and 87). To try:
+- **Of the release of 1.0.3, to ask the maintainer** (decision 91):
+  1. 1.0.0's page says the Windows build of 1.0.0 is to be added. Is it to say
+     instead that 1.0.3 is the newer, or to be taken down, as 0.1 was?
+  2. "An early build" is the second line of the read-me in the image. Is that
+     still what a 1.0 is to say of itself?
+- **1.0.3 was tried by the maintainer on 2026-10-14** ("tips are fine"; the
+  README's screenshot is of it), and then given out. Which of these were among
+  what was tried was not said, so they stand (decisions 86 and 87):
   1. the line of hints: is the blue right, in the light and in the dark? Does it
      light up when the words change, and is that pleasing or a flicker as the
      pointer crosses chords? Are the keys easy to pick out?
