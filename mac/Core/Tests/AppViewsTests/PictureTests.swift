@@ -390,6 +390,54 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "43 the strip, with the way to the guide", size: Self.sheetSize)
     }
 
+    @Test("The line of hints under the sheet: what it says for each thing that can be going on, in the light and the dark; and the window with the pointer on a chord, with Option held, and narrow")
+    func theLineOfHints() async throws {
+        let mac = try macWithHistory()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let cases: [(String, [SheetHints.Hint])] = [
+            ("the pointer on a chord", SheetHints.hints(.onChord)),
+            ("on a place with no chord", SheetHints.hints(.onPlace)),
+            ("Option or Command held", SheetHints.hints(.onPlace, held: true)),
+            ("held, with 4 chords copied", SheetHints.hints(.onPlace, held: true, copied: 4)),
+            ("a chord being typed", SheetHints.hints(.typing(onChord: false, empty: false))),
+            ("the box cleared, on a chord", SheetHints.hints(.typing(onChord: true, empty: true))),
+            ("a chord being carried", SheetHints.hints(.carrying)),
+            ("carried, with Option held", SheetHints.hints(.carrying, held: true)),
+            ("ProPresenter running", SheetHints.cannotChange),
+        ] + SheetHints.tips.enumerated().map { ("tip \($0.offset + 1)", $0.element) }
+        let all = VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(cases.enumerated()), id: \.offset) { _, one in
+                HStack(spacing: 0) {
+                    Text(one.0)
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .frame(width: 190, alignment: .leading)
+                    HintRow(hints: one.1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 30)
+                Divider()
+            }
+        }
+        .background(Color(nsColor: .windowBackgroundColor))
+        let size = NSSize(width: 1120, height: Double(cases.count) * 31)
+        try draw(all, named: "45 the line of hints, all it says", size: size)
+        try draw(all, named: "46 the line of hints, in the dark", size: size, dark: true)
+
+        // In the window: under the sheet, over the quiet line.
+        // (With nobody at the sheet it says a tip, whichever the clock has come to.)
+        try draw(LibraryWindow(model: model), named: "47 the sheet, with a tip under it", size: Self.sheetSize)
+        model.holds(true)
+        try draw(LibraryWindow(model: model), named: "48 the sheet, Option held", size: Self.sheetSize, dark: true)
+        model.holds(false)
+        try draw(LibraryWindow(model: model), named: "49 the sheet, a tip, in a narrow window", size: NSSize(width: 760, height: 560))
+        // A song that has earlier versions: the button to them, in its colour.
+        model.open(song: mac.song("Holy Holy Holy"))
+        try draw(LibraryWindow(model: model), named: "50 a song with earlier versions", size: Self.sheetSize)
+        try draw(LibraryWindow(model: model), named: "51 a song with earlier versions, in the dark", size: Self.sheetSize, dark: true)
+    }
+
     @Test("Chords with no words: the song in the shapes real ones have, as it is; with chords put on its three blank slides and on its lines of chords alone; and that as ChordPro text")
     func chordsWithNoWords() async throws {
         let mac = try MadeUpMac()

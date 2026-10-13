@@ -38,6 +38,9 @@ struct SongPane: View {
                     SheetStrip(model: model, sheet: sheet, key: shown.key)
                     ChordSheetCanvasView(model: model, version: model.sheetVersion, scale: model.sheetZoom, chordColour: model.sheetChordColour)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Divider()
+                    // What the keys and the mouse do just now, where the spot is.
+                    SheetHintBar(model: model)
                 } else if let chordPro = model.chordPro {
                     // One line of help over the text; or, in a warmer colour, why this
                     // song can be read here and not changed.
@@ -214,8 +217,23 @@ struct SongPane: View {
     @ViewBuilder
     private var earlierVersions: some View {
         if model.hasEarlierVersions {
-            Button("Earlier Versions") { model.showEarlierVersions() }
-                .help("See this song as it was before it was changed here, and put a version back.")
+            // In a colour of its own, with the picture a song has in the list before
+            // it: it is the way back, and was passed over as one more grey button.
+            // (The maintainer's, 2026-10-13.)
+            Button {
+                model.showEarlierVersions()
+            } label: {
+                HStack(spacing: 5) {
+                    PresentationGlyph()
+                        .fill(.white)
+                        .aspectRatio(1, contentMode: .fit)
+                        .frame(width: 13, height: 13)
+                        .accessibilityHidden(true)
+                    Text("Earlier Versions")
+                }
+            }
+            .buttonStyle(FilledButton(colour: SongLook.earlierVersions))
+            .help("See this song as it was before it was changed here, and put a version back.")
         }
     }
 
@@ -245,6 +263,99 @@ struct SongPane: View {
         .disabled(!model.canChange || shown.key.isEmpty)
         .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
                                 : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
+    }
+}
+
+/// The colours of the song's header that are this app's own.
+enum SongLook {
+    /// The Earlier Versions button: a blue, the colour furthest from the sheet's
+    /// orange, which in this header says which editor is shown.
+    static let earlierVersions = Color(red: 0.16, green: 0.47, blue: 0.86)
+}
+
+/// A button filled with a colour of the app's choosing, its words white: drawn here
+/// and not left to the system's coloured button, which is that colour only in the
+/// window that has the keyboard and grey in any other (and in the pictures the tests
+/// draw, where it could not be seen at all).
+struct FilledButton: ButtonStyle {
+    var colour: Color
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 12.5, weight: .medium))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 10)
+            .frame(height: 24)
+            .background(RoundedRectangle(cornerRadius: 6, style: .continuous).fill(colour))
+            .opacity(configuration.isPressed ? 0.7 : 1)
+            .contentShape(Rectangle())
+    }
+}
+
+/// The line of hints under the sheet: what SheetHints says just now, its keys drawn
+/// as keys. As many of the hints as there is room for, the first ones first. Where
+/// nothing in particular is to be said, a tip, and after some seconds the next.
+struct SheetHintBar: View {
+    var model: LibraryModel
+    /// Which tip, for the tests that draw this; the clock's, where none is given.
+    var tip: Int?
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: SheetHints.tipLasts)) { time in
+            HintRow(hints: model.sheetHints(tip: tip ?? Int(time.date.timeIntervalSinceReferenceDate / SheetHints.tipLasts)))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .frame(height: 30)
+        .clipped()
+        .background(Color(nsColor: .windowBackgroundColor))
+    }
+}
+
+struct HintRow: View {
+    var hints: [SheetHints.Hint]
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            ForEach((1...max(1, hints.count)).reversed(), id: \.self) { count in
+                row(Array(hints.prefix(count)))
+            }
+        }
+    }
+
+    private func row(_ hints: [SheetHints.Hint]) -> some View {
+        HStack(spacing: 18) {
+            ForEach(Array(hints.enumerated()), id: \.offset) { _, hint in
+                HStack(spacing: 5) {
+                    ForEach(Array(hint.keys.enumerated()), id: \.offset) { _, key in
+                        KeyCap(key: key)
+                    }
+                    Text(hint.says)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel((hint.keys + [hint.says]).joined(separator: " "))
+            }
+        }
+    }
+}
+
+/// A key, drawn as one: its sign in a small box with rounded corners.
+struct KeyCap: View {
+    var key: String
+
+    var body: some View {
+        Text(key)
+            .font(.system(size: 11.5, weight: .medium))
+            .foregroundStyle(.primary.opacity(0.85))
+            .lineLimit(1)
+            .fixedSize()
+            .padding(.horizontal, 5)
+            .frame(minWidth: 20, minHeight: 19)
+            .background(RoundedRectangle(cornerRadius: 4.5, style: .continuous).fill(Color.primary.opacity(0.07)))
+            .overlay(RoundedRectangle(cornerRadius: 4.5, style: .continuous).stroke(Color.primary.opacity(0.28)))
     }
 }
 

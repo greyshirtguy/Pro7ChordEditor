@@ -754,11 +754,12 @@ struct ChordSheetViewTests {
         let names = sheet.rows[line].chords.map(\.name)
         sheet.setSpot(line, 0)
         #expect(canvas.performKeyEquivalent(with: try press("c", .command, in: window)))
-        #expect(model.notice == "\(names.count) chords copied from the line: Command+V puts them on the lines from the spot's on, word for word")
+        // (The key is named by its sign, as the Mac's menus name it.)
+        #expect(model.notice == "\(names.count) chords copied from the line: \u{2318}V puts them on the lines from the spot's on, word for word")
         #expect(canvas.performKeyEquivalent(with: try press("C", [.command, .shift], in: window)))
         #expect(model.notice.contains("copied from 4 lines"))
         await model.whatWasSaidIsGone()
-        #expect(model.notice == LibraryModel.sheetHelp)
+        #expect(model.notice == "7 slides, 40 chords.")
 
         // The first line's chords onto the second, word for word: each on the same
         // numbered word, as far into it as it was.
@@ -850,7 +851,7 @@ struct ChordSheetViewTests {
         let fewer = try #require(sheet.rows.indices.first { sheet.usable($0) && !sheet.rows[$0].alone && sheet.rows[$0].chords.count != 4 && sheet.rows[$0].chords.count > 0 })
         canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: fewer, at: 0))), shift: false)
         #expect(canvas.performKeyEquivalent(with: try press("c", .command, in: window)))
-        #expect(sheet.typing && model.notice == "4 chords copied from the line: Command+V puts them on the lines from the spot's on, word for word")
+        #expect(sheet.typing && model.notice == "4 chords copied from the line: \u{2318}V puts them on the lines from the spot's on, word for word")
         #expect(canvas.performKeyEquivalent(with: try press("v", .command, in: window)))
         #expect(!sheet.typing)
         // The keys that zoom are the sheet's whoever has the keyboard.

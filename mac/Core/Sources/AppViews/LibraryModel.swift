@@ -178,9 +178,11 @@ public final class LibraryModel {
         case sheet, chordPro
     }
 
-    /// What the quiet line says while the sheet is shown: what the keys do.
-    public static let sheetHelp = "1 to 7: the key\u{2019}s chords  \u{00B7}  A to G: type one, and a click on the next place keeps it  \u{00B7}  "
-        + "Drag moves a chord, with Option copies it  \u{00B7}  Delete removes  \u{00B7}  Command+C and Command+V: a line\u{2019}s chords onto another"
+    /// What is going on in the sheet, as its view says it, and whether Option or
+    /// Command is held down: what the line of hints under the sheet goes by
+    /// (SheetHints.swift). Neither is anything of the song's.
+    public private(set) var sheetSituation = SheetHints.Situation.nothing
+    public private(set) var modifierHeld = false
     /// How long what the sheet said stays on the quiet line.
     public var sayingLasts: Duration = .seconds(6)
 
@@ -233,9 +235,11 @@ public final class LibraryModel {
             if shown.problem != nil { return "Nothing was done to this file." }
             // What was just said (a copy, a paste, Command+S) is said in either editor.
             if let said { return said }
-            if editorShown == .sheet { return Self.sheetHelp }
             let slides = shown.slides == 1 ? "1 slide" : "\(shown.slides) slides"
             let chords = shown.chords == 1 ? "1 chord" : "\(shown.chords) chords"
+            // (What the keys do on the sheet is said on a line of its own, over this
+            // one: `sheetHints`.)
+            if editorShown == .sheet { return "\(slides), \(chords)." }
             // (There is no Save button to look for, so it says there is no need of one;
             // but only where something can be typed.)
             return canType ? "\(slides), \(chords). A change is saved a moment after it is typed." : "\(slides), \(chords)."
@@ -245,6 +249,28 @@ public final class LibraryModel {
             return songs.count == 1 ? "1 song, \(withChords) with chords." : "\(songs.count) songs, \(withChords) with chords."
         }
         return ""
+    }
+
+    /// What the line of hints under the sheet says just now. `tip`: which of the
+    /// tips it is the turn of, where there is nothing in particular to say.
+    public func sheetHints(tip: Int = 0) -> [SheetHints.Hint] {
+        guard canChange else { return SheetHints.cannotChange }
+        return SheetHints.hints(sheetSituation, held: modifierHeld, copied: sheet.flatMap(SheetHints.copied(in:)), tip: tip)
+    }
+
+    /// The sheet's view says what is going on in it. (Only what has changed is put
+    /// down: the pointer says this at every move.)
+    public func sheetIs(_ situation: SheetHints.Situation) {
+        if sheetSituation != situation {
+            sheetSituation = situation
+        }
+    }
+
+    /// Option or Command went down, or came up.
+    public func holds(_ held: Bool) {
+        if modifierHeld != held {
+            modifierHeld = held
+        }
     }
 
     // ---- What the person does
@@ -633,7 +659,7 @@ public final class LibraryModel {
     public func pasteChords() {
         guard let sheet else { return }
         guard sheet.copied != nil else {
-            say("Nothing has been copied yet. Command+C copies the chords of the line the spot is on.")
+            say("Nothing has been copied yet. \(SheetHints.command)C copies the chords of the line the spot is on.")
             return
         }
         guard let pasted = sheet.paste() else { return }
@@ -683,7 +709,8 @@ public final class LibraryModel {
     /// The sheet's song for a song just opened, or put back.
     private func makeSheet(of song: OpenSong) -> ChordSheet {
         let made = ChordSheet(song: song)
-        made.pasteKeys = "Command+V"
+        sheetSituation = .nothing
+        made.pasteKeys = SheetHints.command + "V"
         made.refused = { [weak self] error in
             self?.sheetRefused = true
             self?.refuse(error)

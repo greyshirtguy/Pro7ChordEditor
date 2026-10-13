@@ -18,6 +18,9 @@
 // is under Help. mac/NOTES.md says where things stand.
 //
 // One window and not a new one at every Command+N: there is one library to look at.
+// Closing it quits the app, as it does for any app of one window: there is nothing to
+// do without it. And the menu bar is kept to what the app has a use for (AppMenus, in
+// the package).
 
 import AppViews
 import SwiftUI
@@ -27,22 +30,25 @@ struct Pro7ChordEditorApp: App {
     @State private var model = LibraryModel.onThisMac()
     @State private var copies = AllCopiesModel.onThisMac()
 
+    init() {
+        // Before any menu is made: what the system is not to put in them, and the
+        // tidying of what it puts in all the same.
+        AppMenus.atStart()
+        AppMenus.watch()
+    }
+
     var body: some Scene {
         // (Its title is the app's name and its version: AppTitle, in the package.)
         Window(AppTitle.ofThisApp, id: "main") {
-            LibraryWindow(model: model)
+            // (What was being typed is saved as the app goes: the window sees to
+            // that when it is told the app is quitting.)
+            LibraryWindow(model: model, whenClosed: { DispatchQueue.main.async { NSApp.terminate(nil) } })
         }
         .defaultSize(width: 1280, height: 800)
         .commands {
-            // File > Save, for the hand that presses Command+S out of habit: nothing is
-            // saved by hand here, and the window says so. And Revert, beside it, as in
-            // the window (spec/06-library.md, rule 12a).
-            CommandGroup(replacing: .saveItem) {
-                Button("Save") { model.saveNow() }
-                    .keyboardShortcut("s", modifiers: .command)
-                Button("Revert to as Opened\u{2026}") { model.askToRevert() }
-                    .disabled(!model.canRevert)
-            }
+            // About, with the app's icon; and File > Revert, as in the window
+            // (spec/06-library.md, rule 12a). No Save: nothing is saved by hand.
+            AppCommands(model: model)
             // Help: the guide (spec/13-guide.md).
             GuideCommands()
         }

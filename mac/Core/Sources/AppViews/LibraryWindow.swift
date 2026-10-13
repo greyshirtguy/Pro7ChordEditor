@@ -57,9 +57,14 @@ public enum AppTitle {
 public struct LibraryWindow: View {
     @Bindable private var model: LibraryModel
     @Environment(\.openWindow) private var openWindow
+    /// What is done when the window is closed. The app quits: there is one window,
+    /// and nothing to do without it (spec/10-platforms.md). Nothing, where none is
+    /// given: under the tests, which close a good many windows.
+    private var whenClosed: () -> Void
 
-    public init(model: LibraryModel) {
+    public init(model: LibraryModel, whenClosed: @escaping () -> Void = {}) {
         self.model = model
+        self.whenClosed = whenClosed
     }
 
     public var body: some View {
@@ -70,6 +75,7 @@ public struct LibraryWindow: View {
                 .frame(minWidth: 380, maxWidth: .infinity)
         }
         .frame(minWidth: 620, minHeight: 440)
+        .background(WindowKeeper(save: { model.saveNow() }, closed: whenClosed).frame(width: 0, height: 0))
         .sheet(isPresented: Binding(get: { model.earlier != nil }, set: { if !$0 { model.closeEarlierVersions() } })) {
             EarlierVersionsPanel(model: model)
         }
@@ -90,6 +96,9 @@ public struct LibraryWindow: View {
         .onChange(of: model.guideAsked) { openWindow(id: GuideWindow.id) }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willResignActiveNotification)) { _ in
             model.settle()
+            // (A key held down as the app is left is let go where this app cannot
+            // see it.)
+            model.holds(false)
         }
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
             model.settle()
@@ -124,6 +133,58 @@ public struct LibraryWindow: View {
     }
 }
 
+/// What the window needs of AppKit that SwiftUI has no word for: to be told when it
+/// closes, and to answer Command+S, which is in no menu (spec/06-library.md, rule 12a:
+/// the key is for the hand that presses it out of habit, and a Save in the menu would
+/// say there is saving to do).
+struct WindowKeeper: NSViewRepresentable {
+    var save: () -> Void
+    var closed: () -> Void
+
+    final class Keeper: NSView {
+        var save: () -> Void = {}
+        var closed: () -> Void = {}
+        private var watch: (any NSObjectProtocol)?
+
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            if let watch {
+                NotificationCenter.default.removeObserver(watch)
+                self.watch = nil
+            }
+            guard let window else { return }
+            watch = NotificationCenter.default.addObserver(forName: NSWindow.willCloseNotification, object: window, queue: .main) { [weak self] _ in
+                MainActor.assumeIsolated { self?.closed() }
+            }
+        }
+
+        /// Whether a key pressed is Command+S and nothing more.
+        static func isSave(_ event: NSEvent) -> Bool {
+            event.type == .keyDown
+                && event.modifierFlags.intersection([.command, .control, .option, .shift]) == .command
+                && event.charactersIgnoringModifiers?.lowercased() == "s"
+        }
+
+        override func performKeyEquivalent(with event: NSEvent) -> Bool {
+            guard Self.isSave(event) else { return super.performKeyEquivalent(with: event) }
+            save()
+            return true
+        }
+    }
+
+    func makeNSView(context: Context) -> Keeper {
+        let keeper = Keeper()
+        keeper.save = save
+        keeper.closed = closed
+        return keeper
+    }
+
+    func updateNSView(_ keeper: Keeper, context: Context) {
+        keeper.save = save
+        keeper.closed = closed
+    }
+}
+
 /// The greys of the two lists at the left, and of the bar between them: ProPresenter's
 /// own in the dark (read off a picture of its window), and their like in the light.
 /// The libraries' ground is the lighter of the two, as there.
@@ -149,7 +210,9 @@ enum ListsLook {
     /// libraries, room for what is over them and three of them; for the songs, for
     /// the search box and the choice over them and a few of them.
     static let barHeight = 22.0
-    static let leastLibraries = 170.0
+    static let leastLibraries = 190.0
+    /// What stands over the choice of place.
+    static let placesTitle = "WORKSPACE OR PROPRESENTER FOLDER"
     static let leastSongs = 150.0
 
     /// How tall the libraries' part is, given this share of a height that also holds
@@ -264,6 +327,13 @@ struct PlacesPane: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 6) {
+                // What this top part is: where the songs are looked for. (The
+                // maintainer's, 2026-10-13; the libraries under it had a title and
+                // this had none.)
+                Text(ListsLook.placesTitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
                 if model.places.isEmpty {
                     // It is not an error: someone may keep a copy of a library elsewhere,
                     // or have no ProPresenter on this Mac at all.

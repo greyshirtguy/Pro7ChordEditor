@@ -231,6 +231,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         /// The words a step larger or smaller, or their usual size: answers with how
         /// many times their usual size they then are.
         var zoom: (_ direction: Int) -> Double? = { _ in nil }
+        /// What is going on in the sheet, for the line of hints under it; and whether
+        /// Option or Command is held down, which that line answers to.
+        var situation: (SheetHints.Situation) -> Void = { _ in }
+        var held: (Bool) -> Void = { _ in }
 
         /// As the window wires them.
         @MainActor
@@ -241,7 +245,44 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                  redo: { [model] in model.redo() },
                  canUndo: { [model] in model.canUndo },
                  canRedo: { [model] in model.canRedo },
-                 zoom: { [model] in model.zoomSheet($0) })
+                 zoom: { [model] in model.zoomSheet($0) },
+                 situation: { [model] in model.sheetIs($0) },
+                 held: { [model] in model.holds($0) })
+        }
+    }
+
+    /// Whether the person is at the sheet just now: the pointer is over it, or the
+    /// keys have moved the spot since it left. The line of hints says what goes with
+    /// the spot only then (SheetHints).
+    private(set) var attending = false
+    private var flagsWatch: Any?
+
+    /// Says what is going on to whoever keeps the line of hints.
+    private func tell() {
+        asks.situation(sheet.map { SheetHints.situation(of: $0, attending: attending) } ?? .nothing)
+    }
+
+    /// Option or Command went down or came up, anywhere in the app.
+    func modifiers(_ flags: NSEvent.ModifierFlags) {
+        asks.held(flags.contains(.option) || flags.contains(.command))
+    }
+
+    // The keys that are held are watched for the whole app while the sheet is in a
+    // window, and not only while the sheet has the keyboard: the box a chord is typed
+    // in has it as often.
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        if let flagsWatch {
+            NSEvent.removeMonitor(flagsWatch)
+            self.flagsWatch = nil
+        }
+        guard window != nil else {
+            asks.held(false)
+            return
+        }
+        flagsWatch = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.modifiers(event.modifierFlags)
+            return event
         }
     }
 
@@ -552,6 +593,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             movingTheKeys = false
         }
         needsDisplay = true
+        tell()
     }
 
     /// Puts the bubble a chord is typed in at the place the chord is for. It grows
@@ -699,10 +741,21 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         if let place = place(at: point, shift: shift) {
             sheet.pointerOver(place.row, place.at)
             (place.onChord ? NSCursor.pointingHand : NSCursor.arrow).set()
+            attending = true
         } else {
             NSCursor.arrow.set()
+            // (Over the bare sheet, between the slides, there is nothing to say of
+            // the spot: it is where it was left.)
+            attending = false
         }
         needsDisplay = true
+        tell()
+    }
+
+    /// The pointer has left the sheet.
+    func pointerLeft() {
+        attending = false
+        tell()
     }
 
     func pressed(at point: NSPoint, shift: Bool) {
@@ -717,6 +770,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             pressed = (-1, nil, point, false)
         }
         needsDisplay = true
+        tell()
     }
 
     func dragged(to point: NSPoint, shift: Bool) {
@@ -736,6 +790,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         }
         NSCursor.closedHand.set()
         needsDisplay = true
+        tell()
     }
 
     /// The button is let go. `copy`: the key that copies as it drags is held.
@@ -774,9 +829,13 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         if let tracking {
             removeTrackingArea(tracking)
         }
-        let area = NSTrackingArea(rect: .zero, options: [.mouseMoved, .activeInKeyWindow, .inVisibleRect], owner: self)
+        let area = NSTrackingArea(rect: .zero, options: [.mouseMoved, .mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self)
         addTrackingArea(area)
         tracking = area
+    }
+
+    override func mouseExited(with event: NSEvent) {
+        pointerLeft()
     }
 
     override func mouseMoved(with event: NSEvent) {
@@ -954,6 +1013,12 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             if let scale = asks.zoom(direction) {
                 setScale(scale)
             }
+        }
+        // (The keys that move the spot or act on it are the person at the sheet, as
+        // the pointer over it is.)
+        switch key {
+        case .zoom, .undo, .redo: break
+        default: attending = true
         }
         sync()
     }
