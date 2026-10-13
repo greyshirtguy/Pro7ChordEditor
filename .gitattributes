@@ -70,3 +70,6 @@
 testdata/** -text
 *.pro binary
 *.png binary
+# (The apps' icons: mac/App/ChordEditor.icns and windows/App/ChordEditor.ico.)
+*.icns binary
+*.ico binary
