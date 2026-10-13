@@ -18,7 +18,7 @@ the list of those things. Anything not on it is to be the same.
 | Showing the sheet, and the ChordPro text | Command+1, Command+2 | Ctrl+1, Ctrl+2 |
 | The key that would save | Command+S. It is in no menu ([06](06-library.md), rule 12a) | Ctrl+S |
 | The names of the keys in the line of hints ([03](03-chord-sheet.md), rule 53e), and in what a copy says | Their signs: ⌫ for Delete, ↩ for Return, ⇥ for Tab, ⌥ for Option, ⌘C, ⌘V. The key that brings up the copying is ⌥, or ⌘; and ⌘C and ⌘V do the same with ⌥ held as well, which may be down still when they are pressed | In words: Delete, Enter, Tab, Ctrl+C, Ctrl+V. The key that brings up the copying is Ctrl |
-| The edge between the lists and the song ([06](06-library.md), rule 6a) | The app's own, and not the system's split view, which starts the lists at their widest whatever it is asked, and changes their width with the window's | Whatever of the platform's starts where it is told to and keeps the lists' width |
+| The edge between the lists and the song ([06](06-library.md), rule 6a) | The app's own, and not the system's split view, which starts the lists at their widest whatever it is asked, and changes their width with the window's. A bar eight points wide, which the system is told is a place where the pointer is the one for dragging sideways | Whatever of the platform's starts where it is told to and keeps the lists' width |
 | Deleting | Either delete key | Delete or Backspace |
 | Open on what is at the spot | Return | Enter, F2 |
 | Redo | Shift+Command+Z | Ctrl+Y, Ctrl+Shift+Z |

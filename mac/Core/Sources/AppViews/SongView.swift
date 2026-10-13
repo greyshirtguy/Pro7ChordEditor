@@ -1,14 +1,19 @@
-// The song that is open, at the right of the window: its name, the switch between its
-// two editors (EditorSwitch.swift), its two keys, and the editor that is shown: the
-// chord sheet (ChordSheetView.swift) or the song as ChordPro text to be typed in
-// (ChordProView.swift). spec/06-library.md, rules 12, 14 and 19;
-// spec/03-chord-sheet.md; spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules
-// 5 to 7.
+// The song that is open, at the right of the window: its header (SongHeader.swift: its
+// name, the switch between its two editors, its two keys), the editor that is shown,
+// which is the chord sheet (ChordSheetView.swift) or the song as ChordPro text to be
+// typed in (ChordProView.swift), under the sheet the line of hints, and at the foot the
+// quiet line. spec/06-library.md, rules 12, 14 and 19; spec/03-chord-sheet.md;
+// spec/04-chordpro-editor.md; spec/05-song-and-saving.md, rules 5 to 7.
+//
+// The parts that change often are views of their own (the line of hints, the quiet
+// line), and nothing here is left to SwiftUI to arrange by trying arrangements: what
+// that cost is in SongHeader.swift, and in mac/NOTES.md, "What made the window slow".
 //
 // `SongLines` is a song's lines only to be looked at, each line of words with its chords
 // before the characters they stand over: what an earlier version of a song is shown as
 // (EarlierVersionsPanel.swift).
 
+import AppKit
 import Song
 import SwiftUI
 
@@ -27,7 +32,7 @@ struct SongPane: View {
                     .background(Color.yellow.opacity(0.35))
             }
             if let shown = model.shown {
-                header(shown)
+                SongHeader(model: model, shown: shown)
                 Divider()
                 if let problem = shown.problem {
                     Text(problem)
@@ -72,57 +77,9 @@ struct SongPane: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             Divider()
-            HStack(spacing: 10) {
-                Text(model.notice.isEmpty ? " " : model.notice)
-                    .font(.callout)
-                    .foregroundStyle(model.refusal == nil ? .secondary : .primary)
-                    .lineLimit(4)
-                    .fixedSize(horizontal: false, vertical: true)
-                if model.offersOpeningAgain {
-                    Button("Open Again") { model.openAgain() }
-                        .controlSize(.small)
-                        .help("Read the song again from its file, as it is now.")
-                }
-                if model.justPutBack != nil && model.refusal == nil {
-                    // Undoing a putting-back is only putting back the copy that was
-                    // made just before it. The offer goes after a few seconds; the copy
-                    // stays at the top of the earlier versions.
-                    Button("Undo") { model.takeBack() }
-                        .controlSize(.small)
-                        .help("Put the song back as it was a moment ago.")
-                }
-                Spacer(minLength: 0)
-                if let shown = model.shown, shown.problem == nil {
-                    saving
-                }
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .task(id: model.justPutBack) {
-                guard model.justPutBack != nil else { return }
-                try? await Task.sleep(for: .seconds(8))
-                if !Task.isCancelled { model.forgetWhatWasPutBack() }
-            }
+            QuietLine(model: model)
         }
         .background(Color(nsColor: .textBackgroundColor))
-    }
-
-    /// At the right of the quiet line: Revert, which asks before it does anything, and
-    /// where a Save button would be, the words that say why there is none. Nothing is
-    /// saved by hand here: every change is saved as it is made (spec/06, rule 12a).
-    @ViewBuilder
-    private var saving: some View {
-        Button("Revert\u{2026}") { model.askToRevert() }
-            .controlSize(.small)
-            .disabled(!model.canRevert)
-            .help("Take back every change made to this song since it was opened here, after asking. What the song is now is kept as an earlier version first.")
-        Text(model.savingCaption)
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .fixedSize()
-            .help(model.canChange
-                  ? "There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first."
-                  : "Nothing is saved while ProPresenter is running.")
     }
 
     /// One of the two buttons that make the ChordPro text smaller and larger: a small
@@ -143,127 +100,65 @@ struct SongPane: View {
         .help(says)
         .accessibilityLabel(direction < 0 ? "Smaller text" : "Larger text")
     }
+}
 
-    /// The song's name at the left, the switch between its two editors in the middle,
-    /// and its keys at the right: on one row where the pane is wide enough for all
-    /// three with the name whole. Otherwise the keys go on a row of their own under
-    /// the other two; and where even that is too wide, each has a row. Nothing is
-    /// ever cut short to fit but the name.
-    private func header(_ shown: LibraryModel.ShownSong) -> some View {
-        ViewThatFits(in: .horizontal) {
-            // (The two sides are given the same width, so that the switch is in the
-            // middle of the pane and not of what is left over.)
-            HStack(alignment: .center, spacing: 12) {
-                name(shown, whole: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                if shown.problem == nil {
-                    EditorSwitch(model: model)
-                }
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    earlierVersions
-                    if shown.problem == nil {
-                        keys(shown)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .trailing)
+/// The quiet line at the foot of the song's part of the window: what is there to be
+/// seen, or for a few seconds what just happened; and at its right Revert, and why
+/// there is no Save. A view of its own, so that what it says can change (it changes at
+/// every chord put on) without the rest of the song's part being worked out again.
+struct QuietLine: View {
+    @Bindable var model: LibraryModel
+
+    var body: some View {
+        HStack(spacing: 10) {
+            Text(model.notice.isEmpty ? " " : model.notice)
+                .font(.callout)
+                .foregroundStyle(model.refusal == nil ? .secondary : .primary)
+                .lineLimit(4)
+                .fixedSize(horizontal: false, vertical: true)
+            if model.offersOpeningAgain {
+                Button("Open Again") { model.openAgain() }
+                    .controlSize(.small)
+                    .help("Read the song again from its file, as it is now.")
             }
-            // (Narrower: the name has what the switch leaves, and is not cut short
-            // for the sake of the switch standing in the middle.)
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .center, spacing: 12) {
-                    name(shown, whole: false)
-                    Spacer(minLength: 8)
-                    if shown.problem == nil {
-                        EditorSwitch(model: model)
-                    }
-                }
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    if shown.problem == nil {
-                        keys(shown)
-                    }
-                    Spacer(minLength: 0)
-                    earlierVersions
-                }
+            if model.justPutBack != nil && model.refusal == nil {
+                // Undoing a putting-back is only putting back the copy that was
+                // made just before it. The offer goes after a few seconds; the copy
+                // stays at the top of the earlier versions.
+                Button("Undo") { model.takeBack() }
+                    .controlSize(.small)
+                    .help("Put the song back as it was a moment ago.")
             }
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .firstTextBaseline, spacing: 12) {
-                    name(shown, whole: false)
-                    Spacer(minLength: 8)
-                    earlierVersions
-                }
-                if shown.problem == nil {
-                    EditorSwitch(model: model)
-                        .frame(maxWidth: .infinity)
-                    HStack(alignment: .firstTextBaseline, spacing: 12) {
-                        keys(shown)
-                        Spacer(minLength: 0)
-                    }
-                }
+            Spacer(minLength: 0)
+            if let shown = model.shown, shown.problem == nil {
+                saving
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .task(id: model.justPutBack) {
+            guard model.justPutBack != nil else { return }
+            try? await Task.sleep(for: .seconds(8))
+            if !Task.isCancelled { model.forgetWhatWasPutBack() }
+        }
     }
 
-    private func name(_ shown: LibraryModel.ShownSong, whole: Bool) -> some View {
-        Text(shown.name)
-            .font(.title2)
-            .lineLimit(1)
-            .truncationMode(.middle)
-            // (On the one row the name is not to be cut short to make room: if it
-            // would be, the row does not fit, and the keys go under it.)
-            .fixedSize(horizontal: whole, vertical: false)
-    }
-
+    /// At the right of the quiet line: Revert, which asks before it does anything, and
+    /// where a Save button would be, the words that say why there is none. Nothing is
+    /// saved by hand here: every change is saved as it is made (spec/06, rule 12a).
     @ViewBuilder
-    private var earlierVersions: some View {
-        if model.hasEarlierVersions {
-            // In a colour of its own, with the picture a song has in the list before
-            // it: it is the way back, and was passed over as one more grey button.
-            // (The maintainer's, 2026-10-13.)
-            Button {
-                model.showEarlierVersions()
-            } label: {
-                HStack(spacing: 5) {
-                    PresentationGlyph()
-                        .fill(.white)
-                        .aspectRatio(1, contentMode: .fit)
-                        .frame(width: 13, height: 13)
-                        .accessibilityHidden(true)
-                    Text("Earlier Versions")
-                }
-            }
-            .buttonStyle(FilledButton(colour: SongLook.earlierVersions))
-            .help("See this song as it was before it was changed here, and put a version back.")
-        }
-    }
-
-    /// The song's two keys, each to be set: the key its chords are written in, and,
-    /// quieter beside it, the key ProPresenter is to show them in. Neither changes any
-    /// chord in the file.
-    @ViewBuilder
-    private func keys(_ shown: LibraryModel.ShownSong) -> some View {
-        Picker("Key", selection: Binding(get: { shown.key }, set: { model.setKey($0) })) {
-            if shown.key.isEmpty {
-                Text("None").tag("")
-            }
-            ForEach(model.keys, id: \.self) { Text($0).tag($0) }
-        }
-        .fixedSize()
-        .disabled(!model.canChange)
-        .help(shown.key.isEmpty ? "This song does not say what key it is in. Pick the key its chords are written in."
-                                : "The key the song's chords are written in. Changing it changes no chord.")
-        Picker("Shown in", selection: Binding(get: { shown.shownKey }, set: { model.setShownKey($0) })) {
-            if shown.shownKey.isEmpty {
-                Text("None").tag("")
-            }
-            ForEach(model.keys, id: \.self) { Text($0).tag($0) }
-        }
-        .fixedSize()
-        .foregroundStyle(.secondary)
-        .disabled(!model.canChange || shown.key.isEmpty)
-        .help(shown.key.isEmpty ? "Set the song's key first, and then the key ProPresenter is to show it in."
-                                : "The key ProPresenter shows this song's chords in. It moves them there itself; the chords here stay as they are written.")
+    private var saving: some View {
+        Button("Revert\u{2026}") { model.askToRevert() }
+            .controlSize(.small)
+            .disabled(!model.canRevert)
+            .help("Take back every change made to this song since it was opened here, after asking. What the song is now is kept as an earlier version first.")
+        Text(model.savingCaption)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .help(model.canChange
+                  ? "There is nothing to save by hand: every change is saved as it is made, with a copy of the song as it was kept first."
+                  : "Nothing is saved while ProPresenter is running.")
     }
 }
 
@@ -293,81 +188,189 @@ struct FilledButton: ButtonStyle {
     }
 }
 
+/// How the hints are fitted into the width there is: how many of them, on one line or
+/// one under another, and how large. Arithmetic, on widths measured with the font the
+/// line is drawn in; no window in it.
+///
+/// Where there is not room for all the hints the last are left off; but not one that
+/// is needed (the two sentences on copying and pasting are one thing, and the second
+/// is the point of it). Those go one under the other where they do not fit side by
+/// side; where one of them is still too long they are drawn smaller, a step at a time;
+/// and at their smallest they are cut off at the right.
+///
+/// WHY IT IS ARITHMETIC, and SwiftUI is not asked to choose the first arrangement
+/// that fits (`ViewThatFits`), as it was until 2026-10-13: to choose, SwiftUI builds
+/// every arrangement it is offered and measures it, each time the line is laid out,
+/// and the line is laid out whenever what it says changes: as often as the pointer
+/// crosses a chord. Measured then, that was most of what a move of the pointer cost
+/// once the song's header had been put right (SongHeader.swift has the greater part).
+@MainActor
+enum HintFit {
+    struct Fit: Equatable, Sendable {
+        /// How many of the hints are said, from the first.
+        var count: Int
+        /// Whether they are one under another, and not side by side.
+        var stacked: Bool
+        /// How many times their usual size they are drawn.
+        var size: Double
+    }
+
+    /// The sizes the needed hints are tried at, one under the other: as they come,
+    /// and two steps smaller.
+    static let sizes = [1.0, 0.9, 0.8]
+    /// The size of the words, and of the sign on a key; the room between two hints,
+    /// between the parts of one, and between two lines of them; how tall the line is,
+    /// and the room it keeps at its sides and over and under what it says.
+    static let wordSize = 12.0
+    static let keySize = 11.5
+    static let between = 18.0
+    static let within = 5.0
+    static let lines = 4.0
+    static let height = 30.0
+    static let sides = 12.0
+    static let overAndUnder = 5.0
+
+    private static var known: [String: Double] = [:]
+
+    /// How wide some words are, in the system's font of a size and a weight. (A
+    /// point is added: SwiftUI gives a line of text a whole number of points.)
+    static func width(of words: String, size: Double, weight: NSFont.Weight = .regular) -> Double {
+        let key = "\(size) \(weight.rawValue) \(words)"
+        if let width = known[key] { return width }
+        let width = ceil((words as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: size, weight: weight)]).width) + 1
+        known[key] = width
+        return width
+    }
+
+    /// How wide a key is drawn: its sign and the room either side of it, and never
+    /// less than a key is.
+    static func width(ofKey key: String, size: Double) -> Double {
+        max(20 * size, width(of: key, size: keySize * size, weight: .medium) + 10 * size)
+    }
+
+    /// How wide one hint is: its words before its keys, its keys, and what it says.
+    static func width(of hint: SheetHints.Hint, size: Double) -> Double {
+        var parts: [Double] = []
+        if !hint.lead.isEmpty {
+            parts.append(width(of: hint.lead, size: wordSize * size))
+        }
+        parts += hint.keys.map { width(ofKey: $0, size: size) }
+        parts.append(width(of: hint.says, size: wordSize * size))
+        return parts.reduce(0, +) + within * size * Double(parts.count - 1)
+    }
+
+    /// How wide these hints are side by side.
+    static func width(of hints: [SheetHints.Hint], size: Double) -> Double {
+        hints.map { width(of: $0, size: size) }.reduce(0, +) + between * size * Double(max(0, hints.count - 1))
+    }
+
+    /// How the hints are fitted into a width (the width they have to themselves, the
+    /// room at the line's sides taken off).
+    static func fit(_ hints: [SheetHints.Hint], in room: Double) -> Fit {
+        guard !hints.isEmpty else { return Fit(count: 0, stacked: false, size: 1) }
+        // (How many of them, from the first, may not be left off.)
+        let needed = hints.prefix { $0.needed }.count
+        for count in (max(1, needed)...hints.count).reversed() where width(of: Array(hints.prefix(count)), size: 1) <= room {
+            return Fit(count: count, stacked: false, size: 1)
+        }
+        guard needed > 1 else {
+            // (One hint, and no room for it: it is cut off.)
+            return Fit(count: 1, stacked: false, size: 1)
+        }
+        for size in sizes where hints.prefix(needed).allSatisfy({ width(of: $0, size: size) <= room }) {
+            return Fit(count: needed, stacked: true, size: size)
+        }
+        return Fit(count: needed, stacked: true, size: sizes.last ?? 1)
+    }
+
+    /// How tall the line is for a fit: its usual height, or what the hints need one
+    /// under another, if that is more.
+    static func height(of fit: Fit) -> Double {
+        guard fit.stacked else { return height }
+        let line = 19 * fit.size
+        return max(height, Double(fit.count) * line + Double(fit.count - 1) * lines * fit.size + 2 * overAndUnder)
+    }
+}
+
+/// How wide the song's part of the window is: what the line of hints fits itself to.
+/// (The window says it, which is what divides itself.)
+private struct SongWidthKey: EnvironmentKey {
+    static let defaultValue = 900.0
+}
+
+extension EnvironmentValues {
+    var songWidth: Double {
+        get { self[SongWidthKey.self] }
+        set { self[SongWidthKey.self] = newValue }
+    }
+}
+
 /// The line of hints under the sheet: what SheetHints says just now, its keys drawn
 /// as keys. As many of the hints as there is room for, the first ones first. It is one
 /// line, but for the two sentences on copying and pasting where there is not room for
 /// them side by side: then it is two, and the sheet over it that much shorter while
 /// they are said.
+///
+/// How tall it is, is worked out (HintFit) and not asked of what is in it: so a change
+/// in what it says, which is as often as the pointer crosses a chord, has nothing
+/// else in the window measured again unless the line itself is to be taller.
 struct SheetHintBar: View {
     var model: LibraryModel
+    @Environment(\.songWidth) private var width
 
     var body: some View {
-        HintRow(hints: model.sheetHints)
-            // (As wide as the song's part of the window and no wider, whatever it
-            // has to say: what does not fit is cut off at the right, and does not
-            // push the window's parts about.)
-            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 5)
-            .frame(minHeight: 30)
+        let hints = model.sheetHints
+        let fit = HintFit.fit(hints, in: width - 2 * HintFit.sides)
+        HintRow(hints: hints, fit: fit)
+            .padding(.horizontal, HintFit.sides)
+            // (As wide as the song's part of the window and no wider, and as tall
+            // as was worked out, whatever is in it: what does not fit is cut off at
+            // the right, and pushes nothing about.)
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: HintFit.height(of: fit), maxHeight: HintFit.height(of: fit), alignment: .leading)
             .clipped()
             .background(Color(nsColor: .windowBackgroundColor))
     }
 }
 
-/// Hints in a row, as many as there is room for. Where there is not room for all, the
-/// last are left off; but not one that is needed (the two sentences on copying and
-/// pasting are one thing, and the second is the point of it). Those go one under the
-/// other where they do not fit side by side; and where one of them is still too long,
-/// are drawn smaller, a step at a time, and at their smallest are cut off at the
-/// right.
+/// Hints as they were fitted: so many of them side by side, or one under another.
 struct HintRow: View {
     var hints: [SheetHints.Hint]
-
-    /// The sizes the needed hints are tried at, one under the other: as they come,
-    /// and two steps smaller.
-    static let sizes = [1.0, 0.9, 0.8]
+    var fit: HintFit.Fit
 
     var body: some View {
-        // (How many of them, from the first, may not be left off.)
-        let needed = hints.prefix { $0.needed }.count
-        ViewThatFits(in: .horizontal) {
-            ForEach((max(1, needed)...max(1, hints.count)).reversed(), id: \.self) { count in
-                row(Array(hints.prefix(count)), size: 1)
+        let said = Array(hints.prefix(fit.count))
+        if fit.stacked {
+            VStack(alignment: .leading, spacing: HintFit.lines * fit.size) {
+                ForEach(Array(said.enumerated()), id: \.offset) { _, hint in
+                    one(hint, size: fit.size)
+                }
             }
-            if needed > 0 {
-                ForEach(Self.sizes, id: \.self) { size in
-                    VStack(alignment: .leading, spacing: 4 * size) {
-                        ForEach(0..<needed, id: \.self) { index in
-                            row([hints[index]], size: size)
-                        }
-                    }
+        } else {
+            HStack(spacing: HintFit.between * fit.size) {
+                ForEach(Array(said.enumerated()), id: \.offset) { _, hint in
+                    one(hint, size: fit.size)
                 }
             }
         }
     }
 
-    private func row(_ hints: [SheetHints.Hint], size: Double) -> some View {
-        HStack(spacing: 18 * size) {
-            ForEach(Array(hints.enumerated()), id: \.offset) { _, hint in
-                HStack(spacing: 5 * size) {
-                    if !hint.lead.isEmpty {
-                        words(hint.lead, size: size)
-                    }
-                    ForEach(Array(hint.keys.enumerated()), id: \.offset) { _, key in
-                        KeyCap(key: key, size: size)
-                    }
-                    words(hint.says, size: size)
-                }
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(hint.read)
+    private func one(_ hint: SheetHints.Hint, size: Double) -> some View {
+        HStack(spacing: HintFit.within * size) {
+            if !hint.lead.isEmpty {
+                words(hint.lead, size: size)
             }
+            ForEach(Array(hint.keys.enumerated()), id: \.offset) { _, key in
+                KeyCap(key: key, size: size)
+            }
+            words(hint.says, size: size)
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(hint.read)
     }
 
     private func words(_ words: String, size: Double) -> some View {
         Text(words)
-            .font(.system(size: 12 * size))
+            .font(.system(size: HintFit.wordSize * size))
             .foregroundStyle(.secondary)
             .lineLimit(1)
             .fixedSize()
@@ -381,7 +384,7 @@ struct KeyCap: View {
 
     var body: some View {
         Text(key)
-            .font(.system(size: 11.5 * size, weight: .medium))
+            .font(.system(size: HintFit.keySize * size, weight: .medium))
             .foregroundStyle(.primary.opacity(0.85))
             .lineLimit(1)
             .fixedSize()

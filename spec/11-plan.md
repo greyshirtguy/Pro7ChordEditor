@@ -72,7 +72,8 @@ its turn comes, from the page that has it:
 | A title over the choice of place; Earlier Versions in a colour, with a song's picture | [06](06-library.md), rule 7; [07](07-backups.md), rule 15 |
 | The line of hints under the sheet, and the highlighted line with its colour in the settings. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints"; [06](06-library.md), rule 20a |
 | A text box's other ranges go with the words when a line of chords alone is made longer or shorter, as Simple Presenter has it | [01](01-file-format.md), "The box's other ranges" |
-| The edge between the lists and the song starts half way between its least and its most | [06](06-library.md), rule 6a |
+| The edge between the lists and the song starts half way between its least and its most, and is a bar that is seen | [06](06-library.md), rule 6a |
+| Nothing in the window keeps the pointer waiting | [06](06-library.md), rule 6e |
 
 ## What the maintainer is asked for along the way
 

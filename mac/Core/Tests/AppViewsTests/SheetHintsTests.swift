@@ -12,6 +12,7 @@
 import AppKit
 @testable import AppViews
 import Song
+import SwiftUI
 import Testing
 
 @MainActor
@@ -128,6 +129,81 @@ struct SheetHintsTests {
         #expect(SheetHints.hints(.nothing) == SheetHints.idle)
         #expect(SheetHints.hints(.nothing, held: true) == SheetHints.idle)
         #expect(SheetHints.hints(.nothing, held: true, paste: SheetHints.Paste(lines: 2, replaces: true)) == SheetHints.idle)
+    }
+
+    // ---- How what is said is fitted into the line
+
+    @Test("With room for all its hints the line says them all, side by side; with less, the last are left off one at a time, and the first is always said. The line is no taller for it")
+    func fittedSideBySide() {
+        for hints in [SheetHints.hints(.onChord), SheetHints.hints(.onPlace), SheetHints.hints(.typing(onChord: false, empty: false)), SheetHints.hints(.carrying)] {
+            let all = HintFit.width(of: hints, size: 1)
+            #expect(HintFit.fit(hints, in: all) == HintFit.Fit(count: hints.count, stacked: false, size: 1))
+            #expect(HintFit.fit(hints, in: 5000).count == hints.count)
+            // A point short of all of them: one fewer; and so on down to the first.
+            var room = all - 1
+            for count in (1..<hints.count).reversed() {
+                let fit = HintFit.fit(hints, in: room)
+                #expect(fit == HintFit.Fit(count: count, stacked: false, size: 1), "\(hints.map(\.says)) in \(room)")
+                #expect(HintFit.height(of: fit) == 30)
+                room = HintFit.width(of: Array(hints.prefix(count)), size: 1) - 1
+            }
+            // No room even for the first: it is said all the same, and is cut off.
+            #expect(HintFit.fit(hints, in: 10) == HintFit.Fit(count: 1, stacked: false, size: 1))
+        }
+        #expect(HintFit.fit([], in: 500).count == 0)
+        // What a row of hints is: its hints, and eighteen between each two.
+        let two = SheetHints.hints(.carrying)
+        #expect(HintFit.width(of: two, size: 1) == HintFit.width(of: two[0], size: 1) + 18 + HintFit.width(of: two[1], size: 1))
+    }
+
+    @Test("The two sentences on copying and pasting are never left off: side by side where there is room; else one under the other, the line two lines tall; then smaller, a step at a time; and at the smallest, cut off")
+    func theTwoSentences() {
+        typealias Fit = HintFit.Fit
+        let hints = SheetHints.hints(.onPlace, held: true, paste: SheetHints.Paste(lines: 1, replaces: true))
+        #expect(hints.count == 2 && hints.allSatisfy(\.needed))
+        let both = HintFit.width(of: hints, size: 1)
+        let longer = max(HintFit.width(of: hints[0], size: 1), HintFit.width(of: hints[1], size: 1))
+        #expect(HintFit.fit(hints, in: both) == Fit(count: 2, stacked: false, size: 1))
+        #expect(HintFit.height(of: Fit(count: 2, stacked: false, size: 1)) == 30)
+        // A point short: one under the other, at their usual size.
+        #expect(HintFit.fit(hints, in: both - 1) == Fit(count: 2, stacked: true, size: 1))
+        #expect(HintFit.fit(hints, in: longer) == Fit(count: 2, stacked: true, size: 1))
+        #expect(HintFit.height(of: Fit(count: 2, stacked: true, size: 1)) == 2 * 19 + 4 + 10)
+        // The longer of them a point too long: smaller.
+        #expect(HintFit.fit(hints, in: longer - 1) == Fit(count: 2, stacked: true, size: 0.9))
+        let smaller = max(HintFit.width(of: hints[0], size: 0.9), HintFit.width(of: hints[1], size: 0.9))
+        #expect(smaller < longer)
+        #expect(HintFit.fit(hints, in: smaller - 1) == Fit(count: 2, stacked: true, size: 0.8))
+        // And with no room for that either, the smallest all the same.
+        #expect(HintFit.fit(hints, in: 100) == Fit(count: 2, stacked: true, size: 0.8))
+        // Two lines are never less tall than the line is for one.
+        #expect(HintFit.height(of: Fit(count: 2, stacked: true, size: 0.8)) >= 30)
+    }
+
+    @Test("What a hint is worked out to be wide is what SwiftUI then draws it, or a point or two more: never less, or its end would be cut off; and not much more, or a hint would be left off that had room")
+    func asWideAsItIsDrawn() {
+        let every: [[Hint]] = [
+            SheetHints.hints(.onChord), SheetHints.hints(.onPlace), SheetHints.hints(.typing(onChord: false, empty: false)),
+            SheetHints.hints(.typing(onChord: true, empty: true)), SheetHints.hints(.carrying), SheetHints.hints(.carrying, held: true),
+            SheetHints.hints(.onPlace, held: true), SheetHints.hints(.onPlace, held: true, paste: SheetHints.Paste(lines: 4, replaces: true)),
+            SheetHints.idle, SheetHints.cannotChange,
+        ]
+        for hints in every {
+            for size in HintFit.sizes {
+                let fit = HintFit.Fit(count: hints.count, stacked: false, size: size)
+                let drawn = Double(NSHostingView(rootView: HintRow(hints: hints, fit: fit)).fittingSize.width)
+                let worked = HintFit.width(of: hints, size: size)
+                #expect(worked >= drawn - 0.5, "\(hints.map(\.read)) at \(size): drawn \(drawn) wide, worked out as \(worked)")
+                #expect(worked <= drawn + 3 * Double(hints.count * 3), "\(hints.map(\.read)) at \(size): drawn \(drawn) wide, worked out as \(worked)")
+            }
+        }
+        // And one under another, each is as tall as was allowed for it.
+        let two = SheetHints.hints(.onPlace, held: true)
+        for size in HintFit.sizes {
+            let fit = HintFit.Fit(count: 2, stacked: true, size: size)
+            let drawn = Double(NSHostingView(rootView: HintRow(hints: two, fit: fit)).fittingSize.height)
+            #expect(drawn + 2 * HintFit.overAndUnder <= HintFit.height(of: fit) + 0.5, "at \(size): \(drawn) tall")
+        }
     }
 
     // ---- What is going on, read off the sheet

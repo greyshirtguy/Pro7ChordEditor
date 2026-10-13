@@ -104,6 +104,23 @@ song the width they took.)
    view does none of this. Asked to start the lists at 270, it started them at 480,
    having given each side half the window up to the lists' most; and it changed the
    lists' width as the window's changed. So the edge is the app's own there.)
+
+   **The edge is a narrow bar that is seen**, of the colour of the bar between the
+   two lists and with a small grip in its middle as that has: on the Mac eight
+   points wide. Every point of it takes the mouse, the pointer changes shape the
+   moment it is over it, and it lies over neither part of the window. (For a day it
+   was a hairline with five points to be dragged by, and the maintainer found it "a
+   bit hard to grab", 2026-10-13.)
+6e. **Nothing in the window keeps the pointer waiting.** The spot follows the
+   pointer as fast as the pointer moves, and the edge is dragged smoothly with a
+   song open. (**New** as a rule, 2026-10-13, the maintainer having found the Mac
+   app slow at both. What was wrong was how the song's header was laid out, and
+   nothing of the sheet: it was arranged three ways for the system to choose the
+   one that fits, and the system built all three, their pickers of twenty-six keys
+   with them, whenever anything in the song's part of the window changed its size
+   or its words. `mac/NOTES.md` has the measurements. Whatever a platform offers
+   that chooses among arrangements by building them, a header with pickers in it
+   is not to be left to it.)
 6b. **The two lists have grounds of different greys**, as in ProPresenter: the
    libraries' the lighter, the songs' the darker, and the bar between them darker
    still. With the system dark they are ProPresenter's own three (`#585858`, `#3e3e3e`

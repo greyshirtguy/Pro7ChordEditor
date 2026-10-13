@@ -85,6 +85,17 @@ let package = Package(
                 .product(name: "SwiftProtobuf", package: "swift-protobuf"),
             ]
         ),
-        .testTarget(name: "AppViewsTests", dependencies: ["AppViews", "ChordRules", "Song", "TestData"]),
+        // (ProFormat, for the one test that makes a long song to time the window with.)
+        .testTarget(
+            name: "AppViewsTests",
+            dependencies: [
+                "AppViews",
+                "ChordRules",
+                "Song",
+                "ProFormat",
+                "TestData",
+                .product(name: "SwiftProtobuf", package: "swift-protobuf"),
+            ]
+        ),
     ]
 )

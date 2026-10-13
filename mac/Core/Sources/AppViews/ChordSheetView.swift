@@ -349,6 +349,24 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         var placed = ChordLayout.Placed()
     }
 
+    /// What of the laying out does not go by how wide the sheet is seen to be: where
+    /// each line's chords stand along it, and what each slide needs across. It is the
+    /// costly part (every line of the song is measured letter by letter), and is the
+    /// same for as long as the rows are and the zoom is: so it is kept, and a sheet
+    /// that is only made wider or narrower has its slides put in rows again and
+    /// nothing measured. (Measured, 2026-10-13, on a song of 56 slides: 25 thousandths
+    /// of a second each time the edge of the window's two parts moved a step.)
+    private struct Measured {
+        var rows: [SheetRow]
+        var metrics: SheetMetrics
+        var placed: [ChordLayout.Placed]
+        var slides: [(first: Int, count: Int, label: String, needs: Double)]
+    }
+
+    private var measured: Measured?
+    /// How many times the lines have been measured: for the tests.
+    private(set) var timesMeasured = 0
+
     private(set) var cells: [Cell] = []
     private(set) var laid: [Laid] = []
     /// How many slides there are to a row of the grid.
@@ -409,6 +427,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     override var isFlipped: Bool { true }
     override var isOpaque: Bool { true }
+
     // While a chord is being typed a click on the sheet is not to take the keyboard
     // from the box: what the click does (keep the chord, open the bubble elsewhere) is
     // worked out with the song as it was when it was made (ChordSheet.pick).
@@ -426,6 +445,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             laidRows = []
             laid = []
             cells = []
+            measured = nil
             typingShown = nil
             pressed = nil
             scroll(.zero)
@@ -469,23 +489,13 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             return
         }
         let rows = sheet.rows
-        metrics.lines = rows.map { $0.kind == .line ? SheetMetrics.line($0.text.string, font: metrics.wordFont) : nil }
+        if measured == nil || measured?.metrics !== metrics || measured?.rows != rows {
+            measured = measure(rows, of: sheet)
+        }
+        let slides = measured?.slides ?? []
         var lines = Array(repeating: Laid(), count: rows.count)
-        // Each slide: its first line's row, how many lines it has, what its foot says,
-        // and how wide a cell of the grid it needs.
-        var slides: [(first: Int, count: Int, label: String, needs: Double)] = []
-        for (index, row) in rows.enumerated() where row.kind == .line && row.first {
-            var widest = 0.0
-            for line in index..<(index + row.count) {
-                lines[line].placed = sheet.placed(line, metrics)
-                // (A line of chords alone has a place past its last chord, for the
-                // next: that place needs room to be pointed at.)
-                widest = max(widest, lines[line].placed.width + (rows[line].alone ? 44 * metrics.scale : 0))
-            }
-            let box = sheet.blocks[row.block]
-            // The slide's number, and on the first slide of each group the group's name.
-            let label = String(row.slide + 1) + (box.startsItsGroup && !box.group.isEmpty ? "  " + box.group : "")
-            slides.append((index, row.count, label, widthNeeded(byLines: widest, label: label) + 2 * SheetLook.around))
+        for (index, placed) in (measured?.placed ?? []).enumerated() where lines.indices.contains(index) {
+            lines[index].placed = placed
         }
         let pad = metrics.cardPad
         let around = SheetLook.around
@@ -533,6 +543,31 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         laidRows = rows
         content = NSSize(width: left + SheetLook.margin, height: top + SheetLook.margin + 40)
         fit()
+    }
+
+    /// Measures the song's lines: each as a line of text, where its chords stand
+    /// along it, and what each slide needs across.
+    private func measure(_ rows: [SheetRow], of sheet: ChordSheet) -> Measured {
+        timesMeasured += 1
+        metrics.lines = rows.map { $0.kind == .line ? SheetMetrics.line($0.text.string, font: metrics.wordFont) : nil }
+        var placed = Array(repeating: ChordLayout.Placed(), count: rows.count)
+        // Each slide: its first line's row, how many lines it has, what its foot says,
+        // and how wide a cell of the grid it needs.
+        var slides: [(first: Int, count: Int, label: String, needs: Double)] = []
+        for (index, row) in rows.enumerated() where row.kind == .line && row.first {
+            var widest = 0.0
+            for line in index..<(index + row.count) {
+                placed[line] = sheet.placed(line, metrics)
+                // (A line of chords alone has a place past its last chord, for the
+                // next: that place needs room to be pointed at.)
+                widest = max(widest, placed[line].width + (rows[line].alone ? 44 * metrics.scale : 0))
+            }
+            let box = sheet.blocks[row.block]
+            // The slide's number, and on the first slide of each group the group's name.
+            let label = String(row.slide + 1) + (box.startsItsGroup && !box.group.isEmpty ? "  " + box.group : "")
+            slides.append((index, row.count, label, widthNeeded(byLines: widest, label: label) + 2 * SheetLook.around))
+        }
+        return Measured(rows: rows, metrics: metrics, placed: placed, slides: slides)
     }
 
     /// Lays out again, for another width or another zoom, with the slide that was at
@@ -773,6 +808,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
             // the spot: it is where it was left.)
             attending = false
         }
+        // (All of the sheet is drawn again, and not only the lines the pointer has
+        // left and come to. Drawing only those was tried, 2026-10-13, and measured:
+        // the system then first copies the picture it has of the whole sheet, which
+        // took longer than drawing it.)
         needsDisplay = true
         tell()
     }
@@ -1545,16 +1584,48 @@ struct SheetStrip: View {
     /// The key the song states, or "" for none.
     var key: String
 
+    /// What is said at the strip's right of a song that names no key.
+    static let noKey = "The song names no key: pick the one its chords are in"
+    static let sides = 14.0
+    static let between = 8.0
+    /// How wide the three round buttons at the strip's right are, with the room
+    /// between them and before the last.
+    static let zoomWidth = 3 * 24.0 + 2 * 6 + 6
+
+    /// How wide one of the key's chords is in the strip, and all seven with the room
+    /// between them: worked out from the font they are drawn in.
+    static func width(ofChip number: Int, _ name: String) -> Double {
+        max(34, HintFit.width(of: String(number), size: 11) + 5 + HintFit.width(of: name, size: 13, weight: .bold) + 16)
+    }
+
+    static func width(ofChords names: [String]) -> Double {
+        names.enumerated().map { width(ofChip: $0.offset + 1, $0.element) }.reduce(0, +) + between * Double(max(0, names.count - 1))
+    }
+
+    /// Whether there is room in a strip this wide for what is said of a song that
+    /// names no key: beside the chords, with at least twelve between, and the
+    /// buttons. Where there is not, it is left out.
+    static func saysNoKey(in whole: Double, chords names: [String]) -> Bool {
+        whole - 2 * sides >= width(ofChords: names) + between + 12 + between + HintFit.width(of: noKey, size: 12) + between + zoomWidth
+    }
+
     var body: some View {
         // Nothing in the strip is ever squeezed or wrapped. Where the pane is too narrow
         // for the chords and what is said of the key, that is left out; and where it is
         // too narrow for the chords, they scroll sideways.
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) {
-                chords
-                Spacer(minLength: 12)
-                if key.isEmpty {
-                    Text("The song names no key: pick the one its chords are in")
+        //
+        // (One arrangement, and whether there is room for the words worked out. It
+        // was three, of which SwiftUI was to choose the first that fits: and to
+        // choose it built all three, with their seven chords each, every time the
+        // song's part of the window was laid out. SongHeader.swift has what that
+        // cost.)
+        GeometryReader { given in
+            HStack(spacing: Self.between) {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    chords
+                }
+                if key.isEmpty && Self.saysNoKey(in: given.size.width, chords: sheet.inKey) {
+                    Text(Self.noKey)
                         .font(.system(size: 12))
                         .foregroundStyle(Color(nsColor: SheetLook.caption))
                         .lineLimit(1)
@@ -1562,19 +1633,9 @@ struct SheetStrip: View {
                 }
                 zoom
             }
-            HStack(spacing: 8) {
-                chords
-                Spacer(minLength: 12)
-                zoom
-            }
-            HStack(spacing: 8) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    chords
-                }
-                zoom
-            }
+            .padding(.horizontal, Self.sides)
+            .frame(width: given.size.width, height: given.size.height)
         }
-        .padding(.horizontal, 14)
         .frame(height: 44)
         .frame(maxWidth: .infinity)
         .background(Color(nsColor: SheetLook.strip))

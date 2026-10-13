@@ -60,6 +60,20 @@ open mac/Pro7ChordEditor.xcodeproj        # the app: Command+R to run, Command+U
 
 Nothing has to be installed first, and the `proto/` submodule is not needed to build.
 
+Two things the tests do when they are asked, and not otherwise:
+
+```
+PRO7_PICTURES=/some/folder swift test --package-path mac/Core    # the window drawn into pictures there, to be looked at
+PRO7_SPEED=1 swift test --package-path mac/Core --filter SpeedTests    # how long the window keeps the main thread
+```
+
+The second times the window on a long song: the pointer moved across the sheet, a
+chord dragged, and the edge between the lists and the song moved. It fails for
+nothing and says what it found, to be set beside the numbers in
+[`NOTES.md`](NOTES.md), "What made the window slow". Run it before and after any
+change to how the window is laid out or drawn. (`PRO7_SPEED=2` is the same as a
+screen of two dots to the point would have it.)
+
 ## What is where
 
 | | |

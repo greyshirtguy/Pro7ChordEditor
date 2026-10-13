@@ -416,6 +416,53 @@ struct ChordSheetViewTests {
         }
     }
 
+    @Test("Made wider or narrower, the sheet puts its slides in rows again and measures nothing: the lines are measured once for the song as it is, and again only when a chord changes, the words' size does, or the song is another. What comes of it is what laying out afresh at that width gives")
+    func measuredOnce() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        let (canvas, window) = view(for: model, width: 1500)
+        defer { window.close() }
+        let once = canvas.timesMeasured
+        #expect(once >= 1)
+        var columnsSeen: Set<Int> = []
+        for width in [1500.0, 1100, 760, 500, 900, 1300, 2000] {
+            widen(window, to: width, canvas)
+            columnsSeen.insert(canvas.columns)
+            // What it is now is what a sheet shown afresh at this width is.
+            let (fresh, other) = view(for: model, width: width)
+            #expect(canvas.columns == fresh.columns, "at \(width)")
+            #expect(canvas.cells.map(\.frame) == fresh.cells.map(\.frame), "at \(width)")
+            #expect(canvas.cells.map(\.card) == fresh.cells.map(\.card), "at \(width)")
+            #expect(canvas.laid.map(\.left) == fresh.laid.map(\.left) && canvas.laid.map(\.chordTop) == fresh.laid.map(\.chordTop), "at \(width)")
+            #expect(canvas.laid.map(\.placed.xs) == fresh.laid.map(\.placed.xs) && canvas.laid.map(\.placed.widths) == fresh.laid.map(\.placed.widths), "at \(width)")
+            other.close()
+        }
+        // (The widths were to be such that the rows of slides changed.)
+        #expect(columnsSeen.count >= 3)
+        #expect(canvas.timesMeasured == once, "the lines were measured again for a width")
+
+        // A chord put on: that is another song to measure.
+        let line = try row("That saved a wretch like me", of: model)
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: line, at: 13))), shift: false)
+        canvas.key(.number(4))
+        #expect(model.sheet?.chordAt(line, 13).isEmpty == false)
+        #expect(canvas.timesMeasured == once + 1)
+        // The pointer moving, and a key that changes nothing: not.
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: line, at: 5))), shift: false)
+        canvas.key(.right)
+        #expect(canvas.timesMeasured == once + 1)
+        // The words another size: again.
+        canvas.key(.zoom(1))
+        #expect(canvas.timesMeasured == once + 2)
+        widen(window, to: 800, canvas)
+        #expect(canvas.timesMeasured == once + 2)
+        // Another song: again, and nothing of the last one's is kept.
+        model.open(song: mac.song("It Is Well"))
+        canvas.show(model.sheet, scale: model.sheetZoom)
+        #expect(canvas.timesMeasured == once + 3)
+        #expect(canvas.laid.count == model.sheet?.rows.count)
+    }
+
     @Test("Laid out again, for another size of words, the slide that was at the top of what is seen is still there")
     func staysWhereItWas() async throws {
         let mac = try MadeUpMac()

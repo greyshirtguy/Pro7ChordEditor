@@ -444,21 +444,22 @@ struct PictureTests {
             ("ProPresenter running", SheetHints.cannotChange),
             ("nobody at the sheet", SheetHints.idle),
         ]
-        func all(labels: Double) -> some View {
+        /// Every case, each fitted into this much room as the line under the sheet
+        /// fits it, with what it is a case of before it.
+        func all(room: Double) -> some View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(Array(cases.enumerated()), id: \.offset) { _, one in
+                    let fit = HintFit.fit(one.1, in: room)
                     HStack(spacing: 0) {
                         Text(one.0)
                             .font(.caption)
                             .foregroundStyle(.tertiary)
-                            .frame(width: labels, alignment: .leading)
-                        HintRow(hints: one.1)
-                            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                            .frame(width: 190, alignment: .leading)
+                        HintRow(hints: one.1, fit: fit)
+                            .frame(width: room, height: HintFit.height(of: fit), alignment: .leading)
                             .clipped()
                     }
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
-                    .frame(minHeight: 30)
                     Divider()
                 }
                 Spacer(minLength: 0)
@@ -466,13 +467,14 @@ struct PictureTests {
             .background(Color(nsColor: .windowBackgroundColor))
         }
         // (Tall enough for three of the rows to be two lines.)
-        let size = NSSize(width: 1160, height: Double(cases.count) * 31 + 80)
-        try draw(all(labels: 190), named: "45 the line of hints, all it says", size: size)
-        try draw(all(labels: 190), named: "46 the line of hints, in the dark", size: size, dark: true)
+        let tall = Double(cases.count) * 31 + 80
+        try draw(all(room: 946), named: "45 the line of hints, all it says", size: NSSize(width: 190 + 24 + 946, height: tall))
+        try draw(all(room: 946), named: "46 the line of hints, in the dark", size: NSSize(width: 190 + 24 + 946, height: tall), dark: true)
         // With less room: the last hints are left off; the two sentences on copying
-        // are drawn smaller, and at their smallest are cut off.
-        try draw(all(labels: 190), named: "53 the line of hints, with 720 of room", size: NSSize(width: 190 + 24 + 720, height: size.height))
-        try draw(all(labels: 190), named: "54 the line of hints, with 560 of room", size: NSSize(width: 190 + 24 + 560, height: size.height))
+        // go one under the other, and then are drawn smaller.
+        try draw(all(room: 720), named: "53 the line of hints, with 720 of room", size: NSSize(width: 190 + 24 + 720, height: tall))
+        try draw(all(room: 560), named: "54 the line of hints, with 560 of room", size: NSSize(width: 190 + 24 + 560, height: tall))
+        try draw(all(room: 340), named: "59 the line of hints, with 340 of room", size: NSSize(width: 190 + 24 + 340, height: tall))
 
         // In the window: under the sheet, over the quiet line.
         let sheet = try #require(model.sheet)

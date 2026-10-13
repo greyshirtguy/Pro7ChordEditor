@@ -16,6 +16,7 @@
 // size), and it changes the lists' width as the window is made wider or narrower. Here
 // the lists start half way between their least and their most, keep that width while
 // the window changes, and are left where they are dragged to, which is remembered.
+// What is dragged is a narrow bar (`EdgeGrip`).
 //
 // Nothing here is a rule. What is shown comes from LibraryModel, and what the person
 // does is passed on to it.
@@ -68,10 +69,8 @@ public struct LibraryWindow: View {
     /// given: under the tests, which close a good many windows.
     private var whenClosed: () -> Void
     /// While the edge between the lists and the song is being dragged: how wide the
-    /// lists were when the drag began, and how wide the drag has made them.
-    @State private var began: Double?
+    /// drag has made the lists. (It is remembered when the edge is let go.)
     @State private var dragged: Double?
-    @State private var overEdge = false
 
     public init(model: LibraryModel, whenClosed: @escaping () -> Void = {}) {
         self.model = model
@@ -85,46 +84,26 @@ public struct LibraryWindow: View {
             HStack(spacing: 0) {
                 ListsPane(model: model)
                     .frame(width: width)
-                ListsLook.edge
+                // The edge, which is dragged: a narrow bar of its own between the
+                // two parts, lying over neither.
+                EdgeGrip(width: width,
+                         moved: { dragged = ListsLook.width(asked: $0, of: whole) },
+                         ended: {
+                             if let dragged {
+                                 model.setListsWidth(dragged)
+                             }
+                             dragged = nil
+                         },
+                         // (Twice clicked, it goes back to where it usually is.)
+                         reset: {
+                             dragged = nil
+                             model.setListsWidth(nil)
+                         })
                     .frame(width: ListsLook.edgeWidth)
                 SongPane(model: model)
                     .frame(maxWidth: .infinity)
-            }
-            // What is dragged is wider than the line that is seen: the line, and a
-            // little of the lists beside it. None of the song's part, where the sheet
-            // says what shape the pointer is as it moves and would take this one's
-            // away; and little of the lists', whose scroll bars are at that side.
-            .overlay(alignment: .leading) {
-                Color.clear
-                    .frame(width: ListsLook.edgeGrip)
-                    .contentShape(Rectangle())
-                    .onHover { inside in
-                        guard inside != overEdge else { return }
-                        overEdge = inside
-                        if inside {
-                            NSCursor.resizeLeftRight.push()
-                        } else {
-                            NSCursor.pop()
-                        }
-                    }
-                    .gesture(DragGesture(minimumDistance: 1, coordinateSpace: .global)
-                        .onChanged { drag in
-                            let start = began ?? width
-                            began = start
-                            dragged = ListsLook.width(asked: start + drag.translation.width, of: whole)
-                        }
-                        .onEnded { _ in
-                            if let dragged {
-                                model.setListsWidth(dragged)
-                            }
-                            began = nil
-                            dragged = nil
-                        })
-                    // (Twice clicked, it goes back to where it usually is.)
-                    .onTapGesture(count: 2) { model.setListsWidth(nil) }
-                    .help("Drag sideways to give the lists or the song more room.")
-                    .accessibilityLabel("The edge between the lists and the song")
-                    .offset(x: width - ListsLook.edgeGripOverLists)
+                    // (How wide it is: what the line of hints fits itself to.)
+                    .environment(\.songWidth, max(0, whole - width - ListsLook.edgeWidth))
             }
         }
         .frame(minWidth: 620, minHeight: 440)
@@ -238,20 +217,156 @@ struct WindowKeeper: NSViewRepresentable {
     }
 }
 
+/// The edge between the lists and the song, which is dragged sideways: a narrow bar
+/// with a small grip in its middle, as the bar between the two lists has.
+///
+/// It is AppKit's and not SwiftUI's, for the two things the maintainer found wrong
+/// with the one before it (2026-10-13: "a bit hard to grab ... it might be too
+/// narrow? or take too long to show the mouse cursor change?"). That one was five
+/// points of nothing to be seen, and SwiftUI said the pointer was over it a moment
+/// late. This one is a bar that is seen, every point of it takes the mouse, and the
+/// pointer's shape over it is the system's own to keep (a cursor rectangle), which
+/// changes as the pointer crosses the bar's edge. It lies over neither part of the
+/// window: the sheet says what shape the pointer is as it moves over the sheet, and
+/// the lists have their scroll bars at that side.
+struct EdgeGrip: NSViewRepresentable {
+    /// How wide the lists are now.
+    var width: Double
+    /// It is being dragged: the lists are asked to be this wide.
+    var moved: (Double) -> Void
+    /// It was let go.
+    var ended: () -> Void
+    /// It was clicked twice.
+    var reset: () -> Void
+
+    final class Grip: NSView {
+        var width = 0.0
+        var moved: (Double) -> Void = { _ in }
+        var ended: () -> Void = {}
+        var reset: () -> Void = {}
+        /// The button is down: where the pointer was across the window when it went
+        /// down, and how wide the lists were then.
+        private(set) var down: (x: Double, width: Double)?
+        private var over = false
+        private var tracking: NSTrackingArea?
+
+        override var isFlipped: Bool { true }
+        // (A click on it in a window that is not in front drags it all the same.)
+        override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+        override var mouseDownCanMoveWindow: Bool { false }
+
+        override func resetCursorRects() {
+            addCursorRect(bounds, cursor: .resizeLeftRight)
+        }
+
+        override func updateTrackingAreas() {
+            super.updateTrackingAreas()
+            if let tracking {
+                removeTrackingArea(tracking)
+            }
+            let area = NSTrackingArea(rect: .zero, options: [.mouseEnteredAndExited, .activeInKeyWindow, .inVisibleRect], owner: self)
+            addTrackingArea(area)
+            tracking = area
+        }
+
+        override func mouseEntered(with event: NSEvent) {
+            over = true
+            needsDisplay = true
+        }
+
+        override func mouseExited(with event: NSEvent) {
+            over = false
+            needsDisplay = true
+        }
+
+        /// The button went down at this place across the window; `clicks`: how
+        /// many times in a row.
+        func pressed(at x: Double, clicks: Int) {
+            if clicks >= 2 {
+                down = nil
+                reset()
+                return
+            }
+            down = (x, width)
+            needsDisplay = true
+        }
+
+        /// The pointer is at this place across the window, with the button down.
+        func pulled(to x: Double) {
+            guard let down else { return }
+            moved(down.width + x - down.x)
+        }
+
+        func released() {
+            guard down != nil else { return }
+            down = nil
+            needsDisplay = true
+            ended()
+        }
+
+        override func mouseDown(with event: NSEvent) {
+            pressed(at: event.locationInWindow.x, clicks: event.clickCount)
+        }
+
+        override func mouseDragged(with event: NSEvent) {
+            pulled(to: event.locationInWindow.x)
+        }
+
+        override func mouseUp(with event: NSEvent) {
+            released()
+        }
+
+        override func draw(_ dirtyRect: NSRect) {
+            ListsLook.barGrey.setFill()
+            bounds.fill()
+            // The grip: a little bar in the middle, darker while the pointer is on
+            // the edge or has hold of it.
+            let grip = NSRect(x: (bounds.width - 4) / 2, y: (bounds.height - 30) / 2, width: 4, height: 30)
+            NSColor.labelColor.withAlphaComponent(over || down != nil ? 0.55 : 0.28).setFill()
+            NSBezierPath(roundedRect: grip, xRadius: 2, yRadius: 2).fill()
+        }
+    }
+
+    func makeNSView(context: Context) -> Grip {
+        let grip = Grip()
+        grip.toolTip = "Drag sideways to give the lists or the song more room. Clicked twice, it goes back to where it starts."
+        grip.setAccessibilityElement(true)
+        grip.setAccessibilityRole(.splitter)
+        grip.setAccessibilityLabel("The edge between the lists and the song")
+        updateNSView(grip, context: context)
+        return grip
+    }
+
+    func updateNSView(_ grip: Grip, context: Context) {
+        grip.width = width
+        grip.moved = moved
+        grip.ended = ended
+        grip.reset = reset
+    }
+}
+
 /// The greys of the two lists at the left, and of the bar between them: ProPresenter's
 /// own in the dark (read off a picture of its window), and their like in the light.
 /// The libraries' ground is the lighter of the two, as there.
 enum ListsLook {
-    static func grey(light: Double, dark: Double) -> Color {
-        Color(nsColor: NSColor(name: nil) { appearance in
+    /// A grey that is one thing in the light and another in the dark.
+    static func systemGrey(light: Double, dark: Double) -> NSColor {
+        NSColor(name: nil) { appearance in
             let isDark = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
             return NSColor(white: isDark ? dark : light, alpha: 1)
-        })
+        }
+    }
+
+    static func grey(light: Double, dark: Double) -> Color {
+        Color(nsColor: systemGrey(light: light, dark: dark))
     }
 
     static let libraries = grey(light: 0.925, dark: 0.345)
     static let songs = grey(light: 0.835, dark: 0.243)
-    static let bar = grey(light: 0.74, dark: 0.184)
+    /// The bars that are dragged: the one between the two lists, and the edge
+    /// between the lists and the song.
+    nonisolated(unsafe) static let barGrey = systemGrey(light: 0.74, dark: 0.184)
+    static let bar = Color(nsColor: barGrey)
     /// What the bar says of the list under it: how many songs the library has, and
     /// how many of them are listed where the list is narrowed.
     static func count(shown: Int, of all: Int) -> String {
@@ -259,15 +374,9 @@ enum ListsLook {
         return all == 1 ? "1 SONG" : "\(all) SONGS"
     }
 
-    /// How tall the bar is, and the least height each list is left with: for the
-    /// libraries, room for what is over them and three of them; for the songs, for
-    /// the search box and the choice over them and a few of them.
-    /// The edge between the lists and the song: the line that is seen, how wide it
-    /// is, and how wide the part of the window is that it can be dragged by.
-    static let edge = grey(light: 0.74, dark: 0.11)
-    static let edgeWidth = 1.0
-    static let edgeGrip = 5.0
-    static let edgeGripOverLists = 4.0
+    /// The edge between the lists and the song: a bar of the colour of the bar
+    /// between the two lists, this wide, all of which can be dragged.
+    static let edgeWidth = 8.0
     /// The least width the song is left with, whatever the lists are asked to be.
     static let leastSong = 380.0
 
@@ -280,6 +389,9 @@ enum ListsLook {
         return min(max(asked, LibraryModel.leastListsWidth), most)
     }
 
+    /// How tall the bar is, and the least height each list is left with: for the
+    /// libraries, room for what is over them and three of them; for the songs, for
+    /// the search box and the choice over them and a few of them.
     static let barHeight = 22.0
     static let leastLibraries = 190.0
     /// What stands over the choice of place.

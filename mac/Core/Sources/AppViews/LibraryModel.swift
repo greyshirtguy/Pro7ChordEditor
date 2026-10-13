@@ -196,6 +196,9 @@ public final class LibraryModel {
     public private(set) var sheetSituation = SheetHints.Situation.nothing
     public private(set) var sheetPaste = SheetHints.Paste()
     public private(set) var modifierHeld = false
+    /// The same three as they were last said, kept where nothing watches them
+    /// (`sheetIs` has why).
+    @ObservationIgnored private var told = (situation: SheetHints.Situation.nothing, paste: SheetHints.Paste(), held: false)
     /// How long what the sheet said stays on the quiet line.
     public var sayingLasts: Duration = .seconds(6)
 
@@ -272,18 +275,28 @@ public final class LibraryModel {
 
     /// The sheet's view says what is going on in it, and what a paste there would do.
     /// (Only what has changed is put down: the pointer says this at every move.)
+    ///
+    /// What was last said is kept a second time, where nothing watches it, and that
+    /// is what the new is held against. The sheet's view says this while it is being
+    /// brought up to date by the window, among other times; and a thing that is READ
+    /// while a view is brought up to date is a thing the window then brings that view
+    /// up to date for, every time it changes. So the sheet's view was brought up to
+    /// date, and drawn again whole, each time the hints changed: by its own saying.
     public func sheetIs(_ situation: SheetHints.Situation, paste: SheetHints.Paste = SheetHints.Paste()) {
-        if sheetSituation != situation {
+        if told.situation != situation {
+            told.situation = situation
             sheetSituation = situation
         }
-        if sheetPaste != paste {
+        if told.paste != paste {
+            told.paste = paste
             sheetPaste = paste
         }
     }
 
     /// Option or Command went down, or came up.
     public func holds(_ held: Bool) {
-        if modifierHeld != held {
+        if told.held != held {
+            told.held = held
             modifierHeld = held
         }
     }
@@ -748,8 +761,7 @@ public final class LibraryModel {
     /// The sheet's song for a song just opened, or put back.
     private func makeSheet(of song: OpenSong) -> ChordSheet {
         let made = ChordSheet(song: song)
-        sheetSituation = .nothing
-        sheetPaste = SheetHints.Paste()
+        sheetIs(.nothing)
         made.pasteKeys = SheetHints.command + "V"
         made.refused = { [weak self] error in
             self?.sheetRefused = true

@@ -5,7 +5,9 @@
 // The edge is the window's own (LibraryWindow.swift says why it is not the system's
 // split view, which starts the lists at their widest whatever it is asked). So where it
 // is, is plain arithmetic, and is tried as that; and then the window itself is laid out
-// off the screen, drawn, and the edge looked for in the picture.
+// off the screen, drawn, and the edge looked for in the picture. What a hand on the
+// mouse does to it is tried by telling the edge what the mouse would: that the button
+// went down, where the pointer went, and that it was let go.
 
 import AppKit
 @testable import AppViews
@@ -37,12 +39,13 @@ struct WindowLayoutTests {
             #expect(ListsLook.width(asked: 480, of: whole) == 480)
             #expect(ListsLook.width(asked: 9000, of: whole) == 480)
         }
-        // Narrower: the song keeps 380, and the line between them its one.
-        #expect(ListsLook.width(asked: 480, of: 800) == 419)
+        // Narrower: the song keeps 380, and the edge between them its eight.
+        #expect(ListsLook.edgeWidth == 8)
+        #expect(ListsLook.width(asked: 480, of: 800) == 412)
         #expect(ListsLook.width(asked: 345, of: 800) == 345)
-        #expect(ListsLook.width(asked: 345, of: 700) == 319)
+        #expect(ListsLook.width(asked: 345, of: 700) == 312)
         // The narrowest the window can be made, and narrower than that.
-        #expect(ListsLook.width(asked: 345, of: 620) == 239)
+        #expect(ListsLook.width(asked: 345, of: 620) == 232)
         #expect(ListsLook.width(asked: 345, of: 500) == 210)
         #expect(ListsLook.width(asked: 345, of: 0) == 210)
     }
@@ -81,6 +84,104 @@ struct WindowLayoutTests {
         let third = mac.model()
         await third.start()
         #expect(third.listsWidth == 210)
+    }
+
+    // ---- The edge itself, which is dragged
+
+    @Test("The edge, dragged: the lists are asked to be as much wider or narrower as the pointer has gone since the button went down; let go, that is said once; clicked twice, it is put back and nothing is dragged")
+    func theEdgeDragged() {
+        let grip = EdgeGrip.Grip(frame: NSRect(x: 0, y: 0, width: ListsLook.edgeWidth, height: 400))
+        var asked: [Double] = []
+        var ended = 0
+        var reset = 0
+        grip.width = 345
+        grip.moved = { asked.append($0) }
+        grip.ended = { ended += 1 }
+        grip.reset = { reset += 1 }
+
+        // Not down: the pointer passing over it drags nothing.
+        grip.pulled(to: 600)
+        grip.released()
+        #expect(asked.isEmpty && ended == 0)
+
+        grip.pressed(at: 349, clicks: 1)
+        grip.pulled(to: 379)
+        grip.pulled(to: 300)
+        // (Whatever width the lists are meanwhile, as the dragging makes them: it
+        // goes by where the button went down.)
+        grip.width = 296
+        grip.pulled(to: 1000)
+        #expect(asked == [375, 296, 996])
+        grip.released()
+        grip.released()
+        #expect(ended == 1 && reset == 0)
+
+        // Twice clicked: put back, and the second click drags nothing.
+        grip.pressed(at: 349, clicks: 2)
+        grip.pulled(to: 500)
+        grip.released()
+        #expect(reset == 1 && asked.count == 3 && ended == 1)
+        // The pointer's shape over it is the system's to keep, by a rectangle that is
+        // all of the bar; and a click on it in a window that is not in front drags it.
+        #expect(grip.acceptsFirstMouse(for: nil) && !grip.mouseDownCanMoveWindow)
+    }
+
+    @Test("In the window: the edge dragged makes the lists as wide as it is dragged to, within their least and their most; let go, that is remembered; clicked twice, they are back where they start")
+    func theEdgeInTheWindow() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        await model.start()
+        model.choose(library: mac.library("Songs"))
+        let size = NSSize(width: 1280, height: 800)
+        let host = NSHostingView(rootView: LibraryWindow(model: model).frame(width: size.width, height: size.height))
+        let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        defer {
+            window.contentView = nil
+            window.close()
+        }
+        window.contentView = host
+        host.frame = NSRect(origin: .zero, size: size)
+        func settle() {
+            for _ in 0..<4 { CFRunLoopRunInMode(.defaultMode, 0.01, false) }
+            host.layoutSubtreeIfNeeded()
+        }
+        func grip() throws -> EdgeGrip.Grip {
+            func find(in view: NSView) -> EdgeGrip.Grip? {
+                if let found = view as? EdgeGrip.Grip { return found }
+                for inner in view.subviews {
+                    if let found = find(in: inner) { return found }
+                }
+                return nil
+            }
+            return try #require(find(in: host), "the window has no edge to drag")
+        }
+        settle()
+        // It stands just right of the lists, and is as wide as it is said to be.
+        var frame = try grip().convert(try grip().bounds, to: host)
+        #expect(frame.minX == 345 && frame.width == ListsLook.edgeWidth && frame.height == 800)
+
+        try grip().pressed(at: 349, clicks: 1)
+        try grip().pulled(to: 409)
+        settle()
+        frame = try grip().convert(try grip().bounds, to: host)
+        #expect(frame.minX == 405)
+        // (Not remembered until it is let go.)
+        #expect(model.listsWidth == 345)
+        // Past the most the lists may have: they stop there.
+        try grip().pulled(to: 2000)
+        settle()
+        #expect(try grip().convert(try grip().bounds, to: host).minX == 480)
+        try grip().pulled(to: 440)
+        try grip().released()
+        settle()
+        #expect(model.listsWidth == 436 && mac.appData.settings.listsWidth == 436)
+        #expect(try grip().convert(try grip().bounds, to: host).minX == 436)
+
+        try grip().pressed(at: 440, clicks: 2)
+        settle()
+        #expect(model.listsWidth == 345 && mac.appData.settings.listsWidth == nil)
+        #expect(try grip().convert(try grip().bounds, to: host).minX == 345)
     }
 
     /// The window laid out off the screen at a size and drawn; and where, along a row
@@ -126,12 +227,12 @@ struct WindowLayoutTests {
         let model = mac.model()
         await model.start()
         model.choose(library: mac.library("Songs"))
-        for (size, wide) in [(NSSize(width: 1280, height: 800), 345.0), (NSSize(width: 1000, height: 560), 345), (NSSize(width: 1900, height: 1000), 345), (NSSize(width: 620, height: 440), 239)] {
+        for (size, wide) in [(NSSize(width: 1280, height: 800), 345.0), (NSSize(width: 1000, height: 560), 345), (NSSize(width: 1900, height: 1000), 345), (NSSize(width: 620, height: 440), 232)] {
             let drawn = try listsWidth(of: model, at: size)
             #expect(drawn == wide, "in a window \(size.width) wide the lists are drawn \(drawn) wide")
         }
         model.setListsWidth(430)
-        for (size, wide) in [(NSSize(width: 1280, height: 800), 430.0), (NSSize(width: 700, height: 500), 319)] {
+        for (size, wide) in [(NSSize(width: 1280, height: 800), 430.0), (NSSize(width: 700, height: 500), 312)] {
             let drawn = try listsWidth(of: model, at: size)
             #expect(drawn == wide, "dragged to 430, in a window \(size.width) wide the lists are drawn \(drawn) wide")
         }
