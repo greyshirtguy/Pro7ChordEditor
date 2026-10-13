@@ -6,8 +6,11 @@ by library, and opens one on its **chord sheet**: every slide of the song with i
 words, and each chord in a bubble over the word it is played on. **Chords are put on
 there with the mouse and the keys**: point at a word and press 1 to 7 for the chords
 of the song's key, or drag one of them down onto the word, or type one; drag a chord
-to move it; copy a line's chords onto another line. The same song can be had as ChordPro text, each chord in square brackets
-where it is played, and chords typed in there. The words cannot be changed in either.
+to move it; copy a line's chords onto another line. A line under the sheet says what
+the keys and the mouse do where the pointer is, and a one-page guide to all of it
+opens the first time the app is started and is under Help after that. The same song
+can be had as ChordPro text, each chord in square brackets where it is played, and
+chords typed in there. The words cannot be changed in either.
 Every change is saved as it is made, with a copy of the song's file as it was kept
 first, and a song's earlier versions can be looked at and put back.
 

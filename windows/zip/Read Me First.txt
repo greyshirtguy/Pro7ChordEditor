@@ -54,13 +54,16 @@ of ProPresenter that keeps its songs otherwise has none for it to find. Any
 folder of .pro files can be opened with Choose Folder.
 
 
+HOW CHORDS ARE PUT ON
+
+A page that says how opens by itself the first time the app is started, in a
+window of its own. After that it is under Help in the menu, on the F1 key,
+and behind the ? at the right of the row of chords over a song. And under a
+song, a blue line says what the keys and the mouse do where the pointer is.
+
+
 NOT YET TRIED
 
 - A song made from a ChordPro file (File, New Song from ChordPro File) has
   not yet been opened in ProPresenter. Until it has, make one only to try
   it, and look at it in ProPresenter before it is wanted.
-
-
-NOT IN IT YET
-
-- An icon.

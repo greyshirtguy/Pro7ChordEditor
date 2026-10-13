@@ -20,8 +20,9 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the icon; the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The icon is the maintainer's own since 2026-10-14: decision 133.) (The version's number is 0.2 since the maintainer said so: decision 120.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
 | **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
+| **The window as the Mac's 1.0.3** (asked for on 2026-10-14) | Built, 2026-10-14. **No hand has tried it** | What the Mac app gained between its 0.2 and its 1.0.3, which a note from its session listed and `spec/` has: the line of hints under the sheet and the highlighted line (`spec/03`, rules 53a to 53h); an emptied box that is kept takes the chord off (rule 35a); a text box's other ranges go with the words (`spec/01`); the edge as a bar that is seen, the title over the choice of place, no Save in any menu, the quiet line as a count (`spec/06`, rules 6a, 6e, 7, 12, 12a, 20a); Earlier Versions in blue (`spec/07`, rule 15); the guide (`spec/13`); the icon and the menus (`spec/10`). And the build put right, which had been red since the test data was made again. Decisions 122 to 139, "The window as the Mac's 1.0.3" and "At the round of 2026-10-14". **Which number it is to be given out under is the maintainer's to say; nothing was published** |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -797,6 +798,108 @@ ProPresenter is for.
     was built on, and the script refuses one that does** ("At M10": the build of
     0.1.0 that was given out names one). As the Mac's script since its 0.2.
 
+122. **The build had been red for two days, for a number kept in a test.** `LibraryTests`
+    counted eleven files in `as-read-by-simple-presenter.json`; the test data was made
+    again on 2026-10-12 with Chords With No Words in it, the twelfth. It counts what
+    the file has now. (`TestData.cs` says at its head that the files are found by
+    looking and never by a list kept in the tests; this was a number that got past
+    that.) And what each paste of `sheet-model.json` answers and says (`pasted`: `did`
+    and `said`), new in the vectors that day, is held: the answer in `Song.Tests`,
+    the sentence in `SheetModelTests`.
+123. **A text box's other ranges go with the words** (`spec/01`, "The box's other
+    ranges"; the maintainer, 2026-10-13: "let's copy simple presenter for now").
+    `RtfWords.PlaceAfter` is the reference's `placeAfter`, held to its own test's
+    cases under the names they have there, there being no vector; `Writing.
+    MoveOtherRanges` is the Mac's. Until this the Windows app left such a range where
+    it was, as the page says of "the Windows app before it had this rule".
+124. **An emptied box that is kept takes the chord off** (`spec/03`, rule 35a):
+    `ChordSheet.FinishTyping`, as the Mac's. The Mac's cases, and a hand at the
+    window with what the file then has.
+125. **The line of hints is built to rules 53a to 53h**, its words in `SheetHints.cs`
+    with no window in it. **On Windows one key is two things**: the key for
+    shortcuts and the key that copies a chord as it is dragged are both Ctrl, where
+    the Mac has Command and Option. So Ctrl held at a line brings up the copying
+    (the page's table says it is to), and Ctrl held while a chord is carried says
+    that letting go leaves a copy. **What follows from it, which the Mac has not**:
+    someone who holds Ctrl meaning to drag a copy sees the two sentences on copying
+    until the chord is picked up. It is as the page has it, and is the maintainer's
+    to weigh.
+126. **The keys are named in words, and so are wider than the Mac's signs**: of the
+    five hints of a chord being typed, the last ("A click on another word keeps it
+    too") is left off in a song's pane under some 1100 wide, which is the usual one.
+    Rule 53a says the last are left off, and the first is the one most worth reading.
+    The sizes are Windows' own (`HintFit`): words 12.5, a key's sign 12 and a little
+    bolder, a key 20 tall and at least 22 wide, the line 30.
+127. **The line of hints is one element that draws itself, with a signal of its own**
+    (`HintLine.cs`, `LibraryModel.HintsChanged`), for rule 6e. The model's one signal
+    has every part of the window read it again; what the hints say changes as often
+    as the pointer crosses a chord. Its height is worked out and not asked of what is
+    in it, and it asks for no width. Its lighting up is the opacity of one brush,
+    which WPF changes by itself between frames: 0.12 of a second up, 0.25 lit, 1.3
+    to fade, the Mac's times. Windows' "Show animations in Windows" switched off, it
+    does not light up (`SystemParameters.ClientAreaAnimation`).
+128. **The highlighted line is drawn by drawing its slide again, each slide being a
+    drawing of its own** (`ChordSheetCanvas`). Its colour is `SheetLineColour` in the
+    settings, between the two chord colours, named "The highlighted line" there as on
+    the Mac. A chord's name is `#ff8a1f` as it comes.
+129. **The quiet line is one line** and says how much there is of the song. The one
+    sentence of what the keys do (`LibraryModel.SheetHelp`) is kept for a screen
+    reader, which is told it of the sheet.
+130. **The edge is still WPF's own thing for dragging between two columns**
+    (`GridSplitter`), which starts where it is told to and changes no width but as it
+    is dragged: checked, as the note from the Mac asked, by tests that lay the window
+    out at many widths and raise the dragging on it. It is drawn here and not by the
+    look: eight wide, the bar's grey, with a grip. `ListsWidth` in the settings; 345
+    as it starts.
+131. **The menus are File, Edit and Help. View and Song are gone.** The page says of
+    the Mac "No View menu, there being nothing to put in it", and of Windows "The
+    same commands in the window's own menu". Windows' View had the two editors and
+    the size of the words; Song had Earlier Versions. Each of those has its buttons
+    in the window, and its keys, which the buttons' tips say. File keeps what the Mac
+    has not built or has elsewhere: Choose Folder, the two commands of ChordPro
+    files, Revert, Settings, Exit. Help has the guide and **About Pro7 Chord Editor**,
+    which opens the settings at About (on the Mac, About is the app menu's).
+    **Theirs to change**: a View menu is two lines to put back.
+132. **Earlier Versions is drawn here**, and not left to the look's own coloured
+    button: `#2978db`, white words, the list's picture of a song. Lighter under the
+    pointer (`#3a86e3`) and darker pressed (`#1f63bc`): mine.
+133. **The icon**: `App.csproj` names `ChordEditor.ico` as the program's, which gives
+    it to the file, the taskbar and each window. About shows it too, from the same
+    file, carried in `AppViews` as it is.
+134. **The guide's page is a document** (`FlowDocument`, in `GuideView.cs`), so that
+    its words can be selected and copied across paragraphs, as rule 9 says they can.
+    For that the box at its top is square-cornered, where the Mac's is rounded. The
+    names of keys are kept whole where a line breaks, by the character with no
+    width the quiet line has for it. The guide's words and pictures are carried
+    inside the library (`EmbeddedResource`), so they are in the one file the app is
+    given out as. **Closing the main window closes the guide**: closing the window
+    ends the program (`spec/10`), and a guide left open would have kept it running.
+    It opens beside the main window where the screen has room (`GuideWindow.
+    PlaceBeside`). That it has been shown is written as it opens, by reading what is
+    kept and writing it back with that one thing more.
+135. **The guide's pictures are the sheet's view alone, 720 wide, with its scroll bar
+    hidden for the picture, cut off under the first row of slides; and Windows'
+    arrow is drawn in by the test.** Held dot for dot on this PC; on GitHub's
+    machine only to being there, 1440 across and not blank, as the Mac's are there.
+136. **Nothing that has not changed is made again** (rule 6e; "What the window costs",
+    below): a line's words are laid out once for what they say; a line's words and
+    chords are kept as one drawing, by what the line says and has on it; a slide
+    that is where it was and as it was is not drawn again; the ChordPro text asks
+    its box where a line is once, and keeps each line's letters as a drawing.
+137. **The picture at the top of the repository's README is what the window holds,
+    drawn by a test on the test hymns** (`PictureTests.TheWindowForTheReadMe`), and
+    not a photograph of the window: it has no title bar. A session does not start
+    the app on this PC; and the title would carry a number that is the maintainer's
+    to choose.
+138. **The sheet's own tests lay the window out with the lists 270 wide**, as they
+    were when those tests were written, so that three slides go to a row at 1280.
+    As the app comes, with the lists at 345, **two slides go to a row in a window
+    1280 wide at the sheet's usual size**. That follows from rule 6a's "half way",
+    and is said here because it is seen at once.
+139. **The version is still 0.2.** One release holds both apps under one number
+    since 0.3 (`spec/10`), the Mac is at 1.0.3, and which number the Windows app is
+    built as is the maintainer's to say. Nothing was published.
+
 ## How it is laid out, and why
 
 ```
@@ -1133,6 +1236,31 @@ names. What to know before changing any of it:
   `ChordSheetWindowTests` one in a real window. Picture 71 is the chord over a word.
 - **The title and the version**: `AboutTheApp.cs` (`Number`, `Title`), shown by
   `LibraryWindow.xaml.cs`; `AboutTests` holds both.
+
+### The window as the Mac's 1.0.3 (the round of 2026-10-14)
+
+- **The rules of the song**: `ChordRules/RtfWords.cs` (`PlaceAfter`), `Song/Writing.cs`
+  (`MoveOtherRanges`), called from `OpenSong.ChangeLine`; `Song/ChordSheet.cs`
+  (`FinishTyping` for rule 35a, and `PasteWouldReplace` for the hint).
+- **The line of hints**: `SheetHints.cs` (what is said: no window), `HintFit.cs` (how
+  it is fitted: arithmetic), `HintLine.cs` (the element), `LibraryModel.Hints.cs`
+  (what the model keeps, and its own signal). The sheet's element says what is going
+  on in it (`ChordSheetCanvas.Tell`, `Attending`, `KeysHeld`); the strip says when
+  the pointer is over the key's chords (`ChordSheetView`).
+- **The highlighted line**: `ChordSheetCanvas` (`Highlighted`, `DrawTheHighlight`,
+  `DrawCell`), `SheetMetrics.LineIn`.
+- **What is kept ready**: `SheetMetrics` (`laidOut`), `ChordSheetCanvas` (`LineReady`,
+  `DrawnAs`, `LayDown`), `ChordProUnderlay` (`places`, `ready`).
+- **The edge**: `LibraryView.xaml` (the bar), `LibraryView.xaml.cs` (`EdgeLeftAt`),
+  `ListsLook` (the numbers), `LibraryModel.ListsWidth`.
+- **The guide**: `Guide.cs` (the words, read and said in Windows' own), `GuideView.cs`
+  (the page and its window), `LibraryModel.Guide.cs` (shown once), `AppViews/Guide/`
+  (the copy of the words, and the three pictures). `LibraryWindow` opens it.
+- **The tests**: `SheetHintsTests`, `WindowEdgeTests`, `GuideTests`,
+  `GuidePictureTests`, `SpeedTests`; in `Song.Tests`, `ChordsWithNoWordsTests` (the
+  other ranges) and `ChordSheetTests` (35a, whether a paste would replace); in
+  `ChordRules.Tests`, `RtfWordsTests` (the reference's cases of `placeAfter`).
+  Pictures 72 to 81.
 
 ## What was found out
 
@@ -2148,6 +2276,105 @@ names. What to know before changing any of it:
 - **The build of 0.1.0 that was given out names the folder it was built in**: see
   "At M10".
 
+### At the round of 2026-10-14
+
+- **What the window costs** (`spec/06`, rule 6e), measured by `SpeedTests` when it is
+  asked to (`PRO7_SPEED=1`), on this PC, on a song of 56 slides and 336 chords in a
+  window 1920 by 1050 that is really there and nobody sees. In thousandths of a
+  second, from the thing done until the window has laid out and drawn what came of
+  it; the middle one of many goes, and the worst:
+
+  | | Usually | At worst | As it was first measured |
+  | --- | --- | --- | --- |
+  | The pointer moved over the sheet | 0.4 | 8 | the same |
+  | The pointer moved along one line | 0.3 | 15 | the same |
+  | A change of what the hints say, and of the highlighted line | 1.8 | 12 | the same |
+  | Ctrl going down, or coming up | 0.8 | 2.5 | the same |
+  | A chord dragged over the sheet | 0.3 | 27 | the same |
+  | A chord put on or taken off (the file is saved) | 33 | 91 | 100, and 160 |
+  | A step of the edge, with the sheet | 10 | 17 | 39, and 67 |
+  | A step of the edge, with the ChordPro text | 9 | 14 | 31, and 42 |
+  | A step of the edge, with no song | 3.5 | 6 | the same |
+
+  (The Mac's, on its own machine, from the note: a pointer move 1.5 usually and 11
+  at worst; a step of the edge 15 with the sheet, 12 with the text, 6 with no
+  song.)
+- **Where the time was.** The pointer was never kept waiting here: the spot was
+  already a drawing of its own over the slides, and the song's header was already
+  laid out by arithmetic (`SongLook`), which is what was wrong on the Mac. What was
+  slow was found by putting a clock round the parts for an afternoon (taken out
+  again):
+  - **A step of the edge with the sheet: 27 of its 39 were the drawing of every
+    slide afresh**, its words laid out as letters and its chords' names drawn, for
+    slides that had not moved. Every line was also laid out again at each step
+    (`SheetMetrics.Hold` threw them all away), which is what the Mac had too.
+  - **With the ChordPro text: 18 of 26 were the letters behind the box**: asking
+    the box where each of forty lines is (a third of a thousandth each) and laying
+    each line's letters out again (an eighth).
+  - **A chord put on: 64 of 100 were the same two**, done for the whole song
+    because its rows were other rows, though one line of it had changed. What is
+    left, some 30, is the saving of the file: read whole, written beside itself,
+    read back, a copy kept.
+- **A change of the hints costs a thousandth or two**, held by a test that is always
+  run to under 40; and the line lighting up keeps the window's thread at work for a
+  small part of two seconds, held to under 800 thousandths of them.
+- **WPF arranges an element again before it draws it, if it is asked to draw it**
+  (`InvalidateVisual`). A test that counts the window's layings out found one for
+  each change of the hints. So `HintLine` draws into a drawing of its own, as the
+  sheet does, and asks nothing.
+- **An element that wants measuring, and is first reached by an arranging that began
+  above it, is measured there and then, and what holds it is never told** that it
+  wants another size. It is WPF's own rule (`MeasureDuringArrange`), for a window
+  being made another size just then. FOUND in a picture: the two sentences on
+  copying stood one under the other in room for one, and the quiet line's new words
+  were cut off after "fr". The tests arranged from the top, as a window being
+  resized does. Two things came of it: `HintLine` tells what holds it itself when it
+  is to be another height; and `Pictures.LayOut` lays out what is waiting first, as
+  a window does before it draws. **The quiet line can still be caught by it** in a
+  real window, if its words change in the very moment the window is resized: it
+  would be cut short until its words next change. Not seen, and left.
+- **The same line drawn straight onto a slide, and laid down as a drawing, came out
+  other by a part of a dot.** So the highlighted line, and the bubble the spot
+  lights, are made and laid down the same way as the lines kept ready; or a line
+  would have shivered as the pointer came onto it. A test that looks for what else
+  changes when the spot moves saw it.
+- **A view that is drawn into a picture is in no window, and its line of hints does
+  not light up there**: so a picture is the same whenever it is drawn.
+  `HintLine.ShowLit` is for the pictures that are of it lit.
+- **A colour of this app's own (`Pro7.Chord`) is nothing until the view is told to
+  follow the look** (`Look.Follow`): the chords of the guide's line of ChordPro text
+  were black until `GuideView` did.
+- **WPF breaks a line at the plus of "Ctrl+1"** on the guide's page as it did on the
+  quiet line. The same cure.
+- **The guide's pictures had to be made again once the same day**, when the sheet
+  came to be drawn from its kept drawings: the test that holds them dot for dot said
+  so, which is what it is for.
+- **Six of the sheet's tests counted on three slides to a row at 1280**, and failed
+  when the lists came to start at 345. They lay the window out with the lists at
+  270 now (decision 138).
+- **Two sheets on one model** tell it different things, the note from the Mac says,
+  and there for ever. Here the sheet tells the model only when it draws, and not
+  because the model's hints changed, so there is no going round; but the windows
+  `SpeedTests` opens are closed all the same.
+- **WHAT NO TEST CAN BE, and no hand has tried.** How the line of hints looks as it
+  lights up and fades. Whether Ctrl going down is told at once while the pointer
+  lies still (it is heard by the window's own `PreviewKeyDown`, and counts while the
+  sheet has the keyboard: A GUESS until a hand has held Ctrl over a line). Whether
+  the pointer changes shape the moment it is over the edge. That the guide opens at
+  the first start beside the main window, and not at the second; that Help, F1 and
+  the ? each bring it to the front; that the icon is in the taskbar and the title
+  bars. And how any of it feels on a real library, which is the point of rule 6e:
+  the numbers above are of a window off the screen.
+- **No round of breaking the code on purpose was run for this round**, as one was
+  for the chord from the strip. What is held is held by the tests named in "The
+  window as the Mac's 1.0.3"; how many breakages they would catch has not been
+  counted.
+- **Mistakes made on the Mac, held here so that they are not made**: that a paste
+  "replaces" goes by every line it would really go onto, and a line passed over
+  does not count; that with the pointer off the lines Ctrl says nothing of copying;
+  that a hint too long is cut off and never makes the song's part wider; that the
+  guide's pictures are held to what the app draws.
+
 ### What the maintainer found by hand
 
 - **2026-10-12, the first try of a build: a click on the sheet did nothing.**
@@ -2183,6 +2410,38 @@ names. What to know before changing any of it:
 
 ## Left rough, and what to ask
 
+- **Nobody has tried the window of the round of 2026-10-14.** What a hand is asked
+  to try, on a COPY of a library:
+  - **The line of hints**: move the pointer over a word, a chord, the bare sheet
+    between slides, the key's chords in the strip; hold Ctrl over a line, lying
+    still; drag a chord, and hold Ctrl as it is carried; type a chord, and clear
+    one's name. Is what the blue line says right for each, at once? Does it light
+    up and fade, and is that pleasant or too much? Is the line the pointer is on
+    plain to see in orange?
+  - **Speed**: on a long song in a large window, does the spot keep up with the
+    pointer, and a dragged chord? Is the edge between the lists and the song smooth
+    to drag, on the sheet and on the ChordPro text?
+  - **The edge**: is it easy to take hold of; does the pointer change the moment it
+    is over it; clicked twice, does it go back; closed and started again, is it
+    where it was left?
+  - **The guide**: it should open by itself at the first start, beside the main
+    window, and not at the next. Help, F1 and the ? at the right of the strip should
+    each open it, or bring it to the front. A chord can be put on while it is open.
+    Closing the main window closes it.
+  - **The menus** are File, Edit and Help now: is anything missed that View or Song
+    had? Ctrl+S should still say there is nothing to save by hand.
+  - **The icon**, on the file, in the taskbar and at the top left of each window;
+    and the blue Earlier Versions button, once a song has been changed.
+  - **Two slides to a row** in a window 1280 wide, where there were three: the
+    lists start wider now (decision 138).
+- **Which number the Windows app is to be built as**, and whether its file is to be
+  added to the release the Mac's is in: the maintainer's (decision 139). The row of
+  "Try it" in the README at the top is brought up to date when there is a release.
+- **`spec/` says nothing of three things this round had to choose**, each written
+  above for the Mac's session to see: that on Windows Ctrl is both the key for
+  shortcuts and the key that copies a dragged chord, and what follows (decision
+  125); what Windows' menus are, where the Mac has built less and keeps some things
+  elsewhere (131); and that closing the main window closes the guide (134).
 - **Nobody has dragged a chord out of the strip.** No test can ("At the chord from
   the strip"), and a session does not move the maintainer's mouse. What a hand is
   asked to try, on a COPY of a library:
@@ -2328,8 +2587,9 @@ names. What to know before changing any of it:
     wheel; that the slide at the top stays there;
   - the wheel and a trackpad scrolling the sheet; the strip, where the pane is too
     narrow for its seven chords, scrolled sideways by the wheel;
-  - the switch: a click, the arrow keys on it, Ctrl with 1 and 2, the View menu;
-    and that the keyboard goes to the editor shown;
+  - the switch: a click, the arrow keys on it, Ctrl with 1 and 2 (the View menu,
+    which stood here, is gone since 2026-10-14: decision 131); and that the keyboard
+    goes to the editor shown;
   - the settings' Chords section: the system's colour picker, and the sheet behind
     it changing colour as one is chosen;
   - that the sheet is sharp, and its tails on their characters, on a screen set to
@@ -2416,8 +2676,8 @@ names. What to know before changing any of it:
   `RtfWords.cs`, for stand-ins (`BytesOf`, held by vectors) and for any words
   (`WordsWritten`). The first could be the second with a test before it. Left, so
   as not to touch what the vectors hold for the sake of tidiness.
-- **What is left of M10**, none of it this session's to decide: **the icon** (the
-  app and its window have .NET's own); **the words** of About and of the read-me
+- **What is left of M10**, none of it this session's to decide (the icon, which
+  stood here, the app has since 2026-10-14); **the words** of About and of the read-me
   (decisions 113 and 115); **what Windows says of the unsigned file**, to be seen
   and the read-me held to it; **the version**, which says 0.1.0 as the Mac's early
   build says 0.1; whether to sign; and a release that is not an early one. (An
@@ -2450,7 +2710,7 @@ names. What to know before changing any of it:
   be in its song's own folder and named as a copy is. Every copy the list hands
   over is both, so nothing can be made to fail there; the care is kept because it
   stands before a deletion (AGENTS.md, "The person's files").
-- **The app has no icon.** It is M10's.
+- (The app has its icon since 2026-10-14: decision 133.)
 - **`old/publish.py` must not be run**: it commits, pushes and tags. Its README says
   so now.
 - **Two lines of `reference/README.md` are no longer true**, under "Where this and

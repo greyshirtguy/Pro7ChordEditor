@@ -635,6 +635,45 @@ public class PictureTests
             return Task.CompletedTask;
         });
 
+    // ---- The picture of the app at the top of the repository (README.md)
+    //
+    // What the window holds, with a song open on its chord sheet and the pointer on a
+    // word: the same kind of view as the Mac's beside it there. It is the window's
+    // CONTENTS, drawn here as every other picture is, and not a photograph of a window
+    // on a screen: so it has no title bar round it. (A session does not start the app
+    // on the maintainer's PC, where it would open their own library; and this one
+    // shows the test hymns, which may be shown to anyone.) It is always drawn, to be
+    // looked at; and it is put in the repository's `pictures` folder when asked (in
+    // PowerShell, from windows/):
+    //
+    //     $env:PRO7_SCREENSHOT = "write"
+    //     dotnet test --project Tests/AppViews.Tests --filter-method "*TheWindowForTheReadMe"
+    [Fact]
+    public void TheWindowForTheReadMe()
+    {
+        const string name = "81 the window, for the README at the top";
+        DrawSheet(
+            name,
+            true,
+            "Amazing Grace",
+            (_, _, hand) =>
+            {
+                // (A chord put on and taken off again: so that the song has an earlier
+                // version, and its button is there to be seen.)
+                hand.PointAt("grace my fears");
+                hand.Press(Key.D5);
+                hand.Press(Key.Delete);
+                hand.PointAt("wretch");
+                return Task.CompletedTask;
+            },
+            width: 1440,
+            height: 900);
+        if (string.Equals(Environment.GetEnvironmentVariable("PRO7_SCREENSHOT"), "write", StringComparison.Ordinal))
+        {
+            File.Copy(Path.Combine(Pictures.Folder, name + ".png"), Path.Combine(Pro7ChordEditor.Tests.TestData.Repository, "pictures", "screenshot-windows.png"), overwrite: true);
+        }
+    }
+
     // ---- The guide (spec/13-guide.md: "The window, drawn into pictures and looked at:
     // as it opens, in the light and in the dark; made narrow; and the whole page")
 

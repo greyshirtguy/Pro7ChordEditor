@@ -8,11 +8,10 @@ on a stage screen, as it does for songs from Multitracks.
 
 <p align="center">
   <img src="pictures/screenshot-mac.png" width="49%" alt="Pro7 Chord Editor on a Mac: the hymn Amazing Grace as a grid of its slides, with chords in orange over the words of two of them, and at the left the libraries and the songs of one">
-  <!-- The Windows app's screenshot goes beside the Mac's. Save it as
-       pictures/screenshot-windows.png, of the same kind of view (a song open on its
-       chord sheet), and move the line below out of this comment.
-  <img src="pictures/screenshot-windows.png" width="49%" alt="Pro7 Chord Editor on Windows: a song as a grid of its slides, with chords over its words, and at the left the libraries and the songs of one">
-  -->
+  <img src="pictures/screenshot-windows.png" width="49%" alt="Pro7 Chord Editor on Windows: the hymn Amazing Grace as a grid of its slides, with chords in orange over its words, and at the left the libraries and the songs of one">
+  <!-- The Windows app's is what its window holds, drawn by one of its own tests on the
+       test hymns (windows/Tests/AppViews.Tests/PictureTests.cs, "TheWindowForTheReadMe",
+       which says how it is made again): so it has no title bar round it. -->
 </p>
 
 ProPresenter shows the chords a song came with and has no way to put one on. This
@@ -95,7 +94,7 @@ Linux, lifted out and made again natively for the Mac and for Windows:
 | `proto/` | The descriptions of ProPresenter's file formats ([ProPresenter7-Proto](https://github.com/greyshirtguy/ProPresenter7-Proto), a submodule) |
 | [`windows/`](windows/README.md) | The Windows app |
 | [`mac/`](mac/README.md) | The Mac app |
-| `pictures/` | The pictures this page shows: the apps' icon, and a screenshot of each app (`screenshot-mac.png`; `screenshot-windows.png` is still to come) |
+| `pictures/` | The pictures this page shows: the apps' icon, and a screenshot of each app (`screenshot-mac.png`, `screenshot-windows.png`) |
 
 It is being built by describing it to an AI model. [`AGENTS.md`](AGENTS.md) is what
 such a model is told before it starts, and [`spec/11-plan.md`](spec/11-plan.md) is the
