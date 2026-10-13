@@ -56,4 +56,3 @@ NOT IN IT YET
 - Finding and mending the songs that the first chord editor, the one for
   Windows, left wrong.
 - Making a song from a ChordPro file.
-- An icon.
