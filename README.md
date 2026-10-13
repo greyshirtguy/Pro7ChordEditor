@@ -1,4 +1,7 @@
-# Pro7 Chord Editor
+<p align="center">
+  <img src="pictures/ChordEditor.png" width="160" alt="The icon of Pro7 Chord Editor: a bubble with the chord Am7 in it, on orange">
+</p>
+<h1 align="center">Pro7 Chord Editor</h1>
 
 Puts chords on the songs of a ProPresenter 7 library, so that ProPresenter shows them
 on a stage screen, as it does for songs from Multitracks.
@@ -82,6 +85,7 @@ Linux, lifted out and made again natively for the Mac and for Windows:
 | `proto/` | The descriptions of ProPresenter's file formats ([ProPresenter7-Proto](https://github.com/greyshirtguy/ProPresenter7-Proto), a submodule) |
 | [`windows/`](windows/README.md) | The Windows app |
 | [`mac/`](mac/README.md) | The Mac app |
+| `pictures/` | The pictures this page shows: the apps' icon |
 
 It is being built by describing it to an AI model. [`AGENTS.md`](AGENTS.md) is what
 such a model is told before it starts, and [`spec/11-plan.md`](spec/11-plan.md) is the
