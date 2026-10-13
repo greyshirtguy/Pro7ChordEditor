@@ -12,6 +12,16 @@
 
 namespace Pro7ChordEditor.AppViews;
 
+/// <summary>The colours of the song's header that are this app's own.</summary>
+public static class HeaderLook
+{
+    /// <summary>
+    /// The Earlier Versions button: a blue, the colour furthest from the sheet's orange,
+    /// which in this header says which editor is shown (spec/07, rule 15: #2978db).
+    /// </summary>
+    public static readonly System.Windows.Media.Color EarlierVersions = System.Windows.Media.Color.FromRgb(0x29, 0x78, 0xDB);
+}
+
 /// <summary>The ways the song's header is laid out, the widest first.</summary>
 public enum HeaderRows
 {

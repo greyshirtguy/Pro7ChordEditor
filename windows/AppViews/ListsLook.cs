@@ -27,19 +27,28 @@ public static class ListsLook
     /// </summary>
     public const double LeastSongs = 150;
 
-    /// <summary>How wide the lists are until the edge between them and the song is dragged.</summary>
-    public const double UsualWidth = 270;
-
     /// <summary>The least and the most width the lists can be dragged to.</summary>
     public const double LeastWidth = 210;
 
     public const double MostWidth = 480;
 
+    /// <summary>
+    /// How wide the lists are until the edge between them and the song is dragged: half
+    /// way between their least and their most, in a window of any width (spec/06, rule
+    /// 6a; the maintainer's, 2026-10-13: "lets make the default about half way between
+    /// min and max". Until then, 270).
+    /// </summary>
+    public const double UsualWidth = (LeastWidth + MostWidth) / 2;
+
     /// <summary>The least width the song is left with.</summary>
     public const double LeastSong = 380;
 
-    /// <summary>How wide the edge between the lists and the song is.</summary>
-    public const double EdgeWidth = 5;
+    /// <summary>
+    /// How wide the edge between the lists and the song is: a bar that is seen, and
+    /// easy to take hold of. (For a day on the Mac it was a hairline with five to be
+    /// dragged by, as it was here, and the maintainer found it "a bit hard to grab".)
+    /// </summary>
+    public const double EdgeWidth = 8;
 
     /// <summary>
     /// How wide the lists are in a window this wide, when the edge was last left where

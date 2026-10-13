@@ -373,6 +373,13 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     public double ListsSplit { get; private set; } = UsualListsSplit;
 
     /// <summary>
+    /// How wide the two lists at the window's left are, where the window has room for
+    /// that: what the edge between them and the song was last dragged to (spec/06,
+    /// rule 6a). ListsLook.Width has what they are given in a window of a given width.
+    /// </summary>
+    public double ListsWidth { get; private set; } = ListsLook.UsualWidth;
+
+    /// <summary>
     /// How many times its usual size the ChordPro text is: one of <see cref="Zooms"/>.
     /// Only the size changes with it: not a character of the text.
     /// </summary>
@@ -584,6 +591,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         var settings = appData.ReadSettings();
         chosenFolders = [.. settings.ChosenFolders];
         ListsSplit = Within(settings.ListsSplit ?? UsualListsSplit);
+        ListsWidth = WithinWidths(settings.ListsWidth ?? ListsLook.UsualWidth);
         TextZoom = NearestZoom(settings.TextZoom ?? UsualTextZoom);
         SheetZoom = NearestZoom(settings.SheetZoom ?? UsualSheetZoom);
         SheetChordColour = ColourAsKept(settings.SheetChordColour);
@@ -773,6 +781,20 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         FindPlaces(Paths.IdOf(folder), null);
         Remember();
         appData.Log("A folder was chosen: " + Paths.NameOf(folder) + ".");
+        Changed();
+    }
+
+    /// <summary>
+    /// The edge between the lists and the song was dragged, to where the lists are this
+    /// wide; or, with nothing, put back where it starts. It is remembered.
+    /// </summary>
+    public void SetListsWidth(double? width)
+    {
+        ListsWidth = WithinWidths(width ?? ListsLook.UsualWidth);
+        if (started)
+        {
+            Remember();
+        }
         Changed();
     }
 
@@ -1514,6 +1536,9 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
 
     private static double Within(double share) => double.IsNaN(share) ? UsualListsSplit : Math.Min(Math.Max(share, 0.1), 0.9);
 
+    private static double WithinWidths(double width) =>
+        double.IsNaN(width) ? ListsLook.UsualWidth : Math.Min(Math.Max(width, ListsLook.LeastWidth), ListsLook.MostWidth);
+
     private static double NearestZoom(double wanted) =>
         double.IsNaN(wanted) ? UsualTextZoom : Zooms.MinBy(zoom => Math.Abs(zoom - wanted));
 
@@ -1716,6 +1741,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         LastPlace = PlaceId,
         LastLibrary = LibraryId,
         ListsSplit = ListsSplit == UsualListsSplit ? null : ListsSplit,
+        ListsWidth = ListsWidth == ListsLook.UsualWidth ? null : ListsWidth,
         TextZoom = TextZoom == UsualTextZoom ? null : TextZoom,
         SheetZoom = SheetZoom == UsualSheetZoom ? null : SheetZoom,
         SheetChordColour = SheetChordColour,

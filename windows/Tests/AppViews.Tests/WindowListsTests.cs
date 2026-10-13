@@ -35,20 +35,25 @@ public class WindowListsTests
     [Fact]
     public void HowWideTheListsAreWhereTheEdgeWasLeftButNeverSoWideThatTheSongIsLeftWithLessThanItsLeast()
     {
-        Assert.Equal(270, ListsLook.Width(ListsLook.UsualWidth, 1280));
+        // As it starts: half way between the lists' least and their most, in a window
+        // of any width that has room for it (spec/06, rule 6a).
+        Assert.Equal(345, ListsLook.UsualWidth);
+        Assert.Equal(345, ListsLook.Width(ListsLook.UsualWidth, 1280));
+        Assert.Equal(345, ListsLook.Width(ListsLook.UsualWidth, 1920));
+        Assert.Equal(345, ListsLook.Width(ListsLook.UsualWidth, 800));
         Assert.Equal(400, ListsLook.Width(400, 1280));
         // A window made narrow takes the width from the lists: the song keeps its least.
         Assert.Equal(640 - ListsLook.EdgeWidth - ListsLook.LeastSong, ListsLook.Width(270, 640));
-        Assert.Equal(255, ListsLook.Width(270, 640));
-        Assert.Equal(255, ListsLook.Width(400, 640));
+        Assert.Equal(252, ListsLook.Width(270, 640));
+        Assert.Equal(252, ListsLook.Width(400, 640));
         // Made wide again, it gives it back.
         Assert.Equal(400, ListsLook.Width(400, 900));
         // Never less than the lists' least, nor more than their most, wherever the edge was left.
         Assert.Equal(ListsLook.LeastWidth, ListsLook.Width(270, 500));
         Assert.Equal(ListsLook.LeastWidth, ListsLook.Width(100, 1280));
         Assert.Equal(ListsLook.MostWidth, ListsLook.Width(600, 2000));
-        // The Mac app's numbers (LibraryWindow.swift).
-        Assert.Equal((270.0, 210.0, 480.0, 380.0), (ListsLook.UsualWidth, ListsLook.LeastWidth, ListsLook.MostWidth, ListsLook.LeastSong));
+        // The Mac app's numbers (LibraryWindow.swift), and the bar's eight.
+        Assert.Equal((345.0, 210.0, 480.0, 380.0, 8.0), (ListsLook.UsualWidth, ListsLook.LeastWidth, ListsLook.MostWidth, ListsLook.LeastSong, ListsLook.EdgeWidth));
     }
 
     [Fact]

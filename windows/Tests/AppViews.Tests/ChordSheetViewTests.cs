@@ -40,6 +40,11 @@ public class ChordSheetViewTests
         model.ChooseLibrary(pc.Library("Songs"));
         await model.MarksAreWorkedOutAsync();
         model.Open(pc.Song(name));
+        // (The lists as wide as they were when these tests were written, 270, so that
+        // three slides go to a row in a window 1280 wide, which many of them count on.
+        // As the app comes the lists are 345 since 2026-10-14, and two do: that is
+        // held where the edge is, in WindowEdgeTests.)
+        model.SetListsWidth(270);
         Look.Wear(view, dark: true);
         Pictures.LayOut(view, width, height);
         return (model, view, new Hand(view.SongPane.ChordSheet.Canvas));
@@ -2021,76 +2026,54 @@ public class ChordSheetViewTests
     });
 
     // ---- The window's menu
-
+    //
+    // spec/10-platforms.md, "Menus": kept to what the app has a use for. File, Edit and
+    // Help; no Save in any of them, though Ctrl+S is answered still (spec/06, rule
+    // 12a); Edit is the six that work wherever something can be typed; and Help has the
+    // guide. (Until 2026-10-14 there were a View menu, with the two editors and the
+    // size of the words, and a Song menu with Earlier Versions. Each of those has its
+    // buttons in the window, and its keys, which are held where those are.)
     [Fact]
-    public void TheViewMenuHasTheTwoEditorsWithTheOneShownTickedAndTheSizeOfTheWordsOfThatOne() => OnAMadeUpPC(async pc =>
+    public void TheMenusAreFileEditAndHelpWithNoSaveInThemAndCtrlSIsAnsweredStill() => OnAMadeUpPC(async pc =>
     {
         var (model, view, _) = await Open(pc, "Amazing Grace");
-        var chords = Named<MenuItem>(view, "ShowChords");
-        var chordPro = Named<MenuItem>(view, "ShowChordPro");
-        var larger = Named<MenuItem>(view, "LargerWords");
-        var smaller = Named<MenuItem>(view, "SmallerWords");
-        var usual = Named<MenuItem>(view, "UsualWords");
-        void Opened() => ((MenuItem)chords.Parent).RaiseEvent(new RoutedEventArgs(MenuItem.SubmenuOpenedEvent));
-        static void Chosen(MenuItem item) => item.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        static string Named(object item) => item is MenuItem one ? one.Header as string ?? ((System.Windows.Input.RoutedUICommand)one.Command).Text : "-";
+        Assert.Equal(["_File", "_Edit", "_Help"], view.Menus.Select(menu => (string)menu.Header));
+        var dots = ((char)0x2026).ToString();
+        Assert.Equal(
+            ["Choose _Folder" + dots, "-", "_New Song from ChordPro File" + dots, "Save Song as _ChordPro File" + dots, "-", "_Revert to as Opened" + dots, "-", "Se_ttings" + dots, "-", "E_xit"],
+            view.Menus[0].Items.Cast<object>().Select(Named));
+        Assert.Equal(["Undo", "Redo", "-", "Cut", "Copy", "Paste", "-", "Select All"], view.Menus[1].Items.Cast<object>().Select(Named));
+        Assert.Equal(["Pro7 Chord Editor _Guide", "-", "_About Pro7 Chord Editor"], view.Menus[2].Items.Cast<object>().Select(Named));
+        // Nothing in any menu says Save, by itself; and nothing says Delete.
+        var all = view.Menus.SelectMany(menu => menu.Items.OfType<MenuItem>()).ToList();
+        Assert.DoesNotContain(all, item => item.Header is "_Save" or "Save" || item.InputGestureText == "Ctrl+S");
+        Assert.DoesNotContain(all, item => (item.Header as string)?.Contains("Delete", StringComparison.Ordinal) == true);
+        // The guide's key is said beside it.
+        Assert.Equal("F1", all.Single(item => item.Header is "Pro7 Chord Editor _Guide").InputGestureText);
 
-        Assert.Equal(("Ctrl+1", "Ctrl+2", "Ctrl+Plus", "Ctrl+Minus", "Ctrl+0"), (chords.InputGestureText, chordPro.InputGestureText, larger.InputGestureText, smaller.InputGestureText, usual.InputGestureText));
-        // The sheet is shown: its name is ticked, and the sizes are the sheet's.
-        Opened();
-        Assert.Equal((true, false), (chords.IsChecked, chordPro.IsChecked));
-        Assert.True(chords.IsEnabled && chordPro.IsEnabled && larger.IsEnabled && smaller.IsEnabled && usual.IsEnabled);
-        Chosen(larger);
-        Assert.Equal((0.9, 1.0), (model.SheetZoom, model.TextZoom));
-        Chosen(smaller);
-        Chosen(smaller);
-        Assert.Equal((0.7, 1.0), (model.SheetZoom, model.TextZoom));
-        Chosen(usual);
-        Assert.Equal((0.8, 1.0), (model.SheetZoom, model.TextZoom));
-        // The other editor, chosen in the menu: ticked, and the sizes are the text's.
-        Chosen(chordPro);
+        // Ctrl+S, pressed out of habit, is answered by the view all the same, with its
+        // sentence; and Ctrl with anything else, or S with anything more, is not.
+        Assert.True(view.KeyPressed(Key.S, ModifierKeys.Control));
+        Assert.StartsWith("Saved. Every change here is saved as it is made", model.Notice, StringComparison.Ordinal);
+        Assert.False(view.KeyPressed(Key.S, ModifierKeys.Control | ModifierKeys.Shift));
+        Assert.False(view.KeyPressed(Key.S, ModifierKeys.None));
+
+        // F1 asks for the guide: the view passes it to whatever window holds it.
+        var asked = 0;
+        view.ShowGuide = () => asked++;
+        Assert.True(view.KeyPressed(Key.F1, ModifierKeys.None));
+        Assert.Equal(1, asked);
+        Assert.False(view.KeyPressed(Key.F1, ModifierKeys.Control));
+        all.Single(item => item.Header is "Pro7 Chord Editor _Guide").RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        Assert.Equal(2, asked);
+
+        // The two editors and the sizes of the words have their keys still, though no
+        // menu has them.
+        Assert.True(view.KeyPressed(Key.D2, ModifierKeys.Control));
         Assert.Equal(LibraryModel.Editor.ChordPro, model.EditorShown);
-        Opened();
-        Assert.Equal((false, true), (chords.IsChecked, chordPro.IsChecked));
-        Chosen(larger);
-        Chosen(larger);
-        Assert.Equal((0.8, 1.25), (model.SheetZoom, model.TextZoom));
-        Chosen(usual);
-        Assert.Equal((0.8, 1.0), (model.SheetZoom, model.TextZoom));
-        // At the end of its sizes, the one that would go further is greyed.
-        for (var times = 0; times < 9; times++)
-        {
-            Chosen(smaller);
-        }
-        Opened();
-        Assert.Equal(0.5, model.TextZoom);
-        Assert.False(smaller.IsEnabled);
-        Assert.True(larger.IsEnabled);
-        Chosen(usual);
-        // (And at the text's largest, though the sheet could be larger still.)
-        for (var times = 0; times < 9; times++)
-        {
-            Chosen(larger);
-        }
-        Opened();
-        Assert.Equal((0.8, 1.5), (model.SheetZoom, model.TextZoom));
-        Assert.False(larger.IsEnabled);
-        Assert.True(smaller.IsEnabled);
-        Chosen(usual);
-        Chosen(chords);
+        Assert.True(view.KeyPressed(Key.D1, ModifierKeys.Control));
         Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
-        for (var times = 0; times < 9; times++)
-        {
-            Chosen(larger);
-        }
-        Opened();
-        Assert.Equal((1.5, 1.0), (model.SheetZoom, model.TextZoom));
-        Assert.False(larger.IsEnabled);
-        Assert.True(smaller.IsEnabled);
-        // With a song that could not be read, or none, there is nothing to show or to size.
-        model.Open(pc.Song("Nonsense"));
-        Opened();
-        Assert.False(chords.IsEnabled || chordPro.IsEnabled || larger.IsEnabled || smaller.IsEnabled || usual.IsEnabled);
-        Assert.Equal((false, false), (chords.IsChecked, chordPro.IsChecked));
     });
 
     // The mouse taken from the sheet while a press is on (another window came to the

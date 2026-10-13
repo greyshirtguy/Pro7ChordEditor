@@ -81,6 +81,14 @@
     <InternalsVisibleTo Include="Pro7ChordEditor.AppViews.Tests" />
   </ItemGroup>
   <ItemGroup>
+    <!--
+      The app's icon, for About to show: the one file the program itself is given
+      (..\App\ChordEditor.ico), carried in this library as it is. It is not copied
+      in the repository.
+    -->
+    <Resource Include="..\App\ChordEditor.ico" Link="ChordEditor.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ChordRules\ChordRules.csproj" />
     <ProjectReference Include="..\Song\Song.csproj" />
   </ItemGroup>

@@ -275,12 +275,13 @@ public class ChordProFilesViewTests
         model.Answer(false);
         Assert.True(view.ChordProCommands.BringIn.IsEnabled);
 
-        // Both are in the File menu, between choosing a folder and saving.
+        // Both are in the File menu, between choosing a folder and Revert. (There is
+        // no Save in it: spec/06, rule 12a.)
         var file = (MenuItem)bringIn.Parent;
         Assert.Equal("_File", (string)file.Header);
         var headers = file.Items.Cast<object>().Select(item => item is MenuItem one ? (string)one.Header : "-").ToList();
         Assert.Equal(
-            ["Choose _Folder" + (char)0x2026, "-", "_New Song from ChordPro File" + (char)0x2026, "Save Song as _ChordPro File" + (char)0x2026, "-", "_Save"],
+            ["Choose _Folder" + (char)0x2026, "-", "_New Song from ChordPro File" + (char)0x2026, "Save Song as _ChordPro File" + (char)0x2026, "-", "_Revert to as Opened" + (char)0x2026],
             headers.Take(6));
 
         // The kinds of file the system's chooser is asked to show: not ProPresenter's own.

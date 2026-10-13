@@ -10,7 +10,11 @@
                at and nothing changed. It goes by itself when ProPresenter does;
     a header   the song's name at the left; the switch between the two editors in the
                middle; at the right Earlier Versions, if copies of it are kept, and its
-               two keys, each to be set. Where the pane is too narrow for the name to
+               two keys, each to be set. Earlier Versions is a button in a colour of
+               its own, a blue (#2978db) with white words, and before them the picture
+               a song has in the list: it is the way back, and as one more grey button
+               it was passed over (spec/07, rule 15; the colour and the picture are the
+               maintainer's asking, 2026-10-13, and which blue is the Mac app's choice). Where the pane is too narrow for the name to
                be read beside them, the keys go on a row of their own under it, and
                where even that is too wide each has a row (SongLook.cs);
     offers     under the header, a row for each thing found in the song that wants
@@ -118,7 +122,34 @@
               HorizontalAlignment="Right"
               VerticalAlignment="Center"
               Click="EarlierVersionsWasClicked"
-              ToolTip="See this song as it was before it was changed here, and put a version back." />
+              ToolTip="See this song as it was before it was changed here, and put a version back.">
+        <!--
+          Drawn here, and not left to the look's own coloured button: so that it is this
+          blue in every look, in the window that has the keyboard and in one that has
+          not, and in the pictures the tests draw.
+        -->
+        <Button.Template>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="Ground" Background="#2978DB" CornerRadius="5" Height="30" Padding="10,0,12,0" BorderThickness="1" BorderBrush="Transparent">
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <views:PresentationIcon Width="15" Height="15" Fill="White" Margin="0,1,7,0" VerticalAlignment="Center" />
+                <TextBlock Text="{TemplateBinding Content}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center" />
+              </StackPanel>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="Ground" Property="Background" Value="#3A86E3" />
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="Ground" Property="Background" Value="#1F63BC" />
+              </Trigger>
+              <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="Ground" Property="BorderBrush" Value="White" />
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Button.Template>
+      </Button>
       <StackPanel x:Name="Keys" Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
         <TextBlock Text="Key" VerticalAlignment="Center" Margin="0,0,6,0" />
         <ComboBox x:Name="Key"

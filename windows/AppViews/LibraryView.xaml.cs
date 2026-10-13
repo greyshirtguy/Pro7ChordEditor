@@ -3,10 +3,11 @@
 // edge was last dragged to, as far as the window's width lets it (ListsLook.Width), and
 // passes on what is chosen in the menu.
 //
-// Two things in the menu open something of the system's or a window of their own, and
-// so are here and not in the model: choosing a folder, and the settings. And a few keys
-// are the whole view's, whatever in it has the keyboard: Esc, Ctrl+S, and Ctrl with 1
-// and with 2, which show the song's two editors (spec/06, rule 12).
+// A few things in the menu open something of the system's or a window of their own, and
+// so are here and not in the model: choosing a folder, the settings, the guide. And a
+// few keys are the whole view's, whatever in it has the keyboard: Esc; Ctrl+S, which is
+// in no menu and is answered here all the same (spec/06, rule 12a); F1, which shows the
+// guide; and Ctrl with 1 and with 2, which show the song's two editors (rule 12).
 
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +20,8 @@ namespace Pro7ChordEditor.AppViews;
 /// <summary>What the window holds: its menu, the lists at the left, the song at the right.</summary>
 public partial class LibraryView : UserControl
 {
-    // How wide the lists were when the edge was last let go.
+    // How wide the lists were when the edge was last let go: the model's, which
+    // remembers it from one start of the app to the next.
     private double leftAt = ListsLook.UsualWidth;
 
     public LibraryView(LibraryModel model)
@@ -29,8 +31,32 @@ public partial class LibraryView : UserControl
         // (The panes have it from here: what a view is handed, those in it are handed
         // too.)
         DataContext = model;
+        leftAt = model.ListsWidth;
         SizeChanged += (_, _) => LayOut();
+        // The model says how wide the lists were left: when the app starts, what was
+        // remembered; and after the edge is let go or clicked twice. (Not while the
+        // edge is being dragged: where it is then is the hand's to say.)
+        model.PropertyChanged += (_, _) =>
+        {
+            if (leftAt != Model.ListsWidth && !Edge.IsDragging)
+            {
+                leftAt = Model.ListsWidth;
+                LayOut();
+            }
+        };
     }
+
+    /// <summary>
+    /// Shows the guide, in a window of its own beside this one (spec/13-guide.md). The
+    /// window sets it; a view in no window has none to show.
+    /// </summary>
+    public Action ShowGuide { get; set; } = () => { };
+
+    /// <summary>The edge between the lists and the song: for a test to drag.</summary>
+    internal GridSplitter TheEdge => Edge;
+
+    /// <summary>The menus across the top, as their names: for a test to read.</summary>
+    internal IReadOnlyList<MenuItem> Menus => [.. ((Menu)((MenuItem)Revert.Parent).Parent).Items.OfType<MenuItem>()];
 
     public LibraryModel Model => (LibraryModel)DataContext;
 
@@ -129,9 +155,23 @@ public partial class LibraryView : UserControl
         }
     }
 
-    private void TheEdgeWasDragged(object sender, DragCompletedEventArgs e)
+    private void TheEdgeWasDragged(object sender, DragCompletedEventArgs e) => EdgeLeftAt(Lists.ActualWidth);
+
+    // Clicked twice, the edge goes back to where it starts.
+    private void TheEdgeWasClickedTwice(object sender, MouseButtonEventArgs e)
     {
-        leftAt = Lists.ActualWidth;
+        EdgeLeftAt(null);
+        e.Handled = true;
+    }
+
+    /// <summary>
+    /// The edge was let go where the lists are this wide; or, with nothing, was clicked
+    /// twice, and goes back to where it starts. It is the model's to remember.
+    /// </summary>
+    internal void EdgeLeftAt(double? width)
+    {
+        Model.SetListsWidth(width);
+        leftAt = Model.ListsWidth;
         LayOut();
     }
 
@@ -205,6 +245,12 @@ public partial class LibraryView : UserControl
             Model.SaveNow();
             return true;
         }
+        // F1 is Windows' key for help: the guide (spec/10-platforms.md).
+        if (key == Key.F1 && held == ModifierKeys.None)
+        {
+            ShowGuide();
+            return true;
+        }
         return false;
     }
 
@@ -237,36 +283,36 @@ public partial class LibraryView : UserControl
         }
     }
 
-    private void OpenTheSettings(object sender, RoutedEventArgs e) =>
-        new SettingsWindow(Model) { Owner = Window.GetWindow(this) }.ShowDialog();
+    private void OpenTheSettings(object sender, RoutedEventArgs e) => OpenSettings(null);
+
+    // The settings, in a window of their own over this one: at the section they were
+    // last at, or at one that is named.
+    private void OpenSettings(string? section)
+    {
+        var settings = new SettingsWindow(Model) { Owner = Window.GetWindow(this) };
+        if (section is not null)
+        {
+            settings.Show(section);
+        }
+        settings.ShowDialog();
+    }
 
     private void CloseTheWindow(object sender, RoutedEventArgs e) => Window.GetWindow(this)?.Close();
 
-    private void SaveNow(object sender, RoutedEventArgs e) => Model.SaveNow();
-
     private void AskToRevert(object sender, RoutedEventArgs e) => Model.AskToRevert();
+
+    private void ShowTheGuide(object sender, RoutedEventArgs e) => ShowGuide();
+
+    // What the app is, and which version: the settings' own section of that name.
+    private void ShowAbout(object sender, RoutedEventArgs e) => OpenSettings("About");
 
     // (A command that has nothing to do just now is greyed, and is still there to be
     // found.)
     private void TheFileMenuWasOpened(object sender, RoutedEventArgs e)
     {
-        Save.IsEnabled = Model.Shown is { Problem: null };
         Revert.IsEnabled = Model.CanRevert;
         BringIn.IsEnabled = Model.CanBringInAFile;
         WriteOut.IsEnabled = Model.CanWriteChordPro;
-    }
-
-    private void TheSongMenuWasOpened(object sender, RoutedEventArgs e) => EarlierVersions.IsEnabled = Model.HasEarlierVersions;
-
-    private void TheViewMenuWasOpened(object sender, RoutedEventArgs e)
-    {
-        var read = Model.Shown is { Problem: null };
-        var sheet = Model.EditorShown == LibraryModel.Editor.Sheet;
-        ShowChords.IsEnabled = ShowChordPro.IsEnabled = UsualWords.IsEnabled = read;
-        ShowChords.IsChecked = read && sheet;
-        ShowChordPro.IsChecked = read && !sheet;
-        LargerWords.IsEnabled = read && (sheet ? Model.CanZoomSheetIn : Model.CanZoomTextIn);
-        SmallerWords.IsEnabled = read && (sheet ? Model.CanZoomSheetOut : Model.CanZoomTextOut);
     }
 
     // Shows the song in one of its two editors, and gives that one the keyboard.
@@ -275,30 +321,4 @@ public partial class LibraryView : UserControl
         Model.Show(editor);
         Song.GiveTheEditorTheKeyboard();
     }
-
-    private void ShowTheSheet(object sender, RoutedEventArgs e) => Show(LibraryModel.Editor.Sheet);
-
-    private void ShowTheText(object sender, RoutedEventArgs e) => Show(LibraryModel.Editor.ChordPro);
-
-    // The words of the editor that is shown, a step larger or smaller, or their usual
-    // size: the sheet's and the text's are each remembered by themselves.
-    private void Zoom(int direction)
-    {
-        if (Model.EditorShown == LibraryModel.Editor.Sheet)
-        {
-            Model.ZoomSheet(direction);
-        }
-        else
-        {
-            Model.ZoomText(direction);
-        }
-    }
-
-    private void MakeTheWordsLarger(object sender, RoutedEventArgs e) => Zoom(1);
-
-    private void MakeTheWordsSmaller(object sender, RoutedEventArgs e) => Zoom(-1);
-
-    private void MakeTheWordsTheirUsualSize(object sender, RoutedEventArgs e) => Zoom(0);
-
-    private void ShowEarlierVersions(object sender, RoutedEventArgs e) => Model.ShowEarlierVersions();
 }

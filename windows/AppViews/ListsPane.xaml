@@ -41,7 +41,14 @@
 
     <!-- Over: the place, and its libraries. -->
     <DockPanel Grid.Row="0" Background="{DynamicResource Pro7.Libraries}" ClipToBounds="True">
-      <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
+      <StackPanel DockPanel.Dock="Top" Margin="10,8,10,10">
+        <!-- What this top part is, in the small capitals the list of libraries has for its own title (spec/06, rule 7; the maintainer's, 2026-10-13). -->
+        <TextBlock x:Name="PlaceTitle"
+                   Text="WORKSPACE OR PROPRESENTER FOLDER"
+                   FontSize="11"
+                   TextTrimming="CharacterEllipsis"
+                   Margin="0,0,0,6"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
         <TextBlock x:Name="NoPlace" TextWrapping="Wrap" Margin="0,0,0,6" />
         <ComboBox x:Name="Places"
                   DisplayMemberPath="Label"

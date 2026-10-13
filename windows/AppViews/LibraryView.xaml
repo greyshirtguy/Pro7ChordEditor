@@ -1,7 +1,7 @@
 <!--
   What the window holds: one view. spec/06-library.md, "The window".
 
-    across the top  the window's own menu, with every command in it
+    across the top  the window's own menu, kept to what the app has a use for
                     (spec/10-platforms.md, "Menus");
     at the left     two lists, one over the other, as ProPresenter has them: the place
                     and its libraries, and under them the songs of the library chosen
@@ -11,17 +11,37 @@
                     (EarlierVersionsPanel); and while Revert is asking, its question
                     (QuestionPanel).
 
-  The menu. File has what is done to the library and to the song's file: Save, for the
-  hand that goes to it out of habit, though nothing is saved by hand here, and Revert
-  beside it, as in the window (spec/06, rule 12a). Edit has what a box of text takes,
-  each sent to whatever has the keyboard: in the ChordPro text, Undo and Redo are the
-  text's own (spec/04, rule 23); on the chord sheet they are the song's, and Copy and
-  Paste are of a line's chords (spec/03, rules 47 to 53). View has the two editors,
-  the one that is shown ticked, and the size of the words in it.
+  The menu. File has what is done to the library and to the song's file, and Revert,
+  as in the window. THERE IS NO SAVE IN IT (spec/06, rule 12a: "It is in no menu";
+  the maintainer, 2026-10-13, of the Mac's: "I am guessing the save menu is not
+  needed". A Save in a menu says there is saving to do, and here every change is saved
+  as it is made). Ctrl+S, pressed out of habit, is answered still, by the view. Edit
+  has what a box of text takes, each sent to whatever has the keyboard: in the
+  ChordPro text, Undo and Redo are the text's own (spec/04, rule 23); on the chord
+  sheet they are the song's, and Copy and Paste are of a line's chords (spec/03, rules
+  47 to 53). Help has the guide, and what the app is.
 
-  The edge between the lists and the song is dragged sideways, to give either more
-  width. How wide the lists then are in a window of a given width is ListsLook's
-  arithmetic, which the code beside this asks whenever the window's width changes.
+  (Until 2026-10-14 there were two menus more, View and Song. View had the two
+  editors and the size of the words, each of which has its buttons in the window and
+  its keys, which those buttons' tips say; Song had Earlier Versions, which is the
+  blue button in the song's header. The Mac's menus were kept to what is of use on
+  2026-10-13, "lets clean up the menus", and have neither; and the page says Windows
+  has the same commands in the window's own menu.)
+
+  The edge between the lists and the song is a bar that is seen, of the colour of the
+  bar between the two lists and with a small grip in its middle as that has. It is
+  dragged sideways, to give either more width; clicked twice, it goes back to where it
+  starts, half way between the least and the most the lists can be; and where it is
+  left is remembered (spec/06, rule 6a). How wide the lists then are in a window of a
+  given width is ListsLook's arithmetic, which the code beside this asks whenever the
+  window's width changes: they keep their width as the window is made wider or
+  narrower, the song having the difference.
+
+  It is WPF's own thing for dragging between two columns, which starts where it is
+  told to and changes no width but as it is dragged. (The Mac's own split view did
+  neither, and the edge there is the app's.) It is drawn here and not by the look, so
+  that it is the same bar in every look; every point of its width takes the mouse, and
+  the pointer is the one for dragging sideways the moment it is over it.
 
   Nothing here is a rule. What is shown comes from LibraryModel, which this view is
   handed, and what the person does is passed on to it.
@@ -50,7 +70,6 @@
           <MenuItem x:Name="BringIn" Header="_New Song from ChordPro File&#x2026;" Click="BringInAFile" />
           <MenuItem x:Name="WriteOut" Header="Save Song as _ChordPro File&#x2026;" Click="WriteAChordProFile" />
           <Separator />
-          <MenuItem x:Name="Save" Header="_Save" InputGestureText="Ctrl+S" Click="SaveNow" />
           <MenuItem x:Name="Revert" Header="_Revert to as Opened&#x2026;" Click="AskToRevert" />
           <Separator />
           <MenuItem Header="Se_ttings&#x2026;" Click="OpenTheSettings" />
@@ -67,40 +86,50 @@
           <Separator />
           <MenuItem Command="ApplicationCommands.SelectAll" />
         </MenuItem>
-        <MenuItem Header="_View" SubmenuOpened="TheViewMenuWasOpened">
-          <MenuItem x:Name="ShowChords" Header="_Chords" InputGestureText="Ctrl+1" Click="ShowTheSheet" />
-          <MenuItem x:Name="ShowChordPro" Header="Chord_Pro" InputGestureText="Ctrl+2" Click="ShowTheText" />
+        <MenuItem Header="_Help">
+          <MenuItem x:Name="TheGuide" Header="Pro7 Chord Editor _Guide" InputGestureText="F1" Click="ShowTheGuide" />
           <Separator />
-          <MenuItem x:Name="LargerWords" Header="_Larger" InputGestureText="Ctrl+Plus" Click="MakeTheWordsLarger" />
-          <MenuItem x:Name="SmallerWords" Header="_Smaller" InputGestureText="Ctrl+Minus" Click="MakeTheWordsSmaller" />
-          <MenuItem x:Name="UsualWords" Header="_Usual Size" InputGestureText="Ctrl+0" Click="MakeTheWordsTheirUsualSize" />
-        </MenuItem>
-        <MenuItem Header="_Song" SubmenuOpened="TheSongMenuWasOpened">
-          <MenuItem x:Name="EarlierVersions" Header="_Earlier Versions&#x2026;" Click="ShowEarlierVersions" />
+          <MenuItem x:Name="About" Header="_About Pro7 Chord Editor" Click="ShowAbout" />
         </MenuItem>
       </Menu>
       <Border DockPanel.Dock="Top" Height="1" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
       <Grid>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition x:Name="Lists" Width="270" MinWidth="210" MaxWidth="480" />
+          <ColumnDefinition x:Name="Lists" Width="345" MinWidth="210" MaxWidth="480" />
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="*" MinWidth="380" />
         </Grid.ColumnDefinitions>
         <views:ListsPane x:Name="Listed" Grid.Column="0" />
-        <!-- The edge. It is the bar's colour, and has the look's own small grip in its middle. -->
+        <!-- The edge: a bar of the colour of the bar between the two lists, with a small grip in its middle as that has. -->
         <GridSplitter x:Name="Edge"
                       Grid.Column="1"
-                      Width="5"
-                      MinWidth="5"
+                      Width="8"
+                      MinWidth="8"
                       Padding="0"
                       HorizontalAlignment="Center"
                       VerticalAlignment="Stretch"
                       ResizeBehavior="PreviousAndNext"
                       ResizeDirection="Columns"
-                      Background="{DynamicResource Pro7.Bar}"
+                      Cursor="SizeWE"
                       Focusable="False"
                       DragCompleted="TheEdgeWasDragged"
-                      ToolTip="Drag left or right to give the lists or the song more room." />
+                      MouseDoubleClick="TheEdgeWasClickedTwice"
+                      ToolTip="Drag left or right to give the lists or the song more room. Click twice to put it back where it starts.">
+          <GridSplitter.Template>
+            <ControlTemplate TargetType="GridSplitter">
+              <Border Background="{DynamicResource Pro7.Bar}">
+                <Border x:Name="EdgeGrip"
+                        Width="4"
+                        Height="30"
+                        CornerRadius="2"
+                        Opacity="0.28"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Background="{DynamicResource TextFillColorPrimaryBrush}" />
+              </Border>
+            </ControlTemplate>
+          </GridSplitter.Template>
+        </GridSplitter>
         <views:SongPane x:Name="Song" Grid.Column="2" />
       </Grid>
     </DockPanel>

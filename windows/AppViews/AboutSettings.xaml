@@ -15,10 +15,14 @@
 
       What it is made from can be read at https://github.com/greyshirtguy/Pro7ChordEditor
 
+  Over the words is the app's icon, the maintainer's own (spec/10-platforms.md: on
+  the Mac it is About "which shows the app's icon").
+
   WHERE IT IS. On a Mac an app says this in a panel of the system's own, from the app's
   menu. Windows has no such panel, and an app there says it in a Help menu or, as apps
-  made for Windows 11 do, at the foot of its settings. It is in the settings here: this
-  app has nothing to put in a menu called Help, and is not to promise any (AGENTS.md).
+  made for Windows 11 do, at the foot of its settings. It is in the settings here, and
+  Help > About Pro7 Chord Editor opens the settings at it. (Until 2026-10-14 there was
+  no Help menu, this app having nothing to put in one. It has the guide now.)
 
   The words are AboutTheApp's, and are a proposal for the maintainer. The address is a
   link, which is opened by whatever the person has set to open one.
@@ -35,6 +39,14 @@
              FontSize="13"
              UseLayoutRounding="True">
   <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Image x:Name="Icon"
+           Source="/Pro7ChordEditor.AppViews;component/ChordEditor.ico"
+           Width="72"
+           Height="72"
+           HorizontalAlignment="Left"
+           Margin="0,2,0,12"
+           RenderOptions.BitmapScalingMode="HighQuality"
+           AutomationProperties.Name="The icon of Pro7 Chord Editor" />
     <TextBlock x:Name="Named" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
     <TextBlock x:Name="Version" Margin="0,4,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
     <TextBlock x:Name="BuiltFrom" Margin="0,2,0,0" Foreground="{DynamicResource TextFillColorSecondaryBrush}" />

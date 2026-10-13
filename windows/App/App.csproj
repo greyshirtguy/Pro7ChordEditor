@@ -21,6 +21,14 @@
     RuntimeIdentifier   Which kind of computer the .NET inside is for: Windows on an
                         Intel or AMD processor, 64-bit. (Windows on Arm runs that too.)
 
+  ITS ICON is ChordEditor.ico, beside this file: the maintainer's own picture, as it
+  was given (spec/10-platforms.md, "Where each follows its platform"). Named here as
+  the program's icon, it is what Windows shows for the file, in the taskbar, and at the
+  top left of each of the app's windows, which have the program's icon where they are
+  given none of their own. The settings' About section shows it too, from the same
+  file (AppViews.csproj). Nothing makes the icon from anything: a new one is a new
+  file.
+
   The file is large for what it does, most of it .NET. Making it smaller, and what
   Windows says of an .exe that nobody has signed, are milestone M10's.
 -->
@@ -37,6 +45,7 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <!-- What the app says of itself to Windows: how it is to be drawn on a fine screen. -->
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>ChordEditor.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\AppViews\AppViews.csproj" />

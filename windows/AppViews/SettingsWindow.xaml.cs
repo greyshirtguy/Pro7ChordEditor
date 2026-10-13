@@ -19,4 +19,7 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         Content = new SettingsView(model, copies);
     }
+
+    /// <summary>Shows one of the settings' sections, by its name: "About".</summary>
+    public void Show(string section) => ((SettingsView)Content).Show(section);
 }
