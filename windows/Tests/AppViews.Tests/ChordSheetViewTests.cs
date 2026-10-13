@@ -265,7 +265,7 @@ public class ChordSheetViewTests
         var (model, view, hand) = await Open(pc, "Amazing Grace");
         Assert.Equal(FirstSlide, InTheFile(0, "Amazing Grace", pc));
         Assert.False(model.CanUndo);
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Equal("7 slides, 40 chords.", model.Notice);
 
         // No click first: the pointer over a word, and a key.
         hand.PointAt("wretch");
@@ -836,14 +836,15 @@ public class ChordSheetViewTests
         Assert.Equal(
             "Nothing was put here: chords copied from a line of words go only onto a line of words, and chords with no words only onto a line with none.",
             model.Notice);
-        // What is said goes after a few seconds, and the line says what the keys do.
+        // What is said goes after a few seconds, and the line says how much there is
+        // of the song.
         model.SayingLasts = TimeSpan.FromMilliseconds(1);
         hand.PointAt("That saved");
         hand.Press(Key.C, ModifierKeys.Control);
         Assert.Equal("1 chord copied from the line" + CopiedSays, model.Notice);
         await model.WhatWasSaidIsGoneAsync();
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
-        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), quiet.Text);
+        Assert.Matches("^7 slides, [0-9]+ chords[.]$", model.Notice);
+        Assert.Equal(model.Notice, quiet.Text);
     });
 
     [Fact]
@@ -1068,7 +1069,7 @@ public class ChordSheetViewTests
         Assert.Equal(Visibility.Collapsed, ((FrameworkElement)pane.FindName("Editor")).Visibility);
         Assert.Equal("5:Em 13:C 25:D", hand.ChordsOf("wretch"));
         Assert.Same(hand.Sheet.Rows, hand.Grid.Rows);
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Matches("^7 slides, [0-9]+ chords[.]$", model.Notice);
 
         // Undone on the sheet, where undo is the song's: the text typed is taken back
         // too, and the text shows it when it is next looked at.
@@ -1556,7 +1557,7 @@ public class ChordSheetViewTests
         hand.PointAt("wretch");
         hand.Press(Key.D4);
         Assert.Equal("1:G 8:G7 18:C 28:G 47:C 59:D", InTheFile(0, "Amazing Grace", pc));
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Equal("7 slides, 41 chords.", model.Notice);
     });
 
     [Fact]
@@ -1604,9 +1605,12 @@ public class ChordSheetViewTests
         var canvas = hand.Canvas;
         var none = Pictures.Drawn(view, 1280, 900);
 
-        // The dots of the window that differ between two drawings, as the rectangle
-        // of the sheet they are all within.
-        Rect? Differ((int Width, int Height, int[] Dots) one, (int Width, int Height, int[] Dots) other)
+        // The dots of the sheet that differ between two drawings, as the rectangle of
+        // the sheet they are all within; but for those in a part that is meant to
+        // differ. (Of the sheet: the line of hints under it says another thing too,
+        // which SheetHintsTests holds.)
+        var scroll = Named<ScrollViewer>(view.SongPane.ChordSheet, "Scroll");
+        Rect? Differ((int Width, int Height, int[] Dots) one, (int Width, int Height, int[] Dots) other, Rect? but = null)
         {
             Rect? within = null;
             for (var dot = 0; dot < one.Dots.Length; dot++)
@@ -1616,24 +1620,43 @@ public class ChordSheetViewTests
                     continue;
                 }
                 var at = view.TranslatePoint(new Point((dot % one.Width) / (double)Pictures.Scale, (dot / one.Width) / (double)Pictures.Scale), canvas);
+                if (at.X < 0 || at.Y < 0 || at.X >= scroll.ViewportWidth || at.Y >= scroll.ViewportHeight || but?.Contains(at) == true)
+                {
+                    continue;
+                }
                 within = within is { } has ? Rect.Union(has, at) : new Rect(at, new Size(0, 0));
             }
             return within;
         }
 
+        // Where a row's words are drawn: the line the pointer is on has them in another
+        // colour (spec/03, rule 53f), so they are drawn again with the spot.
+        Rect WordsOf(int row)
+        {
+            var item = hand.Grid.Lines[row];
+            return new Rect(item.Left - 1.5, item.ChordTop + canvas.Metrics.BubbleHeight + canvas.Metrics.Tail - 1.5, item.Placed!.WordsWidth + 3, canvas.Metrics.WordHeight + 3);
+        }
+
         // Pointed at a word with no chord: a bubble in outline over the place, with a
-        // tail down through the words. Nothing else of the window is drawn otherwise.
+        // tail down through the words; and the words of that line in the highlighted
+        // line's colour. Nothing else of the sheet is drawn otherwise.
         var wretch = hand.PlaceOf("wretch");
         hand.PointAt(wretch);
         var spot = Pictures.Drawn(view, 1280, 900);
-        var changed = Differ(none, spot);
+        Assert.NotNull(Differ(none, spot));
+        var changed = Differ(none, spot, WordsOf(wretch.Row));
         Assert.NotNull(changed);
         var metrics = canvas.Metrics;
         var line = hand.Grid.Lines[wretch.Row];
         var x = hand.Grid.XOf(wretch);
         var allowed = new Rect(x - 1.5, line.ChordTop - 1.5, (26 * metrics.Scale) + 3, metrics.BubbleHeight + metrics.Tail + metrics.WordHeight + (3 * metrics.Scale) + 3);
         Assert.True(allowed.Contains(changed.Value), Said($"what changed is {changed.Value}, and the spot is within {allowed}"));
-        Assert.True(changed.Value.Width > 15 * metrics.Scale && changed.Value.Height > metrics.BubbleHeight + metrics.Tail, Said($"what changed is only {changed.Value}"));
+        Assert.True(changed.Value.Width > 15 * metrics.Scale && changed.Value.Height > metrics.BubbleHeight, Said($"what changed is only {changed.Value}"));
+        // And the words that changed are that line's, from its start to its end.
+        var words = Differ(none, spot, allowed);
+        Assert.NotNull(words);
+        Assert.True(WordsOf(wretch.Row).Contains(words.Value), Said($"what changed is {words.Value}, and the line's words are within {WordsOf(wretch.Row)}"));
+        Assert.True(words.Value.Width > line.Placed!.WordsWidth * 0.9);
         // It is the accent's orange.
         var orange = spot.Dots.Where((dot, n) => dot != none.Dots[n]).Count(dot => ((dot >> 16) & 0xFF) > 150 && ((dot >> 8) & 0xFF) is > 70 and < 150 && (dot & 0xFF) < 90);
         Assert.True(orange > 60, "only " + orange + " dots of the spot are orange");
@@ -1642,7 +1665,7 @@ public class ChordSheetViewTests
         var sweet = hand.PlaceOf("sweet");
         hand.PointAt(sweet, onItsChord: true);
         var lit = Pictures.Drawn(view, 1280, 900);
-        var bubble = Differ(none, lit);
+        var bubble = Differ(none, lit, WordsOf(sweet.Row));
         Assert.NotNull(bubble);
         var placed = hand.Grid.Lines[sweet.Row].Placed!;
         var which = hand.Sheet.Rows[sweet.Row].Chords.ToList().FindIndex(chord => chord.At == sweet.At);
@@ -1711,54 +1734,51 @@ public class ChordSheetViewTests
         Assert.True(brokenOnce, "left to itself the line was never broken inside the key's name: this test holds nothing");
     });
 
+    // The quiet line is one line, whatever it says and whichever editor is shown: so
+    // the sheet over it does not grow and shrink as things are said for a few seconds.
+    // (Until 2026-10-13 it said what the keys do while the sheet was shown, on up to
+    // four lines, and was kept that tall. That is said on the line of hints now.) What
+    // went wrong is the one thing said in full, on as many lines as it needs.
     [Fact]
-    public void TheQuietLineIsAsTallWhateverItSaysWhileTheSheetIsShown() => OnAMadeUpPC(async pc =>
+    public void TheQuietLineIsOneLineWhateverItSaysAndWhatIsTooLongForItIsCutShort() => OnAMadeUpPC(async pc =>
     {
         var (model, view, hand) = await Open(pc, "Amazing Grace");
         var quiet = Named<TextBlock>(view.SongPane, "Quiet");
         var foot = Named<FrameworkElement>(view.SongPane, "Foot");
-        // What the keys do is on two lines here, and is all there.
-        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), quiet.Text);
+        var line = Math.Ceiling(quiet.FontFamily.LineSpacing * quiet.FontSize);
+        Assert.Equal("7 slides, 40 chords.", quiet.Text);
+        Assert.Equal(TextWrapping.NoWrap, quiet.TextWrapping);
         var tall = foot.ActualHeight;
-        Assert.True(quiet.ActualHeight > 30, "the help is " + quiet.ActualHeight + " tall");
-        // Something short is said for a few seconds: the line is as tall as it was, so
-        // that the sheet over it does not grow and shrink.
+        Assert.InRange(quiet.ActualHeight, line - 1, line + 1);
+        // Something longer is said for a few seconds: the line is as tall as it was.
         hand.PointAt("Amazing");
         hand.Press(Key.C, ModifierKeys.Control);
         Pictures.LayOut(view, 1280, 800);
         Assert.StartsWith("4 chords copied", quiet.Text, StringComparison.Ordinal);
         Assert.Equal(tall, foot.ActualHeight, 0.5);
-        // Over the ChordPro text one line is all it ever needs.
+        // Over the ChordPro text it is as tall.
         model.Show(LibraryModel.Editor.ChordPro);
         Pictures.LayOut(view, 1280, 800);
-        Assert.True(foot.ActualHeight < tall - 10);
+        Assert.Equal(tall, foot.ActualHeight, 0.5);
         model.Show(LibraryModel.Editor.Sheet);
         Pictures.LayOut(view, 1280, 800);
         Assert.Equal(tall, foot.ActualHeight, 0.5);
-        // At the window's least it has four lines at the most, cut short with dots.
+        // At the window's least it is one line still, cut short with dots.
         Pictures.LayOut(view, 640, 480);
-        Assert.InRange(quiet.ActualHeight, 3 * 16.0, (4 * 17.0) + 1);
-        // On the sheet its words go on to the next line where one is not enough; over
-        // the text they are one line.
-        Assert.Equal(TextWrapping.Wrap, quiet.TextWrapping);
-        model.Show(LibraryModel.Editor.ChordPro);
-        Pictures.LayOut(view, 640, 480);
-        Assert.Equal(TextWrapping.NoWrap, quiet.TextWrapping);
-        Assert.True(quiet.ActualHeight < 2 * 17.0);
+        Assert.StartsWith("4 chords copied", quiet.Text, StringComparison.Ordinal);
+        Assert.InRange(quiet.ActualHeight, line - 1, line + 1);
+        Assert.Equal(TextTrimming.CharacterEllipsis, quiet.TextTrimming);
+        Assert.Equal(tall, foot.ActualHeight, 0.5);
 
-        // Where four lines are not enough it has four and no more: in a pane by itself,
-        // narrower than the window ever makes it, where what the keys do would run to a
-        // dozen.
-        // (Of a song newly opened, with nothing just said of it.)
-        var (another, _, _) = await Open(pc, "Plain Song");
-        var alone = new SongPane { DataContext = another };
-        Look.Wear(alone, dark: true);
-        Pictures.LayOut(alone, 330, 600);
-        var narrow = Named<TextBlock>(alone, "Quiet");
-        Assert.Equal(SongPane.WithKeysWhole(LibraryModel.SheetHelp), narrow.Text);
-        var line = Math.Ceiling(narrow.FontFamily.LineSpacing * narrow.FontSize);
-        Assert.InRange(narrow.ActualHeight, (3 * line) + 1, (4 * line) + 0.5);
-        Assert.Equal(TextTrimming.CharacterEllipsis, narrow.TextTrimming);
+        // What went wrong is said whole, on as many lines as it needs, and is not cut.
+        pc.ProPresenterIsRunning = true;
+        hand.PointAt("wretch");
+        hand.Press(Key.D4);
+        Pictures.LayOut(view, 640, 480);
+        Assert.NotNull(model.Refused);
+        Assert.Equal(TextWrapping.Wrap, quiet.TextWrapping);
+        Assert.Equal(TextTrimming.None, quiet.TextTrimming);
+        Assert.True(quiet.ActualHeight > line * 1.5, "what went wrong is " + quiet.ActualHeight + " tall");
     });
 
     // ---- Where the bubble may stand, and what else is the box's
@@ -1899,9 +1919,10 @@ public class ChordSheetViewTests
             return count;
         }
 
-        // The words are nearly white, and a chord's name the colour of sand.
+        // The words are nearly white, and a chord's name the sheet's orange (#ff8a1f
+        // as it comes, since 2026-10-14; until then the colour of sand).
         static bool Words(int red, int green, int blue) => red > 190 && green > 190 && blue > 190;
-        static bool Name(int red, int green, int blue) => red > 215 && green is > 170 and < 240 && blue is > 120 and < 200 && red - blue > 40;
+        static bool Name(int red, int green, int blue) => red > 215 && green is > 105 and < 170 && blue < 80;
 
         var lines = 0;
         for (var row = 0; row < sheet.Rows.Count; row++)

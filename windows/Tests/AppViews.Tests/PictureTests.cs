@@ -550,6 +550,91 @@ public class PictureTests
             return Task.CompletedTask;
         });
 
+    // ---- The line of hints, and the highlighted line (spec/03, rules 53a to 53h)
+    //
+    // (The pictures of the spot above have the line as it is on a word and on a chord,
+    // with that line's words in the highlighted line's colour.)
+
+    // With Ctrl held at a line: how its chords are copied and pasted, and that a paste
+    // there would replace. In a wide window the two sentences are side by side.
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheHintsWithCtrlHeldAtALine(bool dark) => DrawSheet(
+        "72 the hints with Ctrl held at a line, " + In(dark),
+        dark,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt("wretch");
+            hand.Canvas.KeysHeld(ctrl: true);
+            return Task.CompletedTask;
+        },
+        width: 1700,
+        height: 900);
+
+    // In a window of the usual size they do not fit side by side: one under the other,
+    // the line two lines tall. Here after a whole verse was copied.
+    [Fact]
+    public void TheHintsOnCopyingOneUnderTheOther() => DrawSheet(
+        "73 the hints on copying, one under the other",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt("Amazing");
+            hand.Press(Key.C, ModifierKeys.Control | ModifierKeys.Shift);
+            hand.PointAt("I once was lost");
+            hand.Canvas.KeysHeld(ctrl: true);
+            return Task.CompletedTask;
+        });
+
+    // Lit, as it is for a moment when what it says has just changed.
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void TheHintsLitWhenWhatTheySayHasJustChanged(bool dark) => DrawSheet(
+        "74 the hints lit, as when what they say has just changed, " + In(dark),
+        dark,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.PointAt(hand.PlaceOf("sweet"), onItsChord: true);
+            System.Windows.DependencyObject? up = hand.Canvas;
+            while (up is not null and not ChordSheetView)
+            {
+                up = System.Windows.Media.VisualTreeHelper.GetParent(up) ?? System.Windows.LogicalTreeHelper.GetParent(up);
+            }
+            ((ChordSheetView)up!).HintLine.ShowLit(1);
+            return Task.CompletedTask;
+        });
+
+    // While a chord is typed, with its name cleared: that Enter takes it off (rule 35a).
+    [Fact]
+    public void TheHintsWhileAChordsNameIsCleared() => DrawSheet(
+        "75 the hints while a chord" + (char)0x2019 + "s name is cleared",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.Click(hand.PlaceOf("sweet"), onItsChord: true);
+            hand.Press(Key.Back);
+            return Task.CompletedTask;
+        });
+
+    // A line of chords alone, highlighted: its rule in the colour, twice as thick.
+    [Fact]
+    public void ALineOfChordsAloneHighlighted() => DrawSheet(
+        "76 a line of chords alone, highlighted",
+        true,
+        "Chords With No Words",
+        (_, _, hand) =>
+        {
+            var alone = Enumerable.Range(0, hand.Sheet.Rows.Count).First(row => hand.Sheet.Usable(row) && hand.Sheet.Rows[row].Alone);
+            hand.PointAt(new Spot(alone, 0));
+            return Task.CompletedTask;
+        });
+
     // (spec/03, rule 46b: the lit bubble with the chord's name, where it would land.
     // What the system itself shows meanwhile, its pointer, no picture here can have.)
     [Fact]

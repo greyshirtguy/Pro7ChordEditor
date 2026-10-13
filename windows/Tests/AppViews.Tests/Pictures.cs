@@ -87,6 +87,12 @@ public static class Pictures
         // (Twice: a view may change how it is laid out on finding how big it is.)
         for (var pass = 0; pass < 2; pass++)
         {
+            // What is waiting to be laid out is laid out first, in the ordinary way,
+            // as a window does it before it draws. Without this, a part that wanted
+            // to be measured again could be reached first by the arranging below, be
+            // measured there quietly, and be drawn in the room it had before: FOUND
+            // on 2026-10-14, in a picture whose quiet line was cut off after "fr".
+            view.UpdateLayout();
             view.Measure(new Size(width, height));
             view.Arrange(new Rect(0, 0, width, height));
             view.UpdateLayout();

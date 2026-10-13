@@ -269,8 +269,10 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// What the quiet line says while the sheet is shown: what the keys do
-    /// (spec/10-platforms.md has the words, with Ctrl where the Mac has its own keys).
+    /// What a screen reader is told the keys do on the sheet, all of it in one sentence.
+    /// (Until 2026-10-13 the quiet line said this too while the sheet was shown. It now
+    /// says how much there is of the song, and what the keys do where the pointer is, is
+    /// said on a line of its own over it: SheetHints.cs.)
     /// </summary>
     public static string SheetHelp { get; } =
         "1 to 7: the key" + (char)0x2019 + "s chords  " + (char)0xB7 + "  A to G: type one, and a click on the next place keeps it  " + (char)0xB7 + "  "
@@ -329,6 +331,12 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     public string? SheetChordColour { get; private set; }
 
     public string? TextChordColour { get; private set; }
+
+    /// <summary>
+    /// The colour of the words of the highlighted line on the sheet, the same way
+    /// (spec/03, rule 53f; spec/06, rule 20a).
+    /// </summary>
+    public string? SheetLineColour { get; private set; }
 
     public bool ProPresenterIsRunning { get; private set; }
 
@@ -538,12 +546,14 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
                 {
                     return Said;
                 }
-                if (EditorShown == Editor.Sheet)
-                {
-                    return SheetHelp;
-                }
                 var slides = Shown.Slides == 1 ? "1 slide" : Number(Shown.Slides) + " slides";
                 var chords = Shown.Chords == 1 ? "1 chord" : Number(Shown.Chords) + " chords";
+                // (What the keys do on the sheet is said on a line of its own, over
+                // this one: `SheetHintsNow`.)
+                if (EditorShown == Editor.Sheet)
+                {
+                    return slides + ", " + chords + ".";
+                }
                 // (There is no Save button to look for, so it says there is no need of
                 // one; but only where something can be typed.)
                 return slides + ", " + chords + (CanType ? ". A change is saved a moment after it is typed." : ".");
@@ -578,6 +588,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         SheetZoom = NearestZoom(settings.SheetZoom ?? UsualSheetZoom);
         SheetChordColour = ColourAsKept(settings.SheetChordColour);
         TextChordColour = ColourAsKept(settings.TextChordColour);
+        SheetLineColour = ColourAsKept(settings.SheetLineColour);
         OffersToMoveBack = settings.OffersToMoveBack == true;
         keptMarks = appData.ReadMarks();
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -1032,6 +1043,18 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     public void SetTextChordColour(string? colour)
     {
         TextChordColour = ColourAsKept(colour);
+        if (started)
+        {
+            Remember();
+        }
+        Changed();
+    }
+
+    /// <summary>The same for the words of the highlighted line on the sheet.</summary>
+    public void SetSheetLineColour(string? colour)
+    {
+        SheetLineColour = ColourAsKept(colour);
+        SheetVersion++;
         if (started)
         {
             Remember();
@@ -1697,6 +1720,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         SheetZoom = SheetZoom == UsualSheetZoom ? null : SheetZoom,
         SheetChordColour = SheetChordColour,
         TextChordColour = TextChordColour,
+        SheetLineColour = SheetLineColour,
         OffersToMoveBack = OffersToMoveBack ? true : null,
     });
 }

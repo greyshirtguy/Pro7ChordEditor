@@ -91,6 +91,24 @@ public sealed class AppData(string folder)
         public string? TextChordColour { get; init; }
 
         /// <summary>
+        /// The colour of the words of the line the person is at on the sheet, the
+        /// highlighted line, the same way (spec/03, rule 53f; spec/06, rule 20a).
+        /// </summary>
+        public string? SheetLineColour { get; init; }
+
+        /// <summary>
+        /// How wide the two lists at the window's left are; nothing if the edge between
+        /// them and the song was never moved (spec/06, rule 6a).
+        /// </summary>
+        public double? ListsWidth { get; init; }
+
+        /// <summary>
+        /// Whether the guide has opened by itself, as it does once: at the first start
+        /// of the app on this PC (spec/13-guide.md, rule 2). Nothing if it never has.
+        /// </summary>
+        public bool? GuideShown { get; init; }
+
+        /// <summary>
         /// Whether a song whose chords look as if they were put on by hand in the first
         /// Windows editor is marked, and offered to have them moved (spec/08-repair.md,
         /// check 2). Nothing, which is no, unless it was switched on: that editor's
@@ -103,7 +121,8 @@ public sealed class AppData(string folder)
         public bool Equals(Settings? other) =>
             other is not null && ChosenFolders.SequenceEqual(other.ChosenFolders) && LastPlace == other.LastPlace
             && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom && SheetZoom == other.SheetZoom
-            && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour && OffersToMoveBack == other.OffersToMoveBack;
+            && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour && OffersToMoveBack == other.OffersToMoveBack
+            && SheetLineColour == other.SheetLineColour && ListsWidth == other.ListsWidth && GuideShown == other.GuideShown;
 
         public override int GetHashCode() => HashCode.Combine(ChosenFolders.Count, LastPlace, LastLibrary, ListsSplit);
     }

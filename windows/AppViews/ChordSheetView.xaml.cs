@@ -55,11 +55,18 @@ public partial class ChordSheetView : UserControl
             }
         };
         Strip.SizeChanged += (_, _) => LayOutTheStrip();
+        // The pointer over the key's chords: the line of hints says they can be dragged
+        // (spec/03, rule 53b).
+        ChordsSeen.MouseEnter += (_, _) => model?.PointerIsOverTheKeyChords(true);
+        ChordsSeen.MouseLeave += (_, _) => model?.PointerIsOverTheKeyChords(false);
         DataContextChanged += (_, _) => Follow(DataContext as LibraryModel);
     }
 
     /// <summary>The sheet itself: for the pane to give the keyboard to, and for a test to point at.</summary>
     internal ChordSheetCanvas Canvas => Sheet;
+
+    /// <summary>The line of hints under the sheet: for a test to read.</summary>
+    internal HintLine HintLine => Hints;
 
     /// <summary>The buttons of the key's chords, in order: for a test to click.</summary>
     internal IReadOnlyList<Button> ChordsOfTheKey => [.. Chords.Children.OfType<Button>()];
@@ -86,6 +93,7 @@ public partial class ChordSheetView : UserControl
         }
         model = now;
         Sheet.Asked = model is null ? ChordSheetCanvas.Asks.Nothing : ChordSheetCanvas.Asks.Of(model);
+        Hints.Model = model;
         if (model is not null)
         {
             model.PropertyChanged += TheModelChanged;
@@ -104,6 +112,7 @@ public partial class ChordSheetView : UserControl
         }
         var sheet = model.Sheet;
         Sheet.ChordColour = SheetLook.Written(model.SheetChordColour) ?? SheetLook.ChordName;
+        Sheet.LineColour = SheetLook.Written(model.SheetLineColour) ?? SheetLook.LineWords;
         Sheet.Show(sheet, model.SheetZoom);
         Smaller.IsEnabled = model.CanZoomSheetOut;
         Larger.IsEnabled = model.CanZoomSheetIn;

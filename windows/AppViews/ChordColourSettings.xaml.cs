@@ -1,7 +1,7 @@
-// The code beside ChordColourSettings.xaml, which says what the view is. Here: the two
-// colours the model has are shown in their wells and on their samples whenever the
-// model says it has changed, and a colour chosen, or the usual one asked for, is passed
-// on.
+// The code beside ChordColourSettings.xaml, which says what the view is. Here: the
+// three colours the model has are shown in their wells and on their samples whenever
+// the model says it has changed, and a colour chosen, or the usual one asked for, is
+// passed on.
 //
 // Nothing here is a rule. A colour is kept by the window's model as it is written,
 // "#rrggbb", and nothing is kept where the usual colour is (LibraryModel); the sheet and
@@ -52,13 +52,18 @@ public partial class ChordColourSettings : UserControl
 
     private void TheModelChanged(object? sender, PropertyChangedEventArgs e) => Show();
 
-    // Puts the two colours the model has into the wells and onto the samples.
+    // Puts the three colours the model has into the wells and onto the samples.
     private void Show()
     {
         var onTheSheet = Brush(SheetLook.Written(model.SheetChordColour) ?? SheetLook.ChordName);
         SheetColour.Background = onTheSheet;
         SheetSample.Foreground = onTheSheet;
         SheetUsual.IsEnabled = model.SheetChordColour is not null;
+
+        var ofTheLine = Brush(SheetLook.Written(model.SheetLineColour) ?? SheetLook.LineWords);
+        LineColour.Background = ofTheLine;
+        LineSample.Foreground = ofTheLine;
+        LineUsual.IsEnabled = model.SheetLineColour is not null;
 
         // The text's usual colour is the look's, and is asked of it by its name: so
         // that it is whatever the look has, in the light and in the dark.
@@ -101,7 +106,17 @@ public partial class ChordColourSettings : UserControl
         }
     }
 
+    private void ChooseTheLines(object sender, RoutedEventArgs e)
+    {
+        if (AskForAColour(SheetLook.Written(model.SheetLineColour) ?? SheetLook.LineWords) is { } chosen)
+        {
+            model.SetSheetLineColour(SheetLook.AsWritten(chosen));
+        }
+    }
+
     private void TheSheetsUsual(object sender, RoutedEventArgs e) => model.SetSheetChordColour(null);
+
+    private void TheLinesUsual(object sender, RoutedEventArgs e) => model.SetSheetLineColour(null);
 
     private void TheTextsUsual(object sender, RoutedEventArgs e) => model.SetTextChordColour(null);
 }

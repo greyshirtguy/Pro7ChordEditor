@@ -21,8 +21,20 @@ public static class SheetLook
     /// <summary>The orange of the spot, of what is picked, and of the header's switch (#ff8a1f).</summary>
     public static readonly Color Accent = Of(0xFF8A1F);
 
-    /// <summary>The colour of a chord's name in its bubble, unless another is chosen in the settings.</summary>
-    public static readonly Color ChordName = Of(0xFFD9A8);
+    /// <summary>
+    /// The colour of a chord's name in its bubble, unless another is chosen in the
+    /// settings: the sheet's orange (spec/06, rule 20a; the maintainer's, 2026-10-14,
+    /// "lets make the default chord color orange now". Until then it was Simple
+    /// Presenter's pale #ffd9a8, which Simple Presenter still has).
+    /// </summary>
+    public static readonly Color ChordName = Of(0xFF8A1F);
+
+    /// <summary>
+    /// The colour of the words of the highlighted line, the line the person is at,
+    /// unless another is chosen in the settings: the sheet's orange too (spec/03, rule
+    /// 53f).
+    /// </summary>
+    public static readonly Color LineWords = Of(0xFF8A1F);
 
     public static readonly Color Bubble = Of(0x34363C);
     public static readonly Color BubbleEdge = Of(0x5C5F66);

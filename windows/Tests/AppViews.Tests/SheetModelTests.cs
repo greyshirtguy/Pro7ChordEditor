@@ -149,10 +149,10 @@ public class SheetModelTests
         Assert.Equal(["Verse 1", "Chorus", "Outro"], sheet.Rows.Where(row => row.Kind == SheetRowKind.Group).Select(row => row.Name));
         Assert.Equal(7, sheet.Rows.Count(row => row.Kind == SheetRowKind.Line));
         Assert.Equal("G", sheet.Key);
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Matches("^[0-9]+ slides?, [0-9]+ chords?[.]$", model.Notice);
         // With no spot there is nothing to copy, and nothing is said.
         model.CopyChords(wholeGroup: false);
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Matches("^[0-9]+ slides?, [0-9]+ chords?[.]$", model.Notice);
         // Another song has another sheet; one that could not be read has none.
         model.Open(pc.Song("Amazing Grace"));
         Assert.NotSame(sheet, model.Sheet);
@@ -281,8 +281,8 @@ public class SheetModelTests
         var chords = settings.ChordColours;
         var orange = Color.FromRgb(0xFF, 0x95, 0x00);
 
-        // As the app comes: the sheet's #ffd9a8 and the text's orange, with nothing kept
-        // and nothing to put back.
+        // As the app comes: the sheet's orange (#ff8a1f, since 2026-10-14) and the
+        // text's, with nothing kept and nothing to put back.
         Assert.Null(model.SheetChordColour);
         Assert.Null(model.TextChordColour);
         Assert.Equal(SheetLook.ChordName, Of(Named<Border>(chords, "SheetColour").Background));
@@ -376,6 +376,89 @@ public class SheetModelTests
         // Nothing of any of this is the song's: its file is as it was.
         Assert.False(model.ChangedSinceOpened);
         Assert.Equal(0, Green(Pictures.Drawn(view, 1280, 800)));
+    });
+
+    // spec/06, rule 20a: "between those two, the colour of the highlighted line of the
+    // chord sheet ... chosen and put back the same way, and shown as two lines of
+    // words, the second in the colour. Under its name it says what it is".
+    [Fact]
+    public void TheColourOfTheHighlightedLineIsChosenInTheSettingsBetweenTheTwoAndRemembered() => OnAMadeUpPC(async pc =>
+    {
+        var model = pc.Model();
+        var view = new LibraryView(model);
+        await model.StartAsync();
+        model.ChooseLibrary(pc.Library("Songs"));
+        await model.MarksAreWorkedOutAsync();
+        model.Open(pc.Song("Amazing Grace"));
+        Look.Wear(view, dark: true);
+        Pictures.LayOut(view, 1280, 800);
+        var canvas = view.SongPane.ChordSheet.Canvas;
+        var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+        Look.Wear(settings, dark: true);
+        Pictures.LayOut(settings, 960, 700);
+        var chords = settings.ChordColours;
+
+        // As the app comes: the sheet's orange, with nothing kept and nothing to put back.
+        Assert.Null(model.SheetLineColour);
+        Assert.Equal("#ff8a1f", SheetLook.AsWritten(SheetLook.LineWords));
+        Assert.Equal(SheetLook.LineWords, Of(Named<Border>(chords, "LineColour").Background));
+        Assert.Equal(SheetLook.LineWords, Of(Named<TextBlock>(chords, "LineSample").Foreground));
+        Assert.False(Named<Button>(chords, "LineUsual").IsEnabled);
+        Assert.Equal(SheetLook.LineWords, canvas.LineColour);
+        // What it is, in the page's words with Windows' keys.
+        Assert.Equal(
+            "The line the pointer is on, on the chord sheet: where Ctrl+C copies from and Ctrl+V pastes to.",
+            Named<TextBlock>(chords, "LineSays").Text);
+        // It is between the sheet's chord colour and the text's.
+        double Top(string name) => Named<FrameworkElement>(chords, name).TranslatePoint(new Point(0, 0), chords).Y;
+        Assert.True(Top("SheetWell") < Top("LineWell") && Top("LineWell") < Top("TextWell"));
+
+        // The well asks for a colour, starting from the one it has.
+        Color? from = null;
+        Color? answer = null;
+        chords.AskForAColour = start =>
+        {
+            from = start;
+            return answer;
+        };
+        Click(Named<Button>(chords, "LineWell"));
+        Assert.Equal(SheetLook.LineWords, from);
+        Assert.Null(model.SheetLineColour);
+
+        // One chosen: it is kept as it is written, and is on the sample and on the
+        // sheet behind at once. The chords' colours are their own.
+        var green = Color.FromRgb(0x33, 0xCC, 0x66);
+        answer = green;
+        Click(Named<Button>(chords, "LineWell"));
+        Assert.Equal("#33cc66", model.SheetLineColour);
+        Assert.Equal("#33cc66", pc.AppData.ReadSettings().SheetLineColour);
+        Assert.Equal(green, Of(Named<Border>(chords, "LineColour").Background));
+        Assert.Equal(green, Of(Named<TextBlock>(chords, "LineSample").Foreground));
+        Assert.True(Named<Button>(chords, "LineUsual").IsEnabled);
+        Assert.Equal(green, canvas.LineColour);
+        Assert.Null(model.SheetChordColour);
+        Assert.Equal(SheetLook.ChordName, canvas.ChordColour);
+        Click(Named<Button>(chords, "LineWell"));
+        Assert.Equal(green, from);
+
+        // It is remembered from one start of the app to the next; one kept that is no
+        // colour is taken as none.
+        var again = pc.Model();
+        await again.StartAsync();
+        Assert.Equal("#33cc66", again.SheetLineColour);
+        pc.AppData.Keep(pc.AppData.ReadSettings() with { SheetLineColour = "green" });
+        var next = pc.Model();
+        await next.StartAsync();
+        Assert.Null(next.SheetLineColour);
+
+        // Usual Colour puts back the one it came with, and nothing is kept.
+        Click(Named<Button>(chords, "LineUsual"));
+        Assert.Null(model.SheetLineColour);
+        Assert.Null(pc.AppData.ReadSettings().SheetLineColour);
+        Assert.Equal(SheetLook.LineWords, canvas.LineColour);
+        Assert.False(Named<Button>(chords, "LineUsual").IsEnabled);
+        // Nothing of this is the song's: its file is as it was.
+        Assert.False(model.ChangedSinceOpened);
     });
 
     [Fact]

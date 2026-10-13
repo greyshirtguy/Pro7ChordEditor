@@ -43,6 +43,10 @@ public sealed class SheetMetrics : SheetSizes
     private double[]?[] edges = [];
     private Brush chordBrush = Frozen(SheetLook.ChordName);
 
+    // The one line that was last asked for in another colour than the words': the
+    // highlighted line, of which there is one at a time.
+    private (int Row, Brush Brush, TextLine Line)? inColour;
+
     /// <param name="scale">How many times its usual size everything is.</param>
     /// <param name="dotsToAUnit">How many of the screen's dots there are to one of WPF's units: 1 on a plain screen.</param>
     public SheetMetrics(double scale, double dotsToAUnit = 1)
@@ -73,16 +77,31 @@ public sealed class SheetMetrics : SheetSizes
         }
     }
 
+    /// <summary>How many times the lines have been thrown away to be laid out again: for a test to count.</summary>
+    internal int Held { get; private set; }
+
     /// <summary>
     /// The sheet's rows are these now: each line's words are laid out as one line of
     /// text when the row is first asked about.
+    ///
+    /// Told the rows it has already, it does nothing: a line's words are measured once
+    /// for a song, and not again each time its slides are put in rows for another width
+    /// (spec/06, rule 6e. Until 2026-10-14 every line was measured again at each step
+    /// of the window's edge being dragged, which is what was found slow on the Mac.)
     /// </summary>
     public void Hold(IReadOnlyList<SheetRow> rows)
     {
+        if (ReferenceEquals(rows, held))
+        {
+            return;
+        }
+        Held++;
         foreach (var line in lines)
         {
             line?.Dispose();
         }
+        inColour?.Line.Dispose();
+        inColour = null;
         lines = new TextLine?[rows.Count];
         edges = new double[]?[rows.Count];
         held = rows;
@@ -98,6 +117,27 @@ public sealed class SheetMetrics : SheetSizes
             return null;
         }
         return lines[row] ??= LineOf(held[row].Text, wordFace, SheetLook.WordSize * Scale, WordsBrush);
+    }
+
+    /// <summary>
+    /// A row's words as a line of text in another colour than the words' own: for the
+    /// highlighted line. The same words in the same font, so every letter is where it
+    /// is in the usual colour.
+    /// </summary>
+    public TextLine? LineIn(int row, Brush brush)
+    {
+        if (row < 0 || row >= held.Count || held[row].Kind != SheetRowKind.Line)
+        {
+            return null;
+        }
+        if (inColour is { } has && has.Row == row && ReferenceEquals(has.Brush, brush))
+        {
+            return has.Line;
+        }
+        inColour?.Line.Dispose();
+        var line = LineOf(held[row].Text, wordFace, SheetLook.WordSize * Scale, brush);
+        inColour = (row, brush, line);
+        return line;
     }
 
     public override double Advance(int row, int units)

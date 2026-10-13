@@ -12,9 +12,20 @@
 // in, and draws.
 //
 // It is drawn in two layers. Under: the slides, their words and their chords, which
-// change when the song does. Over: the ring round the slide that is picked, and the
-// spot, which follow the pointer. So the pointer moving draws only the little that
-// moves with it, and the spot keeps up with it.
+// change when the song does; each slide a drawing of its own. Over: the ring round the
+// slide that is picked, and the spot, which follow the pointer. So the pointer moving
+// draws only the little that moves with it, and the spot keeps up with it (spec/06,
+// rule 6e).
+//
+// THE HIGHLIGHTED LINE (spec/03, rule 53f): the line the person is at has its words in
+// a colour of its own, and a line of chords alone its rule, twice as thick. Which line
+// that is, is SheetHints' to say. It changes as the pointer goes from line to line, and
+// then the one or two slides it left and came to are drawn again, and no other.
+//
+// THE LINE OF HINTS under the sheet (HintLine.cs) says what the keys do where the spot
+// is. This element says what is going on in it (`Tell`): whether the person is at the
+// sheet (`attending`: the pointer is over a place of a line, or a key has just moved
+// the spot or acted on it), and whether Ctrl is held (`KeysHeld`).
 //
 // What Windows has its own way (spec/10-platforms.md): Ctrl where the Mac has Command;
 // Ctrl held as a chord is let go copies it; Delete or Backspace; Enter or F2 opens the
@@ -80,6 +91,20 @@ public sealed class ChordSheetCanvas : FrameworkElement
     private readonly DrawingVisual over = new();
     private Point entryAt;
 
+    // The slides as they are drawn, one drawing each, in the order of the grid's cells;
+    // and the row whose line they were last drawn with as the highlighted one.
+    private readonly List<DrawingVisual> drawnCells = [];
+    private int? highlightDrawn;
+    private Color lineColour = SheetLook.LineWords;
+    private Brush lineBrush = Frozen(SheetLook.LineWords);
+
+    // Whether the person is at the sheet just now (spec/03, rule 53c): the pointer is
+    // over a place of a line, or the keys have moved the spot or acted on it since the
+    // pointer last moved.
+    private bool attending;
+    private bool ctrlHeld;
+    private Window? watched;
+
     // The typing the bubble is open for: `ChordSheet.TypingsBegun` as it was.
     private int? typingShown;
 
@@ -133,6 +158,8 @@ public sealed class ChordSheetCanvas : FrameworkElement
         // else is dragged over the sheet is told it cannot be: `CarriedOver`.)
         AllowDrop = true;
         AutomationProperties.SetName(this, "The song's chord sheet");
+        Loaded += (_, _) => WatchTheKeysOf(Window.GetWindow(this));
+        Unloaded += (_, _) => WatchTheKeysOf(null);
 
         // Undo, Redo, Copy and Paste in the Edit menu reach whatever has the keyboard as
         // these commands, and the sheet answers them as it does their keys.
@@ -151,9 +178,21 @@ public sealed class ChordSheetCanvas : FrameworkElement
     {
         public static Asks Nothing { get; } = new(_ => { }, () => { }, () => { }, () => { }, () => false, () => false, _ => null);
 
+        /// <summary>
+        /// What is going on in the sheet, and what a paste there would do, for the line
+        /// of hints under it; and whether Ctrl is held down, which that line answers to.
+        /// </summary>
+        public Action<SheetHints.Situation, SheetHints.Paste> Situation { get; init; } = (_, _) => { };
+
+        public Action<bool> Held { get; init; } = _ => { };
+
         /// <summary>As the window wires them.</summary>
         public static Asks Of(LibraryModel model) =>
-            new(model.CopyChords, model.PasteChords, model.Undo, model.Redo, () => model.CanUndo, () => model.CanRedo, direction => model.ZoomSheet(direction));
+            new(model.CopyChords, model.PasteChords, model.Undo, model.Redo, () => model.CanUndo, () => model.CanRedo, direction => model.ZoomSheet(direction))
+            {
+                Situation = model.SheetIs,
+                Held = model.Holds,
+            };
     }
 
     public ChordSheet? Sheet { get; private set; }
@@ -195,6 +234,38 @@ public sealed class ChordSheetCanvas : FrameworkElement
             Draw();
         }
     }
+
+    /// <summary>
+    /// The colour of the words of the highlighted line: the usual one, the sheet's own
+    /// orange, or the one chosen in the settings (spec/06, rule 20a).
+    /// </summary>
+    public Color LineColour
+    {
+        get => lineColour;
+        set
+        {
+            if (value == lineColour)
+            {
+                return;
+            }
+            lineColour = value;
+            lineBrush = Frozen(value);
+            Draw();
+        }
+    }
+
+    /// <summary>Whether the person is at the sheet just now (spec/03, rule 53c).</summary>
+    internal bool Attending => attending;
+
+    /// <summary>
+    /// The highlighted line: the row whose words are drawn in a colour of their own,
+    /// being the line the person is at (SheetHints.Line has which that is, and why it is
+    /// shown).
+    /// </summary>
+    internal int? Highlighted => Sheet is { } sheet ? SheetHints.Line(sheet, attending) : null;
+
+    /// <summary>How many times a slide has been drawn: for a test to count.</summary>
+    internal int SlidesDrawn { get; private set; }
 
     protected override int VisualChildrenCount => 3;
 
@@ -273,6 +344,7 @@ public sealed class ChordSheetCanvas : FrameworkElement
             Grid = null;
             typingShown = null;
             pressed = null;
+            attending = false;
             Scroll?.ScrollToHome();
             Scroll?.ScrollToHorizontalOffset(0);
         }
@@ -297,6 +369,8 @@ public sealed class ChordSheetCanvas : FrameworkElement
             InvalidateMeasure();
             return;
         }
+        // (Each line's words are measured once for the rows there are, and not again
+        // each time the slides are put in rows for another width: Hold says how.)
         Metrics.Hold(sheet.Rows);
         Grid = SheetGrid.LayOut(sheet, Metrics, SeenWidth);
         InvalidateMeasure();
@@ -546,13 +620,84 @@ public sealed class ChordSheetCanvas : FrameworkElement
         {
             sheet.PointerOver(place.Row, place.At);
             Cursor = place.OnChord ? Cursors.Hand : Cursors.Arrow;
+            attending = true;
         }
         else
         {
             Cursor = Cursors.Arrow;
+            // (Over the bare sheet, between the slides, there is nothing to say of the
+            // spot: it is where it was left.)
+            attending = false;
         }
         DrawOver();
     }
+
+    /// <summary>The pointer has left the sheet: no line is the highlighted one now.</summary>
+    public void PointerLeft()
+    {
+        if (!attending)
+        {
+            return;
+        }
+        attending = false;
+        DrawOver();
+    }
+
+    /// <summary>
+    /// Ctrl went down or came up, anywhere in the window. It counts only while the
+    /// sheet has the keyboard, which is when Ctrl with a letter is the sheet's.
+    /// </summary>
+    public void KeysHeld(bool ctrl)
+    {
+        if (ctrl == ctrlHeld)
+        {
+            return;
+        }
+        ctrlHeld = ctrl;
+        Asked.Held(ctrl);
+    }
+
+    // The keys that are held are watched for the whole window while the sheet is in
+    // one, and not only while the sheet itself has the keyboard: the box a chord is
+    // typed in has it as often.
+    private void WatchTheKeysOf(Window? window)
+    {
+        if (ReferenceEquals(window, watched))
+        {
+            return;
+        }
+        if (watched is not null)
+        {
+            watched.PreviewKeyDown -= AKeyWentDownOrUp;
+            watched.PreviewKeyUp -= AKeyWentDownOrUp;
+            watched.Deactivated -= TheWindowWasLeft;
+        }
+        watched = window;
+        if (watched is not null)
+        {
+            watched.PreviewKeyDown += AKeyWentDownOrUp;
+            watched.PreviewKeyUp += AKeyWentDownOrUp;
+            watched.Deactivated += TheWindowWasLeft;
+        }
+        else
+        {
+            KeysHeld(false);
+        }
+    }
+
+    private void AKeyWentDownOrUp(object sender, KeyEventArgs e)
+    {
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (key is Key.LeftCtrl or Key.RightCtrl)
+        {
+            KeysHeld(CtrlIsHeldForTheSheet());
+        }
+    }
+
+    // (A key let go while another window had the keyboard was never told here.)
+    private void TheWindowWasLeft(object? sender, EventArgs e) => KeysHeld(false);
+
+    private bool CtrlIsHeldForTheSheet() => Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && IsKeyboardFocusWithin;
 
     /// <summary>The button is pressed.</summary>
     public void Pressed(Point point, bool shift)
@@ -669,10 +814,22 @@ public sealed class ChordSheetCanvas : FrameworkElement
     protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters) =>
         new PointHitTestResult(this, hitTestParameters.HitPoint);
 
+    protected override void OnMouseLeave(MouseEventArgs e)
+    {
+        base.OnMouseLeave(e);
+        // (While the button is down the sheet keeps the mouse, and a chord carried
+        // past its edge is carried still.)
+        if (pressed is null)
+        {
+            PointerLeft();
+        }
+    }
+
     protected override void OnMouseMove(MouseEventArgs e)
     {
         var point = e.GetPosition(this);
         var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+        KeysHeld(CtrlIsHeldForTheSheet());
         if (e.LeftButton == MouseButtonState.Pressed && pressed is not null)
         {
             Dragged(point, shift);
@@ -1030,6 +1187,12 @@ public sealed class ChordSheetCanvas : FrameworkElement
             default:
                 break;
         }
+        // (The keys that move the spot or act on it are the person at the sheet, as
+        // the pointer over a line is.)
+        if (key.Kind is not (SheetKeyKind.Zoom or SheetKeyKind.Undo or SheetKeyKind.Redo))
+        {
+            attending = true;
+        }
         Sync();
     }
 
@@ -1220,71 +1383,147 @@ public sealed class ChordSheetCanvas : FrameworkElement
     }
 
     // The slides: each a card in a frame of its group's colour, with its lines and
-    // their chords.
+    // their chords. Each is a drawing of its own, laid on the sheet's ground: so that
+    // when the highlighted line changes, the slide it left and the slide it came to
+    // are drawn again and no other.
     private void DrawUnder()
     {
-        using var context = under.RenderOpen();
-        context.DrawRectangle(GroundBrush, null, new Rect(0, 0, Math.Max(ActualWidth, Grid?.Content.Width ?? 0) + 4000, Math.Max(ActualHeight, Grid?.Content.Height ?? 0) + 4000));
+        using (var ground = under.RenderOpen())
+        {
+            ground.DrawRectangle(GroundBrush, null, new Rect(0, 0, Math.Max(ActualWidth, Grid?.Content.Width ?? 0) + 4000, Math.Max(ActualHeight, Grid?.Content.Height ?? 0) + 4000));
+        }
+        under.Children.Clear();
+        drawnCells.Clear();
+        highlightDrawn = Highlighted;
         if (Sheet is not { } sheet || Grid is not { } grid || grid.Lines.Count != sheet.Rows.Count)
         {
             return;
         }
-        var rows = sheet.Rows;
-        foreach (var cell in grid.Cells)
+        for (var n = 0; n < grid.Cells.Count; n++)
         {
-            // The frame is the colour of the slide's group; the card is laid on it, and
-            // under the card is its foot, with the slide's number and, on the first slide
-            // of each group, the group's name.
-            var colour = cell.Colour is { } own ? SheetLook.Of(own) : SheetLook.Group;
-            Rounded(context, cell.Frame, 4, Frozen(colour), null);
-            Rounded(context, cell.Card, 2, CardBrush, null);
-            var label = Metrics.Text(cell.Label, bold: false, SheetLook.LabelSize, SheetLook.IsLight(colour) ? Brushes.Black : Brushes.White);
-            var room = cell.Frame.Width - 16;
-            if (label.WidthIncludingTrailingWhitespace > room && room > 20)
-            {
-                label.MaxTextWidth = room;
-                label.MaxLineCount = 1;
-                label.Trimming = TextTrimming.CharacterEllipsis;
-            }
-            context.DrawText(label, new Point(cell.Frame.Left + 8, cell.Card.Bottom + ((SheetLook.Foot - label.Height) / 2)));
+            var drawing = new DrawingVisual();
+            drawnCells.Add(drawing);
+            under.Children.Add(drawing);
+            DrawCell(n, highlightDrawn);
+        }
+    }
 
-            for (var index = cell.FirstRow; index < cell.FirstRow + cell.Count; index++)
+    // The highlighted line is another than the slides were last drawn with: the slide
+    // it was on, and the slide it is on now, are drawn again.
+    private void DrawTheHighlight()
+    {
+        var now = Highlighted;
+        if (now == highlightDrawn)
+        {
+            return;
+        }
+        var was = highlightDrawn;
+        highlightDrawn = now;
+        if (Sheet is not { } sheet || Grid is not { } grid || grid.Lines.Count != sheet.Rows.Count || drawnCells.Count != grid.Cells.Count)
+        {
+            return;
+        }
+        var left = was is { } old && grid.IsLaid(old) ? grid.Lines[old].Cell : -1;
+        var come = now is { } lit && grid.IsLaid(lit) ? grid.Lines[lit].Cell : -1;
+        if (left >= 0)
+        {
+            DrawCell(left, now);
+        }
+        if (come >= 0 && come != left)
+        {
+            DrawCell(come, now);
+        }
+    }
+
+    // One slide, drawn into its own drawing.
+    private void DrawCell(int number, int? highlighted)
+    {
+        var sheet = Sheet!;
+        var grid = Grid!;
+        var rows = sheet.Rows;
+        var cell = grid.Cells[number];
+        SlidesDrawn++;
+        using var context = drawnCells[number].RenderOpen();
+        // The frame is the colour of the slide's group; the card is laid on it, and
+        // under the card is its foot, with the slide's number and, on the first slide
+        // of each group, the group's name.
+        var colour = cell.Colour is { } own ? SheetLook.Of(own) : SheetLook.Group;
+        Rounded(context, cell.Frame, 4, Frozen(colour), null);
+        Rounded(context, cell.Card, 2, CardBrush, null);
+        var label = Metrics.Text(cell.Label, bold: false, SheetLook.LabelSize, SheetLook.IsLight(colour) ? Brushes.Black : Brushes.White);
+        var room = cell.Frame.Width - 16;
+        if (label.WidthIncludingTrailingWhitespace > room && room > 20)
+        {
+            label.MaxTextWidth = room;
+            label.MaxLineCount = 1;
+            label.Trimming = TextTrimming.CharacterEllipsis;
+        }
+        context.DrawText(label, new Point(cell.Frame.Left + 8, cell.Card.Bottom + ((SheetLook.Foot - label.Height) / 2)));
+
+        for (var index = cell.FirstRow; index < cell.FirstRow + cell.Count; index++)
+        {
+            var row = rows[index];
+            var item = grid.Lines[index];
+            var wordsTop = item.ChordTop + Metrics.BubbleHeight + Metrics.Tail;
+            // The highlighted line, the one the person is at, has its words in a
+            // colour of its own (rule 53f).
+            var lit = index == highlighted;
+            if (row.Alone)
             {
-                var row = rows[index];
-                var item = grid.Lines[index];
-                var wordsTop = item.ChordTop + Metrics.BubbleHeight + Metrics.Tail;
-                if (row.Alone)
+                // A line of chords alone has nothing to read: a rule stands where its
+                // words would be. Highlighted, the rule takes the colour and is
+                // twice as thick.
+                context.DrawRectangle(
+                    lit ? lineBrush : RuleBrush,
+                    null,
+                    new Rect(item.Left, wordsTop + (Metrics.WordHeight / 2) - (lit ? 0.5 : 0), Math.Max(1, cell.Card.Right - Metrics.CardPad - item.Left), lit ? 2 : 1));
+            }
+            else
+            {
+                (lit ? Metrics.LineIn(index, lineBrush) : Metrics.Line(index))?.Draw(context, new Point(item.Left, wordsTop), System.Windows.Media.TextFormatting.InvertAxes.None);
+            }
+            // The chords, each a bubble with its tail on its character. The one that
+            // is being carried is left faint where it was.
+            for (var n = 0; n < row.Chords.Count && item.Placed is not null; n++)
+            {
+                var lifted = sheet.Dragged is { } carried && carried.From == new Spot(index, row.Chords[n].At);
+                if (lifted)
                 {
-                    // A line of chords alone has nothing to read: a rule stands where its
-                    // words would be.
-                    context.DrawRectangle(RuleBrush, null, new Rect(item.Left, wordsTop + (Metrics.WordHeight / 2), Math.Max(1, cell.Card.Right - Metrics.CardPad - item.Left), 1));
+                    context.PushOpacity(0.35);
                 }
-                else
+                ChordOf(context, index, n, lit: false, EdgeBrush);
+                if (lifted)
                 {
-                    Metrics.Line(index)?.Draw(context, new Point(item.Left, wordsTop), System.Windows.Media.TextFormatting.InvertAxes.None);
-                }
-                // The chords, each a bubble with its tail on its character. The one that
-                // is being carried is left faint where it was.
-                for (var n = 0; n < row.Chords.Count && item.Placed is not null; n++)
-                {
-                    var lifted = sheet.Dragged is { } carried && carried.From == new Spot(index, row.Chords[n].At);
-                    if (lifted)
-                    {
-                        context.PushOpacity(0.35);
-                    }
-                    ChordOf(context, index, n, lit: false, EdgeBrush);
-                    if (lifted)
-                    {
-                        context.Pop();
-                    }
+                    context.Pop();
                 }
             }
         }
     }
 
-    // What follows the pointer and the keys: the ring round the slide that is picked, and
-    // the spot.
+    // What follows the pointer and the keys: the highlighted line, the ring round the
+    // slide that is picked, and the spot. And whoever keeps the line of hints is told
+    // what is going on: this is drawn after everything that is done.
     private void DrawOver()
+    {
+        DrawTheHighlight();
+        DrawTheSpot();
+        Tell();
+    }
+
+    // Says what is going on to whoever keeps the line of hints. (There is one sheet to
+    // a model. Two would each say what is going on in itself, the pointer over one and
+    // not the other, and the model would be told one thing and the other for ever.)
+    private void Tell()
+    {
+        if (Sheet is not { } sheet)
+        {
+            Asked.Situation(SheetHints.Situation.Nothing, default);
+            return;
+        }
+        Asked.Situation(SheetHints.Of(sheet, attending), SheetHints.PasteIn(sheet));
+    }
+
+    private void DrawTheSpot()
     {
         using var context = over.RenderOpen();
         if (Sheet is not { } sheet || Grid is not { } grid || grid.Lines.Count != sheet.Rows.Count)

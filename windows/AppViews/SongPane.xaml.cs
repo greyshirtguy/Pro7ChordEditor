@@ -30,9 +30,6 @@ public partial class SongPane : UserControl
     /// <summary>How long the offer to undo a putting back stays.</summary>
     public static readonly TimeSpan TheOfferStays = TimeSpan.FromSeconds(8);
 
-    // How many lines of the quiet line what the keys do on the sheet may take.
-    private const int MostLinesOfHelp = 4;
-
     private readonly DispatcherTimer offer = new() { Interval = TheOfferStays };
     private LibraryModel? model;
     private LibraryModel.ShownSong? shownSong;
@@ -59,8 +56,6 @@ public partial class SongPane : UserControl
         Keys.SizeChanged += (_, _) => LayOutTheHeader();
         Earlier.SizeChanged += (_, _) => LayOutTheHeader();
         Editors.SizeChanged += (_, _) => LayOutTheHeader();
-        Foot.SizeChanged += (_, _) => KeepTheLineAsTallAsTheHelp();
-        Saving.SizeChanged += (_, _) => KeepTheLineAsTallAsTheHelp();
         // A click on the switch has shown the other editor: the keyboard goes to it, so
         // that what is typed next goes where the eye now is.
         Editors.Clicked += (_, _) => GiveTheEditorTheKeyboard();
@@ -135,9 +130,6 @@ public partial class SongPane : UserControl
 
     private static readonly string Joined = ((char)0x2060).ToString();
 
-    // How tall a line of the quiet line is.
-    private double LineOfTheQuietLine => Math.Ceiling(Quiet.FontFamily.LineSpacing * Quiet.FontSize);
-
     // Puts what the model has into the pane.
     private void Show()
     {
@@ -152,13 +144,26 @@ public partial class SongPane : UserControl
         var onTheSheet = read && model.EditorShown == LibraryModel.Editor.Sheet && model.Sheet is not null;
 
         // The quiet line. What went wrong is said in full, on as many lines as it
-        // needs, and stays until the next thing is done. What the keys do on the sheet
-        // is long, and has up to four lines. Anything else is one line.
+        // needs, and stays until the next thing is done. Anything else is one line.
+        // (Each is set only where it is another than it was: this is done at every
+        // change of anything, and a line of text told its own words again is measured
+        // again.)
         var wrong = model.Refused is not null;
-        Quiet.Text = WithKeysWhole(model.Notice);
-        Quiet.TextWrapping = wrong || onTheSheet ? TextWrapping.Wrap : TextWrapping.NoWrap;
-        Quiet.TextTrimming = wrong ? TextTrimming.None : TextTrimming.CharacterEllipsis;
-        Quiet.MaxHeight = wrong || !onTheSheet ? double.PositiveInfinity : MostLinesOfHelp * LineOfTheQuietLine;
+        var notice = WithKeysWhole(model.Notice);
+        if (!string.Equals(Quiet.Text, notice, StringComparison.Ordinal))
+        {
+            Quiet.Text = notice;
+        }
+        var wrapping = wrong ? TextWrapping.Wrap : TextWrapping.NoWrap;
+        if (Quiet.TextWrapping != wrapping)
+        {
+            Quiet.TextWrapping = wrapping;
+        }
+        var trimming = wrong ? TextTrimming.None : TextTrimming.CharacterEllipsis;
+        if (Quiet.TextTrimming != trimming)
+        {
+            Quiet.TextTrimming = trimming;
+        }
         Quiet.SetResourceReference(TextBlock.ForegroundProperty, wrong ? "TextFillColorPrimaryBrush" : "TextFillColorSecondaryBrush");
         Undo.Visibility = Seen(model.JustPutBack is not null && !wrong);
         OpenAgain.Visibility = Seen(model.OffersOpeningAgain);
@@ -192,7 +197,6 @@ public partial class SongPane : UserControl
         // The sheet follows the model by itself (ChordSheetView.xaml.cs): here it is
         // only shown, or put away.
         SheetView.Visibility = Seen(onTheSheet);
-        KeepTheLineAsTallAsTheHelp();
 
         // The text. It is put in place of what the box has only when the model says it
         // was made again from the song; what is typed is the box's own.
@@ -407,37 +411,6 @@ public partial class SongPane : UserControl
         Grid.SetColumnSpan(what, across);
         what.HorizontalAlignment = side;
         what.Margin = margin;
-    }
-
-    // While the sheet is shown, the quiet line is kept as tall as what the keys do
-    // needs at the width it has, whatever it says just then: so that the sheet does not
-    // grow and shrink by a line each time something is said for a few seconds.
-    private void KeepTheLineAsTallAsTheHelp()
-    {
-        var tall = 0.0;
-        if (SheetView.Visibility == Visibility.Visible && Foot.ActualWidth > 0)
-        {
-            var room = Foot.ActualWidth - Foot.Padding.Left - Foot.Padding.Right - Saving.ActualWidth;
-            if (room > 40)
-            {
-                var help = new FormattedText(
-                    WithKeysWhole(LibraryModel.SheetHelp),
-                    CultureInfo.CurrentUICulture,
-                    FlowDirection.LeftToRight,
-                    new Typeface(Quiet.FontFamily, Quiet.FontStyle, Quiet.FontWeight, Quiet.FontStretch),
-                    Quiet.FontSize,
-                    Brushes.Black,
-                    VisualTreeHelper.GetDpi(this).PixelsPerDip)
-                {
-                    MaxTextWidth = room,
-                };
-                tall = Math.Min(Math.Ceiling(help.Height), MostLinesOfHelp * LineOfTheQuietLine);
-            }
-        }
-        if (Quiet.MinHeight != tall)
-        {
-            Quiet.MinHeight = tall;
-        }
     }
 
     // How wide a line of words is when none of it is cut short.

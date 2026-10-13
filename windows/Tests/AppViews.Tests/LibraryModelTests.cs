@@ -107,10 +107,10 @@ public class LibraryModelTests
         Assert.Equal((4, 11), (shown.Slides, shown.Chords));
         Assert.Equal("{c: Verse 1}", shown.Lines[0].Text);
         Assert.Equal("[G] [D/F#] [Em]", shown.Lines[^1].Text);
-        // A song opens on the chord sheet, where the quiet line says what the keys do;
+        // A song opens on the chord sheet, where the quiet line says how much there is of it;
         // over the ChordPro text it says what is there to be seen.
         Assert.Equal(LibraryModel.Editor.Sheet, model.EditorShown);
-        Assert.Equal(LibraryModel.SheetHelp, model.Notice);
+        Assert.Matches("^[0-9]+ slides?, [0-9]+ chords?[.]$", model.Notice);
         model.Show(LibraryModel.Editor.ChordPro);
         Assert.Equal("4 slides, 11 chords. A change is saved a moment after it is typed.", model.Notice);
         Assert.Equal("", model.NoSongSentence);

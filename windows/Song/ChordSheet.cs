@@ -938,6 +938,45 @@ public sealed class ChordSheet
         return pasted;
     }
 
+    /// <summary>
+    /// Whether a paste at the spot would take chords off to put the copied ones on:
+    /// whether any line that what was copied would go onto has chords of its own ("The
+    /// line's own chords are replaced by these, all of them"). The lines are found as
+    /// <see cref="Paste"/> finds them, and one that would be passed over, being of the
+    /// other kind, loses nothing. Nothing is asked of the song. (For the line of
+    /// hints, which says so before the key is pressed: spec/03, rule 53g.)
+    /// </summary>
+    public bool PasteWouldReplace
+    {
+        get
+        {
+            if (Copied is not { } copied || !Usable(spot.Row))
+            {
+                return false;
+            }
+            var index = spot.Row;
+            foreach (var line in copied)
+            {
+                while (index < Rows.Count && !Usable(index))
+                {
+                    index++;
+                }
+                if (index >= Rows.Count)
+                {
+                    break;
+                }
+                var target = Rows[index];
+                var ofOneKind = line is CopiedAlone ? target.Alone : !target.Alone;
+                if (ofOneKind && target.Chords.Count > 0)
+                {
+                    return true;
+                }
+                index++;
+            }
+            return false;
+        }
+    }
+
     // ---- Typing a chord
 
     /// <summary>What the chord being typed might be going to be: the first fourteen.</summary>

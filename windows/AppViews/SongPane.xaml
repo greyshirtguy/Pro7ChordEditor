@@ -16,13 +16,18 @@
     offers     under the header, a row for each thing found in the song that wants
                mending (spec/08-repair.md): a sentence that says what, and at its right
                the button that puts it right. None for most songs;
-    the song   on the chord sheet, under the strip of its key's chords; or as ChordPro
+    the song   on the chord sheet, under the strip of its key's chords and over the
+               line of hints, which says what the keys do where the pointer is
+               (ChordSheetView.xaml has all three); or as ChordPro
                text, under a line of help (or, in a warmer colour, why this song can be
                read there and not changed) with the size of the text at its right: a
                small letter A and a large one; or the sentence that says why it could
                not be read; or, with no song open, a few quiet words where it would be;
-    a line     at the foot, that says what the keys do on the sheet, what is there to
-               be seen, or what went wrong. After a version has been put back it
+    a line     at the foot, the quiet line, that says how much there is of the song
+               ("7 slides, 40 chords."), for a few seconds what just happened, or what
+               went wrong. (Until 2026-10-13 it also said, while the sheet was shown,
+               what the keys do, all of it in one sentence of up to four lines.) After
+               a version has been put back it
                offers, for a few seconds, to undo that; and after a file was found
                changed by something else, to open the song again. At its right end:
                Revert, and where a Save button would be, the words that say why there

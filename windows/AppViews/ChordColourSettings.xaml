@@ -1,14 +1,20 @@
 <!--
-  Chords, in the app's settings: the colour of a chord's name on the chord sheet, and
-  the colour of a chord in the ChordPro text (spec/06-library.md, "Settings").
+  Chords, in the app's settings: the colour of a chord's name on the chord sheet, the
+  colour of the highlighted line of the sheet, and the colour of a chord in the
+  ChordPro text (spec/06-library.md, rule 20a).
 
   Each has a well that shows the colour and opens the system's colour picker when it is
   clicked; a button, "Usual Colour", that puts back the one the app comes with; and
-  beside them the chord as it will look: its name in a bubble over a word, as the sheet
-  draws one, and a line of ChordPro with its chords in their colour, bold.
+  beside them what it will look like: a chord's name in a bubble over a word, as the
+  sheet draws one; two lines of words, the second in the highlighted line's colour;
+  and a line of ChordPro with its chords in their colour, bold.
 
-  The sheet's sample is on the sheet's own dark card, whatever the system's look is,
-  since the sheet is. The text's is on the window's ground, which is the look's.
+  The highlighted line is the line the pointer is on, on the chord sheet
+  (spec/03-chord-sheet.md, rule 53f). Under its name it says what it is, in the page's
+  words, with Windows' keys.
+
+  The sheet's two samples are on the sheet's own dark card, whatever the system's look
+  is, since the sheet is. The text's is on the window's ground, which is the look's.
 
   Nothing here touches a song. A colour is only how this app draws a chord: it is kept
   with the app's own settings, and nothing in a song's file says one.
@@ -27,7 +33,7 @@
              UseLayoutRounding="True">
   <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
     <TextBlock Text="Chords" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
-    <TextBlock Text="The colour chords are drawn in, in each of the two editors."
+    <TextBlock Text="The colour chords are drawn in, in each of the two editors, and the colour of the line the pointer is on."
                TextWrapping="Wrap"
                Margin="0,4,0,18"
                Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -62,6 +68,45 @@
             <TextBlock x:Name="SheetSample" Text="Em7" FontSize="13" FontWeight="Bold" />
           </Border>
           <TextBlock Text="Amazing grace" FontSize="17" Foreground="#E6E6E6" Margin="0,3,0,0" />
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <Border Height="1" Margin="0,18,0,18" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Text="The highlighted line" FontWeight="SemiBold" />
+        <TextBlock x:Name="LineSays"
+                   Text="The line the pointer is on, on the chord sheet: where Ctrl+C copies from and Ctrl+V pastes to."
+                   TextWrapping="Wrap"
+                   Margin="0,4,0,0"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <Button x:Name="LineWell"
+                  Padding="4"
+                  Click="ChooseTheLines"
+                  ToolTip="Choose the colour of the highlighted line on the chord sheet."
+                  AutomationProperties.Name="The colour of the highlighted line on the chord sheet">
+            <Border x:Name="LineColour" Width="40" Height="20" CornerRadius="3" BorderThickness="1" BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}" />
+          </Button>
+          <Button x:Name="LineUsual"
+                  Content="Usual Colour"
+                  Margin="10,0,0,0"
+                  Click="TheLinesUsual"
+                  ToolTip="Put this colour back to the one the app comes with."
+                  ToolTipService.ShowOnDisabled="True" />
+        </StackPanel>
+      </StackPanel>
+      <!-- Two lines as the sheet draws them, the second the highlighted one. -->
+      <Border Grid.Column="1" Width="190" Background="#222428" CornerRadius="4" Padding="10" Margin="12,0,0,0" VerticalAlignment="Center">
+        <StackPanel HorizontalAlignment="Left">
+          <TextBlock Text="Amazing grace" FontSize="17" Foreground="#E6E6E6" />
+          <TextBlock x:Name="LineSample" Text="How sweet the sound" FontSize="17" Margin="0,3,0,0" />
         </StackPanel>
       </Border>
     </Grid>

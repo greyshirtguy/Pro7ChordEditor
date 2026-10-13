@@ -1034,6 +1034,89 @@ public class ChordSheetTests
         Assert.All(asked.Asked.Skip(1), one => Assert.EndsWith("joined true", one, StringComparison.Ordinal));
     }
 
+    // Whether a paste would take chords off: only where a line that what was copied
+    // would go onto has chords of its own; a line that would be passed over loses
+    // nothing; and nothing is asked of the song to find out (spec/03, rule 53g). MINE,
+    // NOT A VECTOR: the Mac's `whetherAPasteWouldReplace`, case for case.
+    [Fact]
+    public void WhetherAPasteWouldTakeChordsOffTheLinesItWouldGoOnto()
+    {
+        var song = new StandInSong(
+            [
+                Box(0, "A", "Holy holy holy", [new Chord(0, "D")], "Verse 1", startsItsGroup: true),
+                Box(1, "B", "Lord God Almighty", [new Chord(5, "A")], "Verse 1"),
+                Box(2, "C", "Early in the morning", null, "Verse 2", startsItsGroup: true),
+                Box(3, "D", "Our song shall rise", [new Chord(4, "G")], "Verse 2"),
+                Box(4, "E", Chords.Placeholders(2), [new Chord(0, "D"), new Chord(2, "G")], "Ending", startsItsGroup: true),
+                Box(5, "F", Chords.Placeholders(1), null, "Ending"),
+            ],
+            "D");
+        var sheet = new ChordSheet(song);
+        // (The rows: 0 the first verse's name, 1 and 2 its lines; 3, and 4 and 5; 6,
+        // and 7 and 8, which are lines of chords alone, the second with none on it.)
+        SheetRowKind[] kinds = [SheetRowKind.Group, SheetRowKind.Line, SheetRowKind.Line, SheetRowKind.Group, SheetRowKind.Line, SheetRowKind.Line, SheetRowKind.Group, SheetRowKind.Line, SheetRowKind.Line];
+        Assert.Equal(kinds, sheet.Rows.Select(row => row.Kind));
+        bool Would(int row)
+        {
+            sheet.SetSpot(row, 0);
+            return sheet.PasteWouldReplace;
+        }
+
+        // Nothing copied yet: nothing would be put on, and so nothing taken off.
+        Assert.False(Would(1));
+        Assert.False(Would(4));
+
+        // One line of words copied: onto a line that has chords, yes; onto one that
+        // has none, no; onto a line of chords alone it is passed over, and that line
+        // keeps its chords.
+        sheet.SetSpot(1, 0);
+        sheet.Copy(whole: false);
+        Assert.True(Would(1));
+        Assert.True(Would(2));
+        Assert.True(Would(5));
+        Assert.False(Would(4));
+        Assert.False(Would(7));
+        Assert.False(Would(8));
+
+        // A whole verse of two lines: it goes onto the spot's line and the next, so it
+        // is yes from a line that has none if the line after it has.
+        sheet.SetSpot(1, 0);
+        sheet.Copy(whole: true);
+        Assert.Equal(2, sheet.Copied?.Count);
+        Assert.True(Would(4));
+        // From the song's last line of words, its second line would go to a line of
+        // chords alone and be passed over: only the first counts.
+        Assert.True(Would(5));
+        // From the last line of all there is one line to go onto, and it is of the
+        // other kind.
+        Assert.False(Would(8));
+
+        // A line of chords alone copied: onto one that has chords, yes; onto the one
+        // that has none, no; and a line of words keeps its own.
+        sheet.SetSpot(7, 0);
+        sheet.Copy(whole: false);
+        Assert.True(Would(7));
+        Assert.False(Would(8));
+        Assert.False(Would(1));
+        Assert.False(Would(5));
+
+        // No spot: no. (The spot cannot be set on a group's name; a sheet with none
+        // has it on no row.)
+        var bare = new ChordSheet(new StandInSong([Box(0, "A", "", null, "Verse 1", startsItsGroup: true)], "D"));
+        Assert.False(bare.PasteWouldReplace);
+        // And the song was asked nothing by any of it.
+        Assert.Empty(song.Asked);
+
+        // What it says is what a paste then does: every line it changes that had
+        // chords, it took them off.
+        sheet.SetSpot(1, 0);
+        sheet.Copy(whole: false);
+        sheet.SetSpot(5, 0);
+        Assert.True(sheet.PasteWouldReplace);
+        Assert.Equal(new ChordSheet.Pasted(Lines: 1, Chords: 1), sheet.Paste());
+        Assert.Equal([new Chord(0, "D")], sheet.Rows[5].Chords);
+    }
+
     // What the song refuses is said, changes nothing, and is not counted as done.
     [Fact]
     public void WhatTheSongRefusesIsSaidChangesNothingAndIsNotCountedAsDone()

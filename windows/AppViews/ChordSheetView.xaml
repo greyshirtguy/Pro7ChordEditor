@@ -10,7 +10,11 @@
                 narrow for the chords and what is said of a song with no key, that is
                 left out; and where it is too narrow for the chords, they scroll
                 sideways (the wheel does it);
-    the sheet   every slide of the song, drawn.
+    the sheet   every slide of the song, drawn;
+    the hints   under the sheet, one line that says what the keys and the mouse do just
+                now, where the spot is (HintLine.cs; spec/03, "The line of hints"). It
+                is blue, light or dark as the system is, and is the one thing here that
+                is not the sheet's own dark.
 
   It is dark whatever the system is, as the sheet is on both platforms
   (spec/10-platforms.md): so the colours here are the sheet's own (SheetLook.cs), the
@@ -124,6 +128,7 @@
         </ScrollViewer>
       </DockPanel>
     </Border>
+    <views:HintLine x:Name="Hints" DockPanel.Dock="Bottom" />
     <ScrollViewer x:Name="Scroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Visible"
