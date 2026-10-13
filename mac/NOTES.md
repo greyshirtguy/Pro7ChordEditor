@@ -757,6 +757,16 @@ And the same day, on how someone new is to find out what the sheet can do:
     for two of the four. `ChordSheetTests`, "What a paste keeps", has the
     example. **Nothing was changed**: it is a rule the vectors hold, made from
     Simple Presenter, so a change is that app's first and then both of these.
+89. **The README has a screenshot of the Mac app**, after its first sentence, with
+    room beside it for Windows' (the maintainer's, 2026-10-14: "two side by side app
+    screenshots"). The picture is the maintainer's own, of 1.0.3 with a song of
+    theirs open, in the repository as it was given (`pictures/screenshot-mac.png`).
+    Its words are a hymn's long out of copyright; beside them it shows the names of
+    three other songs of that library, which was said to the maintainer. The
+    Windows one is that session's to add: the line for it is in the README, in a
+    comment, to be taken out of it. **The picture is of 1.0.3, and what the page
+    offers to download is 1.0.0**, which has not the blue line of hints nor the
+    orange chords: said to the maintainer too.
 
 ## How it is laid out, and why
 
