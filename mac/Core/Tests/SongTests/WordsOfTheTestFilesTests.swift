@@ -28,9 +28,8 @@ struct WordsOfTheTestFilesTests {
         let textBoxes: [TextBox]
     }
 
-    /// (And the one that was made in the shapes real songs have, which is not among
-    /// the files Simple Presenter was asked to read: TestData says why.)
-    static let paths = ((try? TestData.presentationPaths()) ?? []) + ["shaped-as-real-ones/Chords With No Words.pro"]
+    /// (The one that was made in the shapes real songs have among them.)
+    static let paths = (try? TestData.everyPresentationPath()) ?? []
 
     /// Words, unit by unit, as text that sorts and compares: each unit as its number.
     private func spell(_ units: [UInt16]) -> String {

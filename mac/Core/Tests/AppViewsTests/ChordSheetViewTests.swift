@@ -13,6 +13,7 @@ import ChordRules
 import CoreText
 import Song
 import Testing
+import TestData
 
 @MainActor
 @Suite("The chord sheet in the window")
@@ -872,6 +873,38 @@ struct ChordSheetViewTests {
         #expect(LibraryModel.said(of: .init(passedOver: 1)) == "Nothing was put here: \(other).")
         #expect(LibraryModel.said(of: .init(lines: 1, chords: 2, passedOver: 1)) == "2 chords put on the line. 1 line was passed over: \(other).")
         #expect(LibraryModel.said(of: .init()) == nil)
+
+        // And the vectors' own: of each paste testdata/vectors/sheet-model.json has,
+        // what Simple Presenter says of what it did. (That the sheet here DOES the same
+        // is held where the sheet is, in ChordSheetTests.)
+        struct Vectors: Decodable {
+            struct Case: Decodable {
+                struct Pasted: Decodable {
+                    struct Did: Decodable {
+                        let lines: Int
+                        let chords: Int
+                        let leftOut: Int
+                        let passedOver: Int
+                        let refused: Int
+                    }
+                    let did: Did
+                    let said: [String]
+                }
+                let title: String
+                let pasted: Pasted
+            }
+            let copyPaste: [Case]
+        }
+        let vectors = try JSONDecoder().decode(Vectors.self, from: TestData.vector("sheet-model.json"))
+        #expect(vectors.copyPaste.count >= 14)
+        for expected in vectors.copyPaste {
+            let did = expected.pasted.did
+            // (Of a paste the song refused a line of, nothing more is said than the
+            // song's own refusal, there as here. No case has one.)
+            let said = did.refused > 0 ? nil
+                : LibraryModel.said(of: .init(lines: did.lines, chords: did.chords, leftOut: did.leftOut, passedOver: did.passedOver, refused: did.refused))
+            #expect([said].compactMap { $0 } == expected.pasted.said, "\(expected.title)")
+        }
 
         // On a blank slide, where a line of words' chords cannot go: said, and nothing
         // changed.

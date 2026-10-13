@@ -45,9 +45,12 @@ struct ReadingASongTests {
         return "slide \(slide) | group \(group) | starts \(starts) | \(element) | \(blank ? "blank" : "words") | \(units) | \(named)"
     }
 
-    @Test("It says what all eleven test files read as")
-    func theFileIsWhole() {
-        #expect(Self.fileNames.count == 11)
+    /// (Eleven until 2026-10-12, when Simple Presenter read Chords With No Words too.)
+    @Test("It says what all twelve test files read as, and there is no test file it does not say it of")
+    func theFileIsWhole() throws {
+        #expect(Self.fileNames.count == 12)
+        let there = try TestData.everyPresentationPath().compactMap { $0.split(separator: "/").last.map(String.init) }
+        #expect(Self.fileNames.sorted() == there.sorted())
     }
 
     @Test("Each test file reads as Simple Presenter reads it", arguments: fileNames)
@@ -74,7 +77,7 @@ struct ReadingASongTests {
     }
 
     @Test("Read and written with nothing changed, each file is the same file, byte for byte",
-          arguments: (try? TestData.presentationPaths()) ?? [])
+          arguments: (try? TestData.everyPresentationPath()) ?? [])
     func unchangedIsTheSameBytes(path: String) throws {
         let original = try TestData.file(path)
         let written: Data = try RVData_Presentation(serializedBytes: original).serializedData()

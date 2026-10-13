@@ -209,9 +209,13 @@ struct ChordSheetTests {
             #expect([said].compactMap { $0 } == expected.said, "\(expected.title)")
             sheet.setSpot(expected.pasteAt.row, expected.pasteAt.at)
             song.asked = []
-            sheet.paste()
+            let pasted = sheet.paste()
             #expect(song.asked == expected.asked.map(\.spelt), "\(expected.title)")
             #expect(song.after == expected.songAfter.map(\.spelt), "\(expected.title)")
+            // What the paste answers with: how many lines and chords, how many left
+            // out, passed over, refused. (What is said of it is the window's model's
+            // to say, and is held to these same cases there: ChordSheetViewTests.)
+            #expect(pasted == expected.pasted.did.pasted, "\(expected.title)")
         }
     }
 

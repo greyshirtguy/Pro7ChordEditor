@@ -43,18 +43,23 @@ public enum TestData {
         try Data(contentsOf: root.appendingPathComponent("songs").appendingPathComponent(name))
     }
 
-    /// The folders of `testdata/files` that hold presentations: those that Simple
-    /// Presenter was asked to read, so that reading one can be held to what it read
-    /// (`expected/as-read-by-simple-presenter.json`).
+    /// The folders of `testdata/files` whose presentations the tests make their
+    /// libraries of: eleven files, which many a test counts on being eleven.
     ///
     /// `shaped-as-real-ones` is not among them. Its one song was made afterwards, for
-    /// chords with no words, by a tool that runs anywhere, and Simple Presenter runs
-    /// only on the machine it is built on. The tests of chords with no words name it.
+    /// chords with no words, and the tests of that name it and bring it in themselves.
+    /// (It was kept out at first because Simple Presenter had not read it. It has
+    /// since 2026-10-12, and `everyPresentationPath` has it for whatever is held to
+    /// what Simple Presenter read.)
     public static let presentationFolders = ["made-by-simple-presenter", "as-the-old-windows-app-left-them", "made-by-propresenter"]
 
-    /// Every presentation of `testdata/files`, as "folder/Name.pro", in order.
-    public static func presentationPaths() throws -> [String] {
-        try presentationFolders.flatMap { folder in
+    /// The folder of the one song made in the shapes real songs have.
+    public static let shapedFolder = "shaped-as-real-ones"
+
+    /// The presentations of those folders of `testdata/files`, as "folder/Name.pro",
+    /// in order.
+    private static func presentations(in folders: [String]) throws -> [String] {
+        try folders.flatMap { folder in
             try FileManager.default.contentsOfDirectory(atPath: root.appendingPathComponent("files").appendingPathComponent(folder).path)
                 .filter { $0.hasSuffix(".pro") }
                 .sorted()
@@ -62,10 +67,23 @@ public enum TestData {
         }
     }
 
+    /// The presentations the tests make their libraries of, as "folder/Name.pro", in
+    /// order: those of `presentationFolders`.
+    public static func presentationPaths() throws -> [String] {
+        try presentations(in: presentationFolders)
+    }
+
+    /// Every presentation of `testdata/files`: those, and after them the one that was
+    /// made in the shapes real songs have. All of them are in
+    /// `expected/as-read-by-simple-presenter.json`.
+    public static func everyPresentationPath() throws -> [String] {
+        try presentations(in: presentationFolders + [shapedFolder])
+    }
+
     /// Where a presentation of `testdata/files` is, by its name alone: "Plain Song.pro"
     /// as "made-by-simple-presenter/Plain Song.pro". Nothing if there is none.
     public static func presentationPath(named name: String) throws -> String? {
-        try presentationPaths().first { $0.split(separator: "/").last.map(String.init) == name }
+        try everyPresentationPath().first { $0.split(separator: "/").last.map(String.init) == name }
     }
 
     /// A file of `testdata/files`, by its path from there: "expected/Amazing Grace.json".

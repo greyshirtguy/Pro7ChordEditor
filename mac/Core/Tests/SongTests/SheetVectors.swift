@@ -250,6 +250,24 @@ struct SheetVectors: Decodable {
             let lines: [Line]
         }
 
+        /// What the paste answered with, and what is said of that (spec/03, rule 52a).
+        struct Pasted: Decodable {
+            struct Did: Decodable {
+                let lines: Int
+                let chords: Int
+                let leftOut: Int
+                let passedOver: Int
+                let refused: Int
+
+                var pasted: ChordSheet.Pasted {
+                    ChordSheet.Pasted(lines: lines, chords: chords, leftOut: leftOut, passedOver: passedOver, refused: refused)
+                }
+            }
+
+            let did: Did
+            let said: [String]
+        }
+
         let song: String
         let title: String
         let copyAt: ASpot
@@ -259,6 +277,7 @@ struct SheetVectors: Decodable {
         let pasteAt: ASpot
         let asked: [Asked]
         let songAfter: [After]
+        let pasted: Pasted
     }
 
     let songs: [String: ASong]
