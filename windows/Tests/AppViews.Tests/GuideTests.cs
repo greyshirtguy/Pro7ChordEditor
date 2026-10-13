@@ -563,5 +563,9 @@ public class GuideTests
         // Never off the top or the bottom of the screen.
         Assert.Equal(1040 - 820, GuideWindow.PlaceBeside(new Rect(0, 600, 800, 400), new Rect(0, 0, 1920, 1040), size).Y);
         Assert.Equal(0, GuideWindow.PlaceBeside(new Rect(0, -200, 800, 400), new Rect(0, 0, 1920, 1040), size).Y);
+        // Nor off its sides, wherever the main window says it is: one put away in the
+        // taskbar says it is far off to the left.
+        Assert.Equal(new Point(0, 0), GuideWindow.PlaceBeside(new Rect(-32000, -32000, 160, 28), new Rect(0, 0, 1920, 1040), size));
+        Assert.Equal(1920 - 780, GuideWindow.PlaceBeside(new Rect(5000, 100, 1300, 800), new Rect(0, 0, 1920, 1040), size).X);
     }
 }

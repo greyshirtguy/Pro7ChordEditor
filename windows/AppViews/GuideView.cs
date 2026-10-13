@@ -426,7 +426,9 @@ public sealed class GuideWindow : Window
 
     /// <summary>
     /// Where the window opens: in front of the main window and to one side of it where
-    /// the screen has room; over its right-hand part where it has none.
+    /// the screen has room; over its right-hand part where it has none. And never off
+    /// the screen, wherever the main window is said to be (one that is put away in the
+    /// taskbar says it is far off to the left).
     /// </summary>
     /// <param name="main">Where the main window is.</param>
     /// <param name="screen">The part of the screen that windows have.</param>
@@ -447,6 +449,7 @@ public sealed class GuideWindow : Window
         {
             left = Math.Max(screen.Left, screen.Right - size.Width - apart);
         }
+        left = Math.Min(Math.Max(left, screen.Left), Math.Max(screen.Left, screen.Right - size.Width));
         var top = Math.Min(Math.Max(screen.Top, main.Top + 30), Math.Max(screen.Top, screen.Bottom - size.Height));
         return new Point(left, top);
     }

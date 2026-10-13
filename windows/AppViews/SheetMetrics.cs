@@ -15,6 +15,14 @@
 // one that is believed starts. (SEEN on the Mac, of a zero-width space that ends a
 // line, which real songs have. Not seen here; kept, since nothing is lost by it.)
 //
+// A LINE IS LAID OUT ONCE FOR ITS WORDS, and kept by what it says for as long as the
+// song has a line that says it (spec/06, rule 6e). The sheet's rows are made again at
+// every change to the song, a chord put on among them; the words of its lines are the
+// same before and after, the words not being this app's to change, and are not laid
+// out again. (MEASURED, 2026-10-14, on a song of 56 slides: with every line laid out
+// again, and drawn afresh, a chord put on took a tenth of a second, two thirds of it
+// that. windows/NOTES.md, "What the window costs".)
+//
 // The Mac's is `SheetMetrics`, in ChordSheetView.swift, which asks Core Text.
 
 using System.Globalization;
@@ -41,6 +49,10 @@ public sealed class SheetMetrics : SheetSizes
     private readonly Dictionary<string, double> labels = new(StringComparer.Ordinal);
     private TextLine?[] lines = [];
     private double[]?[] edges = [];
+
+    // Each line of words as it was laid out, and where its units start, by what the
+    // line says.
+    private readonly Dictionary<string, (TextLine Line, double[]? Edges)> laidOut = new(StringComparer.Ordinal);
     private Brush chordBrush = Frozen(SheetLook.ChordName);
 
     // The one line that was last asked for in another colour than the words': the
@@ -96,9 +108,20 @@ public sealed class SheetMetrics : SheetSizes
             return;
         }
         Held++;
-        foreach (var line in lines)
+        // (What a line of the rows that were says is kept if a line of these says it
+        // too, and let go otherwise.)
+        var said = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var row in rows)
         {
-            line?.Dispose();
+            if (row.Kind == SheetRowKind.Line)
+            {
+                said.Add(row.Text);
+            }
+        }
+        foreach (var gone in laidOut.Keys.Where(text => !said.Contains(text)).ToList())
+        {
+            laidOut[gone].Line.Dispose();
+            laidOut.Remove(gone);
         }
         inColour?.Line.Dispose();
         inColour = null;
@@ -116,7 +139,21 @@ public sealed class SheetMetrics : SheetSizes
         {
             return null;
         }
-        return lines[row] ??= LineOf(held[row].Text, wordFace, SheetLook.WordSize * Scale, WordsBrush);
+        return lines[row] ??= LaidOut(held[row].Text).Line;
+    }
+
+    /// <summary>How many times a line's words have been laid out: for a test to count.</summary>
+    internal int LinesLaidOut { get; private set; }
+
+    private (TextLine Line, double[]? Edges) LaidOut(string text)
+    {
+        if (!laidOut.TryGetValue(text, out var known))
+        {
+            LinesLaidOut++;
+            known = (LineOf(text, wordFace, SheetLook.WordSize * Scale, WordsBrush), null);
+            laidOut[text] = known;
+        }
+        return known;
     }
 
     /// <summary>
@@ -146,8 +183,21 @@ public sealed class SheetMetrics : SheetSizes
         {
             return 0;
         }
-        var known = edges[row] ??= EdgesOf(line, held[row].Text.Length);
+        var known = edges[row] ??= EdgesKept(line, held[row].Text);
         return known[Math.Min(Math.Max(units, 0), known.Length - 1)];
+    }
+
+    // Where each unit of a line starts, kept with the line by what it says.
+    private double[] EdgesKept(TextLine line, string text)
+    {
+        var known = LaidOut(text);
+        if (known.Edges is { } kept)
+        {
+            return kept;
+        }
+        var found = EdgesOf(line, text.Length);
+        laidOut[text] = (known.Line, found);
+        return found;
     }
 
     /// <summary>

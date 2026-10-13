@@ -17,6 +17,22 @@
 // draws only the little that moves with it, and the spot keeps up with it (spec/06,
 // rule 6e).
 //
+// A LINE IS MADE READY TO DRAW ONCE (spec/06, rule 6e). Its words and its chords, as
+// they are where nobody is at the line, are kept as one drawing, placed from the line's
+// own corner, by what the line says and has on it. When the slides are put in rows
+// again for another width, which is at every step of the window's edge being dragged,
+// each line is laid down again where it now is, and nothing of it is made again. And
+// when a chord is put on, the one line that has it is made again, and no other. (MEASURED, 2026-10-14, on a song of 56
+// slides in a window 1920 by 1050: a step of the edge took 39 thousandths of a second,
+// 27 of them the drawing of every slide's words and chords afresh. windows/NOTES.md,
+// "What the window costs", has the numbers before and after.)
+//
+// AND A SLIDE THAT IS WHERE IT WAS, AND AS IT WAS, IS NOT DRAWN AGAIN. The slides are
+// as wide as the widest of them needs, and stand from the left; so while the window's
+// edge is dragged they stay where they are until one more or one fewer goes to a row.
+// What each slide was last drawn as is remembered (`DrawnAs`), and one that would be
+// drawn the same is left alone.
+//
 // THE HIGHLIGHTED LINE (spec/03, rule 53f): the line the person is at has its words in
 // a colour of its own, and a line of chords alone its rule, twice as thick. Which line
 // that is, is SheetHints' to say. It changes as the pointer goes from line to line, and
@@ -94,7 +110,20 @@ public sealed class ChordSheetCanvas : FrameworkElement
     // The slides as they are drawn, one drawing each, in the order of the grid's cells;
     // and the row whose line they were last drawn with as the highlighted one.
     private readonly List<DrawingVisual> drawnCells = [];
+    private readonly List<DrawnAs?> drawnAs = [];
+    private Rect groundDrawn = Rect.Empty;
     private int? highlightDrawn;
+
+    // Each line as it is drawn where nobody is at it, made once: by what it says and
+    // has on it, with which measures and in which colour of chords. And each slide's
+    // label, the same way.
+    private readonly Dictionary<string, Drawing> linesReady = new(StringComparer.Ordinal);
+    private SheetMetrics? linesReadyWith;
+    private bool linesReadyAreStale;
+    private readonly Dictionary<(string Label, bool OnALightFrame), Drawing> labelsReady = [];
+
+    // How many lines' drawings are kept, before all are let go.
+    private const int MostLinesReady = 6000;
     private Color lineColour = SheetLook.LineWords;
     private Brush lineBrush = Frozen(SheetLook.LineWords);
 
@@ -231,6 +260,8 @@ public sealed class ChordSheetCanvas : FrameworkElement
             chordColour = value;
             Metrics.ChordBrush = Frozen(value);
             Entry.Ink = Frozen(value);
+            // (The lines kept ready have their chords' names in the colour that was.)
+            linesReadyAreStale = true;
             Draw();
         }
     }
@@ -266,6 +297,43 @@ public sealed class ChordSheetCanvas : FrameworkElement
 
     /// <summary>How many times a slide has been drawn: for a test to count.</summary>
     internal int SlidesDrawn { get; private set; }
+
+    // Everything a slide's drawing hangs on: where it is, what is on it, which of its
+    // lines is the highlighted one, which of its chords is being carried, and the
+    // colours and the measures it is drawn with.
+    private readonly record struct DrawnAs(
+        IReadOnlyList<SheetRow> Rows,
+        SheetMetrics Metrics,
+        Rect Frame,
+        Rect Card,
+        int FirstRow,
+        int Count,
+        string Label,
+        Song.Colour? Colour,
+        int? Highlighted,
+        Spot? Lifted,
+        Color ChordColour,
+        Color LineColour);
+
+    private DrawnAs AsItWouldBeDrawn(int number, int? highlighted)
+    {
+        var sheet = Sheet!;
+        var cell = Grid!.Cells[number];
+        bool Within(int row) => row >= cell.FirstRow && row < cell.FirstRow + cell.Count;
+        return new DrawnAs(
+            sheet.Rows,
+            Metrics,
+            cell.Frame,
+            cell.Card,
+            cell.FirstRow,
+            cell.Count,
+            cell.Label,
+            cell.Colour,
+            highlighted is { } lit && Within(lit) ? lit : null,
+            sheet.Dragged is { } carried && Within(carried.From.Row) ? carried.From : null,
+            chordColour,
+            lineColour);
+    }
 
     protected override int VisualChildrenCount => 3;
 
@@ -1346,11 +1414,36 @@ public sealed class ChordSheetCanvas : FrameworkElement
         DrawOver();
     }
 
+    // The pens edges are drawn with, each made once: a pen made afresh for every edge
+    // is one thing more for WPF to hand to what draws, for every bubble of the song.
+    private static readonly Dictionary<(Brush Edge, double Width), Pen> Pens = [];
+
+    private static Pen PenOf(Brush edge, double width)
+    {
+        if (!Pens.TryGetValue((edge, width), out var pen))
+        {
+            pen = new Pen(edge, width);
+            pen.Freeze();
+            Pens[(edge, width)] = pen;
+        }
+        return pen;
+    }
+
     // (An edge is drawn down the middle of its own width.)
     private static void Rounded(DrawingContext context, Rect rect, double radius, Brush? fill, Brush? edge, double width = 1)
     {
         var within = new Rect(rect.X + (width / 2), rect.Y + (width / 2), Math.Max(0, rect.Width - width), Math.Max(0, rect.Height - width));
-        context.DrawRoundedRectangle(fill, edge is null ? null : new Pen(edge, width), edge is null ? rect : within, radius, radius);
+        context.DrawRoundedRectangle(fill, edge is null ? null : PenOf(edge, width), edge is null ? rect : within, radius, radius);
+    }
+
+    // A drawing laid down with its own corner at a point.
+    private static void LayDown(DrawingContext context, Drawing ready, double x, double y)
+    {
+        var moved = new TranslateTransform(x, y);
+        moved.Freeze();
+        context.PushTransform(moved);
+        context.DrawDrawing(ready);
+        context.Pop();
     }
 
     private void BubbleOf(DrawingContext context, string name, double x, double top, double width, bool lit, Brush edge)
@@ -1362,8 +1455,16 @@ public sealed class ChordSheetCanvas : FrameworkElement
 
     private double TailWidth => Math.Max(1.5, 2 * Metrics.Scale);
 
-    // A chord of a line: its tail on its character, and its bubble.
+    // A chord of a line, where the line is: its tail on its character, and its bubble.
     private void ChordOf(DrawingContext context, int index, int n, bool lit, Brush edge)
+    {
+        var item = Grid!.Lines[index];
+        ChordOf(context, index, n, lit, edge, item.Left, item.ChordTop);
+    }
+
+    // The same, of a line whose corner (its left, and the top of its row of chords) is
+    // at a point.
+    private void ChordOf(DrawingContext context, int index, int n, bool lit, Brush edge, double left, double top)
     {
         var grid = Grid!;
         var row = Sheet!.Rows[index];
@@ -1378,9 +1479,77 @@ public sealed class ChordSheetCanvas : FrameworkElement
         context.DrawRectangle(
             edge,
             null,
-            new Rect(item.Left + x + Math.Max(3 * scale, Math.Min(width - (5 * scale), character - x + 1)), item.ChordTop + Metrics.BubbleHeight - 1, TailWidth, Metrics.Tail + (3 * scale)));
-        BubbleOf(context, row.Chords[n].Name, item.Left + x, item.ChordTop, width, lit, edge);
+            new Rect(left + x + Math.Max(3 * scale, Math.Min(width - (5 * scale), character - x + 1)), top + Metrics.BubbleHeight - 1, TailWidth, Metrics.Tail + (3 * scale)));
+        BubbleOf(context, row.Chords[n].Name, left + x, top, width, lit, edge);
     }
+
+    // A line's words and its chords, from the line's corner: the words in their own
+    // colour, or the highlighted line's; and the chord that is being carried, if it is
+    // one of this line's, left faint where it was.
+    private void DrawLine(DrawingContext context, int index, double left, double top, bool lit, int? liftedAt)
+    {
+        var row = Sheet!.Rows[index];
+        var item = Grid!.Lines[index];
+        if (!row.Alone)
+        {
+            (lit ? Metrics.LineIn(index, lineBrush) : Metrics.Line(index))?.Draw(context, new Point(left, top + Metrics.BubbleHeight + Metrics.Tail), System.Windows.Media.TextFormatting.InvertAxes.None);
+        }
+        // The chords, each a bubble with its tail on its character.
+        for (var n = 0; n < row.Chords.Count && item.Placed is not null; n++)
+        {
+            var lifted = liftedAt == row.Chords[n].At;
+            if (lifted)
+            {
+                context.PushOpacity(0.35);
+            }
+            ChordOf(context, index, n, lit: false, EdgeBrush, left, top);
+            if (lifted)
+            {
+                context.Pop();
+            }
+        }
+    }
+
+    // A line as it is drawn where nobody is at it, from its own corner: made the first
+    // time it is asked for, and kept for as long as the rows and the measures are the
+    // ones it was made with.
+    private Drawing LineReady(int index)
+    {
+        if (linesReadyAreStale || !ReferenceEquals(linesReadyWith, Metrics) || linesReady.Count > MostLinesReady)
+        {
+            linesReady.Clear();
+            labelsReady.Clear();
+            linesReadyWith = Metrics;
+            linesReadyAreStale = false;
+        }
+        // What the line says and has on it: its words (or that it has none), and each
+        // chord's place and name. Two lines that are the same in these are drawn the
+        // same, wherever in the song they are.
+        var row = Sheet!.Rows[index];
+        var said = new System.Text.StringBuilder(row.Text.Length + (row.Chords.Count * 8) + 2);
+        said.Append(row.Alone ? '1' : '0').Append(row.Text);
+        foreach (var chord in row.Chords)
+        {
+            said.Append((char)10).Append(chord.At).Append(':').Append(chord.Name);
+        }
+        var key = said.ToString();
+        if (linesReady.TryGetValue(key, out var ready))
+        {
+            return ready;
+        }
+        LinesMadeReady++;
+        var made = new DrawingGroup();
+        using (var context = made.Open())
+        {
+            DrawLine(context, index, 0, 0, lit: false, liftedAt: null);
+        }
+        made.Freeze();
+        linesReady[key] = made;
+        return made;
+    }
+
+    /// <summary>How many times a line has been made ready to draw: for a test to count.</summary>
+    internal int LinesMadeReady { get; private set; }
 
     // The slides: each a card in a frame of its group's colour, with its lines and
     // their chords. Each is a drawing of its own, laid on the sheet's ground: so that
@@ -1388,23 +1557,43 @@ public sealed class ChordSheetCanvas : FrameworkElement
     // are drawn again and no other.
     private void DrawUnder()
     {
-        using (var ground = under.RenderOpen())
+        var whole = new Rect(0, 0, Math.Max(ActualWidth, Grid?.Content.Width ?? 0) + 4000, Math.Max(ActualHeight, Grid?.Content.Height ?? 0) + 4000);
+        if (whole != groundDrawn)
         {
-            ground.DrawRectangle(GroundBrush, null, new Rect(0, 0, Math.Max(ActualWidth, Grid?.Content.Width ?? 0) + 4000, Math.Max(ActualHeight, Grid?.Content.Height ?? 0) + 4000));
+            groundDrawn = whole;
+            using var ground = under.RenderOpen();
+            ground.DrawRectangle(GroundBrush, null, whole);
         }
-        under.Children.Clear();
-        drawnCells.Clear();
         highlightDrawn = Highlighted;
         if (Sheet is not { } sheet || Grid is not { } grid || grid.Lines.Count != sheet.Rows.Count)
         {
+            under.Children.Clear();
+            drawnCells.Clear();
+            drawnAs.Clear();
             return;
         }
-        for (var n = 0; n < grid.Cells.Count; n++)
+        // (As many drawings as there are slides: the ones there are, are drawn into
+        // again.)
+        while (drawnCells.Count > grid.Cells.Count)
+        {
+            under.Children.Remove(drawnCells[^1]);
+            drawnCells.RemoveAt(drawnCells.Count - 1);
+            drawnAs.RemoveAt(drawnAs.Count - 1);
+        }
+        while (drawnCells.Count < grid.Cells.Count)
         {
             var drawing = new DrawingVisual();
             drawnCells.Add(drawing);
+            drawnAs.Add(null);
             under.Children.Add(drawing);
-            DrawCell(n, highlightDrawn);
+        }
+        for (var n = 0; n < grid.Cells.Count; n++)
+        {
+            // (A slide that would be drawn just as it is, is left as it is.)
+            if (drawnAs[n] != AsItWouldBeDrawn(n, highlightDrawn))
+            {
+                DrawCell(n, highlightDrawn);
+            }
         }
     }
 
@@ -1443,6 +1632,7 @@ public sealed class ChordSheetCanvas : FrameworkElement
         var rows = sheet.Rows;
         var cell = grid.Cells[number];
         SlidesDrawn++;
+        drawnAs[number] = AsItWouldBeDrawn(number, highlighted);
         using var context = drawnCells[number].RenderOpen();
         // The frame is the colour of the slide's group; the card is laid on it, and
         // under the card is its foot, with the slide's number and, on the first slide
@@ -1450,52 +1640,77 @@ public sealed class ChordSheetCanvas : FrameworkElement
         var colour = cell.Colour is { } own ? SheetLook.Of(own) : SheetLook.Group;
         Rounded(context, cell.Frame, 4, Frozen(colour), null);
         Rounded(context, cell.Card, 2, CardBrush, null);
-        var label = Metrics.Text(cell.Label, bold: false, SheetLook.LabelSize, SheetLook.IsLight(colour) ? Brushes.Black : Brushes.White);
+        var light = SheetLook.IsLight(colour);
         var room = cell.Frame.Width - 16;
-        if (label.WidthIncludingTrailingWhitespace > room && room > 20)
+        var labelAt = new Point(cell.Frame.Left + 8, cell.Card.Bottom);
+        if (Metrics.LabelWidth(cell.Label) > room && room > 20)
         {
+            // (Too long for its frame, which few are: cut short with dots, to the room
+            // there is now.)
+            var label = Metrics.Text(cell.Label, bold: false, SheetLook.LabelSize, light ? Brushes.Black : Brushes.White);
             label.MaxTextWidth = room;
             label.MaxLineCount = 1;
             label.Trimming = TextTrimming.CharacterEllipsis;
+            context.DrawText(label, new Point(labelAt.X, labelAt.Y + ((SheetLook.Foot - label.Height) / 2)));
         }
-        context.DrawText(label, new Point(cell.Frame.Left + 8, cell.Card.Bottom + ((SheetLook.Foot - label.Height) / 2)));
+        else
+        {
+            if (!labelsReady.TryGetValue((cell.Label, light), out var ready))
+            {
+                var label = Metrics.Text(cell.Label, bold: false, SheetLook.LabelSize, light ? Brushes.Black : Brushes.White);
+                var made = new DrawingGroup();
+                using (var drawing = made.Open())
+                {
+                    drawing.DrawText(label, new Point(0, (SheetLook.Foot - label.Height) / 2));
+                }
+                made.Freeze();
+                labelsReady[(cell.Label, light)] = ready = made;
+            }
+            LayDown(context, ready, labelAt.X, labelAt.Y);
+        }
 
         for (var index = cell.FirstRow; index < cell.FirstRow + cell.Count; index++)
         {
             var row = rows[index];
             var item = grid.Lines[index];
-            var wordsTop = item.ChordTop + Metrics.BubbleHeight + Metrics.Tail;
             // The highlighted line, the one the person is at, has its words in a
             // colour of its own (rule 53f).
             var lit = index == highlighted;
             if (row.Alone)
             {
                 // A line of chords alone has nothing to read: a rule stands where its
-                // words would be. Highlighted, the rule takes the colour and is
-                // twice as thick.
+                // words would be, as far as the card's own edge. Highlighted, the rule
+                // takes the colour and is twice as thick.
+                var wordsTop = item.ChordTop + Metrics.BubbleHeight + Metrics.Tail;
                 context.DrawRectangle(
                     lit ? lineBrush : RuleBrush,
                     null,
                     new Rect(item.Left, wordsTop + (Metrics.WordHeight / 2) - (lit ? 0.5 : 0), Math.Max(1, cell.Card.Right - Metrics.CardPad - item.Left), lit ? 2 : 1));
             }
+            // Its words and its chords. As they are where nobody is at the line, they
+            // were made ready once and are laid down here; the line the person is at,
+            // and the line a chord is being carried from, are made as they now are.
+            //
+            // Made the same way, and laid down the same way, whichever it is: as a
+            // drawing from the line's own corner. (FOUND, 2026-10-14: drawn straight
+            // onto the slide instead, the line's letters and bubbles came out other by
+            // a part of a dot than the same things laid down, so that a line shivered
+            // as the pointer came onto it. A test that looks for what else changes
+            // when the spot moves saw it.)
+            int? liftedAt = sheet.Dragged is { } carried && carried.From.Row == index ? carried.From.At : null;
+            if ((lit && !row.Alone) || liftedAt is not null)
+            {
+                var asItIsNow = new DrawingGroup();
+                using (var drawing = asItIsNow.Open())
+                {
+                    DrawLine(drawing, index, 0, 0, lit, liftedAt);
+                }
+                asItIsNow.Freeze();
+                LayDown(context, asItIsNow, item.Left, item.ChordTop);
+            }
             else
             {
-                (lit ? Metrics.LineIn(index, lineBrush) : Metrics.Line(index))?.Draw(context, new Point(item.Left, wordsTop), System.Windows.Media.TextFormatting.InvertAxes.None);
-            }
-            // The chords, each a bubble with its tail on its character. The one that
-            // is being carried is left faint where it was.
-            for (var n = 0; n < row.Chords.Count && item.Placed is not null; n++)
-            {
-                var lifted = sheet.Dragged is { } carried && carried.From == new Spot(index, row.Chords[n].At);
-                if (lifted)
-                {
-                    context.PushOpacity(0.35);
-                }
-                ChordOf(context, index, n, lit: false, EdgeBrush);
-                if (lifted)
-                {
-                    context.Pop();
-                }
+                LayDown(context, LineReady(index), item.Left, item.ChordTop);
             }
         }
     }
@@ -1557,10 +1772,18 @@ public sealed class ChordSheetCanvas : FrameworkElement
                 there = n;
             }
         }
-        // Where there is a chord at the spot, that chord's own bubble is lit.
+        // Where there is a chord at the spot, that chord's own bubble is lit. (Made
+        // from the line's corner and laid down, as the line under it was: so that it
+        // lies on the bubble it lights, to the dot.)
         if (there >= 0 && sheet.Dragged is null && item.Placed is not null)
         {
-            ChordOf(context, spot.Row, there, lit: true, AccentBrush);
+            var lit = new DrawingGroup();
+            using (var drawing = lit.Open())
+            {
+                ChordOf(drawing, spot.Row, there, lit: true, AccentBrush, 0, 0);
+            }
+            lit.Freeze();
+            LayDown(context, lit, item.Left, item.ChordTop);
             return;
         }
         // Where there is none: a bubble in outline with its tail on the character. It is

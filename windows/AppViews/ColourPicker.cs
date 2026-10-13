@@ -1,5 +1,6 @@
 // The system's own colour picker, asked for a colour (spec/06-library.md, "Settings":
-// each of a chord's two colours "is chosen with the system's own colour picker").
+// each of a chord's two colours, and the highlighted line's, "is chosen with the system's
+// own colour picker").
 //
 // WPF has no door to it of its own. The other part of .NET for windows has, and to
 // take that on for one dialog would be to carry a second way of making windows in the

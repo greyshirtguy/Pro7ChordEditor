@@ -13,10 +13,12 @@
   What is where:
 
     LibraryModel    everything the window shows and does, with no drawing in it. In
-                    four files: the main one, and what is about mending
+                    six files: the main one, and what is about mending
                     (LibraryModel.Mending), about the old editor's copies
-                    (LibraryModel.Folding) and about ChordPro files
-                    (LibraryModel.ChordProFiles)
+                    (LibraryModel.Folding), about ChordPro files
+                    (LibraryModel.ChordProFiles), about the line of hints
+                    (LibraryModel.Hints) and about when the guide is shown
+                    (LibraryModel.Guide)
     LibraryWindow   the window, which frames LibraryView and tells the model what only
                     a window knows
     LibraryView     what the window holds: its menu, ListsPane at the left, SongPane at
@@ -28,7 +30,7 @@
     EditorSwitch    the two buttons, Chords and ChordPro
 
     ChordSheetView  the chord sheet: the strip of the key's chords over the sheet,
-                    which scrolls
+                    which scrolls, and under it the line of hints
     ChordSheetCanvas
                     the sheet itself, drawn, and what the pointer and the keys do on it
     SheetGrid       where every slide, line and chord of the sheet stands, as numbers
@@ -36,6 +38,15 @@
     SheetKeys       which key of the keyboard does what on the sheet
     SheetEntry      the bubble a chord is typed in, with what is offered under its box
     SheetLook       the sheet's colours and sizes
+    SheetHints      what the line of hints under the sheet says, for each thing that
+                    can be going on in the sheet; and which line is the highlighted one
+    HintFit         how the hints are fitted into the width there is, by arithmetic
+    HintLine        the line of hints, drawn: blue, and lighting up as it changes
+
+    Guide           the guide's words, as their file has them and as Windows says them
+    GuideView       the guide's page, and the window it is in
+    Guide\          the words (a copy of spec/guide.json) and the three pictures,
+                    carried inside the library
 
     ChordProText    the song as ChordPro text, to be typed in: WPF's text box, kept to
                     the song's words
@@ -56,7 +67,8 @@
     SettingsWindow  the settings, which frame SettingsView
     SettingsView    the settings' sections, each a tab
     ChordColourSettings
-                    Chords: the colour of a chord in each of the two editors
+                    Chords: the colour of a chord in each of the two editors, and of
+                    the highlighted line of the sheet
     ColourPicker    the system's own picker of a colour
     MendingSettings Mending: its one switch
     AboutSettings   About: what the app says of itself, in AboutTheApp's words

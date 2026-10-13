@@ -20,6 +20,18 @@
 // only true then. So whatever changes what is to be drawn (the text, the size, the
 // colours, the scrolling) only marks this as stale, and the next laying out draws it.
 //
+// WHAT IS KEPT, so that drawing again is quick (spec/06, rule 6e: the text is drawn
+// again at every step of the window's edge being dragged, and whenever it scrolls).
+// Asking the box where a line is, and laying a line's letters out, are the two slow
+// things here (MEASURED, 2026-10-14: a third and an eighth of a thousandth of a second
+// a line, forty lines in view, at every step). So each is done once:
+//
+//   - a line's letters are made into a drawing the first time the line is drawn, and
+//     that drawing is laid down afterwards wherever the line then is;
+//   - where a line is, is asked of the box once and kept as a place in the whole text,
+//     which scrolling does not change. It is asked again when the text changes or its
+//     letters are another size: a line's place hangs on every line above it.
+//
 // Nothing here is a rule. Which stretches of a line are chords is
 // Song/ChordProEditor.cs's (`Colouring`). The Mac colours its text view's own text
 // (ChordProView.swift), which a Mac's can have.
@@ -44,6 +56,11 @@ public sealed class ChordProUnderlay : FrameworkElement
 
     private readonly DrawingVisual drawing = new();
     private readonly Dictionary<string, FormattedText> kept = new(StringComparer.Ordinal);
+
+    // A line's letters as a drawing, by what the line says; and where each line is in
+    // the whole text, by its number.
+    private readonly Dictionary<string, Drawing> ready = new(StringComparer.Ordinal);
+    private readonly Dictionary<int, Point> places = [];
     private TextBox? box;
     private string[] lines = [""];
     private int[] starts = [0];
@@ -113,6 +130,7 @@ public sealed class ChordProUnderlay : FrameworkElement
         {
             starts[line] = starts[line - 1] + lines[line - 1].Length + 1;
         }
+        places.Clear();
         Stale();
     }
 
@@ -120,8 +138,13 @@ public sealed class ChordProUnderlay : FrameworkElement
     public void Remake()
     {
         kept.Clear();
+        ready.Clear();
+        places.Clear();
         Stale();
     }
+
+    /// <summary>How many times the box has been asked where a line is: for a test to count.</summary>
+    internal int PlacesAsked { get; private set; }
 
     /// <summary>What is drawn is no longer what is to be seen. It is drawn at the next laying out.</summary>
     public void Stale()
@@ -214,13 +237,47 @@ public sealed class ChordProUnderlay : FrameworkElement
             // line, though it ends no line of the song's, are drawn on two lines here as
             // they are there: the letters are laid out by the same means, and what
             // follows such a character starts at the left again in both.)
-            var at = box.GetRectFromCharacterIndex(starts[line]);
-            if (!at.IsEmpty)
+            // Where the line is in the whole text: asked of the box the once.
+            if (!places.TryGetValue(line, out var place))
             {
-                context.DrawText(Letters(lines[line]), box.TranslatePoint(at.TopLeft, this));
+                PlacesAsked++;
+                var at = box.GetRectFromCharacterIndex(starts[line]);
+                if (at.IsEmpty)
+                {
+                    continue;
+                }
+                place = new Point(at.X + box.HorizontalOffset, at.Y + box.VerticalOffset);
+                places[line] = place;
             }
+            var here = box.TranslatePoint(new Point(place.X - box.HorizontalOffset, place.Y - box.VerticalOffset), this);
+            var moved = new TranslateTransform(here.X, here.Y);
+            moved.Freeze();
+            context.PushTransform(moved);
+            context.DrawDrawing(Ready(lines[line]));
+            context.Pop();
         }
         context.Pop();
+    }
+
+    // A line's letters as a drawing, made the first time and kept.
+    private Drawing Ready(string line)
+    {
+        if (ready.TryGetValue(line, out var made))
+        {
+            return made;
+        }
+        if (ready.Count >= MostKept)
+        {
+            ready.Clear();
+        }
+        var group = new DrawingGroup();
+        using (var context = group.Open())
+        {
+            context.DrawText(Letters(line), default);
+        }
+        group.Freeze();
+        ready[line] = group;
+        return group;
     }
 
     // A line's letters, made ready to draw: in the box's font and size, the chords in

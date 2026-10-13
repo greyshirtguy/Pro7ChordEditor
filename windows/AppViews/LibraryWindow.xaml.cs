@@ -82,8 +82,12 @@ public partial class LibraryWindow : Window
         }
         guide = new GuideWindow((LibraryModel)((LibraryView)Content).DataContext);
         guide.Closed += (_, _) => guide = null;
-        var here = WindowState == WindowState.Maximized ? SystemParameters.WorkArea : new Rect(Left, Top, ActualWidth, ActualHeight);
-        var at = GuideWindow.PlaceBeside(here, SystemParameters.WorkArea, new Size(guide.Width, Math.Min(guide.Height, SystemParameters.WorkArea.Height)));
+        // (All the screens there are, taken together: the main window may be on any of
+        // them. One that is not at its own size and place, being as big as its screen
+        // or put away in the taskbar, is taken to fill the first screen.)
+        var screens = new Rect(SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop, SystemParameters.VirtualScreenWidth, SystemParameters.VirtualScreenHeight);
+        var here = WindowState == WindowState.Normal ? new Rect(Left, Top, ActualWidth, ActualHeight) : SystemParameters.WorkArea;
+        var at = GuideWindow.PlaceBeside(here, screens, new Size(guide.Width, Math.Min(guide.Height, SystemParameters.WorkArea.Height)));
         guide.WindowStartupLocation = WindowStartupLocation.Manual;
         guide.Left = at.X;
         guide.Top = at.Y;

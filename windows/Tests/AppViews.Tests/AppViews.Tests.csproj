@@ -16,7 +16,19 @@
     WindowListsTests    the two lists as far as they are numbers and words; the small
                         pictures before names; the look; what a row is called to a
                         screen reader
-    PictureTests        pictures of the window, to be looked at
+    SheetHintsTests     the line of hints under the sheet, to the letter, and how
+                        it is fitted and drawn; the highlighted line
+    WindowEdgeTests     the edge between the lists and the song; the title over the
+                        choice of place; Earlier Versions in its blue; the icon
+    GuideTests          the guide: its words held to spec/guide.json, shown once, and
+                        its page as it is laid out
+    GuidePictureTests   the guide's three pictures: drawn here, kept in the app, and
+                        held to what the app draws now
+    SpeedTests          how long the window keeps its own thread: two that are always
+                        run, counts of what is not made again, and a measuring that is
+                        run when asked for
+    PictureTests        pictures of the window, to be looked at; and the one of the
+                        repository's README
     MadeUpPC            what they stand on: a ProPresenter folder of copies of the test
                         files, in a temporary folder
     Pictures            drawing a view into a picture file; and a thread of the kind a

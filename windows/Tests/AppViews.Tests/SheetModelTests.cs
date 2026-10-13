@@ -1,9 +1,10 @@
 // The chord sheet's part of the window's model (LibraryModel), and the settings' Chords
-// section, which is the model's two colours shown and chosen.
+// section, which is the model's three colours shown and chosen: a chord's in each of
+// the two editors, and the highlighted line's.
 //
 // What is done on the sheet is held by a hand at it (ChordSheetViewTests.cs). Here: the
 // sentences a paste is answered with, word for word (spec/03, rule 52a); what the model
-// keeps of its own from one start to the next (the sheet's zoom, the two colours); and
+// keeps of its own from one start to the next (the sheet's zoom, the colours); and
 // that with no song open, or the same editor asked for, nothing happens.
 
 using System.Text.Json;

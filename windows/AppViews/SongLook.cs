@@ -6,9 +6,14 @@
 // row of their own under it."
 //
 // It is apart from the view so that a test can hold it without drawing anything, as the
-// two lists' arithmetic is (ListsLook.cs). On the Mac the system tries each way the
-// header could be laid out and takes the first that fits (SongView.swift, `header`);
-// these are the same ways, in the same order.
+// two lists' arithmetic is (ListsLook.cs). These are the ways the Mac's header is laid
+// out, in the same order (SongHeader.swift). Until 2026-10-13 the Mac had the system
+// try each way and take the first that fits, and the system built all three, their
+// pickers with them, whenever anything in the song's part of the window changed: which
+// was what kept its pointer waiting (spec/06, rule 6e). It is arithmetic there too
+// now, as it has been here from the first. Whatever a platform offers that chooses
+// among arrangements by building them, a header with pickers in it is not to be left
+// to it.
 
 namespace Pro7ChordEditor.AppViews;
 
