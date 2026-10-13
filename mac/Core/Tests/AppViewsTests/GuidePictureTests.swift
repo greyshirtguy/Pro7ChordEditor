@@ -4,7 +4,9 @@
 //
 // Each is the strip and the first row of slides of Amazing Grace, as the window shows
 // them, in a pane as wide as the guide's page, with the sheet in the state the picture
-// is of: the spot on a word, a chord being typed, a chord being dragged. A window that
+// is of: the spot on a word, a chord being typed, a chord being dragged. In each the
+// line the person is at is the highlighted one, its words in their own colour, as the
+// sheet draws it for whoever does these things. A window that
 // is drawn has no pointer in it, so the pointer is drawn in afterwards, where it would
 // be. They are drawn at twice the size, whatever screen this Mac has, so that they are
 // sharp on a screen with dots to spare.
@@ -254,6 +256,11 @@ struct GuidePictureTests {
         var line = try scene.row("That saved a wretch like me")
         scene.sheet.pointerOver(line, 13)
         try lay(scene)
+        // (The pointer is on the word, as the mouse would put it there: so the
+        // person is at the sheet, and the word's line is the highlighted one.)
+        let canvas = try #require(scene.canvas)
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: line, at: 13))), shift: false)
+        #expect(scene.sheet.spot == Spot(row: line, at: 13) && canvas.highlighted == line)
         try keep(try draw(scene, pointerOn: Spot(row: line, at: 13)), named: "point-and-press")
 
         // A chord being typed over "wretch", with D typed so far. (On a slide's second

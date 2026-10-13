@@ -40,6 +40,15 @@ struct PictureTests {
         let appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
         let host = NSHostingView(rootView: view.frame(width: size.width, height: size.height).environment(\.colorScheme, dark ? .dark : .light))
         let window = NSWindow(contentRect: NSRect(origin: .zero, size: size), styleMask: [.borderless], backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        // (Done with, the window goes, and what is in it with it. One that stayed
+        // would go on being kept up to date with its model; and two sheets on one
+        // model, the pointer over one of them and not the other, each tell the model
+        // what is going on, and never agree.)
+        defer {
+            window.contentView = nil
+            window.close()
+        }
         window.appearance = appearance
         window.contentView = host
         host.frame = NSRect(origin: .zero, size: size)
@@ -350,10 +359,14 @@ struct PictureTests {
     func theSettings() async throws {
         let mac = try MadeUpMac()
         let model = await modelWithASongOpen(mac, editor: .sheet)
-        try draw(ChordColourSettings(model: model), named: "28 settings, the colours of chords", size: NSSize(width: 560, height: 330))
+        // (On the window's own ground, which a settings window has under it.)
+        let settings = ChordColourSettings(model: model).background(Color(nsColor: .windowBackgroundColor))
+        try draw(settings, named: "28 settings, the colours of chords", size: NSSize(width: 560, height: 440))
         model.setSheetChordColour("#7fe3ff")
         model.setTextChordColour("#c95fff")
-        try draw(ChordColourSettings(model: model), named: "29 settings, two colours chosen", size: NSSize(width: 560, height: 330), dark: true)
+        model.setSheetLineColour("#8cf58c")
+        try draw(settings, named: "29 settings, three colours chosen", size: NSSize(width: 560, height: 440), dark: true)
+        model.setSheetLineColour(nil)
         try draw(LibraryWindow(model: model), named: "30 the sheet, another colour for chords", size: Self.sheetSize)
     }
 
@@ -390,52 +403,120 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "43 the strip, with the way to the guide", size: Self.sheetSize)
     }
 
-    @Test("The line of hints under the sheet: what it says for each thing that can be going on, in the light and the dark; and the window with the pointer on a chord, with Option held, and narrow")
+    /// The sheet's own view, in a window that has been laid out.
+    private func canvas(in view: NSView) -> SheetCanvas? {
+        if let found = view as? SheetCanvas { return found }
+        for inner in view.subviews {
+            if let found = canvas(in: inner) { return found }
+        }
+        return nil
+    }
+
+    /// Puts the pointer on a place of the sheet in a window that has been laid out,
+    /// as the mouse would, with Option held or not; and gives the window a moment to
+    /// say what it then has to say.
+    private func point(at spot: Spot, onItsChord: Bool = false, optionHeld: Bool = false, in window: NSView) {
+        guard let canvas = canvas(in: window), let point = canvas.point(over: spot, onItsChord: onItsChord) else {
+            Issue.record("the window has no sheet, or the sheet no such place")
+            return
+        }
+        canvas.pointerMoved(to: point, shift: false)
+        canvas.modifiers(optionHeld ? [.option] : [])
+        RunLoop.main.run(until: Date(timeIntervalSinceNow: 0.2))
+        window.layoutSubtreeIfNeeded()
+    }
+
+    @Test("The line of hints under the sheet: what it says for each thing that can be going on, in the light and the dark, and where there is little room; and the window with the pointer on a word, its line highlighted, with Option held, narrow, and on a line of chords alone")
     func theLineOfHints() async throws {
         let mac = try macWithHistory()
         let model = await modelWithASongOpen(mac, editor: .sheet)
+        typealias Paste = SheetHints.Paste
         let cases: [(String, [SheetHints.Hint])] = [
             ("the pointer on a chord", SheetHints.hints(.onChord)),
             ("on a place with no chord", SheetHints.hints(.onPlace)),
             ("Option or Command held", SheetHints.hints(.onPlace, held: true)),
-            ("held, with 4 chords copied", SheetHints.hints(.onPlace, held: true, copied: 4)),
+            ("held, the line has chords", SheetHints.hints(.onPlace, held: true, paste: Paste(lines: 1, replaces: true))),
+            ("held, a verse copied", SheetHints.hints(.onPlace, held: true, paste: Paste(lines: 4, replaces: true))),
             ("a chord being typed", SheetHints.hints(.typing(onChord: false, empty: false))),
             ("the box cleared, on a chord", SheetHints.hints(.typing(onChord: true, empty: true))),
             ("a chord being carried", SheetHints.hints(.carrying)),
             ("carried, with Option held", SheetHints.hints(.carrying, held: true)),
             ("ProPresenter running", SheetHints.cannotChange),
-        ] + SheetHints.tips.enumerated().map { ("tip \($0.offset + 1)", $0.element) }
-        let all = VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(cases.enumerated()), id: \.offset) { _, one in
-                HStack(spacing: 0) {
-                    Text(one.0)
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .frame(width: 190, alignment: .leading)
-                    HintRow(hints: one.1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            ("nobody at the sheet", SheetHints.idle),
+        ]
+        func all(labels: Double) -> some View {
+            VStack(alignment: .leading, spacing: 0) {
+                ForEach(Array(cases.enumerated()), id: \.offset) { _, one in
+                    HStack(spacing: 0) {
+                        Text(one.0)
+                            .font(.caption)
+                            .foregroundStyle(.tertiary)
+                            .frame(width: labels, alignment: .leading)
+                        HintRow(hints: one.1)
+                            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+                            .clipped()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .frame(minHeight: 30)
+                    Divider()
                 }
-                .padding(.horizontal, 12)
-                .frame(height: 30)
-                Divider()
+                Spacer(minLength: 0)
             }
+            .background(Color(nsColor: .windowBackgroundColor))
         }
-        .background(Color(nsColor: .windowBackgroundColor))
-        let size = NSSize(width: 1120, height: Double(cases.count) * 31)
-        try draw(all, named: "45 the line of hints, all it says", size: size)
-        try draw(all, named: "46 the line of hints, in the dark", size: size, dark: true)
+        // (Tall enough for three of the rows to be two lines.)
+        let size = NSSize(width: 1160, height: Double(cases.count) * 31 + 80)
+        try draw(all(labels: 190), named: "45 the line of hints, all it says", size: size)
+        try draw(all(labels: 190), named: "46 the line of hints, in the dark", size: size, dark: true)
+        // With less room: the last hints are left off; the two sentences on copying
+        // are drawn smaller, and at their smallest are cut off.
+        try draw(all(labels: 190), named: "53 the line of hints, with 720 of room", size: NSSize(width: 190 + 24 + 720, height: size.height))
+        try draw(all(labels: 190), named: "54 the line of hints, with 560 of room", size: NSSize(width: 190 + 24 + 560, height: size.height))
 
         // In the window: under the sheet, over the quiet line.
-        // (With nobody at the sheet it says a tip, whichever the clock has come to.)
-        try draw(LibraryWindow(model: model), named: "47 the sheet, with a tip under it", size: Self.sheetSize)
-        model.holds(true)
-        try draw(LibraryWindow(model: model), named: "48 the sheet, Option held", size: Self.sheetSize, dark: true)
+        let sheet = try #require(model.sheet)
+        let first = try row("Amazing grace how sweet the sound", of: sheet)
+        let second = try row("That saved a wretch like me", of: sheet)
+        try draw(LibraryWindow(model: model), named: "47 the sheet, nobody at it", size: Self.sheetSize)
+        // The pointer on a word: its line is the highlighted one.
+        try draw(LibraryWindow(model: model), named: "48 the sheet, the pointer on a word", size: Self.sheetSize) { window in
+            point(at: Spot(row: second, at: 13), in: window)
+        }
+        // And with Option held: how that line's chords are copied, and pasted onto it.
+        try draw(LibraryWindow(model: model), named: "49 the sheet, Option held", size: Self.sheetSize, dark: true) { window in
+            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        }
+        try draw(LibraryWindow(model: model), named: "55 the sheet, Option held, at the size the app opens at", size: NSSize(width: 1280, height: 800)) { window in
+            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        }
+        try draw(LibraryWindow(model: model), named: "56 the sheet, Option held, in a narrow window", size: NSSize(width: 900, height: 560)) { window in
+            point(at: Spot(row: first, at: 8), optionHeld: true, in: window)
+        }
         model.holds(false)
-        try draw(LibraryWindow(model: model), named: "49 the sheet, a tip, in a narrow window", size: NSSize(width: 760, height: 560))
+        // The highlighted line in another colour, chosen in the settings.
+        model.setSheetLineColour("#5fd0ff")
+        try draw(LibraryWindow(model: model), named: "57 the sheet, another colour for the highlighted line", size: Self.sheetSize) { window in
+            point(at: Spot(row: second, at: 13), in: window)
+        }
+        model.setSheetLineColour(nil)
         // A song that has earlier versions: the button to them, in its colour.
         model.open(song: mac.song("Holy Holy Holy"))
         try draw(LibraryWindow(model: model), named: "50 a song with earlier versions", size: Self.sheetSize)
         try draw(LibraryWindow(model: model), named: "51 a song with earlier versions, in the dark", size: Self.sheetSize, dark: true)
+
+        // A line of chords alone has no words to colour: its rule takes the colour.
+        // (The song that has such lines is not among those every made-up Mac has.)
+        try TestData.file("shaped-as-real-ones/Chords With No Words.pro")
+            .write(to: mac.place.appendingPathComponent("Libraries/Songs/Chords With No Words.pro"))
+        await model.refresh()
+        model.open(song: mac.song("Chords With No Words"))
+        let shaped = try #require(model.sheet)
+        let alone = try #require(shaped.rows.firstIndex { $0.alone && !$0.blank && !$0.chords.isEmpty }, "the song was to have a line of chords alone")
+        try draw(LibraryWindow(model: model), named: "58 a line of chords alone, highlighted", size: Self.sheetSize) { window in
+            point(at: Spot(row: alone, at: 0), onItsChord: true, optionHeld: true, in: window)
+        }
+        model.holds(false)
     }
 
     @Test("Chords with no words: the song in the shapes real ones have, as it is; with chords put on its three blank slides and on its lines of chords alone; and that as ChordPro text")

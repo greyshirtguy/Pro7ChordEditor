@@ -132,6 +132,10 @@ public final class LibraryModel {
     /// Only how chords look in this app: nothing in any song's file says a colour.
     public private(set) var sheetChordColour: String?
     public private(set) var textChordColour: String?
+    /// The colour of the words of the highlighted line on the sheet, the line the
+    /// person is at (SheetHints.swift), kept the same way: nothing where it is the
+    /// orange it comes as.
+    public private(set) var sheetLineColour: String?
     /// How many times its usual size the ChordPro text is: one of the same steps, kept
     /// apart from the sheet's, since a size that suits a grid of slides is not the one
     /// that suits a page of text.
@@ -186,10 +190,11 @@ public final class LibraryModel {
         case sheet, chordPro
     }
 
-    /// What is going on in the sheet, as its view says it, and whether Option or
-    /// Command is held down: what the line of hints under the sheet goes by
-    /// (SheetHints.swift). Neither is anything of the song's.
+    /// What is going on in the sheet, as its view says it; what a paste there would
+    /// do; and whether Option or Command is held down: what the line of hints under
+    /// the sheet goes by (SheetHints.swift). None of it is anything of the song's.
     public private(set) var sheetSituation = SheetHints.Situation.nothing
+    public private(set) var sheetPaste = SheetHints.Paste()
     public private(set) var modifierHeld = false
     /// How long what the sheet said stays on the quiet line.
     public var sayingLasts: Duration = .seconds(6)
@@ -259,18 +264,20 @@ public final class LibraryModel {
         return ""
     }
 
-    /// What the line of hints under the sheet says just now. `tip`: which of the
-    /// tips it is the turn of, where there is nothing in particular to say.
-    public func sheetHints(tip: Int = 0) -> [SheetHints.Hint] {
+    /// What the line of hints under the sheet says just now.
+    public var sheetHints: [SheetHints.Hint] {
         guard canChange else { return SheetHints.cannotChange }
-        return SheetHints.hints(sheetSituation, held: modifierHeld, copied: sheet.flatMap(SheetHints.copied(in:)), tip: tip)
+        return SheetHints.hints(sheetSituation, held: modifierHeld, paste: sheetPaste)
     }
 
-    /// The sheet's view says what is going on in it. (Only what has changed is put
-    /// down: the pointer says this at every move.)
-    public func sheetIs(_ situation: SheetHints.Situation) {
+    /// The sheet's view says what is going on in it, and what a paste there would do.
+    /// (Only what has changed is put down: the pointer says this at every move.)
+    public func sheetIs(_ situation: SheetHints.Situation, paste: SheetHints.Paste = SheetHints.Paste()) {
         if sheetSituation != situation {
             sheetSituation = situation
+        }
+        if sheetPaste != paste {
+            sheetPaste = paste
         }
     }
 
@@ -296,6 +303,7 @@ public final class LibraryModel {
         listsWidth = Self.withinWidths(settings.listsWidth ?? Self.usualListsWidth)
         sheetChordColour = Self.colour(settings.sheetChordColour)
         textChordColour = Self.colour(settings.textChordColour)
+        sheetLineColour = Self.colour(settings.sheetLineColour)
         textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -582,6 +590,15 @@ public final class LibraryModel {
         }
     }
 
+    /// And for the words of the highlighted line on the sheet.
+    public func setSheetLineColour(_ colour: String?) {
+        sheetLineColour = Self.colour(colour)
+        sheetVersion += 1
+        if started {
+            remember()
+        }
+    }
+
     /// A colour as it is kept: "#" and six of 0 to 9 and a to f, in small letters.
     /// Nothing for anything else.
     static func colour(_ written: String?) -> String? {
@@ -732,6 +749,7 @@ public final class LibraryModel {
     private func makeSheet(of song: OpenSong) -> ChordSheet {
         let made = ChordSheet(song: song)
         sheetSituation = .nothing
+        sheetPaste = SheetHints.Paste()
         made.pasteKeys = SheetHints.command + "V"
         made.refused = { [weak self] error in
             self?.sheetRefused = true
@@ -1063,6 +1081,7 @@ public final class LibraryModel {
         settings.listsWidth = listsWidth == Self.usualListsWidth ? nil : listsWidth
         settings.sheetChordColour = sheetChordColour
         settings.textChordColour = textChordColour
+        settings.sheetLineColour = sheetLineColour
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
         settings.guideShown = guideShown ? true : nil
         appData.settings = settings

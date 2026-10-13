@@ -12,10 +12,19 @@
 //   while one is typed    what Return, Tab and Esc do with it. With the box empty on
 //                         a chord, that Return takes the chord off;
 //   while one is carried  that letting go moves it, and Option leaves a copy;
-//   with Option held,     the copying of a line's chords onto another: Command+C,
-//   or Command            Shift+Command+C and Command+V, which no picture on the sheet
-//                         shows;
-//   the pointer elsewhere one thing worth knowing, and after some seconds another.
+//   with Option held,     the copying of a line's chords onto another: Command+C and
+//   or Command            Command+V, which no picture on the sheet shows;
+//   the pointer elsewhere where to point to be told.
+//
+// It says them when they are of use, and at no other time. (For a day it also went
+// through ten tips, one every nine seconds, while the pointer was elsewhere. The
+// maintainer, having tried it: "love how they appear at the right time - lets drop the
+// randomly timed tips".)
+//
+// THE HIGHLIGHTED LINE. The copying is of a line and onto a line, and the hint for it
+// has to say which. So the line the person is at is drawn in a colour of its own on
+// the sheet (`line`, below, says which line that is; the sheet's view draws it), and
+// the hint calls it "the highlighted line".
 //
 // The keys are drawn as keys, by the signs the Mac's own keyboard and menus have for
 // them (the Windows app says them in words: spec/10-platforms.md).
@@ -44,17 +53,46 @@ public enum SheetHints {
 
     /// One hint: the keys it is about, drawn as keys, and what they do.
     public struct Hint: Equatable, Sendable {
+        /// Words that stand before the keys, where the hint is a sentence: "Press".
+        public var lead: String
         public var keys: [String]
         public var says: String
+        /// Whether it is to be said whatever the room: where the line has not room
+        /// for all its hints the last are left off, but not one of these, for which
+        /// the line is drawn smaller first.
+        public var needed: Bool
 
-        public init(_ keys: [String], _ says: String) {
+        public init(lead: String = "", _ keys: [String], _ says: String, needed: Bool = false) {
+            self.lead = lead
             self.keys = keys
             self.says = says
+            self.needed = needed
         }
 
         /// A hint that is words alone.
         public init(_ says: String) {
             self.init([], says)
+        }
+
+        /// The hint as it would be read out.
+        public var read: String {
+            ([lead] + keys + [says]).filter { !$0.isEmpty }.joined(separator: " ")
+        }
+    }
+
+    /// What a paste would do just now, which the hint for it says before the key is
+    /// pressed.
+    public struct Paste: Equatable, Sendable {
+        /// How many lines have been copied, if any have.
+        public var lines: Int?
+        /// Whether it would take chords off to put the copied ones on: whether the
+        /// lines it would go onto have chords of their own. (With nothing copied yet,
+        /// whether the spot's line has: that is what a paste there will do.)
+        public var replaces: Bool
+
+        public init(lines: Int? = nil, replaces: Bool = false) {
+            self.lines = lines
+            self.replaces = replaces
         }
     }
 
@@ -82,23 +120,34 @@ public enum SheetHints {
         return sheet.chordAt(sheet.spot.row, sheet.spot.at).isEmpty ? .onPlace : .onChord
     }
 
-    /// How many chords have been copied, if any have been.
-    public static func copied(in sheet: ChordSheet) -> Int? {
-        sheet.copied.map { lines in
-            lines.reduce(0) { sum, line in
-                switch line {
-                case .words(let chords): sum + chords.count
-                case .alone(let names): sum + names.count
-                }
-            }
+    /// The highlighted line: which row of the sheet is the line the person is at, if
+    /// they are at one. The line a chord is being typed on, wherever the pointer has
+    /// gone on to since; else the spot's line, while the person is at the sheet or
+    /// carries a chord over it. It is where Command+C copies from and Command+V
+    /// pastes to, which is why it is shown.
+    public static func line(of sheet: ChordSheet, attending: Bool) -> Int? {
+        let row: Int
+        switch situation(of: sheet, attending: attending) {
+        case .nothing: return nil
+        case .typing: row = sheet.typingAt.row
+        case .carrying, .onChord, .onPlace: row = sheet.spot.row
         }
+        return sheet.usable(row) ? row : nil
+    }
+
+    /// What a paste would do in a sheet just now.
+    public static func paste(in sheet: ChordSheet) -> Paste {
+        guard let copied = sheet.copied else {
+            let row = sheet.spot.row
+            return Paste(lines: nil, replaces: sheet.usable(row) && !sheet.rows[row].chords.isEmpty)
+        }
+        return Paste(lines: copied.count, replaces: sheet.pasteWouldReplace)
     }
 
     /// What to say: the first is the one most worth reading, and where there is not
     /// room for all of them the last are left off. `held`: Option or Command is down.
-    /// `copied`: how many chords have been copied, if any. `tip`: which of the tips
-    /// it is the turn of, where there is nothing in particular to say.
-    public static func hints(_ situation: Situation, held: Bool = false, copied: Int? = nil, tip: Int = 0) -> [Hint] {
+    /// `paste`: what a paste would do just now.
+    public static func hints(_ situation: Situation, held: Bool = false, paste: Paste = Paste()) -> [Hint] {
         switch situation {
         case .typing(onChord: true, empty: true):
             return [Hint([enter], "takes this chord off"),
@@ -115,50 +164,40 @@ public enum SheetHints {
                 ? [Hint("Let go on a word to put a copy there")]
                 : [Hint("Let go on a word to move it there"),
                    Hint([option], "held as you let go, leaves a copy behind")]
-        case .nothing, .onChord, .onPlace:
-            if held { return copying(copied) }
-            if situation == .onChord {
-                return [Hint([delete], "takes this chord off"),
-                        Hint([numbers], "change it"),
-                        Hint("drag it to another word"),
-                        Hint("click to type over it")]
-            }
-            if situation == .onPlace {
-                return [Hint([numbers], "put one of the key\u{2019}s chords here"),
-                        Hint([letters], "or a click: type one"),
-                        Hint([option], "hold, to copy a line\u{2019}s chords onto another")]
-            }
-            return tips[((tip % tips.count) + tips.count) % tips.count]
+        case .onChord:
+            if held { return copying(paste) }
+            return [Hint([delete], "takes this chord off"),
+                    Hint([numbers], "change it"),
+                    Hint("drag it to another word"),
+                    Hint("click to type over it")]
+        case .onPlace:
+            if held { return copying(paste) }
+            return [Hint([numbers], "put one of the key\u{2019}s chords here"),
+                    Hint([letters], "or a click: type one"),
+                    Hint([option], "hold, to copy a line\u{2019}s chords onto another")]
+        case .nothing:
+            // (Whatever is held: there is no highlighted line to speak of.)
+            return idle
         }
     }
 
-    /// The copying of a line's chords onto another, which is done with keys alone
-    /// and so is seen nowhere on the sheet. "This line" is the spot's. The two that
-    /// go together come first, so that where there is not room for all three it is
-    /// the whole verse that is left off.
-    static func copying(_ copied: Int?) -> [Hint] {
-        let pastes = copied.map { "pastes the \($0) copied from this line on, word for word" } ?? "pastes them from this line on, word for word"
-        return [Hint([command + "C"], "copies this line\u{2019}s chords"),
-                Hint([command + "V"], pastes),
-                Hint([shift + command + "C"], "copies the whole verse\u{2019}s or chorus\u{2019}s")]
+    /// The copying of a line's chords onto another, which is done with keys alone and
+    /// so is seen nowhere on the sheet. The words are the maintainer's (2026-10-13):
+    /// "Press Command-C to copy all chords on the highlighted line. Press Command-V to
+    /// paste previously copied chords to the highlighted line", and after it, where
+    /// the line it would go onto has chords, " (Replaces existing chords)".
+    ///
+    /// One thing is added to them. A whole verse or chorus that was copied
+    /// (Shift+Command+C) goes onto as many lines as it has, from the highlighted one
+    /// on; so for that, and only then, the hint says "and the lines after it".
+    static func copying(_ paste: Paste) -> [Hint] {
+        let onto = (paste.lines ?? 1) > 1 ? "to the highlighted line and the lines after it" : "to the highlighted line"
+        return [Hint(lead: "Press", [command + "C"], "to copy all chords on the highlighted line.", needed: true),
+                Hint(lead: "Press", [command + "V"], "to paste previously copied chords \(onto)" + (paste.replaces ? " (Replaces existing chords)" : ""), needed: true)]
     }
 
-    /// Things worth knowing, said one at a time while nothing else is to be said.
-    public static let tips: [[Hint]] = [
-        [Hint("Point at a word and press"), Hint([numbers], "the key\u{2019}s chord of that number goes on")],
-        [Hint("Point at a chord and press"), Hint([delete], "it is taken off")],
-        [Hint([option], "hold it down to see how a line\u{2019}s chords are copied onto another")],
-        [Hint("Drag a chord to another word to move it"), Hint([option], "held, copies it")],
-        [Hint("Drag one of the seven chords out of the strip onto a word")],
-        [Hint([command + "Z"], "takes the last change back"), Hint([shift + command + "Z"], "puts it back")],
-        [Hint([shift], "held, keeps the spot to the starts of words")],
-        [Hint(["\u{2190}", "\u{2192}", "\u{2191}", "\u{2193}"], "move the spot"), Hint([enter], "types a chord there")],
-        [Hint([command + "1"], "shows the sheet"), Hint([command + "2"], "the song as ChordPro text")],
-        [Hint([command + "\u{2212}", command + "+"], "make the words smaller and larger")],
-    ]
-
-    /// How long one tip stays before the next.
-    public static let tipLasts = 9.0
+    /// What is said while the person is not at the sheet: where to point to be told.
+    public static let idle = [Hint("Point at a word or a chord, and this line says what the keys do there.")]
 
     /// What is said while ProPresenter is running and nothing can be put on.
     public static let cannotChange = [Hint("Nothing can be changed here while ProPresenter is running.")]

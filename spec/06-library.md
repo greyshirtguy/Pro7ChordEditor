@@ -275,6 +275,14 @@ words; dropping a `.pro` file on the window to open it.
       over a word, and a line of ChordPro. They are only how this app draws a chord:
       they are kept with the app's own data, and nothing in a song's file says a
       colour.
+
+      And between those two, **the colour of the highlighted line** of the chord
+      sheet ([03-chord-sheet.md](03-chord-sheet.md), rule 53f; as it comes, the
+      sheet's orange, `#ff8a1f`), chosen and put back the same way, and shown as two
+      lines of words, the second in the colour. Under its name it says what it is:
+      "The line the pointer is on, on the chord sheet: where Ctrl+C copies from and
+      Ctrl+V pastes to." (**New**, 2026-10-13, with the highlighted line, and like it
+      **being tried on the Mac**: the others wait.)
     - **Backups**: the copies that are kept, all of them
       ([07-backups.md](07-backups.md), rule 18).
 
@@ -287,8 +295,9 @@ On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in
 `%LOCALAPPDATA%\Pro7ChordEditor`:
 
 - its settings: the folders chosen, the place and library last open, how the window
-  was left (the sizes of the words, the colours of chords, where the bar between the
-  lists is), and whether the guide has been shown ([13-guide.md](13-guide.md), rule 2):
+  was left (the sizes of the words, the colours of chords and of the highlighted
+  line, where the bar between the lists is, and how wide the lists are), and whether
+  the guide has been shown ([13-guide.md](13-guide.md), rule 2):
   all in `settings.json`; and the window's size, which the system keeps for it;
 - the marks it has worked out (rule 10; `marks.json`);
 - the copies of files ([07-backups.md](07-backups.md));

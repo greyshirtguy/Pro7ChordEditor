@@ -19,7 +19,9 @@
 // of them needs: no room is kept for what might be put on a line later. That is the maintainer's, on trying the reference's layout
 // with real songs: one column of slides left most of a window empty and showed few
 // words. How a LINE is drawn (words, bubbles, tails, the spot) is the reference's
-// (qml/ChordSheet.qml), number for number, times the zoom.
+// (qml/ChordSheet.qml), number for number, times the zoom. But for one thing the
+// reference has not: the line the person is at, the highlighted line, has its words in
+// a colour of its own (spec/03, rule 53f; SheetHints.swift says which line that is).
 //
 // The same numbers, for drawing and for pointing. Each line's words are one Core Text
 // line (`SheetMetrics`). That line is what is drawn, and how far along it a character
@@ -231,9 +233,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         /// The words a step larger or smaller, or their usual size: answers with how
         /// many times their usual size they then are.
         var zoom: (_ direction: Int) -> Double? = { _ in nil }
-        /// What is going on in the sheet, for the line of hints under it; and whether
-        /// Option or Command is held down, which that line answers to.
-        var situation: (SheetHints.Situation) -> Void = { _ in }
+        /// What is going on in the sheet, and what a paste there would do, for the
+        /// line of hints under it; and whether Option or Command is held down, which
+        /// that line answers to.
+        var situation: (SheetHints.Situation, SheetHints.Paste) -> Void = { _, _ in }
         var held: (Bool) -> Void = { _ in }
 
         /// As the window wires them.
@@ -246,7 +249,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                  canUndo: { [model] in model.canUndo },
                  canRedo: { [model] in model.canRedo },
                  zoom: { [model] in model.zoomSheet($0) },
-                 situation: { [model] in model.sheetIs($0) },
+                 situation: { [model] in model.sheetIs($0, paste: $1) },
                  held: { [model] in model.holds($0) })
         }
     }
@@ -257,9 +260,23 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     private(set) var attending = false
     private var flagsWatch: Any?
 
-    /// Says what is going on to whoever keeps the line of hints.
+    /// Says what is going on to whoever keeps the line of hints. (There is one sheet
+    /// to a model. Two would each say what is going on in itself, the pointer over
+    /// one and not the other, and the model would be told one thing and the other
+    /// for ever: the tests, which draw many windows, close each when it is done with.)
     private func tell() {
-        asks.situation(sheet.map { SheetHints.situation(of: $0, attending: attending) } ?? .nothing)
+        guard let sheet else {
+            asks.situation(.nothing, SheetHints.Paste())
+            return
+        }
+        asks.situation(SheetHints.situation(of: sheet, attending: attending), SheetHints.paste(in: sheet))
+    }
+
+    /// The highlighted line: the row whose words are drawn in a colour of their own,
+    /// being the line the person is at (SheetHints.line has which that is, and why
+    /// it is shown).
+    var highlighted: Int? {
+        sheet.flatMap { SheetHints.line(of: $0, attending: attending) }
     }
 
     /// Option or Command went down or came up, anywhere in the app.
@@ -293,6 +310,14 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         didSet {
             guard chordColour != oldValue else { return }
             entry.ink = chordColour
+            needsDisplay = true
+        }
+    }
+    /// The colour of the words of the highlighted line: the usual one, the sheet's
+    /// own orange, or the one chosen in the settings.
+    var lineColour = SheetLook.accent {
+        didSet {
+            guard lineColour != oldValue else { return }
             needsDisplay = true
         }
     }
@@ -755,6 +780,8 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// The pointer has left the sheet.
     func pointerLeft() {
         attending = false
+        // (No line is the highlighted one now.)
+        needsDisplay = true
         tell()
     }
 
@@ -1029,6 +1056,18 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let shift = flags.contains(.shift)
         let typed = event.charactersIgnoringModifiers?.lowercased() ?? ""
         if flags.contains(.command) {
+            // (Option held shows the hint for copying and pasting, and may well be
+            // down still when the keys it names are pressed: they do the same with
+            // it. For the rest, Option makes it another key, which is not the
+            // sheet's.)
+            if flags.contains(.option) {
+                guard flags.isSubset(of: [.command, .shift, .option]) else { return nil }
+                switch typed {
+                case "c": return (.copy(wholeGroup: shift), shift)
+                case "v" where !shift: return (.paste, false)
+                default: return nil
+                }
+            }
             guard flags.isSubset(of: [.command, .shift]) else { return nil }
             switch typed {
             case "c": return (.copy(wholeGroup: shift), shift)
@@ -1240,6 +1279,7 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         guard let sheet, let context = NSGraphicsContext.current?.cgContext, laid.count == sheet.rows.count else { return }
         let rows = sheet.rows
         let tailWidth = max(1.5, 2 * metrics.scale)
+        let highlighted = highlighted
 
         for cell in cells where cell.frame.insetBy(dx: -SheetLook.around, dy: -SheetLook.around).intersects(dirtyRect) {
             // The slide that is picked has an orange ring, outside its frame and set
@@ -1266,13 +1306,19 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                 let row = rows[index]
                 let item = laid[index]
                 let wordsTop = item.chordTop + metrics.bubbleHeight + metrics.tail
+                // The highlighted line, the one the person is at, has its words in a
+                // colour of its own.
+                let lit = index == highlighted
                 if row.alone {
                     // A line of chords alone has nothing to read: a rule stands where
-                    // its words would be.
-                    SheetLook.rule.setFill()
-                    NSRect(x: item.left, y: wordsTop + metrics.wordHeight / 2, width: max(1, cell.card.maxX - metrics.cardPad - item.left), height: 1).fill()
+                    // its words would be. (Highlighted, it is the rule that takes the
+                    // colour, and is a little thicker, or there would be nothing to
+                    // show which line is meant.)
+                    (lit ? lineColour : SheetLook.rule).setFill()
+                    let thick = lit ? max(2, (2 * metrics.scale).rounded()) : 1
+                    NSRect(x: item.left, y: wordsTop + metrics.wordHeight / 2 - (thick - 1) / 2, width: max(1, cell.card.maxX - metrics.cardPad - item.left), height: thick).fill()
                 } else if let line = metrics.lines[index] {
-                    Self.draw(line, at: NSPoint(x: item.left, y: wordsTop), font: metrics.wordFont, colour: SheetLook.words, in: context)
+                    Self.draw(line, at: NSPoint(x: item.left, y: wordsTop), font: metrics.wordFont, colour: lit ? lineColour : SheetLook.words, in: context)
                 }
                 // The chords, each a bubble with its tail on its character
                 for (n, chord) in row.chords.enumerated() {
@@ -1468,11 +1514,14 @@ struct ChordSheetCanvasView: NSViewRepresentable {
     var scale: Double
     /// The colour of a chord's name, if another than the usual was chosen: "#rrggbb".
     var chordColour: String?
+    /// And the colour of the highlighted line's words, the same way.
+    var lineColour: String?
 
     func makeNSView(context: Context) -> SheetScroll {
         let scroll = SheetScroll(frame: NSRect(x: 0, y: 0, width: 600, height: 400))
         scroll.canvas.asks = .of(model)
         scroll.canvas.chordColour = ChordColour.colour(chordColour) ?? SheetLook.chordName
+        scroll.canvas.lineColour = ChordColour.colour(lineColour) ?? SheetLook.accent
         scroll.canvas.show(model.sheet, scale: scale)
         return scroll
     }
@@ -1480,6 +1529,7 @@ struct ChordSheetCanvasView: NSViewRepresentable {
     func updateNSView(_ scroll: SheetScroll, context: Context) {
         scroll.canvas.asks = .of(model)
         scroll.canvas.chordColour = ChordColour.colour(chordColour) ?? SheetLook.chordName
+        scroll.canvas.lineColour = ChordColour.colour(lineColour) ?? SheetLook.accent
         scroll.canvas.show(model.sheet, scale: scale)
     }
 }

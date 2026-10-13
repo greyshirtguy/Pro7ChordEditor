@@ -471,14 +471,21 @@ This is how a second verse gets the chords of the first. Vectors: `sheet-model.j
 **New, and being tried on the Mac** (the maintainer's, 2026-10-13, who after two days
 with the sheet "did not realise I could hover and press delete"). Its words are not
 settled: **Windows and Simple Presenter are to wait** until this paragraph says the
-maintainer has agreed them.
+maintainer has agreed them. (It has been tried once, and changed the same day: no
+tips by the clock, other words for the copying, and the highlighted line. Rules 53b,
+53d, 53f and 53g.)
 
 53a. Under the sheet, over the quiet line ([06-library.md](06-library.md), rule 12),
     is one line that says **what the keys and the mouse do just now, where the spot
     is**. It took the place of one sentence on the quiet line that never changed and
     said everything at once. Each hint is the keys it is about, drawn as keys, and a
     few words. Where the line has not room for all its hints, the last are left off,
-    so the first is the one most worth reading.
+    so the first is the one most worth reading. **But not the two sentences on
+    copying and pasting**, which are one thing and the second the point of it: where
+    they do not fit side by side they go one under the other, the line being two
+    lines for as long as they are said and the sheet that much shorter; where one
+    of them is still too long they are drawn smaller (nine tenths of their size,
+    then eight); and only at their smallest are they cut off at the end.
 53b. What it says, the first that applies:
 
     | When | It says |
@@ -487,25 +494,57 @@ maintainer has agreed them.
     | A chord is being typed, the box is empty, and there is a chord at that place | **Enter** takes this chord off · **Esc** leaves it as it was · or type the chord that is to be here |
     | A chord is being typed, otherwise | **Enter** keeps it · **Tab** keeps it and goes on to the next word · **Up, Down** choose from what is offered · **Esc** throws it away · a click on another word keeps it too |
     | A chord is being carried | Let go on a word to move it there · **the key that copies** held as you let go, leaves a copy behind. (With that key held: Let go on a word to put a copy there) |
-    | The key that copies as it drags, or the key for shortcuts, is held (Option or Command; Ctrl) | **Ctrl+C** copies this line's chords · **Ctrl+V** pastes them from this line on, word for word (once some are copied: "pastes the 4 copied from this line on, word for word") · **Ctrl+Shift+C** copies the whole verse's or chorus's |
+    | The person is at the sheet, and the key that copies as it drags, or the key for shortcuts, is held (Option or Command; Ctrl) | Press **Ctrl+C** to copy all chords on the highlighted line. · Press **Ctrl+V** to paste previously copied chords to the highlighted line; and after that, where it would take chords off, " (Replaces existing chords)" (rule 53g) |
     | The spot is on a chord, and the person is at the sheet | **Delete** takes this chord off · **1 – 7** change it · drag it to another word · click to type over it |
     | The spot is on a place with no chord, and the person is at the sheet | **1 – 7** put one of the key's chords here · **A – G** or a click: type one · **the key that copies**: hold, to copy a line's chords onto another |
-    | Otherwise | a tip (rule 53d) |
+    | Otherwise | Point at a word or a chord, and this line says what the keys do there. |
 
+    The words for copying and pasting are the maintainer's (2026-10-13): "Press ⌘-c
+    to copy all chords on the highlighted line. Press ⌘-v to paste previously copied
+    chords to the highlighted line", with " (Replaces existing chords)" after it
+    "when the target line has any chords".
 53c. **The person is at the sheet** while the pointer is over a place of a line, and
     from when a key moves the spot or acts on it until the pointer next moves. With
     the pointer over the bare sheet between the slides, or out of the sheet, the
     spot is only where it was left, and nothing is said of it.
-53d. **A tip** is one thing worth knowing, and after nine seconds the next, round and
-    round: point at a word and press 1 to 7; point at a chord and press Delete; hold
-    the key that copies to see how a line's chords are copied onto another; drag a
-    chord to another word, and that key copies it; drag one of the seven out of the
-    strip; undo and redo; Shift keeps the spot to the starts of words; the arrow keys
-    move the spot and Enter types a chord there; the keys that show the sheet and
-    the text; the keys that zoom.
+53d. **Nothing is said by the clock.** With nobody at the sheet the line says one
+    thing, which is where to point; and that whatever key is held, there being no
+    highlighted line for the copying to be about. (For a day it went through ten
+    tips there, one every nine seconds. The maintainer, having tried them: "love how
+    they appear at the right time - lets drop the randomly timed tips".)
 53e. The keys are named as the platform names them
     ([10-platforms.md](10-platforms.md)): on the Mac by the signs its menus and its
     keyboard have for them, on Windows in words.
+53f. **The highlighted line.** The line the person is at has its words in a colour of
+    its own: as it comes the sheet's orange, `#ff8a1f`, and chosen in the settings
+    ([06-library.md](06-library.md), rule 20a). The maintainer's, 2026-10-13: "we
+    need to highlight the hovered/active line of text - let's make the text highlight
+    by changing color - default orange (a new setting)". It is what Ctrl+C copies
+    from and Ctrl+V pastes to, which is why it is shown, and the hint for those keys
+    calls it by that name. Which line it is:
+    - the line a chord is being typed on, wherever the pointer has gone on to since
+      (a paste there goes from that line: rule 52b);
+    - else the spot's line, while the person is at the sheet (rule 53c) or is
+      carrying a chord over it;
+    - else none.
+
+    A line of chords alone, and a blank slide's line, have no words to colour: the
+    rule that stands where their words would be takes the colour, and is twice as
+    thick.
+53g. **What the hint says of a paste**, to the letter:
+    - " (Replaces existing chords)" is said where a paste now would take chords off
+      a line: where any line that what was copied would go onto (rules 50 and 51)
+      has chords of its own. A line that would be passed over, being of the other
+      kind, loses nothing, and does not count. With nothing copied yet it goes by
+      the highlighted line alone: whether that has chords.
+    - Where more than one line was copied (Ctrl+Shift+C: a verse, a chorus), it is
+      "to the highlighted line and the lines after it", since that is where they go.
+      (**Added by the Mac session** to the maintainer's words, which were said of
+      one line.)
+    - Ctrl+Shift+C itself is said nowhere on the line now. The guide has it
+      ([13-guide.md](13-guide.md)).
+    - On the Mac the two keys do the same with Option held as well: Option is what
+      brings the hint up, and may well be down still when the keys are pressed.
 
 What is said for a copy (rule 49) and a paste (rule 52a) is still said on the quiet
 line, for a few seconds, the key in it named the same way.

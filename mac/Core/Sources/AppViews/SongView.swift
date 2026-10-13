@@ -36,7 +36,8 @@ struct SongPane: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 } else if model.editorShown == .sheet, let sheet = model.sheet {
                     SheetStrip(model: model, sheet: sheet, key: shown.key)
-                    ChordSheetCanvasView(model: model, version: model.sheetVersion, scale: model.sheetZoom, chordColour: model.sheetChordColour)
+                    ChordSheetCanvasView(model: model, version: model.sheetVersion, scale: model.sheetZoom, chordColour: model.sheetChordColour,
+                                         lineColour: model.sheetLineColour)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     Divider()
                     // What the keys and the mouse do just now, where the spot is.
@@ -293,69 +294,101 @@ struct FilledButton: ButtonStyle {
 }
 
 /// The line of hints under the sheet: what SheetHints says just now, its keys drawn
-/// as keys. As many of the hints as there is room for, the first ones first. Where
-/// nothing in particular is to be said, a tip, and after some seconds the next.
+/// as keys. As many of the hints as there is room for, the first ones first. It is one
+/// line, but for the two sentences on copying and pasting where there is not room for
+/// them side by side: then it is two, and the sheet over it that much shorter while
+/// they are said.
 struct SheetHintBar: View {
     var model: LibraryModel
-    /// Which tip, for the tests that draw this; the clock's, where none is given.
-    var tip: Int?
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: SheetHints.tipLasts)) { time in
-            HintRow(hints: model.sheetHints(tip: tip ?? Int(time.date.timeIntervalSinceReferenceDate / SheetHints.tipLasts)))
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, 12)
-        .frame(height: 30)
-        .clipped()
-        .background(Color(nsColor: .windowBackgroundColor))
+        HintRow(hints: model.sheetHints)
+            // (As wide as the song's part of the window and no wider, whatever it
+            // has to say: what does not fit is cut off at the right, and does not
+            // push the window's parts about.)
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 5)
+            .frame(minHeight: 30)
+            .clipped()
+            .background(Color(nsColor: .windowBackgroundColor))
     }
 }
 
+/// Hints in a row, as many as there is room for. Where there is not room for all, the
+/// last are left off; but not one that is needed (the two sentences on copying and
+/// pasting are one thing, and the second is the point of it). Those go one under the
+/// other where they do not fit side by side; and where one of them is still too long,
+/// are drawn smaller, a step at a time, and at their smallest are cut off at the
+/// right.
 struct HintRow: View {
     var hints: [SheetHints.Hint]
 
+    /// The sizes the needed hints are tried at, one under the other: as they come,
+    /// and two steps smaller.
+    static let sizes = [1.0, 0.9, 0.8]
+
     var body: some View {
+        // (How many of them, from the first, may not be left off.)
+        let needed = hints.prefix { $0.needed }.count
         ViewThatFits(in: .horizontal) {
-            ForEach((1...max(1, hints.count)).reversed(), id: \.self) { count in
-                row(Array(hints.prefix(count)))
+            ForEach((max(1, needed)...max(1, hints.count)).reversed(), id: \.self) { count in
+                row(Array(hints.prefix(count)), size: 1)
+            }
+            if needed > 0 {
+                ForEach(Self.sizes, id: \.self) { size in
+                    VStack(alignment: .leading, spacing: 4 * size) {
+                        ForEach(0..<needed, id: \.self) { index in
+                            row([hints[index]], size: size)
+                        }
+                    }
+                }
             }
         }
     }
 
-    private func row(_ hints: [SheetHints.Hint]) -> some View {
-        HStack(spacing: 18) {
+    private func row(_ hints: [SheetHints.Hint], size: Double) -> some View {
+        HStack(spacing: 18 * size) {
             ForEach(Array(hints.enumerated()), id: \.offset) { _, hint in
-                HStack(spacing: 5) {
-                    ForEach(Array(hint.keys.enumerated()), id: \.offset) { _, key in
-                        KeyCap(key: key)
+                HStack(spacing: 5 * size) {
+                    if !hint.lead.isEmpty {
+                        words(hint.lead, size: size)
                     }
-                    Text(hint.says)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                    ForEach(Array(hint.keys.enumerated()), id: \.offset) { _, key in
+                        KeyCap(key: key, size: size)
+                    }
+                    words(hint.says, size: size)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel((hint.keys + [hint.says]).joined(separator: " "))
+                .accessibilityLabel(hint.read)
             }
         }
+    }
+
+    private func words(_ words: String, size: Double) -> some View {
+        Text(words)
+            .font(.system(size: 12 * size))
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+            .fixedSize()
     }
 }
 
 /// A key, drawn as one: its sign in a small box with rounded corners.
 struct KeyCap: View {
     var key: String
+    var size = 1.0
 
     var body: some View {
         Text(key)
-            .font(.system(size: 11.5, weight: .medium))
+            .font(.system(size: 11.5 * size, weight: .medium))
             .foregroundStyle(.primary.opacity(0.85))
             .lineLimit(1)
             .fixedSize()
-            .padding(.horizontal, 5)
-            .frame(minWidth: 20, minHeight: 19)
-            .background(RoundedRectangle(cornerRadius: 4.5, style: .continuous).fill(Color.primary.opacity(0.07)))
-            .overlay(RoundedRectangle(cornerRadius: 4.5, style: .continuous).stroke(Color.primary.opacity(0.28)))
+            .padding(.horizontal, 5 * size)
+            .frame(minWidth: 20 * size, minHeight: 19 * size)
+            .background(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).fill(Color.primary.opacity(0.07)))
+            .overlay(RoundedRectangle(cornerRadius: 4.5 * size, style: .continuous).stroke(Color.primary.opacity(0.28)))
     }
 }
 

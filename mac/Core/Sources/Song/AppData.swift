@@ -48,6 +48,9 @@ public struct AppData: Sendable {
         /// text, each as "#rrggbb"; nothing where the usual colour is kept.
         public var sheetChordColour: String?
         public var textChordColour: String?
+        /// The colour of the words of the line the person is at on the sheet, the
+        /// same way.
+        public var sheetLineColour: String?
         /// How many times its usual size the ChordPro text is; nothing if it was never
         /// changed.
         public var textZoom: Double?

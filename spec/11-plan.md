@@ -70,7 +70,9 @@ its turn comes, from the page that has it:
 | An empty box that is kept takes the chord off | [03](03-chord-sheet.md), rule 35a |
 | The menus kept to what is of use; no Save in them; closing the window quits (Mac) | [10](10-platforms.md), "Where each follows its platform"; [06](06-library.md), rule 12a |
 | A title over the choice of place; Earlier Versions in a colour, with a song's picture | [06](06-library.md), rule 7; [07](07-backups.md), rule 15 |
-| The line of hints under the sheet. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints" |
+| The line of hints under the sheet, and the highlighted line with its colour in the settings. **Being tried on the Mac: the others wait** | [03](03-chord-sheet.md), "The line of hints"; [06](06-library.md), rule 20a |
+| A text box's other ranges go with the words when a line of chords alone is made longer or shorter, as Simple Presenter has it | [01](01-file-format.md), "The box's other ranges" |
+| The edge between the lists and the song starts half way between its least and its most | [06](06-library.md), rule 6a |
 
 ## What the maintainer is asked for along the way
 

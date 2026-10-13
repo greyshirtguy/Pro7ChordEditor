@@ -1,6 +1,6 @@
 // The settings (Command+comma), in sections: how chords are coloured in the two
-// editors, and the copies that are kept (spec/06-library.md, "Settings";
-// spec/07-backups.md, rule 18, for the second).
+// editors, and the highlighted line of the chord sheet; and the copies that are kept
+// (spec/06-library.md, "Settings"; spec/07-backups.md, rule 18, for the second).
 //
 // Each section is a tab of the system's settings window, which is as big as the tab
 // that is open. The copies were all there was here at first, and are AllCopies.swift
@@ -8,7 +8,7 @@
 //
 // A colour is kept by the window's model as it is written, "#rrggbb", and nothing is
 // kept where the usual colour is: `ChordColour` turns one into the other. Nothing here
-// touches a song: a colour is only how this app draws a chord.
+// touches a song: a colour is only how this app draws one.
 
 import AppKit
 import SwiftUI
@@ -50,17 +50,18 @@ public struct SettingsWindow: View {
     }
 }
 
-/// The colour of a chord in each of the two editors, each with what it looks like and
-/// a way back to the usual colour.
+/// The colour of a chord in each of the two editors, and of the highlighted line of
+/// the chord sheet, each with what it looks like and a way back to the usual colour.
 struct ChordColourSettings: View {
     @Bindable var model: LibraryModel
 
     private var onTheSheet: NSColor { ChordColour.colour(model.sheetChordColour) ?? SheetLook.chordName }
     private var inTheText: NSColor { ChordColour.colour(model.textChordColour) ?? .systemOrange }
+    private var theLine: NSColor { ChordColour.colour(model.sheetLineColour) ?? SheetLook.accent }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 18) {
-            row("On the chord sheet", colour: onTheSheet, isUsual: model.sheetChordColour == nil,
+            row("On the chord sheet", picker: "The colour of a chord on the chord sheet", colour: onTheSheet, isUsual: model.sheetChordColour == nil,
                 choose: { model.setSheetChordColour($0) }) {
                 // A chord as the sheet draws one: its name in a bubble, over a word.
                 VStack(alignment: .leading, spacing: 3) {
@@ -80,7 +81,23 @@ struct ChordColourSettings: View {
                 .background(RoundedRectangle(cornerRadius: 4).fill(Color(nsColor: SheetLook.card)))
             }
             Divider()
-            row("In ChordPro text", colour: inTheText, isUsual: model.textChordColour == nil,
+            row("The highlighted line", picker: "The colour of the highlighted line on the chord sheet", colour: theLine, isUsual: model.sheetLineColour == nil,
+                says: "The line the pointer is on, on the chord sheet: where \(SheetHints.command)C copies from and \(SheetHints.command)V pastes to.",
+                choose: { model.setSheetLineColour($0) }) {
+                // Two lines as the sheet draws them, the second the highlighted one.
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Amazing grace")
+                        .foregroundStyle(Color(nsColor: SheetLook.words))
+                    Text("How sweet the sound")
+                        .foregroundStyle(Color(nsColor: theLine))
+                }
+                .font(.system(size: 17))
+                .padding(10)
+                .frame(width: 190, alignment: .leading)
+                .background(RoundedRectangle(cornerRadius: 4).fill(Color(nsColor: SheetLook.card)))
+            }
+            Divider()
+            row("In ChordPro text", picker: "The colour of a chord in ChordPro text", colour: inTheText, isUsual: model.textChordColour == nil,
                 choose: { model.setTextChordColour($0) }) {
                 // A line as the text shows one: the chords in their colour, bold, among
                 // the words.
@@ -92,7 +109,7 @@ struct ChordColourSettings: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(Color(nsColor: .textBackgroundColor)))
                     .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color(nsColor: .separatorColor)))
             }
-            Text("These are only how chords look in this app. Nothing in a song\u{2019}s file says a colour, and ProPresenter shows chords in its own.")
+            Text("These are only how a song looks in this app. Nothing in a song\u{2019}s file says a colour, and ProPresenter shows chords in its own.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -101,16 +118,23 @@ struct ChordColourSettings: View {
         .frame(width: 560)
     }
 
-    /// One editor's colour: its name, the well to choose it from, the way back to the
-    /// usual one, and what a chord then looks like.
-    private func row<Sample: View>(_ name: String, colour: NSColor, isUsual: Bool, choose: @escaping (String?) -> Void,
+    /// One colour: its name, what it is the colour of where the name does not say,
+    /// the well to choose it from (`picker` is what the well is called, for whoever
+    /// cannot see it), the way back to the usual one, and what it then looks like.
+    private func row<Sample: View>(_ name: String, picker: String, colour: NSColor, isUsual: Bool, says: String? = nil, choose: @escaping (String?) -> Void,
                                    @ViewBuilder sample: () -> Sample) -> some View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 8) {
                 Text(name)
                     .font(.headline)
+                if let says {
+                    Text(says)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 HStack(spacing: 10) {
-                    ColorPicker("The colour of a chord: \(name.lowercased())",
+                    ColorPicker(picker,
                                 selection: Binding(get: { Color(nsColor: colour) }, set: { choose(ChordColour.written(NSColor($0))) }),
                                 supportsOpacity: false)
                         .labelsHidden()
