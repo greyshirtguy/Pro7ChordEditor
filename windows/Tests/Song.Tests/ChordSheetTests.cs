@@ -255,7 +255,10 @@ public class ChordSheetTests
             Same(expected.Said, said is null ? [] : [said], expected.Title);
             sheet.SetSpot(expected.PasteAt.Row, expected.PasteAt.At);
             song.Asked.Clear();
-            sheet.Paste();
+            var pasted = sheet.Paste();
+            // What the paste answers: how many lines, chords, left out, passed over,
+            // refused. (What is said of it is the window's model's: SheetModelTests.)
+            Assert.True(expected.Pasted.Did.Pasted == pasted, expected.Title + ": answered " + pasted + ", not " + expected.Pasted.Did.Pasted);
             Same(expected.Asked.Select(asked => asked.Spelt), song.Asked, expected.Title);
             Same(expected.SongAfter.Select(after => after.Spelt), song.After, expected.Title);
         }

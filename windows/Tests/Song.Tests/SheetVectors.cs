@@ -144,8 +144,17 @@ internal sealed record SheetVectors(
             : "alone " + Tests.Spelt.Of(line.GetProperty("alone").EnumerateArray().Select(name => name.GetString()!)));
     }
 
+    /// <summary>How many of each a paste answers that it did (spec/03, rule 52a).</summary>
+    internal sealed record Did(int Lines, int Chords, int LeftOut, int PassedOver, int Refused)
+    {
+        internal ChordSheet.Pasted Pasted => new(Lines, Chords, LeftOut, PassedOver, Refused);
+    }
+
+    /// <summary>What a paste answers, and the sentence that is said of it (in the vectors since 2026-10-12).</summary>
+    internal sealed record PastedOf(Did Did, List<string> Said);
+
     internal sealed record CopyPaste(
-        string Song, string Title, ASpot CopyAt, bool WholeGroup, CopiedOf Copied, List<string> Said, ASpot PasteAt, List<Asked> Asked, List<After> SongAfter);
+        string Song, string Title, ASpot CopyAt, bool WholeGroup, CopiedOf Copied, List<string> Said, ASpot PasteAt, List<Asked> Asked, List<After> SongAfter, PastedOf Pasted);
 
     internal static SheetVectors Read()
     {

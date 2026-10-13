@@ -277,7 +277,11 @@ public sealed class LibraryTests : IDisposable
                 }
             }
         }
-        Assert.Equal(11, held);
+        // Every file that has an answer there was met: as many as the file has, which is
+        // not a number kept here. (It was, 11, and the build was red for two days when
+        // the test data was made again with Chords With No Words in it, 2026-10-12.)
+        Assert.Equal(chordsOf.Count, held);
+        Assert.True(held >= 12, "as-read-by-simple-presenter.json had twelve files when this was written, and has " + held);
         var songs = Listing.Songs(Listing.Libraries(place)[2]);
         // (The song ProPresenter wrote is the one with none.)
         Assert.Equal(new Marks(), Marks.Read(songs.Single(song => song.Name == "Rock Of Ages (Toplady)")));

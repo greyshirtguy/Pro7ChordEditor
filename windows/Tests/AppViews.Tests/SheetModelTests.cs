@@ -6,11 +6,13 @@
 // keeps of its own from one start to the next (the sheet's zoom, the two colours); and
 // that with no song open, or the same editor asked for, nothing happens.
 
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using Pro7ChordEditor.Song;
+using Pro7ChordEditor.Tests;
 using Xunit;
 
 namespace Pro7ChordEditor.AppViews.Tests;
@@ -69,6 +71,37 @@ public class SheetModelTests
         Assert.Equal("Nothing was put here: " + kinds + ".", Said(passedOver: 3));
         // And where there was no line to take any of it, nothing: nothing was tried.
         Assert.Null(Said());
+    }
+
+    // The same, held to the vectors: every case of copyPaste in sheet-model.json says
+    // what its paste answered (`did`) and the sentence said of that (`said`), since
+    // the test data was made again on 2026-10-12. The answer itself is held where the
+    // sheet is (Song.Tests, ChordSheetTests); here, that this app says of it what
+    // Simple Presenter says, to the letter.
+    [Fact]
+    public void WhatAPasteSaysIsWhatTheVectorsSayOfEveryPasteTheyHave()
+    {
+        using var vectors = JsonDocument.Parse(TestData.Vector("sheet-model.json"));
+        var cases = vectors.RootElement.GetProperty("copyPaste").EnumerateArray().ToList();
+        Assert.True(cases.Count >= 14, "sheet-model.json had fourteen pastes when this was written, and has " + cases.Count);
+        var sentences = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var expected in cases)
+        {
+            var title = expected.GetProperty("title").GetString()!;
+            var did = expected.GetProperty("pasted").GetProperty("did");
+            int Of(string name) => did.GetProperty(name).GetInt32();
+            var pasted = new ChordSheet.Pasted(Of("lines"), Of("chords"), Of("leftOut"), Of("passedOver"), Of("refused"));
+            var said = expected.GetProperty("pasted").GetProperty("said").EnumerateArray().Select(sentence => sentence.GetString()!).ToList();
+            var here = LibraryModel.WhatIsSaidOf(pasted);
+            Assert.True(said.SequenceEqual(here is null ? [] : [here], StringComparer.Ordinal), title + ": said " + (here ?? "nothing"));
+            sentences.UnionWith(said);
+        }
+        // (So that it is known what the cases hold between them: a plain paste, one
+        // with chords left out, one where nothing was put, one with a line passed over.)
+        Assert.Contains(sentences, sentence => sentence.EndsWith("put on the line.", StringComparison.Ordinal));
+        Assert.Contains(sentences, sentence => sentence.Contains("left out", StringComparison.Ordinal));
+        Assert.Contains(sentences, sentence => sentence.StartsWith("Nothing was put here", StringComparison.Ordinal));
+        Assert.Contains(sentences, sentence => sentence.Contains("1 line was passed over", StringComparison.Ordinal));
     }
 
     // ---- With no song, and with the same editor
