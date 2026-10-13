@@ -28,9 +28,9 @@ that song's slides for each of the new one's. A song can be written out as a Cho
 file too. **No song made this way has yet been opened in ProPresenter**
 ([`NOTES.md`](NOTES.md)).
 
-**An early build is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page**, marked as a
-pre-release: a zip with the app as one file, and a read-me. **It has been tried by hand
-only briefly.** Keep a backup of your library, quit ProPresenter first, and try it on a
+**Version 1.0.3 is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page**, in the one
+release that holds both apps (`v1.0.3`): a zip with the app as one file, and a read-me.
+**What is new in it since 0.2 has been run far more by its tests than by a hand.** Keep a backup of your library, quit ProPresenter first, and try it on a
 copy of a library before your own: the read-me says how.
 
 Under what is seen it has the rules of chords, held to the same answers as the Mac
@@ -44,7 +44,7 @@ is to be done about that is not decided ([`NOTES.md`](NOTES.md)). A folder of `.
 files, wherever it is, can always be chosen by hand.
 
 The first Windows editor, version 0.9.5, is in [`old/`](old/README.md) as it was, and
-its [latest release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/latest)
+its [last release](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v0.9.5)
 still works as it did. This app is to replace it, and finds and mends what it left in
 files ([`spec/08-repair.md`](../spec/08-repair.md)).
 

@@ -20,7 +20,7 @@ milestone; put right what has become untrue.
 | **M7** Chords with no words | The song's part done at M2, the editors' at M5 and M6 | Both editors ask it now, and a chord put on a blank slide and taken off again leaves the file byte for byte what it was (a test, by a hand at the sheet). What is left: the maintainer seeing in ProPresenter a song so changed |
 | **M8** Mending | Done, 2026-10-12, bar what only the maintainer can try | What the first Windows editor left in songs, found and put right: the three checks, asked of a file; a mark in the list and the list's fourth choice; Mend for a song and Mend All for a list of them; a key that does not fit the chords, offered to be set; chords that look moved to the left, shown both ways before they are moved, behind a setting that is off; a "(Chords)" copy's chords put into the song it was saved beside, and the copy moved out of the library. `spec/08`, and `spec/06` rules 9 and 11. The three proofs at the foot of `spec/08` pass, and more than they ask: **each damaged test file, put right, is the clean file it was made from, to the byte**. It has been started for real on a made-up library and worked through ("At M8"). **Nobody has clicked any of it by hand, and it has been near no real song**: both are the maintainer's, on a COPY of a library. **The Mac app has none of M8 yet**: what was decided here where the page is silent is in the decisions below (78 to 93) for the maintainer to read, and for the Mac to have the same |
 | **M9** ChordPro files | Built, 2026-10-12. **Its proof is the maintainer's, and is not done** | A ChordPro file read from a disk and shown before anything is made of it; a new song made from it, as a copy of a song that is known to be good; and the song that is open written out as a ChordPro file. `spec/09`. What could be proved here is: a song made from each ChordPro file of the test data reads, in this app, as the presentation Simple Presenter made from the same file; a slide of it is the model's slide but for its ids, its words and what is said of stretches of them; nothing of the model song's own is in it; and the file is made new, never over one that is there, and not while ProPresenter is running. **No song made here has been opened in ProPresenter**, which is what the plan asks of M9 and the page asks before this is offered to anyone: on both systems, shown, and its chords seen on a stage screen. **Nobody has clicked any of it by hand**, and of the system's own choosers of a file only the first has been seen to come ("At M9", which also says what went wrong in trying). **The Mac app has none of M9 yet**: where the page is silent, what was decided here is in decisions 94 to 112, for the maintainer to read and for the Mac to have the same |
-| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The icon is the maintainer's own since 2026-10-14: decision 133.) (The version's number is 1.0.3 since the maintainer said so, 2026-10-14: decision 140. A zip of it was made for them to try, and nothing was published.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
+| **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The icon is the maintainer's own since 2026-10-14: decision 133.) (The version's number is 1.0.3 since the maintainer said so, 2026-10-14: decision 140. It was given out the same day, as the Windows file of the release `v1.0.3`: decision 141.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
 | **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
 | **The window as the Mac's 1.0.3** (asked for on 2026-10-14) | Built, 2026-10-14. **No hand has tried it** | What the Mac app gained between its 0.2 and its 1.0.3, which a note from its session listed and `spec/` has: the line of hints under the sheet and the highlighted line (`spec/03`, rules 53a to 53h); an emptied box that is kept takes the chord off (rule 35a); a text box's other ranges go with the words (`spec/01`); the edge as a bar that is seen, the title over the choice of place, no Save in any menu, the quiet line as a count (`spec/06`, rules 6a, 6e, 7, 12, 12a, 20a); Earlier Versions in blue (`spec/07`, rule 15); the guide (`spec/13`); the icon and the menus (`spec/10`). And the build put right, which had been red since the test data was made again. Decisions 122 to 139, "The window as the Mac's 1.0.3" and "At the round of 2026-10-14". **Which number it is to be given out under is the maintainer's to say; nothing was published** |
 
@@ -910,7 +910,36 @@ ProPresenter is for.
     given to nobody**: no tag, no release, and the README's "Try it" still offers
     0.2. Adding it to `v1.0.3` is on the maintainer's word, when they have tried
     it. **The read-me in the zip still says "An early build"**, as the Mac's does
-    in the image of its 1.0.3.
+    in the image of its 1.0.3. (Given out the same day: the next.)
+141. **1.0.3 is given out** (the maintainer, 2026-10-14: "push and add the zip to
+    the v1.0.3 release"), as the Windows file of the release `v1.0.3`, beside the
+    Mac's image, which was there first (`spec/10`: "the other adds its file, its
+    part of the text, and its row of 'Try it'"). "At M10" has what was done and
+    checked. **Mine, and the maintainer's to overrule**:
+    - **the zip is the one that was made to be tried**, to the byte, and not one
+      built again;
+    - **the tag was left where it is**, on the Mac's commit `80497fa`. The
+      Windows file is built from `b376e7f`, which is later: a tag is not moved
+      without being asked, and a release has one. The page says so, in a line
+      at its foot, and About says which commit the file was built from. Someone
+      who takes the source at the tag gets the Windows app as it was at 0.2;
+    - **the Mac's part of the page was left as it came**, to the letter, but for
+      its first sentence, which said that the Windows app's was to be added and
+      now says that both are here. What was added is headed as Windows' own:
+      what is new since 0.2, starting it the first time, what is not yet tried,
+      and what it needs, with the zip's sum;
+    - **the page says of what is new that it "has been run far more by the
+      app's own tests than by a hand"**, and of where the app has been run,
+      what 0.2's page said. No session was told what the maintainer tried of
+      this build before they said to give it out, so the page claims nothing
+      of that;
+    - **the pages of 0.2 and of 1.0.0 were left as they are.** 1.0.0's still
+      says a Windows build of 1.0.0 is to be added (the Mac's notes, decision
+      91, ask the maintainer about it); 0.2's is still a pre-release with its
+      zip, and whether it is to be taken down, as 0.1.0 was, is theirs to say;
+    - **in `windows/README.md` a link was put right** that had been wrong since
+      1.0.0: "its latest release", of the first editor, went to whatever GitHub
+      calls latest, which is this app now. It goes to `v0.9.5`.
 
 ## How it is laid out, and why
 
@@ -2227,6 +2256,20 @@ names. What to know before changing any of it:
   not started**: what its window does is for the maintainer's hand ("Left rough").
   If this zip is the one given out, it is to be held against that sum; if the app
   is built again first, the sum will be another.
+- **1.0.3, given out on 2026-10-14** at the maintainer's word ("push and add the
+  zip to the v1.0.3 release"; decision 141). In this order: the two commits of
+  the version pushed (`73e5134`), and both workflows passed on it (the Windows
+  one ran 823 tests and published the app); the zip above held against its sum
+  (`1c927cc7c36bd1b1b1e5244f41c839ae0c3499ec1b3d536e0dbe7a099e2ed2b7`) and
+  added with `gh release upload v1.0.3 <zip>`; the page's text changed with
+  `gh release edit v1.0.3 --notes-file`, made from the text as it was by putting
+  Windows' parts in (decision 141), and the page read back afterwards to be what
+  was written; the zip fetched back from the address the README
+  gives and held against the one sent, which it is, to the byte; and only then
+  the README's row of "Try it" pushed, so that the page never offered a file
+  that was not there. The release is still no pre-release and still GitHub's
+  "Latest", with two files in it. **The file was not started by a session**,
+  before or after.
 
 ### At the chord from the strip
 

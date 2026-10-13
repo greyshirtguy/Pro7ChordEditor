@@ -29,10 +29,9 @@ words, and lets them be put on, moved and changed.
 | | Download | It needs |
 | --- | --- | --- |
 | **Mac** | **[Pro7ChordEditor-mac-1.0.3.dmg](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-mac-1.0.3.dmg)** (6 MB) | macOS 15 or later, on a Mac with Apple's own chip or Intel's. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3) |
-| **Windows** | **[Pro7ChordEditor-windows-0.2.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/windows-v0.2/Pro7ChordEditor-windows-0.2.zip)** (60 MB) | Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/windows-v0.2) |
+| **Windows** | **[Pro7ChordEditor-windows-1.0.3.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-windows-1.0.3.zip)** (58 MB) | Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3) |
 
-These are the new editor: 1.0.3 for the Mac, and for Windows the early build 0.2
-until its own is added to the same release. Before you use one:
+These are the new editor, 1.0.3 of each, in one release. Before you use one:
 
 - **Keep a backup of your ProPresenter library, and quit ProPresenter first.**
 - **Try it on a copy.** Copy one folder out of ProPresenter's `Libraries` to somewhere
@@ -42,15 +41,15 @@ until its own is added to the same release. Before you use one:
   does the read-me inside it.
 
 How chords are put on with it is on one page: [the guide](spec/13-guide.md#the-words).
-(The Mac app opens that page by itself the first time it is started, and has it under
-Help; the Windows app is to do the same.)
+(Each app opens that page by itself the first time it is started, and has it under
+Help.)
 
 **The first editor is still there.** Version 0.9.5, a Windows program of another
 design, which these replace: it is
 [on the Releases page](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v0.9.5) and works as it did, with the faults it is known to
 have ([`spec/08-repair.md`](spec/08-repair.md)). The new Windows build finds what it
 left in a song and mends it. (From 1.0.0 the release GitHub calls "Latest" is the new
-editor's, which is to hold both downloads; so far it has the Mac's.)
+editor's, and since 1.0.3 it holds both downloads.)
 
 ## Where things stand
 
