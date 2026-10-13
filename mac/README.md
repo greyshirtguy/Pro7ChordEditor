@@ -31,14 +31,19 @@ The image holds the app, a way to Applications to drag it onto, and
 [a read-me](dmg/Read%20Me%20First.txt). The version is the app's own, in the Xcode
 project.
 
-Since 0.3 a release is one for both apps, `v` and the number (`v0.3`), with the Mac's
-image and Windows' zip as its two files. If the Windows app has made it already, the
-image is added to it; if not, it is made with the image, as a pre-release, and its
-text says that Windows' is to come. Either way the Mac's row of "Try it" in
+Since 0.3 a release is one for both apps, `v` and the number (`v1.0.0`), with the
+Mac's image and Windows' zip as its two files. If the Windows app has made it
+already, the image is added to it; if not, it is made with the image, and its text
+says that Windows' is to come. From 1.0.0 it is no pre-release, and is the one GitHub
+calls "Latest". Either way the Mac's row of "Try it" in
 [the README at the top](../README.md) is brought up to date in the same push: the
 link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
 "Getting it to other people"). A release is made, changed or taken down on the
 maintainer's word and not otherwise.
+
+A build can be asked to write out its menus as it starts, for checking one with no
+hand on a mouse: start the program inside the app with `PRO7_SAY_MENUS` set, and it
+prints them (`AppMenus.swift`).
 
 **It is not yet signed with a Developer ID, nor checked by Apple** (notarized): that
 waits on the maintainer's developer account. So on another Mac, once the image has
