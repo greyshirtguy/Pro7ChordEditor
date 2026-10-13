@@ -23,6 +23,7 @@ milestone; put right what has become untrue.
 | What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
 | What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1. **Not given out: a build to try is in `mac/build`**, and a release waits for the maintainer's word | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
 | The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2. **Not given out: a build to try is in `mac/build`** | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
+| The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3. **Not given out: a build to try is in `mac/build`** | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -707,6 +708,55 @@ And the same day, on how someone new is to find out what the sheet can do:
     the system's own divider back; it was not taken up, because the system's
     cannot be told where to start (decision 80), and what made dragging slow was
     not the divider. **By hand only**: how it is to grab.
+86. **The tips refined** (`spec/03`, rules 53b, 53e, 53g, 53h; all the maintainer's,
+    2026-10-14, numbered as asked):
+    1. On every word of every line the line said to hold Option, to see how a
+       line's chords are copied. Gone. What Option does is said on a chord, in
+       the maintainer's words: "You can drag this chord to move it anywhere. (Hold
+       Option to drag a copy)", in place of "drag it to another word".
+    2. "Let's sentence case the tips": each begins with a capital. **Mine**: that
+       the words are otherwise as they were, what a key does said after the key
+       ("Takes this chord off"), and not made whole sentences ("Press ⌫ to take
+       this chord off."), which would have been half as long again.
+    3. Over the key's chords at the top of the sheet: "You can drag these down to
+       the text on any slide". **The "to" is mine**: it was asked for as "down the
+       text". And **mine**: while one of them is being carried over a word the
+       line says "Let go on a word to put this chord there" (it said nothing of it
+       before), and what tells the line that the pointer is over them is a
+       tracking area of AppKit's (`PointerWatch`), under all seven.
+    4. The copying is brought up by Command, and no other key. **Mine, with it**:
+       Command+C and Command+V no longer do anything with Option held as well,
+       which they did for a day because Option then brought the hint up; and that
+       nothing on the line now says to hold Command.
+    5. Blue, to be seen; the keys brighter than the ground; and the line lights up
+       when what it says changes, and fades over a second and a half. **Mine**:
+       which blues (`HintLook`: a light blue where the system is light, a deeper
+       one where it is dark, and the keys white on the one and bright blue on the
+       other), how long each part of the lighting up takes, and that it does not
+       light up for whoever has asked the system for less motion. It is SwiftUI's
+       own animation of how much of the lit colour shows, which costs the main
+       thread a little over a thousandth of a second each time the screen is
+       drawn while it fades (`SpeedTests` holds it); nothing is laid out by it.
+87. **A chord's name on the sheet is orange as it comes** (`spec/06`, rule 20a; the
+    maintainer's: "lets make the default chord color orange now"). The sheet's own
+    orange, `#ff8a1f`: which orange is mine. It is the colour the highlighted
+    line's words also come in, so on that line the chords and the words are one
+    colour; either can be changed in the settings. The guide's three pictures were
+    made again for it. Simple Presenter's is still the pale `#ffd9a8`.
+88. **What a paste keeps: asked by the maintainer, and theirs to decide** (`spec/03`,
+    under rule 52b). "Copy and paste sometimes seems the drop the chords in
+    different place (text ranges) ... the positions all are wrong (they seem to be
+    reduced in offset)". Looked into on copies of their two files of that hymn,
+    read for the shapes of their lines and where their chords are and for nothing
+    else: what they saw is rules 48 and 50 doing what they say. A chord is copied
+    by which WORD it is on, and goes onto the same numbered word. Between
+    "Amazing grace how sweet the sound" (letters 1, 8, 18, 28) and "I once was
+    lost but now am found" that is letters 0, 2, 11, 20: each a word sooner than
+    it is sung, "Amazing" being one word where the other line has three. The
+    places along the line, which is what was expected, would have been no nearer
+    for two of the four. `ChordSheetTests`, "What a paste keeps", has the
+    example. **Nothing was changed**: it is a rule the vectors hold, made from
+    Simple Presenter, so a change is that app's first and then both of these.
 
 ## How it is laid out, and why
 
@@ -1850,6 +1900,10 @@ the About text, a Developer ID, notarizing) is still to come.
   Started twice, shut in, with a new made-up home: two windows the first time and
   one the second; its menus as before. What it is for, the window's speed and the
   edge, is not a thing that told: "Left rough".
+- **1.0.3, built on 2026-10-14 and not given out**: in `mac/build` for the
+  maintainer to try (`Pro7ChordEditor-mac-1.0.3.dmg`, sha256 `12a8819e…2c47`), and
+  a release waits for their word. All 378 tests pass. Version 1.0.3, build 7. Started twice, shut in, with a new made-up
+  home: two windows the first time and one the second.
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -1866,7 +1920,19 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **1.0.2 has been used by nobody** (decisions 84 and 85). To try:
+- **1.0.3 has been used by nobody** (decisions 86 and 87). To try:
+  1. the line of hints: is the blue right, in the light and in the dark? Does it
+     light up when the words change, and is that pleasing or a flicker as the
+     pointer crosses chords? Are the keys easy to pick out?
+  2. the pointer over the seven chords at the top: the line says they can be
+     dragged; off them, it stops saying so; and while one is dragged over a
+     word, what letting go would do;
+  3. Option held on a line: nothing changes. Command held: the two sentences;
+  4. the chords in orange, and the highlighted line in the same orange: is that
+     too much of one colour?
+- **1.0.2 was tried by the maintainer on 2026-10-14**: "It feels wonderful now! all
+  smooth now.. and looks great". So the pointer, the edge and the bar are as
+  wanted. What stood here to be tried of it:
   1. the pointer over the sheet, and a chord dragged: is it as quick as 1.0.0 was,
      or quicker? It was timed off the screen; on it, only a hand can tell;
   2. the edge between the lists and the song, with a song open, on the sheet and
