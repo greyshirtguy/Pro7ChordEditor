@@ -2217,6 +2217,16 @@ names. What to know before changing any of it:
   set moves that for one start. (**A proposal, for both apps and so for `spec/`**:
   a way to start the app with its own things somewhere else, for trying a build
   without the folders that were chosen in the real one.)
+- **1.0.3, built on 2026-10-14 for the maintainer to try, and given to nobody**
+  (decision 140). `make-zip.ps1`, from the commit `b376e7f` with nothing changed
+  since it, after all 823 tests passed at that number:
+  `windows\build\Pro7ChordEditor-windows-1.0.3.zip`, 58 MB, sha256
+  `1c927cc7…d2b7`. The file in it says "1.0.3+b376e7f…" of itself, names no
+  folder of this PC (looked for as it lies and in its five sets of symbols), and
+  has the maintainer's icon, read out of the file as Windows reads it. **It was
+  not started**: what its window does is for the maintainer's hand ("Left rough").
+  If this zip is the one given out, it is to be held against that sum; if the app
+  is built again first, the sum will be another.
 
 ### At the chord from the strip
 
