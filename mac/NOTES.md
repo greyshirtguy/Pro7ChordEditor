@@ -873,7 +873,8 @@ And the same day, on how someone new is to find out what the sheet can do:
     rule has it; the line in it that said which session had brought it up to
     date was taken out, a read-me being no place for it, and is said here
     instead. **Still to ask**: "An early build", the second line of the read-me
-    in the image. The read-me in Windows' zip says the same.
+    in the image. The read-me in Windows' zip says the same. (Answered the same
+    day: it stays, decision 94.)
 93. **Three things the Windows app's session had found of this app are put
     right** (2026-10-14). Its notes had them "for the maintainer to pass on to the
     Mac's session", from 2026-10-12, and they were not passed on: found on
@@ -920,6 +921,14 @@ And the same day, on how someone new is to find out what the sheet can do:
     (look for "pass on" and "the Mac's"), as it reads `spec/`: the maintainer
     passes on what they remember to, and these had waited two days.
     All 382 tests pass. No build was made.
+94. **The read-me still says "An early build", at 1.0** (the maintainer,
+    2026-10-14, asked whether a 1.0 is still to say that of itself: "I'll leave
+    1.0 as "an early build" (not best practice - but a choice I'll keep until
+    I've used it for a while and fixe a few bugs)"). So the second line of the
+    read-me in the image stays as it is until they say otherwise, and it is not
+    to be asked again at each release. It is in `spec/10`, "Getting it to other
+    people", for the Windows app's session, whose zip says the same. That was
+    the second of the two things decision 91 left to ask, and the last.
 
 ## How it is laid out, and why
 
@@ -2104,11 +2113,6 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **Of the release of 1.0.3, to ask the maintainer** (decisions 91 and 92): "An
-  early build" is the second line of the read-me in the image, and of the one in
-  Windows' zip. Is that still what a 1.0 is to say of itself? (What 1.0.0's page
-  said of a Windows build was put right on 2026-10-14, at the maintainer's word
-  to the Windows app's session.)
 - **Of what was put right on 2026-10-14 (decision 93), tried by no hand**, there
   being no build with it:
   1. a song in a key that is not one of the twenty-six, C# major say: its key is

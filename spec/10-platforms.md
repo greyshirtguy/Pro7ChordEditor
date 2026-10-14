@@ -259,6 +259,12 @@ seen in a picture and ask the maintainer to try them.
   1.0.3 for a day, were GitHub's newest with the Mac's file alone. The maintainer,
   of making it a pre-release until the second file is in: "use the pre-release
   idea".)
+- **The read-me in each download still opens "An early build"**, at 1.0 too: the
+  Mac's (`mac/dmg/Read Me First.txt`) and Windows' (`windows/zip/Read Me First.txt`).
+  It is left so until the maintainer says otherwise, and is not asked again at each
+  release. (The maintainer, 2026-10-14, asked whether a 1.0 is still to say that of
+  itself: "I'll leave 1.0 as "an early build" (not best practice - but a choice I'll
+  keep until I've used it for a while and fixe a few bugs)".)
 - **Every push** should build both apps and run both sets of tests on GitHub's own
   Mac and Windows machines (`.github/workflows`). That is the referee the two apps
   share: neither can drift from the vectors without it showing. Set it up in the
