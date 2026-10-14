@@ -293,9 +293,9 @@ And at M4, likewise this session's, and the maintainer's to change:
     app's**, to be closed before the app is gone back to; it has one section so far,
     Backups, which is All Copies.
 36. **Putting back a copy that is already what the file is, is nothing to do and
-    offers nothing to undo** (`spec/07`, rule 21). The Mac's model goes on to offer
-    Undo all the same, and Undo would then put back whatever copy happened to be the
-    newest. **For the maintainer to pass on to the Mac's session.**
+    offers nothing to undo** (`spec/07`, rule 21). (The Mac's model went on to offer
+    Undo all the same, and Undo would then have put back whatever copy happened to
+    be the newest. Put right there on 2026-10-14: `mac/NOTES.md`, decision 93.)
 37. **A song's marks in the list are worked out again as soon as a copy is put back**,
     and whether it has copies: the list is never a file behind.
 38. **How much room the copies take is said as Windows counts it** (1024 to the
@@ -383,9 +383,10 @@ And at M4, likewise this session's, and the maintainer's to change:
     seconds or when the app comes to the front.
 55. **A key that is not one of the twenty-six is listed first in its picker**
     (`spec/02`: "so that the song's own key can always be seen and chosen"), by
-    `LibraryModel.KeysListedFor`. **For the maintainer to pass on**: the Mac's
-    pickers in the song's header list the twenty-six and "None" only, so a song in
-    C# major would show nothing there.
+    `LibraryModel.KeysListedFor`. (The Mac's pickers in the song's header listed
+    the twenty-six and "None" only, so a song in C# major showed nothing there.
+    Put right there on 2026-10-14, by its `keysListed(for:)`: `mac/NOTES.md`,
+    decision 93.)
 56. **Every row of every list says what it shows to a screen reader** ("At M5").
 57. **The settings' Chords section waited for the sheet**, and came with it at M6
     (decision 75). `spec/06`, "Settings", has each colour shown "as it will look",
@@ -1529,13 +1530,14 @@ names. What to know before changing any of it:
   going to the even digit by the exact value held (`0.03125` is `0.0312`). The page
   warns that not every way of rounding does; this one is held by a test of the ties
   there can be.
-- **Where the Mac's port and the reference part, in corners no song will meet.** Seen
-  while reading the Mac's `ChordProSong.swift`: it makes a directive's name small
-  with Swift's `lowercased()` and asks `hasPrefix`, which go by whole characters
-  (`spec/02`, "To the letter", has everything done on units). A name such as
-  `start_of_` followed by an accent laid over the underline is a `start_of_` name to
-  the reference and here, and not on the Mac. Nothing writes such a thing. **For the
-  maintainer to pass on, or not.**
+- **Where the Mac's port and the reference parted, in corners no song will meet.**
+  Seen while reading the Mac's `ChordProSong.swift`: it made a directive's name
+  small with Swift's `lowercased()` and asked `hasPrefix`, which go by whole
+  characters (`spec/02`, "To the letter", has everything done on units). A name
+  such as `start_of_` followed by an accent laid over the underline is a
+  `start_of_` name to the reference and here, and was not on the Mac. Nothing
+  writes such a thing. (Put right there on 2026-10-14, what a name starts with
+  being asked of its units: `mac/NOTES.md`, decision 93.)
 
 ### At M2
 
@@ -1566,12 +1568,27 @@ names. What to know before changing any of it:
   come out as the page's "could not be saved" with the system's own words after it,
   the file untouched and what was being written beside it cleared away; both are
   tests. The swap is `File.Replace`, as `spec/01` asks.
-- **Where the Mac's port writes two bytes more than this one.** A text box with no
-  settings written at all, asked to have no chords: the Mac's port gives it an empty
-  set of settings (Swift makes the part by reaching into it), which reads the same
-  and is a change saved; this one leaves it, since the request changes nothing
-  (`Writing.cs`). No file to hand has such a text box. **For the maintainer to pass
-  on, or not.**
+- **Where this app writes two bytes fewer than the reference and the Mac's port.**
+  A text box with no settings written at all, asked to have no chords: the Mac's
+  port gives it an empty set of settings (Swift makes the part by reaching into
+  it), which reads the same and is a change saved; this one leaves it, since the
+  request changes nothing (`Writing.cs`). No file to hand has such a text box.
+  **This was written down on 2026-10-12 as the Mac's port parting from the
+  reference, without the reference having been looked at. It is the other way
+  about** (the Mac's session, 2026-10-14, and read here in the source the same
+  day): `writeChords` in `proconvert.cpp` begins with `mutable_attributes()`,
+  which makes the settings if there are none, and `commit` in
+  `presentationeditor.cpp` saves whenever the slide's bytes are other than they
+  were. So in the reference and on the Mac such a request saves a file two bytes
+  longer, keeps a copy and is a step of undo; here it does none of the three.
+  The Mac's session says how it is come to from the window: a copied line that
+  had no chords, pasted onto a line of such a box. **What the pages say**:
+  `spec/05`, "A request that would change nothing saves nothing, keeps no copy,
+  and is no step of undo", which a test here quotes for this very case
+  (`NotHeldByTheTestFilesTests`); it does not say whether an empty set of
+  settings where there was none is nothing. No vector has the case. **Not
+  changed: it is the maintainer's to say** which way all three are to go
+  ("Left rough").
 - **Eleven of the twenty-seven cases of `ranges.json`** have the words of a text box
   in a clean test file, and are tried on the file itself (`spec/05`, the fifth
   proof).
@@ -2755,6 +2772,13 @@ names. What to know before changing any of it:
     the song still has it; and **Settings, Backups**, where the copy now is;
   - the row of offers where the pane is narrow: a long sentence beside two or three
     buttons has not been looked at there.
+- **For the maintainer to say, of a text box with no settings written, given no
+  chords** ("At M2"): the reference and the Mac's port write it an empty set of
+  settings, two bytes, and count that a change; this app leaves the file as it
+  is. Either this app does as they do (three lines of `Writing.WriteChords`, and
+  its test turned round), or the other two do as this one does, which is for
+  the Mac's session and for Simple Presenter's. And `spec/05` is to say which,
+  being silent on it now. No file seen has such a box.
 - **For the maintainer to say, of M8**: each of decisions 78 to 93, and above all
   - whether a song beside a copy with a doubted key should keep its own ("At M8");
   - whether the ChordPro text is to show a chord that is on no character (81);

@@ -34,9 +34,12 @@ internal static class Writing
     /// Replaces a box's chord entries with these chords.
     ///
     /// (A text that has no settings at all written, and is given no chords, is left
-    /// without any: there is nothing to write and nowhere it was written. The Mac's
-    /// port writes it an empty set of settings there, which reads the same and is two
-    /// bytes more. No file to hand has such a text box: windows/NOTES.md.)
+    /// without any: there is nothing to write and nowhere it was written. THE
+    /// REFERENCE DOES OTHERWISE, and so does the Mac's port: each writes it an empty
+    /// set of settings there, which reads the same, is two bytes more, and is saved
+    /// as a change. Which way all three are to go is the maintainer's to say, and
+    /// has not been said. No file to hand has such a text box: windows/NOTES.md,
+    /// "At M2".)
     /// </summary>
     internal static void WriteChords(IEnumerable<Chord> chords, RV.Graphics.Types.Text text)
     {
