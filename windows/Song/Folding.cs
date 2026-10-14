@@ -104,7 +104,19 @@ public static class Folding
         var theirs = Checks.Texts(copy).ToList();
         for (var box = 0; box < mine.Count; box++)
         {
-            Writing.WriteChords(Reading.ChordsOf(theirs[box]), mine[box]);
+            var chords = Reading.ChordsOf(theirs[box]);
+            // (A box with no settings written, that the copy has no chords for, is left
+            // as it is. Writing it no chords would give it an empty set of settings, as
+            // an editor's request does since 2026-10-14 (Writing.WriteChords); but that
+            // is no part of what the copy has to give, "mending changes nothing else in
+            // the file" (spec/08-repair.md), and a song that has such a box would never
+            // be found to be folded already. MINE: no page has the case, and the Mac
+            // app has no mending yet to do the same.)
+            if (mine[box].Attributes is null && chords.Count == 0)
+            {
+                continue;
+            }
+            Writing.WriteChords(chords, mine[box]);
         }
         folded.Music = copy.Music?.Clone();
         return folded;

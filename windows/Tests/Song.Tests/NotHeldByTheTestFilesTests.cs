@@ -84,12 +84,21 @@ public sealed class NotHeldByTheTestFilesTests : IDisposable
 
     // ---- Writing a box's chords
 
-    // "A request that would change nothing saves nothing." A text box that has no
-    // settings written at all (ProPresenter writes them for every text box seen so far),
-    // given no chords, is left as it is: there is nothing to write, and nowhere to
-    // write it. Given a chord, it is given settings to hold it.
+    // A text box that has no settings written at all (ProPresenter writes them for every
+    // text box seen so far), given no chords, is given an empty set of settings. The
+    // chords are kept in the settings, so the settings are made before anything else,
+    // as the reference's writeChords begins with mutable_attributes(). So that is a
+    // change, though no chord is other than it was: two bytes more in the file, saved,
+    // with a copy kept and a step of undo (spec/05, under the three requests). Asked
+    // again it is nothing, the settings being there. Given a chord, the box is given
+    // settings to hold it.
+    //
+    // UNTIL 2026-10-14 THIS TEST HELD THE OTHER WAY ABOUT, and the app left such a box
+    // alone, quoting "A request that would change nothing saves nothing". That was this
+    // app's own reading and not the reference's code, which the head of this file says
+    // these tests go by. The maintainer: "yes change windows to match".
     [Fact]
-    public void ATextBoxWithNoSettingsWrittenIsNotChangedByBeingGivenNoChords()
+    public void ATextBoxWithNoSettingsWrittenIsGivenAnEmptySetByBeingGivenNoChords()
     {
         var path = bench.CopyOf("Plain Song.pro");
         var first = new OpenSong(path).TextBoxes[0];
@@ -100,9 +109,25 @@ public sealed class NotHeldByTheTestFilesTests : IDisposable
         Assert.Empty(song.TextBoxes[0].Chords);
 
         song.SetChords(first.Slide, first.Element, []);
-        Assert.False(song.CanUndo);
+        var written = File.ReadAllBytes(song.Path);
+        Assert.Equal(asItWas.Length + 2, written.Length);
+        // What was written is the song as it was, but that the box has settings, with
+        // nothing in them.
+        var meant = Presentation.Parser.ParseFrom(asItWas);
+        Workbench.TextOf(meant, first.Element).Attributes = new Graphics.Types.Text.Types.Attributes();
+        Assert.Equal(meant.ToByteArray(), written);
+        Assert.Empty(new OpenSong(song.Path).TextBoxes[0].Chords);
+        Assert.True(song.CanUndo);
+        Assert.Equal(asItWas, Assert.Single(bench.Copies).Bytes);
+
+        // Asked again it is nothing: nothing written, no copy, and no step of undo, so
+        // that one undoing is back at the file as it was.
+        song.SetChords(first.Slide, first.Element, []);
+        Assert.Equal(written, File.ReadAllBytes(song.Path));
+        Assert.Single(bench.Copies);
+        song.Undo();
         Assert.Equal(asItWas, File.ReadAllBytes(song.Path));
-        Assert.Empty(bench.Copies);
+        Assert.False(song.CanUndo);
 
         song.SetChords(first.Slide, first.Element, [new Chord(0, "G")]);
         Assert.Equal([new Chord(0, "G")], new OpenSong(song.Path).TextBoxes[0].Chords);

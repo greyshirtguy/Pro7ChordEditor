@@ -1013,6 +1013,40 @@ ProPresenter is for.
     it already, "Latest" with both files and its tag on the second one's
     commit. 0.2's page is still there as a pre-release, which nobody has said
     to take down.
+144. **A text box with no settings written, asked to have no chords, is given an
+    empty set of settings, as the reference and the Mac app give it** (the
+    maintainer, 2026-10-14: "yes change windows to match"). Two bytes more in
+    the file; and since a change is whatever leaves a slide's bytes other than
+    they were, it is saved, a copy is kept, and it is a step of undo. Asked
+    again it is nothing. `Writing.WriteChords` makes the settings before
+    anything else now, as the reference's `writeChords` does; it had gone back
+    without doing anything. `spec/05` says so under the three requests, where
+    it was silent: "What is nothing is judged by the file". "At M2" has how
+    this app came to part from the reference, and who found it. **It is in the
+    source and in no build**: 1.0.3 as given out leaves such a box alone.
+    **Mine, within that**:
+    - **folding a "(Chords)" copy into its song still leaves such a box alone
+      where the copy has no chords for it** (`Folding.Folded`). A fold hands
+      every box of the song the chords of the copy's, so with nothing done it
+      would have given the box its empty settings: no part of what the copy
+      has to give ("mending changes nothing else in the file", `spec/08`), and
+      a song with such a box would never have been found to be folded
+      already. No page has the case. **For the Mac's session, when it builds
+      M8**, to do the same or to say why not;
+    - **a song made from a ChordPro file** (`NewSong`) writes each new slide's
+      chords the same way, so a slide copied from a model whose box had no
+      settings, and given no chords, has empty settings now. So the reference
+      has it too (`songimport.cpp` calls `writeChords` for every slide);
+    - **the test that held the other way was turned round**
+      (`NotHeldByTheTestFilesTests`): it expects the two bytes, the file to be
+      the song as it was but for the empty settings, the copy, the one step of
+      undo, and nothing at the second asking. A test was added that a fold
+      leaves such a box alone, and seen to fail with the guard taken out.
+      No expected answer of `testdata/` was touched: none has the case.
+    **What is not known** is what ProPresenter makes of a text box whose
+    settings are there and empty. Nothing suggests it minds: every app here
+    makes the settings when the first chord goes on such a box, with the chord
+    alone in them. No file seen has a box with none, so it has not been tried.
 
 ## How it is laid out, and why
 
@@ -1586,9 +1620,9 @@ names. What to know before changing any of it:
   `spec/05`, "A request that would change nothing saves nothing, keeps no copy,
   and is no step of undo", which a test here quotes for this very case
   (`NotHeldByTheTestFilesTests`); it does not say whether an empty set of
-  settings where there was none is nothing. No vector has the case. **Not
-  changed: it is the maintainer's to say** which way all three are to go
-  ("Left rough").
+  settings where there was none is nothing. No vector has the case. **Changed
+  the same day, at the maintainer's word, to do as the other two**: decision
+  144.
 - **Eleven of the twenty-seven cases of `ranges.json`** have the words of a text box
   in a clean test file, and are tried on the file itself (`spec/05`, the fifth
   proof).
@@ -2772,13 +2806,6 @@ names. What to know before changing any of it:
     the song still has it; and **Settings, Backups**, where the copy now is;
   - the row of offers where the pane is narrow: a long sentence beside two or three
     buttons has not been looked at there.
-- **For the maintainer to say, of a text box with no settings written, given no
-  chords** ("At M2"): the reference and the Mac's port write it an empty set of
-  settings, two bytes, and count that a change; this app leaves the file as it
-  is. Either this app does as they do (three lines of `Writing.WriteChords`, and
-  its test turned round), or the other two do as this one does, which is for
-  the Mac's session and for Simple Presenter's. And `spec/05` is to say which,
-  being silent on it now. No file seen has such a box.
 - **For the maintainer to say, of M8**: each of decisions 78 to 93, and above all
   - whether a song beside a copy with a doubted key should keep its own ("At M8");
   - whether the ChordPro text is to show a chord that is on no character (81);

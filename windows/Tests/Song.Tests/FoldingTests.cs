@@ -144,6 +144,37 @@ public sealed class FoldingTests : IDisposable
 
     // ---- Folding
 
+    // A text box of the original that has no settings written at all, for which the copy
+    // has no chords, is left as it is: the copy has nothing to give it, and "mending
+    // changes nothing else in the file" (spec/08-repair.md). (An editor's request that
+    // such a box have no chords does give it an empty set of settings, as the reference
+    // does: NotHeldByTheTestFilesTests. A fold is not that request.) And a song so
+    // folded is found to be folded, which it would not be if the box were touched each
+    // time. MINE: no page has the case, and no file to hand has such a box.
+    [Fact]
+    public void FoldingLeavesATextBoxWithNoSettingsAloneWhereTheCopyHasNoChordsForIt()
+    {
+        var theirs = Presentation.Parser.ParseFrom(Copy("Plain Song"));
+        var theirFirst = Checks.Texts(theirs).First();
+        var others = theirFirst.Attributes.CustomAttributes.Where(attribute => !Reading.IsAChord(attribute)).ToList();
+        theirFirst.Attributes.CustomAttributes.Clear();
+        theirFirst.Attributes.CustomAttributes.AddRange(others);
+        var copy = bench.FileOf("Plain Song (Chords).pro", theirs.ToByteArray());
+
+        var mine = Presentation.Parser.ParseFrom(WithNoChords(Clean("Plain Song")));
+        Checks.Texts(mine).First().Attributes = null;
+        var song = bench.OpenAt(bench.FileOf("Plain Song.pro", mine.ToByteArray()));
+        Assert.False(Folding.Plan(copy, song.Path).NothingToDo);
+
+        song.FoldIn(File.ReadAllBytes(copy));
+
+        var folded = Presentation.Parser.ParseFrom(File.ReadAllBytes(song.Path));
+        Assert.Null(Checks.Texts(folded).First().Attributes);
+        // The copy's other chords came over all the same.
+        Assert.NotEmpty(song.UsedChords);
+        Assert.True(Folding.Plan(copy, song.Path).NothingToDo);
+    }
+
     [Theory]
     [InlineData("Plain Song")]
     [InlineData("It Is Well")]

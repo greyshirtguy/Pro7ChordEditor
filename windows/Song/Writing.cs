@@ -33,21 +33,19 @@ internal static class Writing
     /// <summary>
     /// Replaces a box's chord entries with these chords.
     ///
-    /// (A text that has no settings at all written, and is given no chords, is left
-    /// without any: there is nothing to write and nowhere it was written. THE
-    /// REFERENCE DOES OTHERWISE, and so does the Mac's port: each writes it an empty
-    /// set of settings there, which reads the same, is two bytes more, and is saved
-    /// as a change. Which way all three are to go is the maintainer's to say, and
-    /// has not been said. No file to hand has such a text box: windows/NOTES.md,
-    /// "At M2".)
+    /// A TEXT THAT HAS NO SETTINGS AT ALL WRITTEN IS GIVEN A SET, EMPTY IF IT IS GIVEN
+    /// NO CHORDS (spec/05-song-and-saving.md, under the three requests). The chords
+    /// are kept in the settings, so the settings are made before anything else, as
+    /// the reference's `writeChords` begins with `mutable_attributes()` and the Mac's
+    /// port reaches into them. An empty set reads as none does, and is two bytes more
+    /// in the file: so such a box given no chords is a change, saved, with a copy kept
+    /// and a step of undo, in all three apps. Until 2026-10-14 this app left such a
+    /// box alone; the maintainer said to do as the other two ("yes change windows to
+    /// match"). No file to hand has such a text box: windows/NOTES.md, "At M2".
     /// </summary>
     internal static void WriteChords(IEnumerable<Chord> chords, RV.Graphics.Types.Text text)
     {
         var ranges = Chords.Ranges(Reading.WordsOf(text), chords);
-        if (text.Attributes is null && ranges.Count == 0)
-        {
-            return;
-        }
         text.Attributes ??= new RV.Graphics.Types.Text.Types.Attributes();
         var entries = text.Attributes.CustomAttributes.Where(attribute => !Reading.IsAChord(attribute)).ToList();
         foreach (var range in ranges)

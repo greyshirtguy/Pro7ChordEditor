@@ -67,7 +67,18 @@ answer says so and nothing is changed. The same if what is named is on the slide
 has no text at all: chords are not put on a shape.
 
 A request that would change nothing saves nothing, keeps no copy, and is no step of
-undo.
+undo. **What is nothing is judged by the file**: a request has changed something when
+the slide it was made of would be written otherwise than it was, though no chord is
+other than it was. One such case is known. A text box with no settings written at all
+(its `attributes`, in which its chords are kept; ProPresenter has written them for
+every text box seen so far), asked by request 1 or 2 to have no chords, is given an
+empty set of settings: two bytes more in the file, which read as none does. That is a
+change. It is saved, a copy is kept, and it is a step of undo; asked again, it is
+nothing. (So the reference has it: its `writeChords` makes the settings before
+anything else, and it saves whenever a slide's bytes are other than they were. The
+Mac app did the same from the first. The Windows app left such a box alone until
+2026-10-14, when the maintainer, told that it alone parted from the reference, said:
+"yes change windows to match".)
 
 Request 1 tidies every name it is handed, those of chords that were there before among
 them, since an editor hands back the whole box. So a chord in a file whose name is not
