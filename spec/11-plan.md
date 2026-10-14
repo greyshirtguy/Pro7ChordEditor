@@ -76,6 +76,8 @@ its turn comes, from the page that has it:
 | A text box's other ranges go with the words when a line of chords alone is made longer or shorter, as Simple Presenter has it | [01](01-file-format.md), "The box's other ranges" |
 | The edge between the lists and the song starts half way between its least and its most, and is a bar that is seen | [06](06-library.md), rule 6a |
 | Nothing in the window keeps the pointer waiting | [06](06-library.md), rule 6e |
+| A picture of each app under its own link in the README's "Try it", no longer side by side at the top (2026-10-14) | [10](10-platforms.md), "Getting it to other people" |
+| One newest release with both files: the app that comes second to a number brings its file in, and the tag is moved to its commit (2026-10-14; done so for 1.0.3) | [10](10-platforms.md), "Getting it to other people" |
 
 ## What the maintainer is asked for along the way
 

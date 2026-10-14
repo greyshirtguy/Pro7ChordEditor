@@ -6,14 +6,6 @@
 Puts chords on the songs of a ProPresenter 7 library, so that ProPresenter shows them
 on a stage screen, as it does for songs from Multitracks.
 
-<p align="center">
-  <img src="pictures/screenshot-mac.png" width="49%" alt="Pro7 Chord Editor on a Mac: the hymn Amazing Grace as a grid of its slides, with chords in orange over the words of two of them, and at the left the libraries and the songs of one">
-  <img src="pictures/screenshot-windows.png" width="49%" alt="Pro7 Chord Editor on Windows: the hymn Amazing Grace as a grid of its slides, with chords in orange over its words, and at the left the libraries and the songs of one">
-  <!-- The Windows app's is what its window holds, drawn by one of its own tests on the
-       test hymns (windows/Tests/AppViews.Tests/PictureTests.cs, "TheWindowForTheReadMe",
-       which says how it is made again): so it has no title bar round it. -->
-</p>
-
 ProPresenter shows the chords a song came with and has no way to put one on. This
 does: it opens the library where it lies, shows a song with its chords over its
 words, and lets them be put on, moved and changed.
@@ -26,12 +18,8 @@ words, and lets them be put on, moved and changed.
 
 ## Try it
 
-| | Download | It needs |
-| --- | --- | --- |
-| **Mac** | **[Pro7ChordEditor-mac-1.0.3.dmg](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-mac-1.0.3.dmg)** (6 MB) | macOS 15 or later, on a Mac with Apple's own chip or Intel's. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3) |
-| **Windows** | **[Pro7ChordEditor-windows-1.0.3.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-windows-1.0.3.zip)** (58 MB) | Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed. [What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3) |
-
-These are the new editor, 1.0.3 of each, in one release. Before you use one:
+The new editor, 1.0.3 of each app, in one release: for [the Mac](#mac) and for
+[Windows](#windows), below. Before you use one:
 
 - **Keep a backup of your ProPresenter library, and quit ProPresenter first.**
 - **Try it on a copy.** Copy one folder out of ProPresenter's `Libraries` to somewhere
@@ -44,7 +32,29 @@ How chords are put on with it is on one page: [the guide](spec/13-guide.md#the-w
 (Each app opens that page by itself the first time it is started, and has it under
 Help.)
 
-**The first editor is still there.** Version 0.9.5, a Windows program of another
+### Mac
+
+**[Pro7ChordEditor-mac-1.0.3.dmg](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-mac-1.0.3.dmg)** (6 MB).
+It needs macOS 15 or later, on a Mac with Apple's own chip or Intel's.
+[What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3)
+
+![Pro7 Chord Editor on a Mac: the hymn Amazing Grace as a grid of its slides, with chords in orange over the words of two of them, and at the left the libraries and the songs of one](pictures/screenshot-mac.png)
+
+### Windows
+
+**[Pro7ChordEditor-windows-1.0.3.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-windows-1.0.3.zip)** (58 MB).
+It needs Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed.
+[What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3)
+
+![Pro7 Chord Editor on Windows: the hymn Amazing Grace as a grid of its slides, with chords in orange over its words, and at the left the libraries and the songs of one](pictures/screenshot-windows.png)
+<!-- The Windows app's picture is what its window holds, drawn by one of its own tests
+     on the test hymns (windows/Tests/AppViews.Tests/PictureTests.cs,
+     "TheWindowForTheReadMe", which says how it is made again): so it has no title bar
+     round it. -->
+
+### The first editor
+
+**It is still there.** Version 0.9.5, a Windows program of another
 design, which these replace: it is
 [on the Releases page](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v0.9.5) and works as it did, with the faults it is known to
 have ([`spec/08-repair.md`](spec/08-repair.md)). The new Windows build finds what it

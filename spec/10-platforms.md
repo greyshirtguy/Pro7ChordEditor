@@ -183,14 +183,19 @@ seen in a picture and ask the maintainer to try them.
 - **Windows**: a self-contained `.exe` in a `.zip` on the Releases page, as the old
   editor was.
 - **The README at the top of the repository says where each app is downloaded**, in
-  the first thing a visitor reads after what the app is: a table, "Try it", with a
-  link for the Mac and a link for Windows that each fetch the newest file of that app
-  straight away. GitHub's own "Latest" can name only one release, and while the new
+  the first thing a visitor reads after what the app is: a section, "Try it", with a
+  part headed for the Mac and a part headed for Windows. Each has a link that fetches
+  the newest file of that app straight away and, under it, a picture of that app
+  (`pictures/screenshot-mac.png`, `pictures/screenshot-windows.png`), as wide as the
+  page. GitHub's own "Latest" can name only one release, and while the new
   apps are given out as pre-releases it names the old Windows editor; so the README,
   not that label, is the way in. **Whoever publishes a release of an app brings that
-  app's row of the table up to date in the same push**: the link, the version, the
+  app's part of "Try it" up to date in the same push**: the link, the version, the
   size. (The maintainer, 2026-10-12: "an obvious answer to someone who wants to try
-  it out: links to both releases".)
+  it out: links to both releases". And on 2026-10-14, of the two pictures, which
+  stood side by side under the page's first sentence, over a table of two rows:
+  "not working well visually"; "move the screenshot down in the readme to the try it
+  section", "no longer side by side - but in a Mac and Windows section".)
 - **One release holds both apps, from 0.3 on.** A release is one tag, `v` and the
   number (`v0.3`), with two files in it, each named for its app and that number:
   `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`.
@@ -201,7 +206,22 @@ seen in a picture and ask the maintainer to try them.
   apps go by one number ([06-library.md](06-library.md), rule 6d), and a number is
   used up once either app has been given out under it. Whichever app is ready first
   makes the release with its own file, and says in its text that the other's is to
-  come; the other adds its file, its part of the text, and its row of "Try it". It
+  come; the other adds its file, its part of the text, and its part of "Try it".
+  **What a visitor is to find is one newest release with both files in it** (the
+  maintainer, 2026-10-14: "I want the user experience to see a single latest release
+  with both builds attached"). The two apps are worked on in sessions of their own,
+  and neither waits for the other: when one has made the tag and the release of a
+  new number, the other's session builds its app under that number and brings its
+  file in ("bring in the new builds after one has made the new tag/release").
+  **The tag is then moved to the commit the second file was built from**, so that
+  the source at the tag is what both files were built from; but only if nothing the
+  first app is built from has changed between the two commits, and if something
+  has, the tag is left and the maintainer told. It is moved by one forced push of
+  the tag, and never by deleting it first, the release on GitHub being held by the
+  tag's name. (The maintainer, 2026-10-14, of 1.0.3, whose tag was on the Mac's
+  commit when the Windows file was added from a later one: "move the tag to make the
+  most sense". That it is done so each time is how the session that did it read
+  them, and is theirs to overrule.) It
   is a pre-release still, and GitHub's "Latest" stays on the first editor, until the
   maintainer says otherwise: with both files in one release that label can name both
   apps, which it could not while each had a release of its own. (The maintainer,

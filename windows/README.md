@@ -30,7 +30,7 @@ file too. **No song made this way has yet been opened in ProPresenter**
 
 **Version 1.0.3 is on the [Releases](https://github.com/greyshirtguy/Pro7ChordEditor/releases) page**, in the one
 release that holds both apps (`v1.0.3`): a zip with the app as one file, and a read-me.
-**What is new in it since 0.2 has been run far more by its tests than by a hand.** Keep a backup of your library, quit ProPresenter first, and try it on a
+**It has been tried by hand only briefly.** Keep a backup of your library, quit ProPresenter first, and try it on a
 copy of a library before your own: the read-me says how.
 
 Under what is seen it has the rules of chords, held to the same answers as the Mac
