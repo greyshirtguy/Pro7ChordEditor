@@ -1088,7 +1088,15 @@ ProPresenter is for.
     Windows app as 1.0.4 and do the second half (`spec/10`, "Getting it to other
     people"). What 1.0.4 has here that 1.0.3 had not is decision 145, and
     decision 144 (made after 1.0.3 was built). `Directory.Build.props` says
-    1.0.4. The zip is made from the commit that says so ("At M10").
+    1.0.4. The zip is made from the commit that says so ("At M10"). **Given
+    out the same day**, at the maintainer's word (asked whether to give it out
+    then or try the zip first: "Give it out now"): the zip added to `v1.0.4`,
+    the Windows parts put into its text beside the Mac's, the tag moved from
+    `09fb480` to `8602027`, and the release made no pre-release and "Latest".
+    "Try it" offers it. **Mine**: the words of the page's Windows parts, which
+    are 1.0.3's with what is new; and that what is new says the flat is drawn
+    from another font, and a little lighter, so that nobody takes it for a
+    fault.
 
 ## How it is laid out, and why
 
@@ -2454,6 +2462,26 @@ names. What to know before changing any of it:
   "Latest", with two files in it. **The file was not started by a session**,
   before or after. (The tag was moved to `b376e7f` afterwards, and the page
   changed twice more: decision 142.)
+- **1.0.4, built and given out on 2026-10-14, as the second half of a release**
+  (decision 146): the first the two apps gave out by the rule of
+  `spec/10` ("What a visitor is to find is one newest release with both files
+  in it"). `make-zip.ps1`, from `8602027` with nothing changed since it, after
+  all 834 tests passed at that number: `Pro7ChordEditor-windows-1.0.4.zip`,
+  58 MB (60,666,919 bytes), sha256
+  `25a39354300f58c2491a83bebc683903ec22dbc969f2aa999955535f702ce977`. The file
+  in it says "1.0.4+8602027…" of itself and names no folder of this PC. **It
+  was not started.** Then, at the maintainer's word: the two commits pushed;
+  the zip added with `gh release upload`, fetched back, and the same to the
+  byte; the page's text changed and read back; `git diff --stat 09fb480
+  8602027 -- mac proto` seen to name `mac/NOTES.md` alone, and the tag then
+  moved by one forced push of it; the release made no pre-release and
+  "Latest" (`gh release edit v1.0.4 --prerelease=false --latest`), which it
+  then was, with both files. Only then the README's Windows part, and its
+  picture drawn again (the strip says F♯dim now). **Done otherwise than for
+  1.0.3**: the zip went up while the workflows of its commit were still
+  running, where for 1.0.3 they had passed first. They were waited for
+  afterwards, and passed: Windows and Mac, for the push of the branch and for
+  the push of the tag.
 
 ### At the chord from the strip
 
