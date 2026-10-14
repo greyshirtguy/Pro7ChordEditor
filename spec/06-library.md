@@ -289,7 +289,7 @@ words; dropping a `.pro` file on the window to open it.
     - **Chords**: the colour of a chord's name on the chord sheet (as it comes, the
       sheet's orange, `#ff8a1f`: the maintainer's, 2026-10-14, "lets make the default
       chord color orange now"; until then it was Simple Presenter's pale `#ffd9a8`,
-      which Simple Presenter still has) and the colour of a chord in the ChordPro
+      which Simple Presenter had until the same day) and the colour of a chord in the ChordPro
       text (as it comes, the system's orange, or `#ff9500` where a system has none). Each is chosen with the
       system's own colour picker, has a button, "Usual Colour", that puts back the
       one it came with, and is shown beside it as it will look: a chord in its bubble
@@ -303,13 +303,15 @@ words; dropping a `.pro` file on the window to open it.
       lines of words, the second in the colour. Under its name it says what it is:
       "The line the pointer is on, on the chord sheet: where Ctrl+C copies from and
       Ctrl+V pastes to." (**New**, 2026-10-13, with the highlighted line, and
-      agreed with it on 2026-10-14: the Windows app is to have it.)
+      agreed with it on 2026-10-14: the Windows app is to have it. Simple Presenter
+      has it too, since the same day, in these words.)
 
       And last, **a switch, "Show sharps and flats as ♯ and ♭"**, on as it comes.
       Under it: "On the chord sheet. Songs are saved with # and b either way." Off,
       the chord sheet and the song's two keys are shown as they were before
       ([03-chord-sheet.md](03-chord-sheet.md), rule 10a). (**New**, the maintainer's,
-      2026-10-14: "a setting to optional turn it off (default to on)".)
+      2026-10-14: "a setting to optional turn it off (default to on)". Simple
+      Presenter has it too, in these words.)
     - **Backups**: the copies that are kept, all of them
       ([07-backups.md](07-backups.md), rule 18).
 

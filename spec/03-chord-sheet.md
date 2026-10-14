@@ -18,7 +18,11 @@ zooms, the key is picked over the sheet and not in the strip, the empty lines a 
 words end with get no row, a name that is no chord is moved and copied like any
 other, and a paste says what came of it. `reference/` holds it as it is now, and
 [`reference/README.md`](../reference/README.md) says what is still different. The
-chord dragged out of the strip it has not got yet.)
+chord dragged out of the strip it has had since its version 0.90, of 2026-10-13; and
+since 2026-10-14, in the change after its version 0.94, the line of hints and its
+highlighted line (rules 53a to 53h), sharps and flats drawn as signs (rules 10a and
+30a), an empty box that is kept taking the chord off (rule 35a), and a chord's name
+orange as it comes.)
 
 ![The chord sheet](pictures/chord-editor.png)
 
@@ -186,7 +190,9 @@ Vectors: `sheet-model.json`, `rows`.
     (**New**, the maintainer's, 2026-10-14: "let's do it for the GUI chord editor..(just
     a visual skin - not changing the underlying data) and leave chordpro text
     unchanged/native/correct. and yes - a setting to optional turn it off (default to
-    on)". It is **Simple Presenter's to follow**, and `signs.json` holds the rule.)
+    on)". Simple Presenter has followed, on 2026-10-14: its `chords::withSigns` is
+    held to `signs.json`. There the signs come from whatever font the system draws
+    them from, the app's own having neither: on the Linux machine, Noto Sans Math.)
 11. **Where a bubble stands.** Its left edge is where its character starts. If that
     would run into the bubble before it on the line, it is pushed right until it clears
     that one by 4. Its tail still points at its own character. That is all of the
@@ -334,8 +340,8 @@ Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
     maintainer's, 2026-10-13: "clicking and editing and deleting the chord text and
     pressing enter or clicking on the next insertion point should delete". Until
     then an empty box that was kept changed nothing, so a chord whose name had been
-    cleared came back. It is **Simple Presenter's to follow**, and no vector holds
-    it yet: [`testdata/README.md`](../testdata/README.md), "Still wanted".)
+    cleared came back. Simple Presenter does as this says since 2026-10-14, and
+    `sheet-model.json` has it, in `typing`.)
 36. A slash on the end of what is kept, typed on the way to a bass note that never
     came, is left off: `G/` is kept as `G`.
 37. What is kept must be a chord (`isChord`). If it is not, nothing is put on.
@@ -519,7 +525,13 @@ three times and changed each time, the last on 2026-10-14 (its words, what bring
 the copying, and how it looks), and the maintainer then said "tips are fine". **The
 Windows app is to have it as it is here**, rules 53a to 53h, its look and its
 lighting up with it: "I hope all these animations, nice looking UI works in
-Windows!". Whether Simple Presenter is to have it has not been said.
+Windows!". **Simple Presenter has it too**, since 2026-10-14 (the maintainer: "I
+like the the automatic hints- so yeah"): the same hints, in the same order, with its
+keys named in words as Windows names them, and Ctrl the key that brings up the copying
+("it be shown when user holds ctrl key on linux"), Ctrl being the key for shortcuts
+there as Command is on the Mac. Its rules are `src/sheethints.h` and its line
+`qml/HintLine.qml` (`reference/`). It has no row for ProPresenter running, asking
+nothing about it.
 
 53a. Under the sheet, over the quiet line ([06-library.md](06-library.md), rule 12),
     is one line that says **what the keys and the mouse do just now, where the spot
@@ -566,7 +578,8 @@ Windows!". Whether Simple Presenter is to have it has not been said.
     they appear at the right time - lets drop the randomly timed tips".)
 53e. The keys are named as the platform names them
     ([10-platforms.md](10-platforms.md)): on the Mac by the signs its menus and its
-    keyboard have for them, on Windows in words. **Every hint begins with a
+    keyboard have for them, on Windows in words. (Simple Presenter, on Linux, names
+    them as Windows does.) **Every hint begins with a
     capital**, as a sentence does, whether or not it is a whole sentence (the
     maintainer's, 2026-10-14: "Let's sentence case the tips").
 53f. **The highlighted line.** The line the person is at has its words in a colour of

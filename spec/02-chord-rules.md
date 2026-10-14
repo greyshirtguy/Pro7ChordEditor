@@ -196,7 +196,9 @@ Reading a whole ChordPro file is in [09-chordpro-files.md](09-chordpro-files.md)
 
 ## Sharps and flats drawn as signs
 
-**New**: not in Simple Presenter. The maintainer's, 2026-10-14, for the chord sheet:
+**New**, and in Simple Presenter as well since the same day (`chords::withSigns` and
+`chords::withoutSigns`, held to `signs.json`). The maintainer's, 2026-10-14, for the
+chord sheet:
 "just a visual skin - not changing the underlying data", the ChordPro text left
 "unchanged/native/correct", and a setting to turn it off, on as it comes. Where the
 signs are drawn is in [03-chord-sheet.md](03-chord-sheet.md), rule 10a. The rule, its

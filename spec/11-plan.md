@@ -82,6 +82,7 @@ its turn comes, from the page that has it:
 | A picture of each app under its own link in the README's "Try it", no longer side by side at the top (2026-10-14) | [10](10-platforms.md), "Getting it to other people" |
 | **How a new number is given out, agreed 2026-10-14, for both sessions**: GitHub's "Latest" always has both files. The app that comes first to a number makes a pre-release; the one that comes second is built under that number, brings its file in, moves the tag to its commit, and makes the release "Latest". (The tag of 1.0.3 was moved so; fetch with `--tags --force`) | [10](10-platforms.md), "Getting it to other people"; [AGENTS.md](../AGENTS.md), "Giving a build out" |
 | Sharps and flats drawn as ♯ and ♭ on the chord sheet and in the song's keys, only drawn (the file, the ChordPro text and what is copied keep `#` and `b`), with a switch in the settings, on as it comes (2026-10-14) | [02](02-chord-rules.md), "Sharps and flats drawn as signs"; [03](03-chord-sheet.md), rules 10a and 30a; [06](06-library.md), rules 12 and 20a |
+| Two vectors more, made from Simple Presenter on 2026-10-14, for both apps' tests to read: `place-after.json` (where a text box's other ranges go), in place of the cases taken over from its test of `placeAfter`; and six cases of an emptied box in `sheet-model.json`, `typing`, beside each app's own | [01](01-file-format.md), "The box's other ranges"; [03](03-chord-sheet.md), rule 35a; [`testdata/README.md`](../testdata/README.md) |
 
 ## What the maintainer is asked for along the way
 

@@ -447,10 +447,12 @@ song whose line of chords alone was made shorter by the Mac app up to its versio
 1.0.0, or by the Windows app before it had this rule, which left the range as it was.
 Nothing looks for such a range or mends it.
 
-No vector holds this yet (`testdata/README.md`, "Still wanted"). Until one does, the
-cases are those of Simple Presenter's own test of `placeAfter`
-(`reference/simple-presenter/tests/tst_rtfstandins.cpp`), which both apps' tests
-take over as they stand.
+`testdata/vectors/place-after.json` holds it, made from Simple Presenter's own
+`placeAfter` on 2026-10-14: every place of four text boxes, with the line in each
+made from one chord long to four. (Until then the cases were those of Simple
+Presenter's own test of `placeAfter`,
+`reference/simple-presenter/tests/tst_rtfstandins.cpp`, which both apps' tests took
+over as they stood.)
 
 ### Chords onto a blank slide
 
