@@ -23,12 +23,19 @@
 // again, and drawn afresh, a chord put on took a tenth of a second, two thirds of it
 // that. windows/NOTES.md, "What the window costs".)
 //
+// A CHORD'S NAME IS MEASURED AS IT IS DRAWN: with the music signs for its sharps and
+// flats, while they are on (spec/03, rule 10a), so that its bubble fits what is in
+// it. The signs are worked out once for each name, when it is first made ready to
+// draw; measures made with them on are not the measures made with them off, and the
+// sheet makes new ones when the switch changes, as for another zoom.
+//
 // The Mac's is `SheetMetrics`, in ChordSheetView.swift, which asks Core Text.
 
 using System.Globalization;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using Pro7ChordEditor.ChordRules;
 using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
@@ -61,10 +68,12 @@ public sealed class SheetMetrics : SheetSizes
 
     /// <param name="scale">How many times its usual size everything is.</param>
     /// <param name="dotsToAUnit">How many of the screen's dots there are to one of WPF's units: 1 on a plain screen.</param>
-    public SheetMetrics(double scale, double dotsToAUnit = 1)
+    /// <param name="signs">Whether a chord's sharps and flats are drawn as the music signs.</param>
+    public SheetMetrics(double scale, double dotsToAUnit = 1, bool signs = false)
     {
         Scale = scale;
         dots = dotsToAUnit;
+        Signs = signs;
         WordHeight = HeightOf(SheetLook.WordSize * scale);
         ChordHeight = HeightOf(SheetLook.ChordSize * scale);
     }
@@ -74,6 +83,9 @@ public sealed class SheetMetrics : SheetSizes
     public override double WordHeight { get; }
 
     public override double ChordHeight { get; }
+
+    /// <summary>Whether a chord's sharps and flats are drawn as the music signs (spec/03, rule 10a).</summary>
+    public bool Signs { get; }
 
     /// <summary>How tall a line of the system's font is at a size: what its letters need over and under.</summary>
     public static double HeightOf(double size) => Math.Ceiling(SheetLook.Font.LineSpacing * size);
@@ -251,12 +263,15 @@ public sealed class SheetMetrics : SheetSizes
         return edges;
     }
 
-    /// <summary>A chord's name, to draw, in the colour chords are drawn in.</summary>
+    /// <summary>
+    /// A chord's name, to draw, in the colour chords are drawn in: with signs, if they
+    /// are on. (Kept by the name itself, which is what the sheet hands about.)
+    /// </summary>
     public FormattedText Name(string name)
     {
         if (!names.TryGetValue(name, out var made))
         {
-            made = Text(name, boldFace, SheetLook.ChordSize * Scale, chordBrush);
+            made = Text(Signs ? Chords.WithSigns(name) : name, boldFace, SheetLook.ChordSize * Scale, chordBrush);
             names[name] = made;
         }
         return made;

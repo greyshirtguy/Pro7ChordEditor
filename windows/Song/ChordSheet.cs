@@ -282,6 +282,27 @@ public sealed class ChordSheet
     public Action Reveal { get; set; } = () => { };
 
     /// <summary>
+    /// Whether a chord's sharps and flats are drawn as the music signs (spec/03, rule
+    /// 10a): the setting, which the window's model gives the sheet. Off as a sheet is
+    /// made, so that a sheet no window has made is as it always was. Only drawing: all
+    /// that the sheet works out, and all it asks of the song, is the same either way.
+    /// </summary>
+    public bool Signs { get; set; }
+
+    /// <summary>
+    /// A chord's name, or a key's, as the sheet draws it: with signs, if they are drawn
+    /// (<see cref="Chords.WithSigns"/>), or as it is.
+    /// </summary>
+    public string Drawn(string name) => Signs ? Chords.WithSigns(name) : name;
+
+    /// <summary>
+    /// What the box a chord is typed in shows: what it holds, drawn (spec/03, rule 30a).
+    /// A sign is one unit, as the character it stands for is, so a place in what is
+    /// shown is the same place in what is held.
+    /// </summary>
+    public string InTheBox => Drawn(Entry.Text);
+
+    /// <summary>
     /// The key the chords are in. A song that names none is taken to be in C, which is
     /// only what the keys 1 to 7 give until the key is set.
     /// </summary>
@@ -1004,18 +1025,23 @@ public sealed class ChordSheet
     /// <summary>
     /// What was typed in the box, as the box would have it now. Only what could be a
     /// chord gets in, and its notes are made capitals as they are typed. Answers with
-    /// what the box is to hold: what was typed tidied, or what it held before.
+    /// what the box is to show: what was typed tidied, or what it held before, drawn.
+    ///
+    /// While the signs are drawn, the box shows them, and what it shows is read with
+    /// each sign as "#" or "b" (<see cref="Chords.WithoutSigns"/>) before anything else:
+    /// so the box holds what it always held, and a sign typed by hand is taken as "#" or
+    /// "b" (spec/03, rule 30a). Off, it is as it was before there were signs.
     /// </summary>
     public string Type(string text)
     {
-        var tidy = Chords.Tidied(text);
+        var tidy = Chords.Tidied(Signs ? Chords.WithoutSigns(text) : text);
         if (!Chords.CouldBecome(tidy) || tidy.Length > LongestTyped)
         {
             Entry = Entry with { Text = Entry.Last };
-            return Entry.Text;
+            return InTheBox;
         }
         Entry = Entry with { Text = tidy, Last = tidy, Pick = -1 };
-        return tidy;
+        return InTheBox;
     }
 
     /// <summary>What Enter takes: the one picked from what is offered, or what is typed.</summary>

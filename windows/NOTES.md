@@ -23,6 +23,7 @@ milestone; put right what has become untrue.
 | **M10** Giving it out | **Begun**, 2026-10-12: only what needs nobody's decision | `make-zip.ps1` makes the zip that is given out (the app as one file, and a read-me) and does nothing with it; `zip/Read Me First.txt` is that read-me, the Mac's with what is Windows' own; and the settings have a fourth section, About. **Not done, and the maintainer's**: the words of About and of the read-me, which are proposals; and whether to pay to have the file signed. (The icon is the maintainer's own since 2026-10-14: decision 133.) (The version's number is 1.0.3 since the maintainer said so, 2026-10-14: decision 140. It was given out the same day, as the Windows file of the release `v1.0.3`: decision 141.) **An early build was given out on 2026-10-12**, at the maintainer's asking after a first try by hand: a pre-release tagged `windows-v0.1.0` ("At M10"; since taken down); **and a second, 0.2, the same day** (`windows-v0.2`), with the chord from the strip and the version in the title. A song made at M9 has still not been opened in ProPresenter; the read-me and each release's page say so |
 | **A chord from the strip** (asked for after M10 was begun) | Built, 2026-10-12. **No hand has tried it** | One of the key's seven chords is dragged out of the strip and let go on a word, on a line of chords alone or on a blank slide, and is put there as its key would have put it (`spec/03`, rules 46a to 46h, which the Mac's session wrote and built first). Windows' own dragging carries it. What it does to a song is the Mac's, case for case, and is held by the Mac's tests of the same. **What Windows itself does between the strip and the sheet is run by no test and has been seen by nobody**: "Left rough" lists what a hand is to try. **And version 0.2**, with the version in the window's title (`spec/06`, rule 6d) |
 | **The window as the Mac's 1.0.3** (asked for on 2026-10-14) | Built, 2026-10-14, and given out that day as 1.0.3. Tried by the maintainer, briefly ("Early hand testing looks good"); which parts was not said | What the Mac app gained between its 0.2 and its 1.0.3, which a note from its session listed and `spec/` has: the line of hints under the sheet and the highlighted line (`spec/03`, rules 53a to 53h); an emptied box that is kept takes the chord off (rule 35a); a text box's other ranges go with the words (`spec/01`); the edge as a bar that is seen, the title over the choice of place, no Save in any menu, the quiet line as a count (`spec/06`, rules 6a, 6e, 7, 12, 12a, 20a); Earlier Versions in blue (`spec/07`, rule 15); the guide (`spec/13`); the icon and the menus (`spec/10`). And the build put right, which had been red since the test data was made again. Decisions 122 to 139, "The window as the Mac's 1.0.3" and "At the round of 2026-10-14". **Which number it is to be given out under is the maintainer's to say; nothing was published** |
+| **Sharps and flats as signs** (agreed 2026-10-14; the Mac's first) | Built, 2026-10-14. **No hand has tried it** | The chord sheet draws a chord's sharps and flats as ♯ and ♭ where they are clearly a sharp or a flat, by the rule of `spec/02` held to `signs.json`: in the bubbles, the strip, what is offered, the box a chord is typed in and the song's two keys. Only drawn: the file, what is copied and the ChordPro text keep `#` and `b`. A switch in the settings turns it off. Decision 145, "Sharps and flats as signs" and "At the signs" |
 
 ## For the maintainer to decide: ProPresenter 22 keeps no `.pro` files
 
@@ -1047,6 +1048,39 @@ ProPresenter is for.
     settings are there and empty. Nothing suggests it minds: every app here
     makes the settings when the first chord goes on such a box, with the chord
     alone in them. No file seen has a box with none, so it has not been tried.
+145. **Sharps and flats drawn as ♯ and ♭ on the chord sheet** (the maintainer,
+    2026-10-14, to the Mac's session: "let's do it for the GUI chord editor..(just
+    a visual skin - not changing the underlying data) and leave chordpro text
+    unchanged/native/correct. and yes - a setting to optional turn it off (default
+    to on)"). The Mac's session wrote the rule, its vectors and the pages
+    (`spec/02`, "Sharps and flats drawn as signs"; `spec/03`, rules 10a and 30a;
+    `spec/06`, rules 12 and 20a; `signs.json`, made by `tools/signs.py`) and built
+    it first (`mac/NOTES.md`, decision 95). Its note to this session said where it
+    seemed to land here, from reading; it landed there. `ChordRules/Signs.cs`
+    gives every answer of `signs.json`. Drawn so: each bubble, as wide as what it
+    draws (`SheetMetrics.Name` draws and measures the drawn name, and the sheet
+    makes new measures when the switch is turned, as for another zoom); the
+    bubble of a chord dragged; the strip's seven, what each says when pointed at
+    and what a screen reader is told of it, while what a click puts on and what
+    is carried is the name; what is offered while typing; the box, which shows
+    the signs as they are typed and is read with `WithoutSigns` before anything
+    else (`ChordSheet.Type`, `InTheBox`); and the song's two keys, chosen by
+    their names (`SongPane.KeyRow`). Not in the ChordPro text, Earlier Versions,
+    Backups, nor any sentence ("in B flat"). The switch is the last thing under
+    Chords in the settings, in the page's words, with three chords in bubbles
+    beside it as the Mac has them; on as the app comes, and kept in
+    `settings.json` (`chordSigns`) only when off. **Mine, within that**:
+    - **the settings' window opens 680 tall, where it was 600, and its Chords
+      section scrolls.** With the switch the section is some 620 tall, and its
+      foot was cut off in the window as it was (picture 46). The window can be
+      made as short as 440, and there it scrolls (picture 46a);
+    - the samples beside the switch are drawn in the page's own font, at the size
+      and in the bubble the sheet's sample above them has;
+    - **with the switch off, nothing is as it was not before**: a ♭ typed by hand
+      between the notes is kept as it was typed, as it always was (at the root
+      and the bass `Tidied` makes it a b). The page says "Off, the sheet is in
+      every way as it was before there were signs, rule 30a too", and the Mac
+      does the same.
 
 ## How it is laid out, and why
 
@@ -1409,6 +1443,24 @@ names. What to know before changing any of it:
   other ranges) and `ChordSheetTests` (35a, whether a paste would replace); in
   `ChordRules.Tests`, `RtfWordsTests` (the reference's cases of `placeAfter`).
   Pictures 72 to 81.
+
+### Sharps and flats as signs (2026-10-14)
+
+- **The rule**: `ChordRules/Signs.cs` (`WithSigns`, `WithoutSigns`), held to
+  `signs.json` by `SignsTests`.
+- **The box and the sheet's model**: `Song/ChordSheet.cs` (`Signs`, `Drawn`,
+  `InTheBox`, `Type`). The model of the window gives each sheet it makes the
+  setting (`LibraryModel.MakeSheet`); a sheet made by no window draws none.
+- **What draws**: `SheetMetrics` (`Signs`, `Name`), `ChordSheetCanvas` (`SetLook`,
+  and the box in `Sync` and `TheBoxChanged`), `SheetEntry.Show`,
+  `ChordSheetView.OfTheKey`, `SongPane.KeyRow`.
+- **The switch**: `LibraryModel` (`ChordSigns`, `SetChordSigns`, `Drawn`),
+  `AppData.Settings.ChordSigns`, `ChordColourSettings` (the switch and its
+  samples), `SettingsWindow.xaml` (its height).
+- **The tests**: `SignsTests`; in `Song.Tests`, `ChordSheetTests`
+  (`WithTheSignsOn...`); in `AppViews.Tests`, `SheetModelTests`
+  (`SharpsAndFlatsAreDrawnAsSigns...`) and the tests that read names off the
+  screen; pictures 46, 46a, 82 and 83, and the guide's three.
 
 ## What was found out
 
@@ -2564,6 +2616,35 @@ names. What to know before changing any of it:
   that a hint too long is cut off and never makes the song's part wider; that the
   guide's pictures are held to what the app draws.
 
+### At the signs
+
+- **Segoe UI Variable, the sheet's font, has the sharp sign and not the flat.**
+  Asked of the fonts themselves (2026-10-14): Segoe UI Variable and Segoe UI have
+  U+266F and not U+266D; Segoe UI Symbol has both, in one weight. So WPF draws
+  each flat from another font, which has no bold, and **the flat is a little
+  thinner and lighter than the bold letters round it**; the sharp is not. Looked
+  at, enlarged, in pictures 82 and 83: each is plainly the sign, and each bubble
+  fits what it draws. `spec/03`, rule 10a, foresaw it ("Where a font has not, the
+  system draws them from another: look at a picture"). Nothing was done about
+  it. **For the maintainer to look at**: if it looks wrong, a font with a bold
+  flat could be asked for the signs alone; none was chosen without your eyes.
+- **The Chords section of the settings no longer fitted its window** once the
+  switch was under it: the sentence at its foot was cut off in picture 46.
+  Decision 145.
+- **Six tests read chords' names off the screen**, and expected `#` and `b`:
+  four of the sheet's (the strip's names, in two keys; the box, twice; what is
+  offered),
+  one of the strip's ends (what a chord says when pointed at), and the guide's
+  pictures. Each now expects the signs, and where it could, also that the box
+  holds, and the file has, `#` and `b`.
+- **A round of breaking the code on purpose** (2026-10-14): the name measured
+  and drawn without signs; the box not reading its signs back; the key pickers
+  deaf to the switch; the switch kept whether on or off; the strip's words
+  with the plain name. Each was caught by a test, and each put back.
+- **What no test can be**: how the signs look to a person, at the sizes the
+  sheet is zoomed to; what a screen reader makes of "7 F♯dim"; and typing a
+  ♭ by hand, which no keyboard here has a key for.
+
 ### What the maintainer found by hand
 
 - **Of 1.0.3, 2026-10-14: "Early hand testing looks good."** Said after the zip
@@ -2604,6 +2685,13 @@ names. What to know before changing any of it:
 
 ## Left rough, and what to ask
 
+- **Nobody has tried the signs for sharps and flats by hand** (decision 145).
+  What a hand is asked to try, on a COPY of a library: a song in a flat key, its
+  strip and its two key pickers; typing F# and Bm7b5 in the box (the sign comes
+  at once, and the caret does not move); the switch under Chords in the settings,
+  with a song open and with a chord being typed (all of it is drawn again at
+  once); and **whether the flat, drawn from another font and thinner than the
+  letters ("At the signs"), reads well enough**.
 - **Nobody has tried the window of the round of 2026-10-14.** What a hand is asked
   to try, on a COPY of a library:
   - **The line of hints**: move the pointer over a word, a chord, the bare sheet

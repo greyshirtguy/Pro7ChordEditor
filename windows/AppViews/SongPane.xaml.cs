@@ -17,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Pro7ChordEditor.ChordRules;
 using Pro7ChordEditor.Song;
 
 namespace Pro7ChordEditor.AppViews;
@@ -61,10 +62,14 @@ public partial class SongPane : UserControl
         Editors.Clicked += (_, _) => GiveTheEditorTheKeyboard();
     }
 
-    /// <summary>A key as a picker lists it: its name, or "None" where the song states none.</summary>
-    public sealed record KeyRow(string Key)
+    /// <summary>
+    /// A key as a picker lists it: its name, or "None" where the song states none.
+    /// The name is drawn with signs for its sharps and flats while those are on, as
+    /// the sheet draws a chord (spec/06, rule 12); what is chosen is the key itself.
+    /// </summary>
+    public sealed record KeyRow(string Key, bool Signs = false)
     {
-        public string Name => Key.Length == 0 ? "None" : Key;
+        public string Name => Key.Length == 0 ? "None" : Signs ? Chords.WithSigns(Key) : Key;
 
         // (What a screen reader says of the row: ListsPane.xaml.cs.)
         public override string ToString() => Name;
@@ -218,7 +223,7 @@ public partial class SongPane : UserControl
         Keys.Visibility = Seen(read);
         if (song is not null && read)
         {
-            ShowTheKeys(song, model.CanChange);
+            ShowTheKeys(song, model.CanChange, model.ChordSigns);
         }
         if (!ReferenceEquals(song, shownSong))
         {
@@ -299,13 +304,13 @@ public partial class SongPane : UserControl
     // The song's two keys, each to be set: the key its chords are written in, and,
     // quieter beside it, the key ProPresenter is to show them in. Neither changes any
     // chord in the file (spec/05, rules 5 to 7).
-    private void ShowTheKeys(LibraryModel.ShownSong song, bool canChange)
+    private void ShowTheKeys(LibraryModel.ShownSong song, bool canChange, bool signs)
     {
         showing = true;
         try
         {
-            List(Key, song.Key);
-            List(ShownKey, song.ShownKey);
+            List(Key, song.Key, signs);
+            List(ShownKey, song.ShownKey, signs);
         }
         finally
         {
@@ -322,14 +327,14 @@ public partial class SongPane : UserControl
             : "The key ProPresenter shows this song" + (char)0x2019 + "s chords in. It moves them there itself; the chords here stay as they are written.";
     }
 
-    private static void List(ComboBox picker, string key)
+    private static void List(ComboBox picker, string key, bool signs)
     {
-        var listed = LibraryModel.KeysListedFor(key);
-        if (picker.ItemsSource is not List<KeyRow> has || !has.Select(row => row.Key).SequenceEqual(listed))
+        var listed = LibraryModel.KeysListedFor(key).Select(one => new KeyRow(one, signs)).ToList();
+        if (picker.ItemsSource is not List<KeyRow> has || !has.SequenceEqual(listed))
         {
             picker.DisplayMemberPath = nameof(KeyRow.Name);
             picker.SelectedValuePath = nameof(KeyRow.Key);
-            picker.ItemsSource = listed.Select(one => new KeyRow(one)).ToList();
+            picker.ItemsSource = listed;
         }
         picker.SelectedValue = key;
     }

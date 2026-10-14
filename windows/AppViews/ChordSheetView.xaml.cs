@@ -19,6 +19,10 @@
 // is handed to the system is behind `Carry`, which a test puts its own in the place of:
 // **the system's own dragging is not run by any test**, since it reads the real mouse.
 //
+// The key's chords are drawn with signs for their sharps and flats while those are on
+// (spec/03, rule 10a): on their buttons, in what each says of itself, and in what a
+// screen reader is told. What a click puts on, and what is carried, is the name.
+//
 // While the other editor is shown the sheet's element is left as it was: nothing of it
 // is laid out or drawn for a song that is being typed into as text. When the sheet is
 // come back to it is brought up to date, and is where it was scrolled to.
@@ -40,6 +44,7 @@ public partial class ChordSheetView : UserControl
 
     private LibraryModel? model;
     private IReadOnlyList<string> listed = [];
+    private bool listedWithSigns;
 
     public ChordSheetView()
     {
@@ -119,33 +124,35 @@ public partial class ChordSheetView : UserControl
         Larger.IsEnabled = model.CanZoomSheetIn;
 
         var inKey = sheet?.InKey ?? [];
-        if (!listed.SequenceEqual(inKey, StringComparer.Ordinal))
+        if (!listed.SequenceEqual(inKey, StringComparer.Ordinal) || listedWithSigns != model.ChordSigns)
         {
             listed = [.. inKey];
+            listedWithSigns = model.ChordSigns;
             Chords.Children.Clear();
             for (var n = 0; n < listed.Count; n++)
             {
-                Chords.Children.Add(OfTheKey(n + 1, listed[n]));
+                Chords.Children.Add(OfTheKey(n + 1, listed[n], model.Drawn(listed[n])));
             }
             ChordsSeen.ScrollToHorizontalOffset(0);
         }
         LayOutTheStrip();
     }
 
-    // One of the key's chords, as a button: its number, quiet, and its name.
-    private Button OfTheKey(int number, string name)
+    // One of the key's chords, as a button: its number, quiet, and its name as it is
+    // drawn. What it puts on and carries is the name.
+    private Button OfTheKey(int number, string name, string drawn)
     {
         var numbered = number.ToString(CultureInfo.InvariantCulture);
         var words = new StackPanel { Orientation = Orientation.Horizontal };
         words.Children.Add(new TextBlock { Text = numbered, FontSize = 11, Foreground = CaptionBrush, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 5, 0) });
-        words.Children.Add(new TextBlock { Text = name, FontSize = 13, FontWeight = FontWeights.Bold, Foreground = WordsBrush, VerticalAlignment = VerticalAlignment.Center });
+        words.Children.Add(new TextBlock { Text = drawn, FontSize = 13, FontWeight = FontWeights.Bold, Foreground = WordsBrush, VerticalAlignment = VerticalAlignment.Center });
         var button = new Button
         {
             Style = (Style)Resources["OfTheKey"],
             Content = words,
-            ToolTip = Says(name, number),
+            ToolTip = Says(drawn, number),
         };
-        System.Windows.Automation.AutomationProperties.SetName(button, numbered + " " + name);
+        System.Windows.Automation.AutomationProperties.SetName(button, numbered + " " + drawn);
         button.Click += (_, _) => model?.PutOfKey(number);
         // The button's own press and click are left as they are. These only watch for
         // the press being pulled away, which is the chord picked up.

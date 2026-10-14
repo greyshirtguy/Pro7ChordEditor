@@ -521,6 +521,66 @@ public class ChordSheetTests
         Assert.Empty(song.Asked);
     }
 
+    // With the signs drawn (rules 10a and 30a), the box shows them as they are typed and
+    // holds # and b: what it offers, what is kept and what the song is asked to put on
+    // have no sign in them. Off, as a sheet is made, the box is as it always was. MINE,
+    // NOT A VECTOR: the rule itself is held to signs.json (ChordRules.Tests); this is
+    // the box's use of it, as the Mac's ChordSheetTests have it.
+    [Fact]
+    public void WithTheSignsOnTheBoxShowsThemAsTheyAreTypedAndHoldsSharpsAndFlats()
+    {
+        var sharp = ((char)0x266F).ToString();
+        var flat = ((char)0x266D).ToString();
+        var (sheet, song) = vectors.Sheet("grace");
+        Assert.False(sheet.Signs);
+        Assert.Equal("F#", sheet.Type("F#"));
+        Assert.Equal("Bb", sheet.Drawn("Bb"));
+
+        sheet.Signs = true;
+        sheet.SetSpot(1, 13);
+        sheet.StartTyping("F");
+        Assert.Equal("F", sheet.InTheBox);
+        // The sharp is drawn as soon as it is typed, and held as #.
+        Assert.Equal("F" + sharp, sheet.Type("F#"));
+        Assert.Equal("F#", sheet.Entry.Text);
+        // What the box shows comes back with its signs, and is read with # and b.
+        Assert.Equal("F" + sharp + "m7", sheet.Type("F" + sharp + "m7"));
+        Assert.Equal("F#m7", sheet.Entry.Text);
+        // A flat between the notes waits for its digit; then it is drawn too, and the
+        // shown is as long as the held, so the caret need not move.
+        Assert.Equal("F" + sharp + "m7b", sheet.Type("F" + sharp + "m7b"));
+        Assert.Equal("F" + sharp + "m7" + flat + "5", sheet.Type("F" + sharp + "m7b5"));
+        Assert.Equal("F#m7b5", sheet.Entry.Text);
+        Assert.Equal(sheet.Entry.Text.Length, sheet.InTheBox.Length);
+        // What is offered is the names themselves.
+        Assert.DoesNotContain(sheet.Offered, name => name.Contains(sharp, StringComparison.Ordinal) || name.Contains(flat, StringComparison.Ordinal));
+        // A sign typed by hand is taken as # or b, between the notes as well.
+        Assert.Equal("B" + flat + "7" + flat + "9", sheet.Type("B" + flat + "7" + flat + "9"));
+        Assert.Equal("Bb7b9", sheet.Entry.Text);
+        // What could not be a chord is undone, to what was shown before.
+        Assert.Equal("B" + flat + "7" + flat + "9", sheet.Type("B" + flat + "7" + flat + "9!"));
+        Assert.Empty(song.Asked);
+        // Enter keeps the name, with no sign in it.
+        sheet.Press(ChordSheet.EntryKey.Enter);
+        Assert.Equal("Bb7b9", sheet.ChordAt(1, 13));
+
+        // Opened on that chord, the box shows it with its signs, and holds it as it is.
+        sheet.SetSpot(1, 13);
+        sheet.StartTyping();
+        Assert.Equal("Bb7b9", sheet.Entry.Text);
+        Assert.Equal("B" + flat + "7" + flat + "9", sheet.InTheBox);
+        sheet.Press(ChordSheet.EntryKey.Escape);
+
+        // Off again, a sign typed by hand between the notes is kept as it was typed,
+        // as before there were signs; at the root it is tidied, as it always was.
+        sheet.Signs = false;
+        sheet.StartTyping("C");
+        Assert.Equal("C7" + flat + "9", sheet.Type("C7" + flat + "9"));
+        Assert.Equal("Bb", sheet.Type("B" + flat));
+        Assert.Equal(sheet.Entry.Text, sheet.InTheBox);
+        sheet.Press(ChordSheet.EntryKey.Escape);
+    }
+
     // Down and Up go through what is offered, round and round; Right takes the one
     // picked into the box (rule 31).
     [Fact]

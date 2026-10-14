@@ -462,6 +462,99 @@ public class SheetModelTests
         Assert.False(model.ChangedSinceOpened);
     });
 
+    // spec/03, rule 10a, and spec/06, rules 12 and 20a: sharps and flats are drawn as
+    // the music signs on the sheet, in the strip, in what is offered and in the song's
+    // two keys, as the app comes; the last thing under Chords in the settings turns that
+    // off, and it is remembered only when off. Only drawn: the file, and the ChordPro
+    // text, have # and b either way.
+    [Fact]
+    public void SharpsAndFlatsAreDrawnAsSignsUntilTheSwitchInTheSettingsIsTurnedOff() => OnAMadeUpPC(async pc =>
+    {
+        var sharp = ((char)0x266F).ToString();
+        var flat = ((char)0x266D).ToString();
+        var model = pc.Model();
+        var view = new LibraryView(model);
+        await model.StartAsync();
+        model.ChooseLibrary(pc.Library("Songs"));
+        await model.MarksAreWorkedOutAsync();
+        model.Open(pc.Song("Amazing Grace"));
+        Look.Wear(view, dark: true);
+        Pictures.LayOut(view, 1280, 800);
+        var canvas = view.SongPane.ChordSheet.Canvas;
+        var strip = view.SongPane.ChordSheet;
+        var key = Named<ComboBox>(view.SongPane, "Key");
+        var settings = new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+        Look.Wear(settings, dark: true);
+        Pictures.LayOut(settings, 960, 648);
+        var chords = settings.ChordColours;
+        string KeyListed(string name) => key.Items.OfType<SongPane.KeyRow>().Single(row => row.Key == name).Name;
+        IEnumerable<string> InTheSong() => new OpenSong(pc.Song("Amazing Grace")).TextBoxes.SelectMany(box => box.Chords).Select(chord => chord.Name);
+
+        // As the app comes: on, and nothing kept of it.
+        Assert.True(model.ChordSigns);
+        Assert.True(chords.SignsSwitch.IsChecked);
+        Assert.Null(pc.AppData.ReadSettings().ChordSigns);
+        Assert.Equal(["B" + flat + "m7", "F" + sharp, "E" + flat + "/G"], chords.SignsShown);
+        Assert.True(canvas.Metrics.Signs);
+        Assert.Equal("B" + flat, canvas.Metrics.Name("Bb").Text);
+        Assert.Equal("7 F" + sharp + "dim", System.Windows.Automation.AutomationProperties.GetName(strip.ChordsOfTheKey[6]));
+        // A key is listed with its signs, and chosen by its name.
+        Assert.Equal("B" + flat, KeyListed("Bb"));
+        Assert.Equal("F" + sharp + "m", KeyListed("F#m"));
+        Assert.Equal("G", key.SelectedValue);
+
+        // A chord typed with a flat is drawn with its sign, and saved with b; and one of
+        // the key's chords with a sharp, put on by its number, is saved with #. (Hand.cs
+        // types as a person does.)
+        var hand = new Hand(canvas);
+        hand.Click("saved");
+        hand.Type("Bb");
+        Assert.Equal("B" + flat, hand.Box.Text);
+        hand.Press(System.Windows.Input.Key.Enter);
+        hand.PointAt("wretch");
+        hand.Press(System.Windows.Input.Key.D7);
+        Assert.Contains("Bb", InTheSong());
+        Assert.Contains("F#dim", InTheSong());
+        Assert.DoesNotContain(InTheSong(), name => name.Contains(sharp, StringComparison.Ordinal) || name.Contains(flat, StringComparison.Ordinal));
+        // The ChordPro text is as ChordPro is written.
+        model.Show(LibraryModel.Editor.ChordPro);
+        Assert.Contains("[Bb]", model.ChordPro!.Text, StringComparison.Ordinal);
+        Assert.Contains("[F#dim]", model.ChordPro.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain(sharp, model.ChordPro.Text, StringComparison.Ordinal);
+        Assert.DoesNotContain(flat, model.ChordPro.Text, StringComparison.Ordinal);
+        model.Show(LibraryModel.Editor.Sheet);
+        Pictures.LayOut(view, 1280, 800);
+
+        // Turned off: everything is drawn as it was before there were signs, and that
+        // is kept.
+        chords.SignsSwitch.IsChecked = false;
+        Click(chords.SignsSwitch);
+        Pictures.LayOut(view, 1280, 800);
+        Assert.False(model.ChordSigns);
+        Assert.False(pc.AppData.ReadSettings().ChordSigns);
+        Assert.Equal(["Bbm7", "F#", "Eb/G"], chords.SignsShown);
+        Assert.False(canvas.Metrics.Signs);
+        Assert.Equal("Bb", canvas.Metrics.Name("Bb").Text);
+        Assert.Equal("7 F#dim", System.Windows.Automation.AutomationProperties.GetName(strip.ChordsOfTheKey[6]));
+        Assert.Equal("Bb", KeyListed("Bb"));
+        hand.Click("lost");
+        hand.Type("Eb");
+        Assert.Equal("Eb", hand.Box.Text);
+        hand.Press(System.Windows.Input.Key.Escape);
+        // It is remembered from one start of the app to the next.
+        var again = pc.Model();
+        await again.StartAsync();
+        Assert.False(again.ChordSigns);
+
+        // On again: nothing is kept, as it comes.
+        chords.SignsSwitch.IsChecked = true;
+        Click(chords.SignsSwitch);
+        Pictures.LayOut(view, 1280, 800);
+        Assert.True(model.ChordSigns);
+        Assert.Null(pc.AppData.ReadSettings().ChordSigns);
+        Assert.Equal("B" + flat, canvas.Metrics.Name("Bb").Text);
+    });
+
     [Fact]
     public void TheSettingsHaveFourSectionsChordsMendingBackupsAndAbout() => OnAMadeUpPC(async pc =>
     {

@@ -1,7 +1,8 @@
 // The code beside ChordColourSettings.xaml, which says what the view is. Here: the
 // three colours the model has are shown in their wells and on their samples whenever
 // the model says it has changed, and a colour chosen, or the usual one asked for, is
-// passed on.
+// passed on. The same for the switch for the signs, whose three sample chords are
+// drawn as the model would draw them.
 //
 // Nothing here is a rule. A colour is kept by the window's model as it is written,
 // "#rrggbb", and nothing is kept where the usual colour is (LibraryModel); the sheet and
@@ -18,7 +19,11 @@ using System.Windows.Media;
 
 namespace Pro7ChordEditor.AppViews;
 
-/// <summary>The colour of a chord in each of the two editors, each with what it looks like and a way back to the usual colour.</summary>
+/// <summary>
+/// The colour of a chord in each of the two editors, each with what it looks like and a
+/// way back to the usual colour; and the switch for the signs, with chords as they are
+/// then drawn.
+/// </summary>
 public partial class ChordColourSettings : UserControl
 {
     private readonly LibraryModel model;
@@ -46,6 +51,16 @@ public partial class ChordColourSettings : UserControl
     /// picker, over the window this is in. Nothing, if they chose none.
     /// </summary>
     public Func<Color, Color?> AskForAColour { get; set; }
+
+    // The chords shown beside the switch for the signs: a flat, a sharp, and a flat with
+    // a bass, as the Mac's settings show them.
+    private static readonly string[] SignsShownOn = ["Bbm7", "F#", "Eb/G"];
+
+    /// <summary>The switch for the signs: for a test to click.</summary>
+    internal CheckBox SignsSwitch => Signs;
+
+    /// <summary>The chords shown beside it, as they are drawn: for a test to read.</summary>
+    internal IReadOnlyList<string> SignsShown => [.. SignsSamples.Children.OfType<Border>().Select(bubble => ((TextBlock)bubble.Child).Text)];
 
     /// <summary>The colour a chord in ChordPro text comes with (spec/06, "Settings": `#ff9500` where a system has no orange of its own).</summary>
     internal static Color UsualInTheText => Look.Colours(dark: false)[Look.Chord];
@@ -81,6 +96,22 @@ public partial class ChordColourSettings : UserControl
             TextSampleTwo.SetResourceReference(TextElement.ForegroundProperty, Look.Chord);
         }
         TextUsual.IsEnabled = model.TextChordColour is not null;
+
+        Signs.IsChecked = model.ChordSigns;
+        SignsSamples.Children.Clear();
+        foreach (var name in SignsShownOn)
+        {
+            SignsSamples.Children.Add(new Border
+            {
+                Background = Brush(SheetLook.Bubble),
+                BorderBrush = Brush(SheetLook.BubbleEdge),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(7, 3, 7, 3),
+                Margin = new Thickness(0, 0, 8, 0),
+                Child = new TextBlock { Text = model.Drawn(name), FontSize = 13, FontWeight = FontWeights.Bold, Foreground = onTheSheet },
+            });
+        }
     }
 
     private static SolidColorBrush Brush(Color colour)
@@ -115,6 +146,8 @@ public partial class ChordColourSettings : UserControl
     }
 
     private void TheSheetsUsual(object sender, RoutedEventArgs e) => model.SetSheetChordColour(null);
+
+    private void SignsWereClicked(object sender, RoutedEventArgs e) => model.SetChordSigns(Signs.IsChecked == true);
 
     private void TheLinesUsual(object sender, RoutedEventArgs e) => model.SetSheetLineColour(null);
 

@@ -9,6 +9,10 @@
   then on, and the window behind it shows it at once; what it shows of the copies is as
   they were when it was opened.
 
+  It opens tall enough for the whole of the Chords section (680, since the switch for
+  the signs was put under it on 2026-10-14; it was 600), which scrolls if the window
+  is made shorter.
+
   A window only frames what is in it. What is in it is a view of its own (SettingsView),
   put in by the code beside this, so that a test can draw it into a picture.
 -->
@@ -17,7 +21,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Settings"
         Width="960"
-        Height="600"
+        Height="680"
         MinWidth="760"
         MinHeight="440"
         ShowInTaskbar="False"

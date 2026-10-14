@@ -338,6 +338,14 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     /// </summary>
     public string? SheetLineColour { get; private set; }
 
+    /// <summary>
+    /// Whether the sheet draws a chord's sharps and flats as the music signs, and the
+    /// song's two keys over it the same (spec/03, rule 10a; spec/06, rules 12 and
+    /// 20a): on as the app comes. Only how they are drawn: nothing in a song's file,
+    /// nor in the ChordPro text, nor in what is copied, ever has a sign from it.
+    /// </summary>
+    public bool ChordSigns { get; private set; } = true;
+
     public bool ProPresenterIsRunning { get; private set; }
 
     /// <summary>The panel of earlier versions, while it is open.</summary>
@@ -597,6 +605,11 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         SheetChordColour = ColourAsKept(settings.SheetChordColour);
         TextChordColour = ColourAsKept(settings.TextChordColour);
         SheetLineColour = ColourAsKept(settings.SheetLineColour);
+        ChordSigns = settings.ChordSigns ?? true;
+        if (Sheet is not null)
+        {
+            Sheet.Signs = ChordSigns;
+        }
         OffersToMoveBack = settings.OffersToMoveBack == true;
         keptMarks = appData.ReadMarks();
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -1076,6 +1089,28 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         Changed();
     }
 
+    /// <summary>Turns the signs for sharps and flats on or off. It is remembered.</summary>
+    public void SetChordSigns(bool on)
+    {
+        ChordSigns = on;
+        if (Sheet is not null)
+        {
+            Sheet.Signs = on;
+        }
+        SheetVersion++;
+        if (started)
+        {
+            Remember();
+        }
+        Changed();
+    }
+
+    /// <summary>
+    /// A chord's name, or a key's, as the sheet and the song's header draw it: with
+    /// signs while they are on (<see cref="Chords.WithSigns"/>), or as it is.
+    /// </summary>
+    public string Drawn(string name) => ChordSigns ? Chords.WithSigns(name) : name;
+
     /// <summary>The same for the words of the highlighted line on the sheet.</summary>
     public void SetSheetLineColour(string? colour)
     {
@@ -1218,6 +1253,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
     // would be, which is only shown (LibraryModel.Mending.cs).
     private ChordSheet MakeSheet(ISheetSong song) => new(song)
     {
+        Signs = ChordSigns,
         PasteKeys = "Ctrl+V",
         Refused = refusal =>
         {
@@ -1752,6 +1788,7 @@ public sealed partial class LibraryModel : INotifyPropertyChanged
         SheetChordColour = SheetChordColour,
         TextChordColour = TextChordColour,
         SheetLineColour = SheetLineColour,
+        ChordSigns = ChordSigns ? null : false,
         OffersToMoveBack = OffersToMoveBack ? true : null,
     });
 }

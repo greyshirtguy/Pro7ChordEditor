@@ -23,13 +23,15 @@
 //   ChordPro.cs      chords as ChordPro text, and the stand-ins of a line with no words
 //   ChordProSong.cs  a ChordPro file read
 //
-// Three things here are not from chords.cpp, and have names of their own:
+// Four things here are not from chords.cpp, and have names of their own but the last:
 //
 //   RtfWords.cs      the words of a text box: the plain text of its RTF. And the one
 //                    thing the apps ever write into an RTF: the stand-ins
 //   KeyFit.cs        which key a song's chords are most likely in (new: tools/keyfit.py)
 //   OldEditor.cs     where the first Windows editor meant a chord to be (new:
 //                    tools/make-fixtures.py)
+//   Signs.cs         WithSigns, WithoutSigns: sharps and flats drawn as the music signs
+//                    on the chord sheet (new: tools/signs.py)
 //
 // WHAT TO KNOW BEFORE CHANGING ANY OF IT.
 //

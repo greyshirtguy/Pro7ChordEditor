@@ -1,7 +1,8 @@
 <!--
   Chords, in the app's settings: the colour of a chord's name on the chord sheet, the
   colour of the highlighted line of the sheet, and the colour of a chord in the
-  ChordPro text (spec/06-library.md, rule 20a).
+  ChordPro text; and last, whether the sheet draws sharps and flats as the music
+  signs (spec/06-library.md, rule 20a).
 
   Each has a well that shows the colour and opens the system's colour picker when it is
   clicked; a button, "Usual Colour", that puts back the one the app comes with; and
@@ -16,8 +17,15 @@
   The sheet's two samples are on the sheet's own dark card, whatever the system's look
   is, since the sheet is. The text's is on the window's ground, which is the look's.
 
+  The switch for the signs is on as the app comes. Beside it, three chords in their
+  bubbles as the sheet then draws them (spec/03-chord-sheet.md, rule 10a).
+
+  The page scrolls where the window is too short for it: with the switch it is taller
+  than the settings' window was as it opened, and the window can be made shorter yet.
+
   Nothing here touches a song. A colour is only how this app draws a chord: it is kept
-  with the app's own settings, and nothing in a song's file says one.
+  with the app's own settings, and nothing in a song's file says one. Nor is a sign:
+  songs are saved with # and b either way.
 
   What is shown comes from LibraryModel, which this view is handed. It has a ground of
   its own and says what colour words are, both the system's: a test draws it with no
@@ -31,9 +39,10 @@
              FontFamily="Segoe UI Variable Text, Segoe UI"
              FontSize="13"
              UseLayoutRounding="True">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
   <StackPanel Margin="14,12,14,14" Width="560" HorizontalAlignment="Left" VerticalAlignment="Top">
     <TextBlock Text="Chords" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,2" />
-    <TextBlock Text="The colour chords are drawn in, in each of the two editors, and the colour of the line the pointer is on."
+    <TextBlock Text="The colour chords are drawn in, in each of the two editors, the colour of the line the pointer is on, and how the chord sheet draws sharps and flats."
                TextWrapping="Wrap"
                Margin="0,4,0,18"
                Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
@@ -150,9 +159,32 @@
       </Border>
     </Grid>
 
+    <Border Height="1" Margin="0,18,0,18" Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center">
+        <CheckBox x:Name="Signs" Click="SignsWereClicked">
+          <TextBlock Text="Show sharps and flats as &#x266F; and &#x266D;" FontWeight="SemiBold" TextWrapping="Wrap" />
+        </CheckBox>
+        <TextBlock Text="On the chord sheet. Songs are saved with # and b either way."
+                   TextWrapping="Wrap"
+                   Margin="28,6,0,0"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+      </StackPanel>
+      <!-- Three chords as the sheet then draws them, each in its bubble (the code beside this fills it). -->
+      <Border Grid.Column="1" Width="190" Background="#222428" CornerRadius="4" Padding="10" Margin="12,0,0,0" VerticalAlignment="Center">
+        <StackPanel x:Name="SignsSamples" Orientation="Horizontal" HorizontalAlignment="Left" />
+      </Border>
+    </Grid>
+
     <TextBlock Text="These are only how chords look in this app. Nothing in a song&#x2019;s file says a colour, and ProPresenter shows chords in its own."
                TextWrapping="Wrap"
                Margin="0,20,0,0"
                Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
   </StackPanel>
+  </ScrollViewer>
 </UserControl>

@@ -797,8 +797,23 @@ public class PictureTests
             model.SetTextChordColour("#4f9dff");
             return new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
         },
+        // (As the window opens: 680 tall, less its title bar.)
         width: 960,
-        height: 600);
+        height: 648);
+
+    // The same in the window at its shortest, where the section scrolls.
+    [Fact]
+    public void TheSettingsChordsInAShortWindow() => DrawView(
+        "46a the settings, chords, in a short window",
+        true,
+        async pc =>
+        {
+            var model = pc.Model();
+            await model.StartAsync();
+            return new SettingsView(model, new AllCopiesModel(pc.AppData.Copies()));
+        },
+        width: 960,
+        height: 408);
 
     [Fact]
     public void TheSettingsBackups() => DrawView(
@@ -827,6 +842,50 @@ public class PictureTests
             hand.Click("saved");
             hand.Type("Em");
             hand.PointAt(hand.PlaceOf("sweet"), onItsChord: true);
+            return Task.CompletedTask;
+        });
+
+    // Sharps and flats drawn as the music signs, as the app comes, and with the switch
+    // for them off (spec/03, rules 10a and 30a; spec/06, rules 12 and 20a): in the
+    // bubbles, each as wide as what it draws; in the box, where a flat is being typed;
+    // in what is offered; in the strip; and in the song's two keys, set to B flat for
+    // them to show it. (The switch is turned while the box is open: what it shows
+    // follows.)
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void SharpsAndFlatsDrawnAsSigns(bool signs) => DrawSheet(
+        "82 sharps and flats drawn as signs, " + (signs ? "on" : "off"),
+        true,
+        "Amazing Grace",
+        (_, model, hand) =>
+        {
+            model.SetKey("Bb");
+            foreach (var (word, name) in new[] { ("grace", "Bb"), ("the sound", "F#m7"), ("saved", "C7b9"), ("wretch", "Eb/G"), ("me", "Dm7(b5)") })
+            {
+                hand.Click(word);
+                hand.Type(name);
+                hand.Press(Key.Enter);
+            }
+            // (On the third slide, so that the box hides none of those.)
+            hand.Click("fear");
+            hand.Type("Ab");
+            model.SetChordSigns(signs);
+            return Task.CompletedTask;
+        });
+
+    // One with a flat carried by the mouse: its bubble, as it is drawn under the pointer.
+    [Fact]
+    public void AChordWithAFlatBeingDragged() => DrawSheet(
+        "83 a chord with a flat being dragged",
+        true,
+        "Amazing Grace",
+        (_, _, hand) =>
+        {
+            hand.Click("me");
+            hand.Type("Bbmaj7");
+            hand.Press(Key.Enter);
+            hand.Drag(hand.PlaceOf("me"), hand.PlaceOf("wretch"), letGo: false);
             return Task.CompletedTask;
         });
 

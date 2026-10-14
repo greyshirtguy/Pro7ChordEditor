@@ -18,6 +18,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using Pro7ChordEditor.ChordRules;
 using Pro7ChordEditor.Song;
 using Xunit;
 
@@ -25,6 +26,11 @@ namespace Pro7ChordEditor.AppViews.Tests;
 
 public class ChordSheetViewTests
 {
+    // The music signs a sharp and a flat are drawn with, as the app comes (spec/03,
+    // rule 10a). What is in the file is # and b whatever is drawn.
+    private static readonly string Sharp = ((char)0x266F).ToString();
+    private static readonly string Flat = ((char)0x266D).ToString();
+
     private static void OnAMadeUpPC(Func<MadeUpPC, Task> what) => Pictures.OnAThreadOfItsOwn(async () =>
     {
         using var pc = new MadeUpPC();
@@ -512,11 +518,13 @@ public class ChordSheetViewTests
         Assert.Equal(new Spot(hand.PlaceOf("saved").Row, 11), sheet.Spot);
         hand.Type("Bb/");
         Assert.Equal(new Spot(hand.PlaceOf("saved").Row, 11), sheet.TypingAt);
-        Assert.Equal("Bb/", hand.Box.Text);
+        // (The box shows the flat as its sign, and holds a b: rule 30a.)
+        Assert.Equal("B" + Flat + "/", hand.Box.Text);
+        Assert.Equal("Bb/", sheet.Entry.Text);
         // Shift with Tab would take the keyboard out of the box by the back door: it is
         // swallowed, and nothing is kept.
         Assert.True(hand.Press(Key.Tab, ModifierKeys.Shift));
-        Assert.Equal("Bb/", hand.Box.Text);
+        Assert.Equal("B" + Flat + "/", hand.Box.Text);
         Assert.True(sheet.Typing);
         Assert.True(hand.Press(Key.Tab));
         Assert.Equal("1:G 8:G7 18:C 28:G 34:G 39:Am 45:Bb 47:C 59:D7", InTheFile(0, "Amazing Grace", pc));
@@ -554,7 +562,11 @@ public class ChordSheetViewTests
         // Each is a button; none is lit until one is picked.
         List<Border> Buttons() => [.. Named<WrapPanel>(entry, "Offered").Children.OfType<Border>()];
         static Color Of(Border button) => ((SolidColorBrush)button.Background).Color;
-        Assert.Equal(offered, Buttons().Select(button => ((TextBlock)button.Child).Text));
+        // Each button draws its name as the sheet does, with signs (rule 10a): of D,
+        // Dm7b5 is offered, and drawn with the flat sign.
+        Assert.Equal(offered.Select(Chords.WithSigns), Buttons().Select(button => ((TextBlock)button.Child).Text));
+        Assert.Contains("Dm7b5", offered);
+        Assert.Contains("Dm7" + Flat + "5", Buttons().Select(button => ((TextBlock)button.Child).Text));
         Assert.All(Buttons(), button => Assert.Equal(SheetLook.Chip, Of(button)));
         // Down picks the first, and the next; Up goes back; and round and round. The
         // one picked is lit in the sheet's orange, and no other.
@@ -589,7 +601,8 @@ public class ChordSheetViewTests
         // At the end of the box, it takes the one picked.
         hand.Box.Select(1, 0);
         Assert.True(hand.Press(Key.Right));
-        Assert.Equal(picked, hand.Box.Text);
+        Assert.Equal(Chords.WithSigns(picked), hand.Box.Text);
+        Assert.Equal(picked, hand.Sheet.Entry.Text);
         Assert.Equal((picked.Length, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
         Assert.True(hand.Sheet.Typing);
         Assert.Equal(-1, entry.Picked);
@@ -1317,7 +1330,8 @@ public class ChordSheetViewTests
     {
         var (model, view, hand) = await Open(pc, "Amazing Grace");
         var strip = view.SongPane.ChordSheet;
-        Assert.Equal(["1 G", "2 Am", "3 Bm", "4 C", "5 D", "6 Em", "7 F#dim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
+        // (Each drawn as the sheet draws a chord, with signs: rule 10a.)
+        Assert.Equal(["1 G", "2 Am", "3 Bm", "4 C", "5 D", "6 Em", "7 F" + Sharp + "dim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
         Assert.Equal("Puts C on the spot. The key 4 does the same. Or drag it onto a word.", strip.ChordsOfTheKey[3].ToolTip);
         Assert.All(strip.ChordsOfTheKey, button => Assert.False(button.Focusable));
         Assert.Equal(Visibility.Collapsed, Named<TextBlock>(strip, "NoKey").Visibility);
@@ -1343,7 +1357,7 @@ public class ChordSheetViewTests
         var key = Named<ComboBox>(view.SongPane, "Key");
         key.SelectedValue = "D";
         Assert.Equal("D", model.Shown!.Key);
-        Assert.Equal(["1 D", "2 Em", "3 F#m", "4 G", "5 A", "6 Bm", "7 C#dim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
+        Assert.Equal(["1 D", "2 Em", "3 F" + Sharp + "m", "4 G", "5 A", "6 Bm", "7 C" + Sharp + "dim"], strip.ChordsOfTheKey.Select(AutomationProperties.GetName));
         Assert.Equal("1:G 8:G7 18:C 28:G 39:Em 47:C 59:D", InTheFile(0, "Amazing Grace", pc));
         hand.PointAt("like");
         hand.Press(Key.D5);
@@ -1849,9 +1863,11 @@ public class ChordSheetViewTests
         hand.Type("!");
         Assert.Equal("Am7", hand.Box.Text);
         Assert.Equal((1, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
-        // One that is taken goes in there, and the caret after it.
+        // One that is taken goes in there, and the caret after it. (A flat, drawn as
+        // its sign at once: one unit for one, so the caret is where it would be.)
         hand.Type("b");
-        Assert.Equal("Abm7", hand.Box.Text);
+        Assert.Equal("A" + Flat + "m7", hand.Box.Text);
+        Assert.Equal("Abm7", hand.Sheet.Entry.Text);
         Assert.Equal((2, 0), (hand.Box.SelectionStart, hand.Box.SelectionLength));
         // A small letter that is a note is made a capital where it stands, the caret
         // staying after it.

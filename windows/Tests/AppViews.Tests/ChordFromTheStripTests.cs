@@ -690,7 +690,8 @@ public class ChordFromTheStripTests
 
         // Each button says its three ways when it is pointed at (rule 46h).
         Assert.Equal("Puts C on the spot. The key 4 does the same. Or drag it onto a word.", fourth.ToolTip);
-        Assert.Equal("Puts F#dim on the spot. The key 7 does the same. Or drag it onto a word.", strip.ChordsOfTheKey[6].ToolTip);
+        // (Its name as it is drawn, with the sharp sign: spec/03, rule 10a.)
+        Assert.Equal("Puts F" + (char)0x266F + "dim on the spot. The key 7 does the same. Or drag it onto a word.", strip.ChordsOfTheKey[6].ToolTip);
 
         // A press that is let go: the pointer may stray a little, and nothing is
         // picked up. (The click is then the button's own, as it always was.)

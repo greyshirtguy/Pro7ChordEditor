@@ -394,14 +394,12 @@ public sealed class ChordSheetCanvas : FrameworkElement
 
     /// <summary>
     /// Shows a song's sheet: another song's from the top, the same one's where it was.
-    /// With a size, at that zoom.
+    /// With a size, at that zoom. A chord's sharps and flats are drawn as signs if the
+    /// sheet says so (spec/03, rule 10a).
     /// </summary>
     public void Show(ChordSheet? shown, double? scale = null)
     {
-        if (scale is { } wanted && wanted != Metrics.Scale)
-        {
-            SetScale(wanted);
-        }
+        SetLook(scale ?? Metrics.Scale, shown?.Signs ?? Metrics.Signs);
         if (!ReferenceEquals(shown, Sheet))
         {
             Sheet = shown;
@@ -491,13 +489,17 @@ public sealed class ChordSheetCanvas : FrameworkElement
     }
 
     /// <summary>Draws everything so many times its usual size.</summary>
-    public void SetScale(double scale)
+    public void SetScale(double scale) => SetLook(scale, Metrics.Signs);
+
+    // The same, and a chord's sharps and flats as signs or not. A bubble is as wide
+    // as what it draws, so the slides are laid out again for either.
+    private void SetLook(double scale, bool signs)
     {
-        if (scale == Metrics.Scale)
+        if (scale == Metrics.Scale && signs == Metrics.Signs)
         {
             return;
         }
-        Metrics = new SheetMetrics(scale, VisualTreeHelper.GetDpi(this).PixelsPerDip) { ChordBrush = Frozen(chordColour) };
+        Metrics = new SheetMetrics(scale, VisualTreeHelper.GetDpi(this).PixelsPerDip, signs) { ChordBrush = Frozen(chordColour) };
         if (Sheet is not null)
         {
             LayOutWhereItWas();
@@ -508,7 +510,7 @@ public sealed class ChordSheetCanvas : FrameworkElement
     {
         base.OnDpiChanged(oldDpi, newDpi);
         // (Letters are measured for the screen they are drawn on.)
-        Metrics = new SheetMetrics(Metrics.Scale, newDpi.PixelsPerDip) { ChordBrush = Frozen(chordColour) };
+        Metrics = new SheetMetrics(Metrics.Scale, newDpi.PixelsPerDip, Metrics.Signs) { ChordBrush = Frozen(chordColour) };
         if (Sheet is not null)
         {
             LayOutWhereItWas();
@@ -572,21 +574,21 @@ public sealed class ChordSheetCanvas : FrameworkElement
         }
         if (sheet.Typing && Grid!.IsLaid(sheet.TypingAt.Row))
         {
-            Entry.Show(sheet.Offered, sheet.Entry.Pick);
+            Entry.Show(sheet.Offered, sheet.Entry.Pick, sheet.Drawn);
             if (typingShown != sheet.TypingsBegun)
             {
                 typingShown = sheet.TypingsBegun;
                 Entry.Visibility = Visibility.Visible;
                 movingTheKeys = true;
                 settingTheBox = true;
-                Entry.Begin(sheet.Entry.Text, sheet.Entry.Selected);
+                Entry.Begin(sheet.InTheBox, sheet.Entry.Selected);
                 settingTheBox = false;
                 movingTheKeys = false;
             }
-            else if (!string.Equals(Entry.Field.Text, sheet.Entry.Text, StringComparison.Ordinal))
+            else if (!string.Equals(Entry.Field.Text, sheet.InTheBox, StringComparison.Ordinal))
             {
                 settingTheBox = true;
-                Entry.Set(sheet.Entry.Text);
+                Entry.Set(sheet.InTheBox);
                 settingTheBox = false;
             }
             PlaceEntry();
@@ -1384,8 +1386,9 @@ public sealed class ChordSheetCanvas : FrameworkElement
         var held = sheet.Type(typed);
         if (!string.Equals(held, typed, StringComparison.Ordinal))
         {
-            // Tidied, the caret stays where it was; undone, it goes back the one place
-            // the key had moved it.
+            // Tidied, or given its signs, the caret stays where it was (a sign is as
+            // long as what it stands for); undone, it goes back the one place the key
+            // had moved it.
             var tidied = held.Length == typed.Length;
             settingTheBox = true;
             Entry.Set(held, tidied ? caret : Math.Max(0, caret - 1));

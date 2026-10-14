@@ -97,6 +97,13 @@ public sealed class AppData(string folder)
         public string? SheetLineColour { get; init; }
 
         /// <summary>
+        /// Whether the chord sheet draws a chord's sharps and flats as the music
+        /// signs (spec/03-chord-sheet.md, rule 10a): false where it was turned off,
+        /// nothing where they are drawn, as they are as the app comes.
+        /// </summary>
+        public bool? ChordSigns { get; init; }
+
+        /// <summary>
         /// How wide the two lists at the window's left are; nothing if the edge between
         /// them and the song was never moved (spec/06, rule 6a).
         /// </summary>
@@ -122,7 +129,8 @@ public sealed class AppData(string folder)
             other is not null && ChosenFolders.SequenceEqual(other.ChosenFolders) && LastPlace == other.LastPlace
             && LastLibrary == other.LastLibrary && ListsSplit == other.ListsSplit && TextZoom == other.TextZoom && SheetZoom == other.SheetZoom
             && SheetChordColour == other.SheetChordColour && TextChordColour == other.TextChordColour && OffersToMoveBack == other.OffersToMoveBack
-            && SheetLineColour == other.SheetLineColour && ListsWidth == other.ListsWidth && GuideShown == other.GuideShown;
+            && SheetLineColour == other.SheetLineColour && ListsWidth == other.ListsWidth && GuideShown == other.GuideShown
+            && ChordSigns == other.ChordSigns;
 
         public override int GetHashCode() => HashCode.Combine(ChosenFolders.Count, LastPlace, LastLibrary, ListsSplit);
     }

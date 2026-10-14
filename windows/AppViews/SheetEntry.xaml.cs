@@ -44,10 +44,17 @@ public partial class SheetEntry : UserControl
     /// <summary>One that is offered was clicked.</summary>
     public Action<string> Chosen { get; set; } = _ => { };
 
-    /// <summary>What is offered now, in order, and which of them is picked (or -1).</summary>
+    /// <summary>
+    /// What is offered now, in order, and which of them is picked (or -1). The names
+    /// themselves: each is drawn as the sheet draws a chord's name, with signs if they
+    /// are on, and a click hands back the name.
+    /// </summary>
     public IReadOnlyList<string> Shown { get; private set; } = [];
 
     public int Picked { get; private set; } = -1;
+
+    // What is offered as it is drawn.
+    private IReadOnlyList<string> saidShown = [];
 
     /// <summary>The colour of what is typed: the colour of a chord's name on the sheet.</summary>
     public Brush Ink
@@ -61,14 +68,20 @@ public partial class SheetEntry : UserControl
         }
     }
 
-    /// <summary>Shows what is offered, the one picked lit in orange. The bubble is as tall as that needs.</summary>
-    public void Show(IReadOnlyList<string> offered, int picked)
+    /// <summary>
+    /// Shows what is offered, the one picked lit in orange, each name as
+    /// <paramref name="drawn"/> draws it. The bubble is as tall as that needs.
+    /// </summary>
+    public void Show(IReadOnlyList<string> offered, int picked, Func<string, string>? drawn = null)
     {
-        if (Shown.SequenceEqual(offered) && picked == Picked)
+        drawn ??= name => name;
+        var said = offered.Select(drawn).ToList();
+        if (Shown.SequenceEqual(offered) && picked == Picked && saidShown.SequenceEqual(said))
         {
             return;
         }
         Shown = [.. offered];
+        saidShown = said;
         Picked = picked;
         Offered.Children.Clear();
         for (var n = 0; n < offered.Count; n++)
@@ -84,7 +97,7 @@ public partial class SheetEntry : UserControl
                 Cursor = Cursors.Hand,
                 Child = new TextBlock
                 {
-                    Text = name,
+                    Text = said[n],
                     FontFamily = SheetLook.Font,
                     FontWeight = FontWeights.Bold,
                     FontSize = SheetLook.ChipSize,
