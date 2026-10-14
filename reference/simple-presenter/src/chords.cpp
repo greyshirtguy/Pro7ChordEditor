@@ -234,6 +234,59 @@ QString tidied(const QString &typed)
     return written(root) + rest;
 }
 
+QString withSigns(const QString &name)
+{
+    // A chord, as couldBecome() has it, but not an empty one; and its root's letter a
+    // capital. (A root in a small letter may be no note at all: "b3/b5".)
+    int root = 0;
+    if (!readNote(name, &root).valid() || !QStringLiteral("ABCDEFG").contains(name.at(0))
+        || !std::all_of(name.cbegin() + root, name.cend(), chordCharacter))
+        return name;
+    QString drawn = name;
+    // The signs of a note that starts at `start` and is `length` long: all but its letter.
+    const auto signs = [&](qsizetype start, qsizetype length) {
+        for (qsizetype i = start + 1; i < start + length; ++i) {
+            if (name.at(i) == u'#')
+                drawn[i] = QChar(0x266F);
+            else if (name.at(i) == u'b')
+                drawn[i] = QChar(0x266D);
+        }
+    };
+    signs(0, root);
+    // The bass: after the last slash after the root, if what follows it is a note and
+    // nothing more (as parts() has it). Its signs only if its letter is a capital.
+    qsizetype end = name.size();
+    const qsizetype slash = name.lastIndexOf(u'/');
+    if (slash >= root) {
+        int bass = 0;
+        readNote(name.mid(slash + 1), &bass);
+        if (bass > 0 && slash + 1 + bass == name.size()) {
+            end = slash;
+            if (QStringLiteral("ABCDEFG").contains(name.at(slash + 1)))
+                signs(slash + 1, bass);
+        }
+    }
+    // Between the two, only a "#" or a "b" that has a digit 0 to 9 straight after it.
+    for (qsizetype i = root; i < end; ++i) {
+        const QChar next = i + 1 < name.size() ? name.at(i + 1) : QChar();
+        if (next < u'0' || next > u'9')
+            continue;
+        if (name.at(i) == u'#')
+            drawn[i] = QChar(0x266F);
+        else if (name.at(i) == u'b')
+            drawn[i] = QChar(0x266D);
+    }
+    return drawn;
+}
+
+QString withoutSigns(const QString &text)
+{
+    QString plain = text;
+    plain.replace(QChar(0x266F), u'#');
+    plain.replace(QChar(0x266D), u'b');
+    return plain;
+}
+
 QString transposed(const QString &chord, const QString &fromKey, const QString &toKey)
 {
     const Note from = noteOfKey(fromKey);

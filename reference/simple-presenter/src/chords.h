@@ -75,6 +75,30 @@ bool couldBecome(const QString &typed);
 // "F#M7/A": what is between the notes is the writer's business).
 QString tidied(const QString &typed);
 
+// ---- Sharps and flats drawn as signs
+//
+// The chord sheet draws a chord's sharps and flats as the signs a musician writes, ♯
+// (U+266F) and ♭ (U+266D): F♯m7, B♭, C7♭9, E♭/G. It is only how a name is DRAWN: what
+// these give is never written to a file, nor put in what is copied, nor in ChordPro
+// text, which keeps "#" and "b". (The maintainer's, 2026-10-14, for the Mac and Windows
+// chord editors and this one alike: "just a visual skin - not changing the underlying
+// data", with a setting to turn it off. Their tools/signs.py is the rule's reference,
+// and tests/unit/data/signs.json, made by it, holds this to it.)
+//
+// withSigns: the name as the sheet draws it. Only a name that is a chord (it starts
+// with a note, and the rest is written only with what a chord's name is written with:
+// no space), and whose root's letter is a capital; anything else comes back as it is
+// ("N.C.", "Bb riff", and "b3/b5", a chord in numbers, where the "b" is no note). Then
+// every sharp and flat of the root; those of the bass, if it has one and its letter is
+// a capital; and between the two, a "#" or "b" with a digit straight after it ("C7b9",
+// "Dm7(b5)"), and no other ("Bm7b", half typed, keeps its "b" until the 5 comes). A sign
+// and what it stands for are one UTF-16 unit each, so the name drawn is as long as the
+// name, and a place in one is the same place in the other.
+QString withSigns(const QString &name);
+// The other way: every ♯ as "#" and every ♭ as "b", and nothing else changed. What the
+// box a chord is typed in holds is read so, while it shows the signs.
+QString withoutSigns(const QString &text);
+
 // ---- From one key to another, and from one notation to another
 
 // The chord as it is in another key. Each note is moved by as many letters and as many

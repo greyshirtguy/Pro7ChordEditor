@@ -1,7 +1,16 @@
 // What a chord is, how it changes key and notation, and ChordPro (src/chords.h).
+//
+// Sharps and flats drawn as signs are held to the cases the Mac and Windows chord
+// editors are held to (tests/unit/data/signs.json, copied to the byte from Pro7 Chord
+// Editor's testdata/vectors, whose tools/signs.py made them and is the rule's
+// reference), so that the three draw a name the same.
 
 #include "chords.h"
 
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QTest>
 
 using namespace chords;
@@ -294,6 +303,29 @@ private slots:
         QCOMPARE(slides.size(), 2);
         QVERIFY(slides.at(0).size() == 2 && slides.at(1).size() == 1);
         QCOMPARE(slidesOf(song.sections.at(0), 0).size(), 3);
+    }
+
+    void sharpsAndFlatsAreDrawnAsSignsWhereTheyAreClearlySo()
+    {
+        QFile file(QStringLiteral(VECTORS "/signs.json"));
+        QVERIFY(file.open(QIODevice::ReadOnly));
+        const QJsonObject all = QJsonDocument::fromJson(file.readAll()).object();
+        const QJsonArray drawn = all.value("withSigns").toArray();
+        const QJsonArray read = all.value("withoutSigns").toArray();
+        QVERIFY(drawn.size() >= 50 && read.size() >= 7);
+        for (const QJsonValue &each : drawn) {
+            const QJsonObject one = each.toObject();
+            const QString name = one.value("in").toString();
+            // (Compared unit by unit: a sign and a "b" print alike in some fonts.)
+            QVERIFY2(withSigns(name) == one.value("out").toString(), qPrintable(one.value("about").toString()));
+            // As long as the name, and only drawn: read back, it is the name.
+            QCOMPARE(withSigns(name).size(), name.size());
+            QCOMPARE(withoutSigns(withSigns(name)), withoutSigns(name));
+        }
+        for (const QJsonValue &each : read) {
+            const QJsonObject one = each.toObject();
+            QVERIFY2(withoutSigns(one.value("in").toString()) == one.value("out").toString(), qPrintable(one.value("about").toString()));
+        }
     }
 };
 

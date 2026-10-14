@@ -1,12 +1,14 @@
 #pragma once
 
 #include "presentation.pb.h"
+#include "proMask.pb.h"
 #include "propDocument.pb.h"
 #include "stage.pb.h"
 #include "template.pb.h"
 
 #include <QAbstractListModel>
 #include <QHash>
+#include <QSet>
 #include <QUrl>
 #include <QVariantMap>
 #include <QtQml/qqmlregistration.h>
@@ -33,13 +35,19 @@
 // or the layout's and its label the name. What differs is only where in the file a
 // row's slide is, and what is kept of the file to undo a change: the cue the slide is
 // in, or the layout.
+//
+// A theme's slides are edited so too (openTheme), and so are the workspace's masks
+// (openMasks), each of which is a slide and a name. The masks are a part of a file
+// that holds much else, the screens and the looks, which other parts of the app write
+// while the editor is up: so the editor holds the masks alone, and saving a change
+// reads that file as it then is and puts the masks into it, nothing else.
 class PresentationEditor : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
     Q_PROPERTY(QString path READ path NOTIFY documentChanged)
     Q_PROPERTY(QString name READ name NOTIFY documentChanged)
-    // What is open: "presentation", "props" or "stage"
+    // What is open: "presentation", "props", "stage", "theme" or "masks"
     Q_PROPERTY(QString kind READ kind NOTIFY documentChanged)
     Q_PROPERTY(int count READ count NOTIFY documentChanged)
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY historyChanged)
@@ -90,6 +98,9 @@ public:
     Q_INVOKABLE QString openStageLayouts(const QString &path, const QString &workspace);
     // A theme: `path` is its Theme file, and its slides are the rows.
     Q_INVOKABLE QString openTheme(const QString &path, const QString &workspace);
+    // The workspace's masks: `path` is the workspace's set-up file, and the masks are
+    // the rows. A workspace that has no such file yet has no masks, and opens so.
+    Q_INVOKABLE QString openMasks(const QString &path, const QString &workspace);
     Q_INVOKABLE void close();
 
     Q_INVOKABLE QVariantMap slideAt(int row) const;
@@ -105,12 +116,23 @@ public:
     // Applies a format to part of an element's text: see RichText::formatted. To format
     // all of it, give a range that covers it, such as 0 to a very large number.
     Q_INVOKABLE QString formatText(int row, const QString &element, int start, int end, const QVariantMap &format);
+    // A slide's notes (see proconvert::readNotes), as a RichText value: its own, or
+    // for a slide with none, no words in the format notes are typed in. Only a
+    // presentation's slides have notes: nothing, for a prop, a layout or a theme.
+    Q_INVOKABLE QVariant notes(int row) const;
+    // Makes them this text. Notes with no words, on a slide that had no notes until
+    // they were typed here since the presentation was opened, are taken out of the file
+    // again, which is then as it was: nothing is left in a file for notes nobody kept.
+    Q_INVOKABLE QString setNotes(int row, const QVariant &richText);
     // Adds a text box, its text set like that of the element `like` if there is one.
     // Returns { id, error }.
     Q_INVOKABLE QVariantMap addText(int row, const QString &like);
     // Adds a shape ("rectangle", "roundedRectangle", "ellipse" or "arrow"), or an
     // element filled with a picture or video file. Each returns { id, error }.
     Q_INVOKABLE QVariantMap addShape(int row, const QString &shape);
+    // Gives a presentation's slide a label of these words, or with none takes its
+    // words away; the label's colour is kept. One step to undo, like any change here.
+    Q_INVOKABLE QString setLabel(int row, const QString &text);
     Q_INVOKABLE QVariantMap addMedia(int row, const QUrl &file);
     // Adds a copy of an element, a little down and right of it. Returns { id, error }.
     Q_INVOKABLE QVariantMap duplicate(int row, const QString &element);
@@ -118,6 +140,11 @@ public:
     // Moves an element to another place in the order they are drawn in, 0 being the
     // back.
     Q_INVOKABLE QString move(int row, const QString &element, int index);
+    // Puts an element where it was let go in the editor's list of the slide's
+    // elements, which has the front one first: `landing` is the row of that list it
+    // goes before, or the number of rows for under the last (see elementorder.h). Let
+    // go where it already is, nothing is changed and no step to undo is left.
+    Q_INVOKABLE QString place(int row, const QString &element, int landing);
 
     // ---- Chords (see chords.h, and proconvert::readChords for how they are kept)
 
@@ -172,6 +199,49 @@ public:
     // slide left with chords keeps what was made for them, and taking them off another
     // day leaves its text box with one stand-in, as any line of chords alone is left.)
     Q_INVOKABLE QString setChordsAlone(int row, const QString &element, int line, const QStringList &names, bool joined = false);
+    // ---- Reflow (see reflow.h for the rules of the words, and what of them is a
+    // guess; qml/ReflowEditor.qml is what works these)
+
+    // The presentation as the reflow editor's table has it: a row for each slide, in
+    // the order the presentation stores them, as { row, slideId, group, groupColor,
+    // groupStart, label, element, text, editable }. `text` is the words of the slide's
+    // text box, and `element` that box's id: the first text box of the slide that has
+    // words of its own (not another element's, a timer's or the live slide's), or, on
+    // a slide where none has, the first that has nothing in it. A slide with no text
+    // box of its own at all is a row too, with no element, that cannot be typed in,
+    // split or joined (`editable` false): a picture, say, or a slide of linked text.
+    //
+    // A slide with several text boxes that have words is a row for the first of them.
+    // The others are the slide's still, and go with it. (A GUESS at what is wanted,
+    // which the maintainer has since said will do: ProPresenter's reflow editor was not
+    // looked at for such a slide.)
+    Q_INVOKABLE QVariantList reflow() const;
+    // The words of a row typed over: what they now are. The words keep how they were
+    // set, and their chords, by the rules of reflow::retyped and of writeText. One
+    // step to undo, for the slide.
+    Q_INVOKABLE QString reflowType(int row, const QString &words);
+    // Splits a row's slide in two where the caret is in its words (see
+    // reflow::splitAt): the slide keeps what is before, and a new slide straight after
+    // it, in the same group, has what is after. Returns { error, row }, the row of the
+    // new slide.
+    //
+    // The new slide is the slide over again: its size and background, every element on
+    // it where it was and set as it was, so that the words that move to it look as
+    // they did. It has ids of its own throughout. What it does not take: the slide's
+    // label, its notes and its hotkey, which are the first slide's; and whatever else
+    // the slide's cue did when it was shown (media it started, a timer, a macro),
+    // which would otherwise be done twice. (GUESSES, all of that paragraph, when it was
+    // made. The maintainer has since said it is as wanted, and as ProPresenter does
+    // as far as they know.)
+    Q_INVOKABLE QVariantMap reflowSplit(int row, int caret);
+    // Joins a row's slide to the one before it: its words go after that one's, on a
+    // new line, with their chords, and the slide itself is taken out of the
+    // presentation and of its group. Returns { error, row, caret }: the row that has
+    // the words now, and where in them the joined words begin. Whatever else the
+    // slide had (other elements, a label, notes, things its cue did) goes with it,
+    // and comes back with it if the join is undone.
+    Q_INVOKABLE QVariantMap reflowJoin(int row);
+
     // Says what key the chords are written in. It changes no chord. The key
     // ProPresenter shows them in goes with it if nobody has chosen another: if the
     // presentation named no key, or its two keys were the same. Where they differed,
@@ -214,9 +284,12 @@ signals:
     void slideChanged(int row);
     // An undo or a redo changed the slide in this row.
     void restored(int row);
+    // The presentation has other slides than it had: one was split or two were joined
+    // in the reflow editor, or that was undone. Every row is to be read again.
+    void restructured();
 
 private:
-    enum class Kind { Presentation, Props, Stage, Theme };
+    enum class Kind { Presentation, Props, Stage, Theme, Masks };
     // Where a row's slide is: which cue of the presentation or of the props, or which
     // stage layout; and for a presentation's slide, its group.
     struct Row
@@ -228,7 +301,12 @@ private:
     };
     // One change: the cue or layout it was made to, as it was before and after. Or,
     // with no row (-1), a change to the presentation's keys: `before` and `after` are
-    // then what musicState() gave.
+    // then what musicState() gave. Or, with kWhole for its row, a change to which
+    // slides the presentation has (one split, two joined): `before` and `after` are
+    // then the whole presentation, a change like that being in several places of it
+    // at once (its cues, a group's list of them).
+    static constexpr int kKeys = -1;
+    static constexpr int kWhole = -2;
     struct Step
     {
         int row;
@@ -240,6 +318,18 @@ private:
 
     void start(Kind kind, const QString &path, const QString &workspace, const QString &name);
     void finishOpening();
+    // Works out the rows of a presentation from its groups and cues.
+    void placeRows();
+    // The same again after the presentation's slides have changed, and every row
+    // described afresh.
+    void relist();
+    // Makes a change to which slides the presentation has, saves it, and keeps it as
+    // one step to undo. `apply` returns an error message, empty if it made the change.
+    template <typename Change>
+    QString restructure(Change apply);
+    // The id of the text box a row stands for in the reflow editor; "" if its slide
+    // has none.
+    QString reflowBox(int row) const;
     google::protobuf::Message *unitAt(int row);
     const google::protobuf::Message *unitAt(int row) const;
     rv::data::Slide *slideIn(int row);
@@ -281,6 +371,8 @@ private:
     rv::data::PropDocument m_props;
     rv::data::Stage::Document m_stage;
     rv::data::Template::Document m_theme;
+    // (The masks alone, out of the file they are in: see openMasks.)
+    rv::data::MaskCollection m_masks;
     QString m_path;
     QString m_name;
     QString m_workspace;
@@ -304,6 +396,9 @@ private:
         std::string look;
     };
     QHash<QString, MadeForChords> m_madeForChords;
+    // The slides, by their cues' ids, that had no notes in the file and have been
+    // given some here since the presentation was opened (see setNotes)
+    QSet<QString> m_notesMade;
     bool m_changed = false;
     QString m_backupPath;
     // The presentation's file as it was read when it was opened here, and the same as

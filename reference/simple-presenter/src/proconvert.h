@@ -51,6 +51,36 @@ RichText readText(const rv::data::Graphics::Text &text);
 // so that correcting a word does not cost a song its chords.
 void writeText(rv::data::Graphics::Text *text, const RichText &rich);
 
+// A slide's notes: words for whoever is running the show or standing on the stage, kept
+// with the slide and never shown to the audience. Only a slide of a presentation has
+// them (a prop, a stage layout and a theme's slide have nowhere for them in their
+// files).
+//
+// How ProPresenter keeps them (seen in fifteen slides of real libraries, version 7 on a
+// Mac): beside the slide itself, as RTF with a set of attributes, which is the pair a
+// text box keeps its text as. The RTF is all there is to them: of those fifteen, eight
+// have attributes with nothing in them, and seven have the look the notes were first
+// typed in (a font, a colour, a paragraph), with no ranges in it. A slide that has
+// never had notes has no such message at all.
+//
+// readNotes gives them as the text they are, with no paragraphs if the slide has
+// none. writeNotes writes the RTF, and leaves whatever the attributes hold as it was;
+// for a slide that had no notes it makes the message, with attributes that hold
+// nothing, as most of those seen have. Notes with no words in them are still notes to
+// the file: whether the message is to be taken out again is for whoever knows it was
+// not there before (PresentationEditor::setNotes).
+//
+// notesFormat is what notes are typed in where there are none yet: the font, the size
+// and the white that ProPresenter's own start in (Helvetica Neue, 24 points), as the
+// notes looked at have them. A GUESS that it is the same in every version and on
+// Windows.
+RichText readNotes(const rv::data::PresentationSlide &slide);
+void writeNotes(rv::data::PresentationSlide *slide, const RichText &rich);
+TextRun notesFormat();
+// Puts a slide's notes into its map, as `notes` (the text they are) and `notesText`
+// (their words): only for a slide that has any.
+void addNotes(const rv::data::PresentationSlide &slide, QVariantMap *map);
+
 // The chords over a text element's words, in order, and replacing them.
 //
 // How ProPresenter keeps them (worked out from songs it imported from Multitracks, and
@@ -111,7 +141,8 @@ void writeChords(rv::data::Graphics::Text *text, const QList<chords::Chord> &cho
 //     chords::Notation) and chordColor; and, only when chordsOn, chordStyle: the
 //     style of its words as plain values { family, size, bold, italic, color,
 //     capitals, alignment (0 left, 1 centred, 2 right) } for ChordedText.qml
-//   linkKind ("none", "element", "timer", "slideText" or "other"): where the element's
+//   linkKind ("none", "element", "timer", "slideText", "clock", "videoCountdown",
+//     "stageMessage" or "other"): where the element's
 //     text comes from, if it is not its own. For another element of the slide,
 //     linkElementId, linkElementName and linkTransform. For a timer, linkTimerId and
 //     linkTimerName (it is found by id, or failing that by name); linkTimerHours,
@@ -121,11 +152,27 @@ void writeChords(rv::data::Graphics::Text *text, const QList<chords::Chord> &cho
 //     "${timer}" where the time goes). For the text of the slide that is live,
 //     linkSlideNext (it is the one after it instead), linkSlideSource (which of its
 //     text, as Show::Source), linkSlideName (the name of the elements whose text it
-//     is, if it goes by name) and linkTransform. For anything else, which this app
-//     does not show, linkLabel names it and linkPicture says whether it is a picture or
-//     a colour that it puts in the element, in place of its fill, and not words
+//     is, if it goes by name), linkSlidePreserve (for a slide's notes: they are shown
+//     in their own fonts, sizes and colours, and not in this element's) and
+//     linkTransform. For the system's clock, linkClockDate and linkClockTime (how the
+//     date and the time are written, each as clocktext::Style), linkClock24 (on the
+//     twenty-four hour clock) and linkClockPattern (text with "${clock}" where they
+//     go). For how long the video that is playing has left, the timer's four parts
+//     again (linkTimerHours and the rest, and linkTimerPattern) and
+//     linkVideoIgnoreLooping (a video that goes round is not counted down). For what
+//     the stage is being told (the stage message), linkFlash (the element's fill
+//     flashes when a message is shown) and linkFlashColor (the colour it flashes).
+//     Those of the notes, the clock, the video and the stage message are there only
+//     for an element that is linked to such a thing: whoever reads them takes none to
+//     be no. (What draws a message of the messages' layer makes one more kind for
+//     itself, "message" with linkMessageId: see Messages::slideOf.) For
+//     anything else, which this app does not show, linkLabel names it and linkPicture
+//     says whether it is a picture or a colour that it puts in the element, in place of
+//     its fill, and not words
 //   visibilityRules (bool), visibilityCriterion (0 all, 1 any, 2 none),
-//     visibilityTimed (one of the conditions is about a timer, so whether the element
+//     visibilityTimed (one of the conditions is about a timer, or about an element
+//     that shows the stage message, which is also marked by visibilityStaged and on
+//     the condition by `staged`; so whether the element
 //     shows is not settled until it is drawn: see Slide.qml),
 //     visibilityConditions: a list of { kind: "element", elementId, elementName, hasText }
 //     and, for conditions on things this app does not track, { kind: "other", index,
@@ -135,13 +182,14 @@ void writeChords(rv::data::Graphics::Text *text, const QList<chords::Chord> &cho
 //   hasText, and visible (false if hidden or if its visibility rules say so).
 // All geometry is in slide units.
 //
-// An element linked to a timer, or to the text of the slide that is live, shows
-// something that is not in the slide at all, and that changes while the slide is on
-// show. So its displayText only stands in for it (the timer at nothing, or no words,
-// in the element's own style); what draws the element asks for the text as it is at
-// the moment (SlideElement.qml). A stage layout is a slide made of text boxes like
-// that. Another such thing, the clock say, is another linkKind handled in those same
-// two places.
+// An element linked to a timer, to the clock, to a video's time, to the stage message
+// or to the text of the slide that is live, shows something that is not in the slide
+// at all, and that changes while the slide is on show. So its displayText only stands
+// in for it (the
+// timer at nothing, the clock at noon, or no words, in the element's own style); what
+// draws the element asks for the text as it is at the moment (SlideElement.qml). A
+// stage layout is a slide made of text boxes like that. Another such thing is another
+// linkKind handled in those same two places.
 //
 // An element linked to something this app does not show (linkKind "other") has no
 // displayText at all. The text such an element has of its own is only a sample of the
@@ -161,10 +209,11 @@ QVariantMap toSlideMap(const rv::data::Slide &slide, const QString &label);
 //     for textShadow...
 //   verticalAlignment, textScale, marginLeft, marginTop, marginRight, marginBottom
 //   chordsOn, chordNotation, chordColor
-//   linkKind ("none", "element", "timer" or "slideText"), linkElementId,
-//     linkTransform, linkTimerId, linkTimerName, linkTimerHours, linkTimerMinutes,
-//     linkTimerSeconds, linkTimerHundredths, linkSlideNext, linkSlideSource,
-//     linkSlideName
+//   linkKind ("none", "element", "timer", "slideText", "clock", "videoCountdown" or
+//     "stageMessage"), linkElementId, linkTransform, linkTimerId, linkTimerName,
+//     linkTimerHours, linkTimerMinutes, linkTimerSeconds, linkTimerHundredths,
+//     linkSlideNext, linkSlideSource, linkSlideName, linkSlidePreserve, linkClockDate,
+//     linkClockTime, linkClock24, linkVideoIgnoreLooping, linkFlash, linkFlashColor
 //   visibilityRules, visibilityCriterion, visibilityConditions (conditions of kind
 //     "other" are kept as they were, by their index)
 // Renaming an element also renames it where other elements of the slide refer to it.

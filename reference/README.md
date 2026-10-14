@@ -2,7 +2,7 @@
 
 The source of the chord editor of
 [Simple Presenter](https://github.com/greyshirtguy/Simple-Presenter), as it is at
-commit `98fc328` (2026-10-12, the change that followed version 0.89). It is here to be
+commit `2e67b1a` (2026-10-14, the change that followed version 0.94). It is here to be
 **read**: not built, not changed, not copied line for line into another language
 where that language has a better way.
 It is the same person's work, under the same licence (`simple-presenter/LICENSE`).
@@ -15,14 +15,19 @@ editors in the middle of the toolbar, the song's two keys, Revert, a name that i
 chord moved and copied like any other, what a paste says, the empty lines a box's
 words end with left off the sheet, and a line of chords alone that keeps one stand-in
 when it loses its last chord. In the change after it, a line of chords alone is
-changed where it stands in the RTF, by the rule of `tools/standins.py`. So what is
-here is no longer only the editor that was copied: it is the third editor, meant to
-work, look and feel as the other two do, and "Where this and `spec/` differ" below
-is what is still not the same.
+changed where it stands in the RTF, by the rule of `tools/standins.py`. In its
+version 0.90 a chord of the strip can be dragged onto a word (`spec/03`, "A chord
+dragged out of the strip"). And in the change after its version 0.94, this commit, it
+took back what the two apps had come to since: the line of hints under the sheet and
+its highlighted line (rules 53a to 53h, the line's colour in the settings), sharps and flats
+drawn as ♯ and ♭ (`chords::withSigns`, held to `signs.json`, with its switch in the
+settings), an empty box that is kept taking the chord off (rule 35a), and a chord's
+name orange as it comes. So what is here is no longer only the editor that was
+copied: it is the third editor, meant to work, look and feel as the other two do,
+and "Where this and `spec/` differ" below is what is still not the same.
 
 The vectors in `testdata/` were made again from this commit
-([`testdata/README.md`](../testdata/README.md) says what came of it: not one case
-that was there came out differently).
+([`testdata/README.md`](../testdata/README.md) says what came of it).
 
 It is C++ and QML, for Qt. Neither new app uses Qt. But the rules are plain functions
 that read the same in any language, and every file opens with a comment that says what
@@ -32,16 +37,17 @@ it is for and why it is the way it is, which is most of the point of having it h
 
 | For | Read | Lines |
 | --- | --- | --- |
-| The chord rules: names, keys, moving key, notations, what is offered, order and ranges, ChordPro, reading a ChordPro file | `src/chords.h` (the comments are the specification), `src/chords.cpp` | 930 |
-| The tests those rules were built with | `tests/tst_chords.cpp` | 300 |
+| The chord rules: names, keys, moving key, notations, what is offered, order and ranges, ChordPro, reading a ChordPro file, sharps and flats drawn as signs | `src/chords.h` (the comments are the specification), `src/chords.cpp` | 1,010 |
+| The tests those rules were built with | `tests/tst_chords.cpp` (the signs held to `signs.json`) | 330 |
 | Where chords are in a file, and reading and writing them | `src/proconvert.h` (search for "chords"), `src/proconvert.cpp` (`readChords`, `writeChords`) | |
 | The words of an RTF | `src/rtf.h`, `src/rtf.cpp` | 480 |
 | **A line of chords alone changed where it stands in the RTF**: `tools/standins.py` in C++, held to `testdata/vectors/stand-ins-in-rtf.json`; and where the other ranges of a text box go when it is (`placeAfter`) | `src/rtfstandins.h` (the comment is the rule), `src/rtfstandins.cpp`, `tests/tst_rtfstandins.cpp` | 680 |
 | The song: what the editors are handed, their changes, saving, undo, the two keys, Revert | `src/presentationeditor.h`, `src/presentationeditor.cpp`: `song`, `usedChords`, `setChords`, `setChordsAlone`, `key`, `setKey`, `shownKey`, `setShownKey`, `change`, `undo`, `redo`, `backUp`, `revertToOpened`, `takeBackRevert` | |
-| **The chord sheet** | `qml/ChordSheet.qml`, `qml/chordlayout.js` | 1,780 |
+| **The chord sheet**: and in it `highlighted` and `attending` (the highlighted line), `drawn` (the signs), `finishTyping` (an empty box kept), `hintsNow` and `pasteWouldReplace` (what the line of hints is told) | `qml/ChordSheet.qml`, `qml/chordlayout.js` | 2,250 |
+| **The line of hints**: what is said when, and how the hints are fitted into the width there is; and the line drawn | `src/sheethints.h` (the comments are the specification), `src/sheethints.cpp`, `tests/tst_sheethints.cpp`; `qml/HintLine.qml`; `SheetHints` in `src/chordsbridge.*` | 660 |
 | The ChordPro editor | `qml/ChordProEditor.qml` | 620 |
 | The switch between the editors | `qml/EditorModes.qml` | 280 |
-| What the editors must do, as that app tests it: three hundred checks, each a sentence | `tests/chords-scripted-test.qml` (as it was before the two apps), `tests/chords2-scripted-test.qml` (the sheet as it came back from them), `tests/chords3-scripted-test.qml` (the keys, Revert, the ChordPro text) | 2,100 |
+| What the editors must do, as that app tests it: four hundred checks, each a sentence | `tests/chords-scripted-test.qml` (as it was before the two apps), `tests/chords2-scripted-test.qml` (the sheet as it came back from them), `tests/chords3-scripted-test.qml` (the keys, Revert, the ChordPro text), `tests/chords4-scripted-test.qml` (a chord dragged out of the strip), `tests/chords5-scripted-test.qml` (an empty box kept, the highlighted line, the signs, the line of hints, and the settings for them) | 3,200 |
 | A song from a ChordPro file | `src/songimport.h`, `src/songimport.cpp`, `qml/ImportSong.qml` | |
 | How it is all described to the person using it | `README-chords.md` | |
 
@@ -51,9 +57,10 @@ QML calls them, and the colouring of ChordPro text), `src/richtext.*` and
 from: **not** to be copied, see `spec/01-file-format.md`), and `qml/ChordedText.qml`
 (how that app draws chords on its stage screen, which this app has none of).
 
-`tests/tst_rtfstandins.cpp` reads its cases from a folder of that repository,
-`tests/unit/data`, which is not copied here: the two files in it are this repository's
-own `testdata/vectors/stand-ins-in-rtf.json` and `rtf-text.json`, to the byte.
+`tests/tst_rtfstandins.cpp` and `tests/tst_chords.cpp` read cases from a folder of
+that repository, `tests/unit/data`, which is not copied here: the three files in it
+are this repository's own `testdata/vectors/stand-ins-in-rtf.json`, `rtf-text.json`
+and `signs.json`, to the byte.
 
 ## What is in these files that is not wanted
 
@@ -70,12 +77,6 @@ is kept to as well, in everything the three have in common. What is still differ
   text box's RTF again whole** (`setChordsAlone`, which says so in the log); the apps,
   which have no writer of RTF, refuse (`spec/01-file-format.md`, "Chords with no
   words").
-- **The other ranges of a text box go with the words here.** When a line of chords
-  alone is made longer or shorter, this code moves the ends of the box's custom
-  attributes that are not chords with the words (`rtfstandins::placeAfter`); the
-  pages leave those as they are. `spec/01-file-format.md` has it, with what was found
-  in real songs, under "Where Simple Presenter differs". It is the maintainer's to
-  say which the three are to do.
 - A blank slide's first chords are written into its text box here with the box's own
   font, size and colour, which the file keeps in `text.attributes` for an empty box
   too (all 229 blank boxes looked at on the Linux machine had them), and the RTF is
@@ -88,9 +89,18 @@ is kept to as well, in everything the three have in common. What is still differ
   box").
 - A new song is made from a song that is known to be good in the apps, and from
   nothing here (`spec/09-chordpro-files.md`).
-- **Not here yet**: a chord dragged out of the strip onto a word
-  (`spec/03-chord-sheet.md`, "A chord dragged out of the strip"), and the guide
-  (`spec/13-guide.md`).
+- **Not here**: the guide (`spec/13-guide.md`), nor the strip's button for it; and
+  of the line of hints, the row for ProPresenter running, nothing here asking
+  whether it is. The line's keys are named in words, as on Windows, and the key that
+  brings up the copying is Ctrl, Linux's key for shortcuts. While one of the strip's
+  chords is pointed at, the quiet line under the line of hints says what that chord
+  does (rule 46h), as the Mac's button says it of itself.
+- **The highlighted line while one of the strip's chords is carried** is the line
+  it would land on only where the lit bubble shows it would land, and none between
+  two slides; the Mac app goes on lighting the spot's line there. Rule 53f says "is
+  carrying a chord over it", and this reads "over" as where it would land.
+- **Ctrl+1, Ctrl+2 and Ctrl+S** are not the editors' here: this app has them for
+  its screens and for showing, as ProPresenter does, and its README says so.
 - Everything about the library, the copies and the mending is the apps' alone. (Of
   the copies this code has one thing: Revert, which puts the song being edited back
   as it was when it was opened.)

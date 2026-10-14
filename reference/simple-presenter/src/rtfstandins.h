@@ -109,11 +109,12 @@ std::optional<QByteArray> withLine(const QByteArray &rtf, int line, const QStrin
 // what a text system does with what is set on characters when more are typed after
 // them, and so what ProPresenter is taken to do, WHICH IS A GUESS.
 //
-// (This is not in the rule the other two editors have, which leave those ranges as
-// they are. In real songs that matters: most text boxes that hold a line of chords
-// alone, as Multitracks makes them, say of all their words that they are in capitals,
-// and with a chord taken off, that range left alone would end past the last of the
-// words.)
+// (It was this app's alone at first; the other two editors left those ranges as they
+// were, until the maintainer had them do as this does, on 2026-10-13. In real songs it
+// matters: most text boxes that hold a line of chords alone, as Multitracks makes them,
+// say of all their words that they are in capitals, and with a chord taken off, that
+// range left alone would end past the last of the words. Pro7 Chord Editor's
+// testdata/vectors/place-after.json is made from this function.)
 int placeAfter(int place, int lineStart, int was, int now);
 
 } // namespace rtfstandins

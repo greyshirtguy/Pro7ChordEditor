@@ -1,5 +1,5 @@
 <!-- The part of Simple Presenter's README that describes its chord features to the person using it, as it is
-     at commit 98fc328 (2026-10-12, the change after version 0.89). Kept here as it was, for how the editor is
+     at commit 2e67b1a (2026-10-14, the change after version 0.94). Kept here as it was, for how the editor is
      explained in plain words. Its links go to that repository. -->
 
 ## Chords
@@ -20,11 +20,12 @@ they stay there, a line of words with chords is never broken in two: text too wi
 its box is made smaller instead. A slide that is chords and no words (an intro, a
 turnaround) is shown as its chords.
 
-![A stage layout in the editor: the text box that shows the current slide's words is picked, with the live song's chords drawn over them, and at the foot of its Text tab are Chords, with Show ticked and a colour, and As, set to Chords](https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/98fc3280daedad8a64921ea45efbbab2d594e771/docs/stage-layout-chords.png)
+![A stage layout in the editor: the text box that shows the current slide's words is picked, with the live song's chords drawn over them, and at the foot of its Text tab are Chords, with Show ticked and a colour, and As, set to Chords](https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/2e67b1aa4aa875ba128374b0c26a01acd84421e8/docs/stage-layout-chords.png)
 
 **The key.** A song's chords are written in the file in its original key. Over the
-slides of a song that has chords there is a **Key** to pick, starting at the key the
-file says the song was last shown in, and the stage shows the chords in the key picked.
+slides of a song that has chords, at the left of the line that has the song's name in
+its middle, there is a **Key** to pick, starting at the key the file says the song was
+last shown in, and the stage shows the chords in the key picked.
 Picking a key changes nothing in the file and lasts while the app is open.
 
 ### The chord editor
@@ -53,9 +54,9 @@ the song, as many to a row as fit.
 
 | Point at a letter, and press 1 to 7 | Or type a chord, and take what is offered |
 |:---:|:---:|
-| <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/98fc3280daedad8a64921ea45efbbab2d594e771/docs/chords-point.png" width="420" alt="The top of the chord sheet: the seven chords of the song's key numbered 1 to 7, and under them the first slide of the first verse in its card, with a bubble in outline over the word the pointer is on"> | <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/98fc3280daedad8a64921ea45efbbab2d594e771/docs/chords-type.png" width="420" alt="The same card with a bubble open over a word, D and a slash typed in it, and over that the bass notes it might be going on to: D/F#, D/A, D/G, D/B, D/C and D/E"> |
+| <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/2e67b1aa4aa875ba128374b0c26a01acd84421e8/docs/chords-point.png" width="420" alt="The top of the chord sheet: the seven chords of the song's key numbered 1 to 7, and under them the first slide of the first verse in its card, with a bubble in outline over the word the pointer is on"> | <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/2e67b1aa4aa875ba128374b0c26a01acd84421e8/docs/chords-type.png" width="420" alt="The same card with a bubble open over a word, D and a slash typed in it, and over that the bass notes it might be going on to: D/F#, D/A, D/G, D/B, D/C and D/E"> |
 | **Drag a chord to where it belongs** | **Or type the lot as ChordPro** |
-| <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/98fc3280daedad8a64921ea45efbbab2d594e771/docs/chords-drag.png" width="420" alt="The same card with the chord D being dragged from one word to another: faint where it was, and bright where it would land"> | <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/98fc3280daedad8a64921ea45efbbab2d594e771/docs/chordpro-type.png" width="420" alt="The ChordPro editor: the same song as text, its groups in curly brackets and its chords in square brackets in orange, one of them just typed"> |
+| <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/2e67b1aa4aa875ba128374b0c26a01acd84421e8/docs/chords-drag.png" width="420" alt="The same card with the chord D being dragged from one word to another: faint where it was, and bright where it would land"> | <img src="https://raw.githubusercontent.com/greyshirtguy/Simple-Presenter/2e67b1aa4aa875ba128374b0c26a01acd84421e8/docs/chordpro-type.png" width="420" alt="The ChordPro editor: the same song as text, its groups in curly brackets and its chords in square brackets in orange, one of them just typed"> |
 
 What makes it quick:
 
@@ -66,6 +67,15 @@ What makes it quick:
 - **Most chords are one key.** The song's key is in the toolbar, and its seven chords
   are along the top of the sheet, numbered. Point at a letter and press **4**, and the
   key's fourth chord is there: in G, that is C. Most of most songs is those seven.
+- **Or one of the seven is dragged onto a word.** Each of them is a button, which puts
+  its chord on the spot when clicked; and it can be picked up and carried down to a
+  word, on any slide, which is slower than a key and is what a hand does unasked. Its
+  picture goes with the pointer, and over a word a lit bubble shows the chord where it
+  would land, in place of a chord that is there. That bubble is the whole of the
+  promise: let go between two slides, on a frame's foot or back on the strip, or press
+  Esc, and nothing is put on. Held near the bottom of the sheet, or its top, it scrolls
+  the sheet to slides that are out of sight. One can be picked up while another chord
+  is being typed, which is kept.
 - **Typing is helped along.** A letter from A to G opens a bubble to type the chord in.
   It takes only what could be a chord, and offers what it might be going to be: the
   chords the song already has, then the key's own, then the usual kinds on that note,
@@ -73,7 +83,29 @@ What makes it quick:
 - **Nothing has to be pressed to say a chord is done.** While one is being typed the
   spot goes on following the pointer. Click the next place, and the chord is kept and
   the bubble opens there: click, type, click, type, down the song. Enter keeps a chord
-  too, and Tab keeps it and moves on to the next word. Only Esc throws one away.
+  too, and Tab keeps it and moves on to the next word. Only Esc throws one away. A
+  bubble emptied and kept so, by Enter or a click, takes off the chord that was there.
+- **A line under the sheet says what the keys do, where you are.** On a chord: that
+  Delete takes it off, 1 to 7 change it, it can be dragged, and a click types over
+  it. On a word with none: 1 to 7, or a letter. While a chord is typed: Enter, Tab,
+  Up and Down, Esc. While one is carried: where letting go puts it, and that Ctrl
+  leaves a copy. Over the strip: that its chords can be dragged down. And with **Ctrl**
+  held, how the lit line's chords are copied and pasted, and whether a paste there
+  would replace chords; where the window is too narrow for that side by side, it goes
+  on two lines. It is blue, to be seen, and lights up for a moment when what it says
+  changes. Under it, the line along the bottom says how much there is of the song
+  ("24 slides, 94 chords."), and for a few seconds what was just done.
+- **The line you are at is lit.** The words of the line the pointer is on are drawn
+  in orange, and so are those of the line a chord is being typed on, wherever the
+  pointer has gone. It is the line Ctrl+C copies from and Ctrl+V pastes to. Over the
+  bare sheet between the slides, or off the sheet, no line is lit; the arrow keys
+  light the spot's line again. A line of chords with no words has its rule lit
+  instead, twice as thick.
+- **Sharps and flats are drawn as ♯ and ♭**: F♯m7, B♭, C7♭9, E♭/G, in the bubbles,
+  the strip, what is offered and the bubble a chord is typed in (where F# becomes F♯
+  as the # is typed), and in the song's two keys. Only those that are clearly a sharp
+  or a flat: the root's and the bass's, and one before a digit. It is only how they
+  are drawn: the song's file, what is copied and the ChordPro text keep `#` and `b`.
 - **Chords are things to pick up.** Drag one to another word, on any slide; hold Ctrl
   to leave a copy behind. A name that is no chord, which some files have ("N.C."), is
   picked up, copied and pasted like any other; only what is newly typed has to be a
@@ -124,9 +156,10 @@ All of it, key by key:
 | Do this | And |
 | --- | --- |
 | 1 to 7 | The key's own chord on that note of its scale goes on the spot: in C, 1 is C, 4 is F, 6 is Am. The strip along the top shows them, and they can be clicked there |
+| Drag one of the strip's seven | Puts it on the word it is let go on, on any slide, where the lit bubble shows; with Shift held, on the start of the word. Let go anywhere else, or with Esc pressed, nothing happens |
 | A to G | Starts a chord by name. Only what could be a chord can be typed, and over it are the chords it might be going to be: the song's own first, then the key's, then the usual kinds |
 | Down, Up | Pick one of those; Right puts it in the box to go on from (for a bass note, say) |
-| Enter | Keeps the chord. Tab keeps it and moves the spot on to the next word. Esc throws it away |
+| Enter | Keeps the chord. Tab keeps it and moves the spot on to the next word. Esc throws it away. A bubble emptied and kept takes off the chord that was there |
 | Click | On a place: type a chord there, or change the one that is there. While a chord is being typed, a click on another place keeps it and starts on the next; a click anywhere else on the sheet keeps it too |
 | Drag a chord | Moves it to another word, on any slide. With Ctrl held it is copied |
 | Delete | Takes off the chord at the spot |
@@ -170,9 +203,11 @@ is kept as a copy with the others the editor keeps, and for a few seconds the li
 offers **Undo**, which puts it back.
 
 **The colour of a chord** in each of the two editors can be chosen in the settings,
-under **Chords**, each with a way back to the colour it came with. They are only how
-the editors draw a chord. Nothing in a song's file says a colour: the stage shows
-chords in the colour its layout gives them.
+under **Chords**, and so can that of the sheet's lit line, each with a way back to the
+colour it came with; and the same section has the switch for drawing sharps and flats
+as signs, on as it comes. They are only how the editors draw a song. Nothing in a
+song's file says any of them: the stage shows chords in the colour its layout gives
+them, with `#` and `b`.
 
 ### Importing a ChordPro file
 
@@ -222,11 +257,11 @@ song's key. The same **+** has **New Presentation…** and **New Library**.
   has its range go with the words: one that ended with the line or went on past it
   still does, and one over all the words is over all of them still. That is what a
   text system does when characters are typed after others, and what ProPresenter is
-  taken to do. In this the app is not as the other two editors, which leave such
-  ranges as they are. It matters in real songs: of 164 text boxes with a line of
-  chords alone in the libraries looked at, 96 say of all their words that they are in
-  capitals, and with a chord taken off, that range left alone would end past the
-  last of the words.
+  taken to do. The other two editors have done the same since 2026-10-13; until then
+  they left such ranges as they were. It matters in real songs: of 164 text boxes
+  with a line of chords alone in the libraries looked at, 96 say of all their words
+  that they are in capitals, and with a chord taken off, that range left alone would
+  end past the last of the words.
 - The first chords of a slide with no words are still written with this app's own
   writer, in the font the text box keeps for what is typed into it. The other two
   editors take the opening of a neighbouring text box's RTF instead.

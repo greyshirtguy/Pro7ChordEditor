@@ -2,11 +2,16 @@
 
 #include "chords.h"
 
+#include "elementorder.h"
+#include "labelfile.h"
 #include "proconvert.h"
+#include "reflow.h"
 #include "richtext.h"
 #include "rtfstandins.h"
 #include "sessionlog.h"
 #include "workspacefiles.h"
+
+#include "proworkspace.pb.h"
 
 #include <QDateTime>
 #include <QDir>
@@ -119,7 +124,8 @@ QString PresentationEditor::kind() const
 {
     return m_kind == Kind::Props ? QStringLiteral("props")
          : m_kind == Kind::Stage ? QStringLiteral("stage")
-         : m_kind == Kind::Theme ? QStringLiteral("theme") : QStringLiteral("presentation");
+         : m_kind == Kind::Theme ? QStringLiteral("theme")
+         : m_kind == Kind::Masks ? QStringLiteral("masks") : QStringLiteral("presentation");
 }
 
 // Opening goes in three steps: the file is read by whichever of the three is being
@@ -135,6 +141,7 @@ void PresentationEditor::start(Kind kind, const QString &path, const QString &wo
     m_undo.clear();
     m_redo.clear();
     m_madeForChords.clear();
+    m_notesMade.clear();
     m_changed = false;
     m_backupPath.clear();
     m_asOpened.clear();
@@ -152,6 +159,8 @@ void PresentationEditor::start(Kind kind, const QString &path, const QString &wo
         m_stage.Clear();
     if (kind != Kind::Theme)
         m_theme.Clear();
+    if (kind != Kind::Masks)
+        m_masks.Clear();
 }
 
 void PresentationEditor::finishOpening()
@@ -164,6 +173,50 @@ void PresentationEditor::finishOpening()
     emit documentChanged();
     emit historyChanged();
     emit keyChanged();
+}
+
+// Every cue that shows a slide, group by group as the presentation stores them, then
+// any cue that no group has.
+void PresentationEditor::placeRows()
+{
+    QHash<std::string, int> cueIndexes;
+    for (int i = 0; i < m_presentation.cues_size(); ++i)
+        cueIndexes.insert(m_presentation.cues(i).uuid().string(), i);
+    QSet<int> placed;
+    const auto place = [this, &placed](int cue, const QString &group, const QString &color, bool start) {
+        const rv::data::Cue &candidate = m_presentation.cues(cue);
+        if (placed.contains(cue) || !candidate.isenabled() || slideAction(candidate) < 0)
+            return false;
+        placed.insert(cue);
+        m_rows.append({cue, group, color, start});
+        return true;
+    };
+    for (const auto &group : m_presentation.cue_groups()) {
+        const rv::data::Color &color = group.group().color();
+        const QString colorName = group.group().has_color() && color.alpha() > 0 ? proconvert::toColor(color).name()
+                                                                                  : QString();
+        bool first = true;
+        for (const rv::data::UUID &id : group.cue_identifiers()) {
+            const auto cue = cueIndexes.constFind(id.string());
+            if (cue != cueIndexes.constEnd() && place(*cue, QString::fromStdString(group.group().name()), colorName, first))
+                first = false;
+        }
+    }
+    for (int i = 0; i < m_presentation.cues_size(); ++i)
+        place(i, QString(), QString(), false);
+}
+
+void PresentationEditor::relist()
+{
+    beginResetModel();
+    m_rows.clear();
+    placeRows();
+    m_slides.clear();
+    for (int row = 0; row < m_rows.size(); ++row)
+        m_slides.append(describe(row));
+    endResetModel();
+    emit documentChanged();
+    emit restructured();
 }
 
 QString PresentationEditor::open(const QString &path, const QString &workspace)
@@ -191,33 +244,7 @@ QString PresentationEditor::open(const QString &path, const QString &workspace)
     m_asOpenedWritten = asOpenedWritten;
     noteFileState();
 
-    // Every cue that shows a slide, group by group as the presentation stores them,
-    // then any cue that no group has.
-    QHash<std::string, int> cueIndexes;
-    for (int i = 0; i < m_presentation.cues_size(); ++i)
-        cueIndexes.insert(m_presentation.cues(i).uuid().string(), i);
-    QSet<int> placed;
-    const auto place = [this, &placed](int cue, const QString &group, const QString &color, bool start) {
-        const rv::data::Cue &candidate = m_presentation.cues(cue);
-        if (placed.contains(cue) || !candidate.isenabled() || slideAction(candidate) < 0)
-            return false;
-        placed.insert(cue);
-        m_rows.append({cue, group, color, start});
-        return true;
-    };
-    for (const auto &group : m_presentation.cue_groups()) {
-        const rv::data::Color &color = group.group().color();
-        const QString colorName = group.group().has_color() && color.alpha() > 0 ? proconvert::toColor(color).name()
-                                                                                  : QString();
-        bool first = true;
-        for (const rv::data::UUID &id : group.cue_identifiers()) {
-            const auto cue = cueIndexes.constFind(id.string());
-            if (cue != cueIndexes.constEnd() && place(*cue, QString::fromStdString(group.group().name()), colorName, first))
-                first = false;
-        }
-    }
-    for (int i = 0; i < m_presentation.cues_size(); ++i)
-        place(i, QString(), QString(), false);
+    placeRows();
 
     finishOpening();
     return {};
@@ -290,6 +317,24 @@ QString PresentationEditor::openTheme(const QString &path, const QString &worksp
     return {};
 }
 
+// The masks are in the workspace's set-up file, with the screens and the looks (see
+// maskfile.h): each a slide and a name. Only they are taken from it.
+QString PresentationEditor::openMasks(const QString &path, const QString &workspace)
+{
+    rv::data::ProPresenterWorkspace file;
+    if (QFile::exists(path)) {
+        const QString error = workspace::readMessage(path, &file, QStringLiteral("the workspace's set-up"));
+        if (!error.isEmpty())
+            return error;
+    }
+    start(Kind::Masks, path, workspace, QStringLiteral("Masks"));
+    *m_masks.mutable_collection() = file.masks();
+    for (int i = 0; i < m_masks.collection_size(); ++i)
+        m_rows.append({i, QString(), QString(), false});
+    finishOpening();
+    return {};
+}
+
 void PresentationEditor::close()
 {
     beginResetModel();
@@ -297,6 +342,7 @@ void PresentationEditor::close()
     m_props.Clear();
     m_stage.Clear();
     m_theme.Clear();
+    m_masks.Clear();
     m_kind = Kind::Presentation;
     m_path.clear();
     m_name.clear();
@@ -305,6 +351,7 @@ void PresentationEditor::close()
     m_undo.clear();
     m_redo.clear();
     m_madeForChords.clear();
+    m_notesMade.clear();
     m_changed = false;
     m_backupPath.clear();
     m_asOpened.clear();
@@ -330,6 +377,7 @@ int PresentationEditor::rowOf(const QString &slideId) const
         const int unit = m_rows.at(row).unit;
         const std::string &id = m_kind == Kind::Stage ? m_stage.layouts(unit).uuid().string()
                               : m_kind == Kind::Theme ? m_theme.slides(unit).base_slide().uuid().string()
+                              : m_kind == Kind::Masks ? m_masks.collection(unit).base_slide().uuid().string()
                               : m_kind == Kind::Props ? m_props.cues(unit).uuid().string()
                                                       : m_presentation.cues(unit).uuid().string();
         if (id == wanted)
@@ -349,6 +397,7 @@ google::protobuf::Message *PresentationEditor::unitAt(int row)
     case Kind::Props: return m_props.mutable_cues(unit);
     case Kind::Stage: return m_stage.mutable_layouts(unit);
     case Kind::Theme: return m_theme.mutable_slides(unit);
+    case Kind::Masks: return m_masks.mutable_collection(unit);
     default: return m_presentation.mutable_cues(unit);
     }
 }
@@ -367,6 +416,8 @@ rv::data::Slide *PresentationEditor::slideIn(int row)
         return m_stage.mutable_layouts(unit)->mutable_slide();
     if (m_kind == Kind::Theme)
         return m_theme.mutable_slides(unit)->mutable_base_slide();
+    if (m_kind == Kind::Masks)
+        return m_masks.mutable_collection(unit)->mutable_base_slide();
     // A change to the cue undone or redone may have altered its actions.
     rv::data::Cue *cue = m_kind == Kind::Props ? m_props.mutable_cues(unit) : m_presentation.mutable_cues(unit);
     const int action = slideAction(*cue, m_kind == Kind::Props);
@@ -383,6 +434,19 @@ QString PresentationEditor::write()
     case Kind::Props: return workspace::writeMessage(m_path, m_props, QStringLiteral("the props"));
     case Kind::Stage: return workspace::writeMessage(m_path, m_stage, QStringLiteral("the stage layouts"));
     case Kind::Theme: return workspace::writeMessage(m_path, m_theme, QStringLiteral("the theme"));
+    case Kind::Masks: {
+        // The file as it is now, which other parts of the app may have written since
+        // the masks were taken from it (a look made live, a screen set up), with the
+        // masks as they are here put into it and nothing else of it touched.
+        rv::data::ProPresenterWorkspace file;
+        if (QFile::exists(m_path)) {
+            const QString error = workspace::readMessage(m_path, &file, QStringLiteral("the workspace's set-up"));
+            if (!error.isEmpty())
+                return error;
+        }
+        *file.mutable_masks() = m_masks.collection();
+        return workspace::writeMessage(m_path, file, QStringLiteral("the workspace's set-up"));
+    }
     default: return proconvert::writePresentation(m_path, m_presentation);
     }
 }
@@ -395,6 +459,10 @@ QVariantMap PresentationEditor::describe(int row) const
         const rv::data::Stage::Layout &layout = m_stage.layouts(place.unit);
         slide = proconvert::toSlideMap(layout.slide(), QString::fromStdString(layout.name()));
         slide.insert("id", QString::fromStdString(layout.uuid().string()));
+    } else if (m_kind == Kind::Masks) {
+        const rv::data::ProMask &mask = m_masks.collection(place.unit);
+        slide = proconvert::toSlideMap(mask.base_slide(), QString::fromStdString(mask.name()));
+        slide.insert("id", QString::fromStdString(mask.base_slide().uuid().string()));
     } else if (m_kind == Kind::Theme) {
         const rv::data::Template::Slide &themed = m_theme.slides(place.unit);
         slide = proconvert::toSlideMap(themed.base_slide(), QString::fromStdString(themed.name()));
@@ -411,6 +479,8 @@ QVariantMap PresentationEditor::describe(int row) const
                      : proconvert::toSlideMap(action.slide().presentation().base_slide(),
                                               QString::fromStdString(action.label().text()));
         slide.insert("id", QString::fromStdString(cue.uuid().string()));
+        if (!prop)
+            proconvert::addNotes(action.slide().presentation(), &slide);
     }
     slide.insert("group", place.group);
     slide.insert("groupColor", place.groupColor);
@@ -590,6 +660,55 @@ void PresentationEditor::previewProperties(int row, const QString &element, cons
     preview(row, [&](rv::data::Slide *slide) { proconvert::applyChanges(slide, element, changes); });
 }
 
+QVariant PresentationEditor::notes(int row) const
+{
+    if (m_kind != Kind::Presentation || row < 0 || row >= m_rows.size())
+        return {};
+    const rv::data::Cue &cue = m_presentation.cues(m_rows.at(row).unit);
+    const int action = slideAction(cue);
+    const RichText kept = action < 0 ? RichText() : proconvert::readNotes(cue.actions(action).slide().presentation());
+    // (Notes that are there with no words in them keep the format they have.)
+    if (!kept.paragraphs.isEmpty())
+        return QVariant::fromValue(kept);
+    return QVariant::fromValue(RichText::plain(QString(), proconvert::notesFormat(), Qt::AlignLeft));
+}
+
+QString PresentationEditor::setNotes(int row, const QVariant &richText)
+{
+    if (m_kind != Kind::Presentation)
+        return QStringLiteral("Only the slides of a presentation have notes.");
+    if (m_previewRow >= 0)
+        commitPreview();
+    if (row < 0 || row >= m_rows.size())
+        return gone;
+    rv::data::Cue *cue = m_presentation.mutable_cues(m_rows.at(row).unit);
+    const int action = slideAction(*cue);
+    if (action < 0)
+        return gone;
+    rv::data::PresentationSlide *slide = cue->mutable_actions(action)->mutable_slide()->mutable_presentation();
+    const RichText rich = richText.value<RichText>();
+    const QString id = QString::fromStdString(cue->uuid().string());
+    const std::string before = cue->SerializeAsString();
+    if (!slide->has_notes()) {
+        // Nothing typed into nothing is nothing to keep.
+        if (rich.isEmpty())
+            return {};
+        m_notesMade.insert(id);
+        proconvert::writeNotes(slide, rich);
+    } else if (rich.isEmpty() && m_notesMade.contains(id)) {
+        // What was typed here has all been taken out again: so is what it was kept in.
+        slide->clear_notes();
+        m_notesMade.remove(id);
+    } else if (proconvert::readNotes(*slide) == rich) {
+        // (As they are already: nothing is written, the RTF least of all, which this
+        // app would write in its own words.)
+        return {};
+    } else {
+        proconvert::writeNotes(slide, rich);
+    }
+    return commit(row, before);
+}
+
 QString PresentationEditor::setText(int row, const QString &element, const QVariant &richText)
 {
     return change(row, [&](rv::data::Slide *slide) {
@@ -648,9 +767,31 @@ QVariantMap PresentationEditor::addShape(int row, const QString &shape)
         const rv::data::Slide::Element added = proconvert::makeShapeElement(*slide, shape);
         id = QString::fromStdString(added.element().uuid().string());
         *slide->add_elements() = added;
+        // A shape on a mask is there to cover what is under it, so it starts black
+        // and not the blue a shape starts with elsewhere. (A GUESS at what
+        // ProPresenter starts a mask's shape as.)
+        if (m_kind == Kind::Masks)
+            proconvert::applyChanges(slide, id, {{"fillColor", QColor(Qt::black)}});
         return QString();
     });
     return {{"id", error.isEmpty() ? id : QString()}, {"error", error}};
+}
+
+// The label of a presentation's slide: the words that stand under it in a list of the
+// slides. The colour the label has is kept, and no words takes the words away. (What
+// a prop, a layout, a theme's slide and a mask are called is not the editor's to
+// change: whatever keeps them renames them, and the editor opens the file again.)
+QString PresentationEditor::setLabel(int row, const QString &text)
+{
+    if (m_kind != Kind::Presentation || row < 0 || row >= m_rows.size())
+        return gone;
+    rv::data::Cue *cue = m_presentation.mutable_cues(m_rows.at(row).unit);
+    const labelfile::Label had = labelfile::of(*cue);
+    if (had.text == text)
+        return {};
+    return change(row, [&](rv::data::Slide *) {
+        return labelfile::set(cue, {text, had.color}) ? QString() : QStringLiteral("That is not a slide that can have a label");
+    });
 }
 
 QVariantMap PresentationEditor::addMedia(int row, const QUrl &file)
@@ -719,6 +860,254 @@ QString PresentationEditor::move(int row, const QString &element, int index)
     });
 }
 
+QString PresentationEditor::place(int row, const QString &element, int landing)
+{
+    const rv::data::Slide *slide = slideIn(row);
+    if (!slide)
+        return gone;
+    const int from = indexOfElement(*slide, element);
+    if (from < 0)
+        return elementGone;
+    const int to = elementorder::placed(slide->elements_size(), from, landing);
+    return to < 0 ? QString() : move(row, element, to);
+}
+
+// Makes a change to which slides the presentation has and saves it. The whole
+// presentation is kept from before and after as the step to undo.
+template <typename Change>
+QString PresentationEditor::restructure(Change apply)
+{
+    if (m_kind != Kind::Presentation)
+        return gone;
+    if (m_previewRow >= 0)
+        commitPreview();
+    const std::string before = m_presentation.SerializeAsString();
+    const QString error = apply(&m_presentation);
+    if (!error.isEmpty()) {
+        m_presentation.ParseFromString(before);
+        return error;
+    }
+    const std::string after = m_presentation.SerializeAsString();
+    if (after == before)
+        return {};
+    backUp();
+    const QString failed = write();
+    if (!failed.isEmpty()) {
+        m_presentation.ParseFromString(before);
+        return failed;
+    }
+    m_changed = true;
+    m_undo.append({kWhole, before, after, false});
+    if (m_undo.size() > undoLimit)
+        m_undo.removeFirst();
+    m_redo.clear();
+    m_beforeRevert.clear();
+    noteFileState();
+    relist();
+    emit historyChanged();
+    return {};
+}
+
+QString PresentationEditor::reflowBox(int row) const
+{
+    if (m_kind != Kind::Presentation || row < 0 || row >= m_slides.size())
+        return {};
+    // As the chord editors find a slide's words (songOf): the first text box with
+    // words of its own, and failing that the first with nothing in it.
+    QString empty;
+    const QVariantList elements = m_slides.at(row).toMap().value("elements").toList();
+    for (const QVariant &entry : elements) {
+        const QVariantMap element = entry.toMap();
+        if (element.value("linkKind").toString() != QLatin1String("none") || !element.value("textBox").toBool())
+            continue;
+        if (!noWords(element.value("text").value<RichText>().plainText()) || element.contains("chords"))
+            return element.value("id").toString();
+        if (empty.isEmpty())
+            empty = element.value("id").toString();
+    }
+    return empty;
+}
+
+QVariantList PresentationEditor::reflow() const
+{
+    QVariantList rows;
+    if (m_kind != Kind::Presentation)
+        return rows;
+    for (int row = 0; row < m_slides.size(); ++row) {
+        const QVariantMap slide = m_slides.at(row).toMap();
+        const QString box = reflowBox(row);
+        QString text;
+        const QVariantList elements = slide.value("elements").toList();
+        for (const QVariant &entry : elements) {
+            const QVariantMap element = entry.toMap();
+            if (!box.isEmpty() && element.value("id").toString() == box)
+                text = element.value("text").value<RichText>().plainText();
+        }
+        rows.append(QVariantMap {
+            {"row", row},
+            {"slideId", slide.value("id")},
+            {"group", slide.value("group")},
+            {"groupColor", slide.value("groupColor")},
+            {"groupStart", slide.value("groupStart")},
+            {"label", slide.value("label")},
+            {"element", box},
+            {"text", text},
+            {"editable", !box.isEmpty()},
+        });
+    }
+    return rows;
+}
+
+QString PresentationEditor::reflowType(int row, const QString &words)
+{
+    const QString box = reflowBox(row);
+    if (box.isEmpty())
+        return QStringLiteral("That slide has no text box of its own to type in.");
+    return change(row, [&](rv::data::Slide *slide) {
+        rv::data::Slide::Element *target = findElement(slide, box);
+        if (!target)
+            return elementGone;
+        rv::data::Graphics::Text *text = target->mutable_element()->mutable_text();
+        const RichText was = proconvert::readText(*text);
+        if (was.plainText() != words)
+            proconvert::writeText(text, reflow::retyped(was, words));
+        return QString();
+    });
+}
+
+QVariantMap PresentationEditor::reflowSplit(int row, int caret)
+{
+    const QString box = reflowBox(row);
+    if (box.isEmpty())
+        return {{"error", QStringLiteral("That slide has no text box of its own to split.")}, {"row", row}};
+    const int unit = m_rows.at(row).unit;
+    const QString error = restructure([&](rv::data::Presentation *presentation) -> QString {
+        rv::data::Cue *cue = presentation->mutable_cues(unit);
+        const int shows = slideAction(*cue);
+        if (shows < 0)
+            return gone;
+        const std::string cueId = cue->uuid().string();
+
+        // The new slide is this one over again, made before this one is changed: its
+        // cue, with nothing in it but the action that shows the slide, and none of
+        // what is the first slide's alone.
+        rv::data::Cue copy;
+        copy.mutable_uuid()->set_string(cueId);
+        copy.set_isenabled(true);
+        rv::data::Action *shown = copy.add_actions();
+        *shown = cue->actions(shows);
+        shown->clear_label();
+        shown->mutable_slide()->mutable_presentation()->clear_notes();
+        // Ids of its own, throughout, each put wherever the old one came up, so that
+        // what one element of the copy says of another is said of the copy's own (as
+        // a pasted slide is given its ids: ProDocument::pasteCue).
+        QList<std::string> ids {cueId, shown->uuid().string(), shown->slide().presentation().base_slide().uuid().string()};
+        for (const rv::data::Slide::Element &element : shown->slide().presentation().base_slide().elements())
+            ids.append(element.element().uuid().string());
+        QByteArray bytes = QByteArray::fromStdString(copy.SerializeAsString());
+        QHash<QString, QString> fresh;
+        for (const std::string &id : ids) {
+            const std::string made = workspace::newUuid();
+            if (id.size() != made.size())
+                continue;
+            bytes.replace(QByteArray::fromStdString(id), QByteArray::fromStdString(made));
+            fresh.insert(QString::fromStdString(id), QString::fromStdString(made));
+        }
+        if (!copy.ParseFromArray(bytes.constData(), int(bytes.size())) || !fresh.contains(box))
+            return QStringLiteral("The slide could not be copied to split it.");
+
+        // The words: what is before the caret stays, what is after goes to the copy,
+        // each set as it was and with the chords that were over it.
+        rv::data::Slide *first = cue->mutable_actions(shows)->mutable_slide()->mutable_presentation()->mutable_base_slide();
+        rv::data::Slide *second = copy.mutable_actions(0)->mutable_slide()->mutable_presentation()->mutable_base_slide();
+        rv::data::Slide::Element *left = findElement(first, box);
+        rv::data::Slide::Element *right = findElement(second, fresh.value(box));
+        if (!left || !right)
+            return elementGone;
+        rv::data::Graphics::Text *leftText = left->mutable_element()->mutable_text();
+        rv::data::Graphics::Text *rightText = right->mutable_element()->mutable_text();
+        const RichText was = proconvert::readText(*leftText);
+        const QList<chords::Chord> chords = proconvert::readChords(*leftText);
+        const reflow::Split split = reflow::splitAt(was.plainText(), caret);
+        proconvert::writeText(leftText, reflow::cut(was, 0, split.leftEnd));
+        proconvert::writeChords(leftText, reflow::chordsLeft(chords, split));
+        proconvert::writeText(rightText, reflow::cut(was, split.rightStart, reflow::length(was)));
+        proconvert::writeChords(rightText, reflow::chordsRight(chords, split));
+
+        // Its place: straight after the slide it was split from, among the cues and
+        // in the group that has that slide.
+        const std::string madeId = copy.uuid().string();
+        *presentation->add_cues() = copy;
+        for (int i = presentation->cues_size() - 1; i > unit + 1; --i)
+            presentation->mutable_cues()->SwapElements(i, i - 1);
+        for (rv::data::Presentation::CueGroup &group : *presentation->mutable_cue_groups()) {
+            for (int i = 0; i < group.cue_identifiers_size(); ++i) {
+                if (group.cue_identifiers(i).string() != cueId)
+                    continue;
+                group.add_cue_identifiers()->set_string(madeId);
+                for (int at = group.cue_identifiers_size() - 1; at > i + 1; --at)
+                    group.mutable_cue_identifiers()->SwapElements(at, at - 1);
+                // (Once: the new slide is one slide, wherever its group comes up.)
+                return QString();
+            }
+        }
+        return QString();
+    });
+    return {{"error", error}, {"row", error.isEmpty() ? row + 1 : row}};
+}
+
+QVariantMap PresentationEditor::reflowJoin(int row)
+{
+    const QString box = reflowBox(row);
+    const QString before = reflowBox(row - 1);
+    if (row < 1 || box.isEmpty() || before.isEmpty()) {
+        return {{"error", row < 1 ? QString() : QStringLiteral("One of those two slides has no text box of its own, so they cannot be joined.")},
+                {"row", row}, {"caret", 0}};
+    }
+    const int firstUnit = m_rows.at(row - 1).unit;
+    const int secondUnit = m_rows.at(row).unit;
+    int caret = 0;
+    const QString error = restructure([&](rv::data::Presentation *presentation) -> QString {
+        rv::data::Cue *firstCue = presentation->mutable_cues(firstUnit);
+        rv::data::Cue *secondCue = presentation->mutable_cues(secondUnit);
+        const int firstShows = slideAction(*firstCue);
+        const int secondShows = slideAction(*secondCue);
+        if (firstShows < 0 || secondShows < 0)
+            return gone;
+        rv::data::Slide::Element *left = findElement(
+            firstCue->mutable_actions(firstShows)->mutable_slide()->mutable_presentation()->mutable_base_slide(), before);
+        rv::data::Slide::Element *right = findElement(
+            secondCue->mutable_actions(secondShows)->mutable_slide()->mutable_presentation()->mutable_base_slide(), box);
+        if (!left || !right)
+            return elementGone;
+        rv::data::Graphics::Text *leftText = left->mutable_element()->mutable_text();
+        const rv::data::Graphics::Text &rightText = right->element().text();
+        const RichText first = proconvert::readText(*leftText);
+        const RichText second = proconvert::readText(rightText);
+        const int firstLength = reflow::length(first);
+        const bool both = firstLength > 0 && reflow::length(second) > 0;
+        const QList<chords::Chord> chords = reflow::chordsJoined(proconvert::readChords(*leftText), firstLength,
+                                                                 proconvert::readChords(rightText), both);
+        proconvert::writeText(leftText, reflow::joined(first, second));
+        proconvert::writeChords(leftText, chords);
+        caret = firstLength + (both ? 1 : 0);
+
+        // The slide whose words those were is taken out: of the cues, and of every
+        // group that lists it. (A group left with nothing in it is kept, as it is when
+        // a slide is deleted: arrangements name their groups.)
+        const std::string joinedId = secondCue->uuid().string();
+        presentation->mutable_cues()->DeleteSubrange(secondUnit, 1);
+        for (rv::data::Presentation::CueGroup &group : *presentation->mutable_cue_groups()) {
+            for (int i = group.cue_identifiers_size() - 1; i >= 0; --i) {
+                if (group.cue_identifiers(i).string() == joinedId)
+                    group.mutable_cue_identifiers()->DeleteSubrange(i, 1);
+            }
+        }
+        return QString();
+    });
+    return {{"error", error}, {"row", error.isEmpty() ? row - 1 : row}, {"caret", error.isEmpty() ? caret : 0}};
+}
+
 // Takes the last step off one list, puts its cue or layout (or the presentation's keys)
 // as it was at the other end of that step, saves, and puts the step on the other list.
 QString PresentationEditor::restore(QList<Step> *from, QList<Step> *to, bool forwards)
@@ -728,7 +1117,16 @@ QString PresentationEditor::restore(QList<Step> *from, QList<Step> *to, bool for
     if (from->isEmpty())
         return {};
     const Step step = from->last();
-    if (step.row < 0) {
+    if (step.row == kWhole) {
+        // A change to which slides there are: the whole presentation, as it was
+        const std::string now = m_presentation.SerializeAsString();
+        m_presentation.ParseFromString(forwards ? step.after : step.before);
+        const QString error = write();
+        if (!error.isEmpty()) {
+            m_presentation.ParseFromString(now);
+            return error;
+        }
+    } else if (step.row < 0) {
         // A change of key, which is no slide's
         const std::string now = musicState();
         setMusicState(forwards ? step.after : step.before);
@@ -752,7 +1150,10 @@ QString PresentationEditor::restore(QList<Step> *from, QList<Step> *to, bool for
     to->append(step);
     m_beforeRevert.clear();
     noteFileState();
-    if (step.row < 0) {
+    if (step.row == kWhole) {
+        relist();
+        emit historyChanged();
+    } else if (step.row < 0) {
         emit historyChanged();
         emit keyChanged();
     } else {

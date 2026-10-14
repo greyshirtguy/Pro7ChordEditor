@@ -460,7 +460,7 @@ QtObject {
                 const sample = named("chordSample:On the chord sheet")
                 check("the settings have a section for chords, with the colour of a chord in each of the two editors", kept.settings.sections.some(s => s.name === "Chords")
                       && part.visible && swatch.visible && named("chordColour:In ChordPro text").visible, kept.settings.sections.map(s => s.name).join(" "))
-                check("each is the colour it comes with, with nothing to go back to", chordSheetColor === "" && chordTextColor === "" && String(swatch.value) === "#ffd9a8"
+                check("each is the colour it comes with, with nothing to go back to", chordSheetColor === "" && chordTextColor === "" && String(swatch.value) === "#ff8a1f"
                       && String(named("chordColour:In ChordPro text").value) === "#ffb45e" && !usual.enabled && !named("usualColour:In ChordPro text").enabled,
                       String(swatch.value))
                 kept.usual = greenest(sample, 14, 20, 40)
@@ -482,7 +482,7 @@ QtObject {
                 return 400
             },
             () => {
-                check("and puts back the colour each came with", chordSheetColor === "" && chordTextColor === "" && String(named("chordColour:On the chord sheet").value) === "#ffd9a8"
+                check("and puts back the colour each came with", chordSheetColor === "" && chordTextColor === "" && String(named("chordColour:On the chord sheet").value) === "#ff8a1f"
                       && !named("usualColour:On the chord sheet").enabled, chordSheetColor + " " + chordTextColor)
                 check("what is no colour is kept as none", chordColorKept("orange") === "" && chordColorKept("#12345") === "" && chordColorKept("#AABBCC") === "#aabbcc")
                 kept.settings.section = "groups"

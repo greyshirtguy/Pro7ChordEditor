@@ -198,7 +198,7 @@ QtObject {
                       && sheet().rows.filter(r => r.kind === "group").length >= 4 && sheet().rows.filter(r => r.kind === "line").length >= 20 && lineOf(herald) >= 0,
                       sheet() ? sheet().rows.filter(r => r.kind === "group").map(r => r.name).join("|") + " " + sheet().rows.length : "")
                 check("the key is the one the chords are written in, and its chords are on the keys 1 to 7", sheet().key === "E" && named("chordKeyBox").currentText === "E"
-                      && named("keyChord4").label === "A" && named("keyChord6").label === "C#m", sheet().key + " " + sheet().inKey.join(" "))
+                      && named("keyChord4").label === "A" && named("keyChord6").label === "C♯m", sheet().key + " " + sheet().inKey.join(" "))
                 kept.song = JSON.stringify(editScreen.editor.song())
                 kept.line = lineOf(herald)
                 check("the line's chords are in their bubbles", names(kept.line) === "1:E 16:Asus2", names(kept.line))
@@ -230,10 +230,11 @@ QtObject {
                 const field = named("chordField")
                 check("a letter opens the bubble to type the chord in, as a capital", sheet().typing && field.activeFocus && field.text === "F", field.text)
                 testInput.type("#m7")
-                check("a chord is typed", field.text === "F#m7", field.text)
+                // (Its sharp drawn as the sign, as the sheet draws one: chords5.qml has that.)
+                check("a chord is typed", field.text === "F♯m7", field.text)
                 testInput.type("!")
                 testInput.type(" ")
-                check("and nothing that could not be part of one", field.text === "F#m7", field.text)
+                check("and nothing that could not be part of one", field.text === "F♯m7", field.text)
                 const entryBox = named("chordEntry")
                 check("what it might be going to be is offered under it", entryBox.offered.length > 0 && entryBox.offered.every(c => c.startsWith("F#m7")), entryBox.offered.join(" "))
                 check("the bubble is on the sheet, at the spot, though the sheet was laid out again by the chord before", entryBox.visible && entryBox.item !== null
