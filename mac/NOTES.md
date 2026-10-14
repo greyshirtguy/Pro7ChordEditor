@@ -24,8 +24,8 @@ milestone; put right what has become untrue.
 | What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
 | The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
 | The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
-| What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day. **In the source and in no build**: the image of 1.0.3 has not these three | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
-| Sharps and flats drawn as ♯ and ♭ (2026-10-14, the maintainer's) | Done the same day. **In the source and in no build** | The rule, for all three apps: `spec/02`, "Sharps and flats drawn as signs", with `tools/signs.py` and `signs.json`, pushed at once. Drawn on the sheet, in the strip, in what is offered and in the box as it is typed, and in the song's two keys; never written. A switch in the settings, on as it comes (decision 95) |
+| What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day, and **given out in 1.0.4** (decision 96) | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
+| Sharps and flats drawn as ♯ and ♭ (2026-10-14, the maintainer's) | Done the same day, and **given out on 2026-10-14 as the Mac's half of the release `v1.0.4`**, a pre-release until Windows' file is added (decision 96) | The rule, for all three apps: `spec/02`, "Sharps and flats drawn as signs", with `tools/signs.py` and `signs.json`, pushed at once. Drawn on the sheet, in the strip, in what is offered and in the box as it is typed, and in the song's two keys; never written. A switch in the settings, on as it comes (decision 95) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -972,6 +972,22 @@ And the same day, on how someone new is to find out what the sheet can do:
       second offered picked" shows no box, and did before this work too
       (drawn from the commit before it). Picture 68 types again instead.
     All 390 tests pass and the app builds. No build was made to try.
+96. **1.0.4 is given out, its first half** (the maintainer, 2026-10-14, having
+    looked at the pictures of the signs: "Looks good. lets bump version, commit,
+    push, and do a new release"). The Mac is the first to the number, so, as
+    decision 92 has it: the release `v1.0.4` is a pre-release and not "Latest",
+    with the Mac's image alone, and its text says the Windows app's 1.0.4 is to be
+    added. 1.0.3, with both files, stays "Latest". The tag is on "Version 1.0.4"
+    (`09fb480`), which the image was made from; it was pushed by itself once both
+    of GitHub's builds of the branch had passed, and both passed on it too. The
+    README's Mac part is 1.0.4's, and the sentence over the two parts says that
+    Windows' is 1.0.3 until its 1.0.4 is added. What is new in it: the signs
+    (decision 95) and the three things of decision 93. **Mine**: the number, 1.0.4,
+    as "bump" has been read each time; and the release's text. **Waiting**: the
+    Windows app's half. Its session builds 1.0.4, adds its zip, and moves the tag to
+    its own commit once `git diff --stat 09fb480 <its commit>` shows nothing changed
+    in `mac/` but `NOTES.md` and `README.md`, nor in `proto`; then makes the release
+    "Latest".
 
 ## How it is laid out, and why
 
@@ -2137,9 +2153,19 @@ the About text, a Developer ID, notarizing) is still to come.
   the second image, being the app that was; and nobody has gone through the
   read-me's steps for opening it with an image that came through a browser,
   which macOS 26 was last seen to follow for 0.1.
-- **In the source since 1.0.3, and in no image** (2026-10-14): the three things
-  of decision 93. The next image is made under a new number, at the maintainer's
-  word, and is given out as decision 92 has it.
+- **1.0.4, given out on 2026-10-14** as the Mac's half of the release `v1.0.4`, a
+  pre-release until Windows' file is added (decision 96). Version 1.0.4, build 8.
+  The image is `Pro7ChordEditor-mac-1.0.4.dmg`, 6,351,400 bytes, sha256
+  `dcc1d388…5e77`, made by the script from the commit `09fb480` with nothing else
+  in the working tree. Checked: the script's own checks; the read-me read through,
+  and nothing in it untrue; the app in the image the same, file for file, as the
+  copy that was started, and its seal holds; started twice, shut in, with a new
+  made-up home: two windows the first time, the guide's among them, and one the
+  second, and the settings it wrote have nothing for the signs, which are on as it
+  comes; all 390 tests, against the optimised code as well as the other; GitHub's
+  two builds of the branch and of the tag; and the file fetched back from the
+  Releases page, the same bytes as the one sent. **Not done**: nobody has opened
+  it by hand, nor through a browser's download.
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -2156,8 +2182,8 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **Of the signs for sharps and flats (decision 95), tried by no hand**, there
-  being no build with them:
+- **Of the signs for sharps and flats (decision 95), tried by no hand**: they are
+  in 1.0.4, which nobody has opened yet:
   1. how they read at the sizes the sheet zooms to. The system font's ♭ is
      small and raised, and its ♯ is close to a `#` at the bubble's size;
   2. typing: `F#` shows F♯ as the `#` is typed, `C7b9` its ♭ once the 9 is, and
@@ -2165,8 +2191,8 @@ the About text, a Developer ID, notarizing) is still to come.
   3. the switch in Settings: the sheet, the strip and the song's keys change at
      once, and stay as they were left when the app is started again;
   4. the key pickers' lists, opened, with the signs.
-- **Of what was put right on 2026-10-14 (decision 93), tried by no hand**, there
-  being no build with it:
+- **Of what was put right on 2026-10-14 (decision 93), tried by no hand**: it is in
+  1.0.4, which nobody has opened yet:
   1. a song in a key that is not one of the twenty-six, C# major say: its key is
      to be seen in both pickers of its header, and to be the first thing in each
      one's list when it is opened. (A picture has the first; no test can open a
