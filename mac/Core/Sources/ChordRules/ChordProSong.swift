@@ -179,6 +179,12 @@ func parseSong(_ text: Units) -> Chords.ParsedSong {
         if line.first == u("#") { continue }
         if let (directiveName, directiveValue) = directive(line) {
             let name = string(directiveName).lowercased()
+            // What the name starts with is asked of its units, as the reference asks it
+            // (spec/02-chord-rules.md, "To the letter"). Swift's own `hasPrefix` goes
+            // by whole characters, and to it a name does not start with "start_of_" if
+            // an accent is laid over that underline. Nothing writes such a name.
+            let nameUnits = Array(name.utf16)
+            func starts(_ with: String) -> Bool { nameUnits.starts(with: with.utf16) }
             let valueUnits = directiveValue.trimmed()
             let value = string(valueUnits)
             switch name {
@@ -198,11 +204,11 @@ func parseSong(_ text: Units) -> Chords.ParsedSong {
                 open("Chorus", value)
             case "start_of_bridge", "sob":
                 open("Bridge", value)
-            case _ where name.hasPrefix("start_of_") || name == "sot" || name == "sog":
+            case _ where starts("start_of_") || name == "sot" || name == "sog":
                 // Tablature, a grid, or something newer: not words to show.
                 close()
                 skipping = true
-            case _ where name.hasPrefix("end_of_") || (name.utf16.count == 3 && name.hasPrefix("eo")):
+            case _ where starts("end_of_") || (nameUnits.count == 3 && starts("eo")):
                 close()
                 skipping = false
             case "comment", "c", "ci", "comment_italic":

@@ -99,6 +99,40 @@ struct EarlierVersionsTests {
         #expect(model.notice == "4 slides, 8 chords. A change is saved a moment after it is typed.")
     }
 
+    @Test("Putting back what the file already is, is nothing to do: no copy is made first, and nothing is offered to be undone")
+    func puttingBackWhatTheFileAlreadyIs() async throws {
+        let (mac, original, _, _) = try macWithHistory()
+        let model = await modelOn(mac)
+        model.showEarlierVersions()
+        let first = try #require(model.earlier?.copies.last)
+        model.pick(copy: first.id)
+        model.putBackPicked()
+        model.forgetWhatWasPutBack()
+        #expect(try mac.bytes(of: "Plain Song") == original)
+        let log = mac.appData.folder.appendingPathComponent("log.txt")
+        let logged = try String(contentsOf: log, encoding: .utf8)
+
+        // The first copy is what the file now is. Put back again:
+        model.showEarlierVersions()
+        #expect(model.earlier?.copies.count == 3)
+        model.pick(copy: first.id)
+        model.putBackPicked()
+        // The panel is put away, and nothing is refused.
+        #expect(model.earlier == nil && model.refusal == nil)
+        // No copy was made first, so there is nothing to offer to undo: "Undo" would
+        // put back whatever copy happened to be the newest, which here is the song as
+        // it was before the first putting back. (spec/07-backups.md, rule 21. Found
+        // by the Windows app's session, which holds its own app to the same.)
+        #expect(model.justPutBack == nil)
+        #expect(model.notice != "Put back the version of \(model.when(first)).")
+        model.takeBack()
+        #expect(try mac.bytes(of: "Plain Song") == original)
+        // Nor does the log say that a version was put back a second time.
+        #expect(try String(contentsOf: log, encoding: .utf8) == logged)
+        model.showEarlierVersions()
+        #expect(model.earlier?.copies.count == 3)
+    }
+
     @Test("Nothing is put back while ProPresenter is running, and the panel says why")
     func whileProPresenterIsRunning() async throws {
         let (mac, _, _, now) = try macWithHistory()

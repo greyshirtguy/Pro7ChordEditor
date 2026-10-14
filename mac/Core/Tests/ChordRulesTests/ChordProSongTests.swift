@@ -62,4 +62,22 @@ struct ChordProSongTests {
         }
         tally.settle()
     }
+
+    @Test("Mine, not a vector. A directive's name is asked of its units: what it starts with is found whatever unit comes next, an accent laid over the last of them too")
+    func aDirectivesNameIsAskedOfItsUnits() {
+        // An accent after a letter or an underline is one character with it, to Swift,
+        // whose own "starts with" then does not find "start_of_" at the front of the
+        // name. The reference asks units (Qt's `startsWith`), and so must this:
+        // spec/02-chord-rules.md, "To the letter". Nothing writes such a name. (Seen by
+        // the Windows app's session, reading this port.)
+        let accent = "\u{301}"
+        let leftOut = Chords.parseSong("{start_of_\(accent)tab}\nleft out\n{end_of_\(accent)tab}\nkept\n")
+        #expect(leftOut.sections.map { $0.lines.map(\.text.string) } == [["kept"]])
+        // "eo" and one unit more ends what is left out, whatever the unit.
+        let ended = Chords.parseSong("{sot}\nleft out\n{eo\(accent)}\nkept\n")
+        #expect(ended.sections.map { $0.lines.map(\.text.string) } == [["kept"]])
+        // (And four units are not three.)
+        let notEnded = Chords.parseSong("{sot}\nleft out\n{eo\(accent)x}\nleft out too\n")
+        #expect(notEnded.sections.isEmpty)
+    }
 }

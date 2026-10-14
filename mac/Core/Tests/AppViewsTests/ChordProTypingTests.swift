@@ -259,6 +259,41 @@ struct ChordProTypingTests {
         #expect(model.shown?.key == "D" && model.refusal == "ProPresenter is running. Quit it to change chords here. Nothing was changed.")
     }
 
+    @Test("A picker lists the twenty-six keys; before them the song's own key, if it is one of the other sixteen; and before them nothing, which it shows as None, if the song states no key")
+    func theKeysAPickerLists() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Plain Song", on: mac)
+        let twentySix = model.keys
+        #expect(twentySix.count == 26 && !twentySix.contains("C#") && !twentySix.contains("A#m"))
+        #expect(model.keysListed(for: "G") == twentySix && model.keysListed(for: "Em") == twentySix)
+        // One of the other sixteen (spec/02-chord-rules.md, "Keys"): it is put first,
+        // so that the song's own key can always be seen and chosen.
+        #expect(model.keysListed(for: "C#") == ["C#"] + twentySix)
+        #expect(model.keysListed(for: "A#m") == ["A#m"] + twentySix)
+        // No key stated.
+        #expect(model.keysListed(for: "") == [""] + twentySix)
+        // Each of the forty-two keys a file can name is in the list of a song in it,
+        // once: sixteen of them as one more than the twenty-six.
+        var more = 0
+        for number in 0...20 {
+            for minor in [false, true] {
+                let key = Chords.keyName(number, minor: minor)
+                let listed = model.keysListed(for: key)
+                #expect(listed.filter { $0 == key }.count == 1)
+                more += listed.count - 26
+            }
+        }
+        #expect(more == 16)
+
+        // A song that is in such a key: both its pickers have it to show. Given one
+        // of the twenty-six, the other is on its list no longer.
+        model.setKey("C#")
+        #expect(model.shown?.key == "C#" && model.shown?.shownKey == "C#" && model.refusal == nil)
+        #expect(model.keysListed(for: model.shown?.key ?? "").first == "C#")
+        model.setKey("D")
+        #expect(model.keysListed(for: model.shown?.key ?? "") == twentySix)
+    }
+
     @Test("The song that is open stays in the list when its first chord takes it out of what the list is narrowed to")
     func staysListed() async throws {
         let mac = try MadeUpMac()

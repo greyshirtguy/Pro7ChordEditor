@@ -380,6 +380,15 @@ struct PictureTests {
         try draw(LibraryWindow(model: model), named: "32 just reverted", size: NSSize(width: 1000, height: 560), dark: true)
     }
 
+    @Test("A song in a key the pickers do not offer, C# major: each picker shows it, and has it first")
+    func aKeyThatIsNotOneOfTheTwentySix() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "Plain Song", editor: .sheet)
+        model.setKey("C#")
+        #expect(model.shown?.key == "C#" && model.shown?.shownKey == "C#")
+        try draw(LibraryWindow(model: model), named: "65 a song in C sharp major", size: Self.sheetSize)
+    }
+
     // ---- The guide (spec/13-guide.md)
 
     @Test("The guide: its window as it opens, in the light and in the dark; in a narrow window; and the whole of its page")

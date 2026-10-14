@@ -245,6 +245,22 @@ public final class LibraryModel {
     /// The keys a song can be said to be in, as the pickers list them.
     public var keys: [String] { Chords.majorKeys() + Chords.minorKeys() }
 
+    /// The keys a picker lists for a song that says it is in this one: the twenty-six;
+    /// before them the song's own key, if it is one of the other sixteen (C# major,
+    /// say), so that it can always be seen and chosen (spec/02-chord-rules.md, "Keys");
+    /// and before them all nothing, which a picker shows as "None", if the song states
+    /// no key (spec/06, rule 12).
+    ///
+    /// (Until 2026-10-14 the pickers listed the twenty-six and "None" only, and showed
+    /// nothing at all for a song in C# major. Found by the Windows app's session, whose
+    /// `KeysListedFor` this is.)
+    public func keysListed(for key: String) -> [String] {
+        let offered = keys
+        // (By its units, as a name is always held against another.)
+        let own = Array(key.utf16)
+        return offered.contains { Array($0.utf16) == own } ? offered : [key] + offered
+    }
+
     /// The quiet line under the song: what is there to be seen. Nothing here is a
     /// promise of what the app will do.
     public var notice: String {
@@ -873,7 +889,17 @@ public final class LibraryModel {
         refusal = nil
         offersOpeningAgain = false
         do {
-            try song.putBack(try bytes())
+            let bytes = try bytes()
+            // Putting back what the file already is, is nothing to do (spec/07, rule
+            // 21): no copy is made first, and so there is nothing to offer to undo.
+            // (Until 2026-10-14 this went on to offer one, of the newest copy there
+            // happened to be, which was not made for it. Found by the Windows app's
+            // session, whose own model does as this does now.)
+            guard bytes != song.bytes else {
+                earlier = nil
+                return
+            }
+            try song.putBack(bytes)
         } catch {
             refuse(error, or: "The copy could not be read.")
             appData.log(notDone(listed.url.lastPathComponent))

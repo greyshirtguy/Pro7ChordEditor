@@ -24,6 +24,7 @@ milestone; put right what has become untrue.
 | What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
 | The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
 | The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
+| What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day. **In the source and in no build**: the image of 1.0.3 has not these three | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -873,6 +874,52 @@ And the same day, on how someone new is to find out what the sheet can do:
     date was taken out, a read-me being no place for it, and is said here
     instead. **Still to ask**: "An early build", the second line of the read-me
     in the image. The read-me in Windows' zip says the same.
+93. **Three things the Windows app's session had found of this app are put
+    right** (2026-10-14). Its notes had them "for the maintainer to pass on to the
+    Mac's session", from 2026-10-12, and they were not passed on: found on
+    reading `windows/NOTES.md` when the maintainer said to align (decision 92).
+    **Mine to take up unasked, and the maintainer's to overrule**: each is this
+    app doing other than `spec/` has it, none is a new rule, and none changes how
+    a song's file is written.
+    - **Putting back what the file already is, is nothing to do** (`spec/07`,
+      rule 21; their decision 36). The song did nothing, rightly, but the
+      window's model went on as if it had: the line under the song said "Put
+      back the version of ..." and offered Undo, of the newest copy there
+      happened to be, which was not made for it. Pressed, that Undo put that copy
+      back, and the song's file was then something the line had not said.
+      (Nothing could be lost by it: the file as it is, is copied before any
+      putting back.) Now the panel is put away and nothing else is done, as on
+      Windows. `EarlierVersionsTests` has it, a test that failed five ways
+      before;
+    - **a key that is not one of the twenty-six is first in its picker**
+      (`spec/02`, "Keys"; their decision 55). A song in C# major showed nothing
+      at all in either picker of its header, a picker whose choice is not in its
+      list being blank: seen in a picture before anything was changed, and "C#"
+      in both after. `LibraryModel.keysListed(for:)`, which is their
+      `KeysListedFor`. The strip of the key's seven chords was right all along;
+    - **what a ChordPro directive's name starts with is asked of its units**
+      (`spec/02`, "To the letter"; their "At M1"). Swift's `hasPrefix` goes by
+      whole characters, so a name with an accent laid over the underline of
+      `start_of_`, or over the "o" of a three-unit `eo` name, was not taken for
+      one, as the reference takes it. Nothing writes such a name, and nothing in
+      the window reads a ChordPro file yet (M9).
+    **Two more that their notes have, and nothing done:**
+    - "the Mac's port writes two bytes more": a text box with no settings written
+      at all, asked to have no chords, is given an empty set of settings, and
+      that is a change saved. **The reference does the same**: `writeChords` in
+      `proconvert.cpp` reaches for the settings before anything else, which
+      makes them, and a change is whatever leaves the slide's bytes other than
+      they were. So here it is the Windows app that parts from the reference.
+      It can be come to from the window, by pasting a copied line that had no
+      chords onto a line of such a text box; no file to hand has one. Said to
+      the maintainer, for that session or for nobody;
+    - their decision 81, a chord that is on no character handed to both editors
+      where it will be written, "for the maintainer to say, and for the Mac's
+      text": it belongs with mending, and is to be looked at when M8 is begun.
+    **A session starts by reading what `windows/NOTES.md` has for this one**
+    (look for "pass on" and "the Mac's"), as it reads `spec/`: the maintainer
+    passes on what they remember to, and these had waited two days.
+    All 382 tests pass. No build was made.
 
 ## How it is laid out, and why
 
@@ -2038,6 +2085,9 @@ the About text, a Developer ID, notarizing) is still to come.
   the second image, being the app that was; and nobody has gone through the
   read-me's steps for opening it with an image that came through a browser,
   which macOS 26 was last seen to follow for 0.1.
+- **In the source since 1.0.3, and in no image** (2026-10-14): the three things
+  of decision 93. The next image is made under a new number, at the maintainer's
+  word, and is given out as decision 92 has it.
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -2059,6 +2109,15 @@ the About text, a Developer ID, notarizing) is still to come.
   Windows' zip. Is that still what a 1.0 is to say of itself? (What 1.0.0's page
   said of a Windows build was put right on 2026-10-14, at the maintainer's word
   to the Windows app's session.)
+- **Of what was put right on 2026-10-14 (decision 93), tried by no hand**, there
+  being no build with it:
+  1. a song in a key that is not one of the twenty-six, C# major say: its key is
+     to be seen in both pickers of its header, and to be the first thing in each
+     one's list when it is opened. (A picture has the first; no test can open a
+     picker.)
+  2. Earlier Versions, with the copy picked being what the song already is: Put
+     This One Back puts the panel away, and the line under the song offers
+     nothing to undo.
 - **1.0.3 was tried by the maintainer on 2026-10-14** ("tips are fine"; the
   README's screenshot is of it), and then given out. Which of these were among
   what was tried was not said, so they stand (decisions 86 and 87):
