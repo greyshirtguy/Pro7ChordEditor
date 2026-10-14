@@ -13,15 +13,17 @@ it; [`spec/02-chord-rules.md`](../spec/02-chord-rules.md) says which rule each h
 | --- | --- | --- |
 | `keys.json`, `chord-names.json`, `transposed.json`, `notated.json`, `shown.json`, `diatonic.json`, `completions.json`, `tidy.json`, `ranges.json`, `carried.json`, `chordpro.json`, `parse-song.json` | The chord rules | `tools/make-vectors` (C++), from Simple Presenter's `src/chords.cpp` |
 | `rtf-text.json` | The words of an RTF, unit by unit | the same, from its `src/rtf.cpp` |
+| `place-after.json` | Where a place in a text box's words goes when a line of chords alone in it is made longer or shorter: where the ends of the box's other ranges go ([`spec/01-file-format.md`](../spec/01-file-format.md), "The box's other ranges") | the same, from its `src/rtfstandins.cpp` (`placeAfter`) |
 | `sheet-model.json`, `layout.json` | What the chord sheet does with a song | `tools/make-vectors/sheet.js`, by running the functions of its `qml/ChordSheet.qml` and `qml/chordlayout.js` |
 | `key-fit.json` | Which key a song is likely in | `tools/keyfit.py`, which is the reference for that rule |
 | `line-break-shift.json` | One of the checks for mending | `tools/make-fixtures.py`, likewise |
 | `signs.json` | Which of a chord's sharps and flats the chord sheet draws as ♯ and ♭ ([`spec/02-chord-rules.md`](../spec/02-chord-rules.md), "Sharps and flats drawn as signs") | `tools/signs.py`, likewise |
 | `stand-ins-in-rtf.json` | The bytes a text box's RTF becomes when a line of chords alone is given more stand-ins or fewer, and the RTF made for a box that has no words ([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with no words") | `tools/standins.py`, likewise |
 
-The first three rows are a record of what Simple Presenter does. The last four are of
-rules that are new here. (Of the last, Simple Presenter has the first part too since
-2026-10-12, ported from `tools/standins.py` and held to the same file.)
+The first four rows are a record of what Simple Presenter does. The last four are of
+rules that are new here. (Of those, Simple Presenter has two as well, ported from
+their tools and held to the same files: the first part of the last since 2026-10-12,
+from `tools/standins.py`, and `signs.json` since 2026-10-14, from `tools/signs.py`.)
 
 Some strings hold characters that cannot be seen: U+200B (a zero-width space) and
 U+2001 (an em quad). Compare strings unit by unit.
@@ -286,7 +288,47 @@ already had it, the nine made on the Mac with a stand-in for that rule among the
 becomes of the other ranges of a text box when a line of its stand-ins is made longer
 or shorter. [`spec/01-file-format.md`](../spec/01-file-format.md) has it under "Where
 Simple Presenter differs", with what real songs have. It wants the maintainer's word,
-and then a vector.
+and then a vector. (The maintainer's word came on 2026-10-13, and the vector on
+2026-10-14: below.)
+
+## Made again on 2026-10-14, on the Linux machine: two vectors that were wanted
+
+Simple Presenter took back what the two apps had come to since 2026-10-12: the line
+of hints and its highlighted line, sharps and flats drawn as signs, an empty box that
+is kept taking the chord off, and a chord's name orange as it comes
+([`reference/README.md`](../reference/README.md) has the whole of it, and the commit,
+`2e67b1a`). `reference/` was brought up to that commit, and everything here that is
+made from Simple Presenter was made again from it. Nothing was edited by hand.
+
+- **The rules' answers** (`tools/make-vectors`): all thirteen files the same to the
+  byte. **New: `place-after.json`**, from Simple Presenter's `rtfstandins::placeAfter`
+  (wanted, below): for four text boxes, every place in each, and where it goes with
+  the line of chords alone in the box made one, two, three and four chords long; 184
+  places in all. Its first box is the table in
+  [`spec/01-file-format.md`](../spec/01-file-format.md), "The box's other ranges",
+  and agrees with it. Neither app's tests read it yet: they hold to the cases taken
+  over from Simple Presenter's own test of `placeAfter`, which this file has among
+  its own.
+- **`sheet-model.json`**: every case that was there the same. Added to `typing`, six
+  cases of rule 35a (wanted, below): a box opened on a chord, emptied, and kept by
+  Enter, by a click on another place and by a click on the bare sheet, each of which
+  asks for the line without that chord; the same ended with Esc, which asks nothing;
+  a box opened where there is no chord and kept empty, which asks nothing; and on a
+  line of chords alone, which asks for the line with one chord fewer. **Neither app's
+  tests have been run against them**: both read whatever cases the file has, and both
+  have the rule.
+- **`layout.json`**: the same to the byte. (The signs change the width of a bubble
+  only as the sheet measures it, by the name it draws; `chordlayout.js`, which these
+  record, is given whatever width that is.)
+- **`key-fit.json`**, **`stand-ins-in-rtf.json`** and **`signs.json`**, by their
+  tools: the same to the byte, as they must be. Simple Presenter's own port of the
+  last (`chords::withSigns`, `chords::withoutSigns`) answers all 59 of its cases, and
+  is held to a copy of it.
+- **`files/expected/as-read-by-simple-presenter.json`**: the same to the byte, every
+  file read by `tools/simple-presenter-scripts/dump.qml` in the build with the test
+  hook; and what `tools/make-fixtures.py` makes, the same.
+- **Not made again**, as before: the clean presentations, whose ids and times would
+  come out other bytes that say the same.
 
 **Still wanted**
 
@@ -298,22 +340,6 @@ and then a vector.
   no words", step 7).
 - A test file whose chords are not in order of place in the file: the Mac app's notes
   say no file here would notice that rule being left out.
-- `placeAfter`: where the ends of a text box's other ranges go when a line of chords
-  alone in it is made longer or shorter
-  ([`spec/01-file-format.md`](../spec/01-file-format.md), "The box's other ranges",
-  decided on 2026-10-13: the apps now do as Simple Presenter does). A vector made
-  from Simple Presenter's own `rtfstandins::placeAfter`, by `tools/make-vectors`.
-  Until there is one, the cases are those of its own test
-  (`reference/simple-presenter/tests/tst_rtfstandins.cpp`), which the Mac app's
-  tests have taken over as they stand (`StandInsInRTFTests`); and what the song
-  itself then writes is held on Chords With No Words, every box of which says of
-  all its words that they are in capitals (`ChordsWithNoWordsTests`).
-- In `sheet-model.json`, `typing`: a box opened on a chord, emptied, and kept (by
-  Enter, by a click on another place, by a click on the bare sheet), which takes the
-  chord off; and the same ended with Esc, which does not
-  ([`spec/03`](../spec/03-chord-sheet.md), rule 35a, new on 2026-10-13). It waits for
-  Simple Presenter to do as that rule says: the Mac app has cases of its own for it
-  meanwhile (`ChordSheetTests`, "Kept with nothing in the box").
 - In `songs/headings.cho`, a second chord on the line that has two spaces after its
   first (`[G]  Two spaces after the [C]chord`). As it is, the line's one chord is at
   the start, which is where it would be whether or not chords moved with the words

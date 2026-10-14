@@ -3,7 +3,8 @@
 // the Mac and the Windows apps' own tests to hold their rules to.
 //
 // Nothing is worked out here. Every answer is whatever Simple Presenter's functions
-// give (src/chords.cpp for the chords, src/rtf.cpp for the text of an RTF), so the
+// give (src/chords.cpp for the chords, src/rtf.cpp for the text of an RTF,
+// src/rtfstandins.cpp for where a text box's other ranges go), so the
 // vectors are a record of what that editor does and not a second opinion of it. Where
 // the code and spec/ disagree, the vectors are the code's side of it.
 //
@@ -12,6 +13,7 @@
 // README.md beside this says how to build it and when to run it again.
 #include "chords.h"
 #include "rtf.h"
+#include "rtfstandins.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -546,6 +548,48 @@ void rtfText()
 
 }
 
+// Where a place in a text box's words goes when a line of chords alone in it is made
+// longer or shorter: Simple Presenter's rtfstandins::placeAfter, which moves the ends
+// of the box's other ranges (spec/01-file-format.md, "The box's other ranges"). For
+// four boxes, every place in each, and the line made each length from one chord to four.
+void placesAfter()
+{
+    struct Box
+    {
+        const char *about;
+        int lineStart;
+        int was;
+        int length;
+    };
+    // (A line of chords alone is 1, 3, 5 ... units long: a stand-in for each chord and a
+    // wide space between two.)
+    const QList<Box> boxes = {
+        {"six units of words and a line break, then a line of two chords alone (3 units, from 6), a line break at 9 and more words "
+         "from 10 to 14: the table in spec/01-file-format.md", 6, 3, 14},
+        {"a box that holds nothing but a line of two chords alone (3 units, from 0), as most of those in Multitracks songs do, with a range "
+         "over all of it in capitals", 0, 3, 3},
+        {"a line of one chord alone (1 unit, from 0), a line break at 1 and words from 2 to 12: a lead line over a verse", 0, 1, 12},
+        {"a line of three chords alone (5 units, from 8) at the end of the box, after eight units of words and a line break", 8, 5, 13},
+    };
+    QJsonArray cases;
+    for (const Box &box : boxes) {
+        for (int now = 1; now <= 7; now += 2) {
+            QJsonArray places;
+            for (int place = 0; place <= box.length; ++place)
+                places.append(QJsonObject {{"place", place}, {"out", rtfstandins::placeAfter(place, box.lineStart, box.was, now)}});
+            cases.append(QJsonObject {{"about", QString::fromUtf8(box.about)}, {"lineStart", box.lineStart}, {"was", box.was}, {"now", now},
+                                      {"length", box.length}, {"places", places}});
+        }
+    }
+    write("place-after.json",
+          "placeAfter(place, lineStart, was, now): where a place in a text box's words is once the line of chords alone that began at "
+          "`lineStart` and was `was` units long has been made `now` units long, as the ends of the box's other ranges (custom attributes that "
+          "are not chords: capitals, a gradient) are moved: spec/01-file-format.md, \"The box's other ranges\". For each case, the box "
+          "`length` units long (as it was) and for every place in it, 0 to `length`, where it goes (`out`). Each end of a range is moved by "
+          "itself.",
+          {{"cases", cases}});
+}
+
 int main(int argc, char **argv)
 {
     QCoreApplication app(argc, argv);
@@ -566,5 +610,6 @@ int main(int argc, char **argv)
     chordPro();
     songs(QDir(outFolder).absoluteFilePath("../songs"));
     rtfText();
+    placesAfter();
     return 0;
 }

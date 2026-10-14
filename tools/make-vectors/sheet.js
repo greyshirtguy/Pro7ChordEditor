@@ -639,6 +639,20 @@ model.typing = [
            [{ click: { row: 1, at: 0 } }, { typed: "G" }, { click: { row: 1, at: 0 } }, { typed: "D" }, { finish: "Enter" }]),
     typing("blank", "Tab on a blank slide keeps the chord and moves the spot on, to the new place after it",
            [{ spot: { row: 5, at: 0 }, press: "C" }, { typed: "C" }, { finish: "Tab" }]),
+    // An empty box that is kept takes the chord off (spec/03, rule 35a; Simple Presenter
+    // since 2026-10-14). Esc alone leaves it.
+    typing("grace", "a box opened on a chord, emptied, and kept by Enter: the chord comes off",
+           [{ spot: { row: 1, at: 8 }, press: "Enter" }, { typed: "" }, { finish: "Enter" }]),
+    typing("grace", "emptied and kept by a click on another place: the chord comes off, and the bubble opens there",
+           [{ spot: { row: 1, at: 8 }, press: "Enter" }, { typed: "" }, { click: { row: 2, at: 5 } }]),
+    typing("grace", "emptied and kept by a click on the bare sheet: the chord comes off",
+           [{ spot: { row: 1, at: 8 }, press: "Enter" }, { typed: "" }, { settle: true }]),
+    typing("grace", "emptied and ended with Esc: nothing changes",
+           [{ spot: { row: 1, at: 8 }, press: "Enter" }, { typed: "" }, { finish: "Esc" }]),
+    typing("grace", "a box opened where there is no chord, kept with nothing in it: nothing is asked of the song",
+           [{ spot: { row: 1, at: 13 }, press: "Enter" }, { typed: "" }, { finish: "Enter" }]),
+    typing("intro", "on a line of chords alone, a chord's box emptied and kept: that chord comes off and the others close up",
+           [{ spot: { row: 1, at: 2 }, press: "Enter" }, { typed: "" }, { finish: "Enter" }]),
 ]
 
 // Copying a line's chords, or a whole group's, and putting them on other lines

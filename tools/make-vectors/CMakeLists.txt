@@ -23,6 +23,7 @@ qt_add_executable(make-vectors
     ${SIMPLE_PRESENTER}/src/chords.cpp
     ${SIMPLE_PRESENTER}/src/rtf.cpp
     ${SIMPLE_PRESENTER}/src/richtext.cpp
+    ${SIMPLE_PRESENTER}/src/rtfstandins.cpp
 )
 target_include_directories(make-vectors PRIVATE ${SIMPLE_PRESENTER}/src)
 target_link_libraries(make-vectors PRIVATE Qt6::Core Qt6::Gui)

@@ -8684,6 +8684,799 @@
                     ]
                 }
             ]
+        },
+        {
+            "song": "grace",
+            "title": "a box opened on a chord, emptied, and kept by Enter: the chord comes off",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 8
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Enter"
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChords",
+                            "row": 0,
+                            "element": "A",
+                            "chords": [
+                                {
+                                    "at": 45,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 17,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 27,
+                                    "name": "G"
+                                }
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        },
+                        {
+                            "at": 27,
+                            "name": "G"
+                        },
+                        {
+                            "at": 45,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "I once was lost but now am found\nWas blind but now I see",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 7,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 16,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "Amen\nAmen and amen",
+                    "chords": []
+                }
+            ]
+        },
+        {
+            "song": "grace",
+            "title": "emptied and kept by a click on another place: the chord comes off, and the bubble opens there",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 8
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "click": {
+                            "row": 2,
+                            "at": 5
+                        }
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChords",
+                            "row": 0,
+                            "element": "A",
+                            "chords": [
+                                {
+                                    "at": 45,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 17,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 27,
+                                    "name": "G"
+                                }
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 2,
+                        "at": 5
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 2,
+                        "at": 5
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        },
+                        {
+                            "at": 27,
+                            "name": "G"
+                        },
+                        {
+                            "at": 45,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "I once was lost but now am found\nWas blind but now I see",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 7,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 16,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "Amen\nAmen and amen",
+                    "chords": []
+                }
+            ]
+        },
+        {
+            "song": "grace",
+            "title": "emptied and kept by a click on the bare sheet: the chord comes off",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 8
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "settle": true
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChords",
+                            "row": 0,
+                            "element": "A",
+                            "chords": [
+                                {
+                                    "at": 45,
+                                    "name": "D"
+                                },
+                                {
+                                    "at": 0,
+                                    "name": "G"
+                                },
+                                {
+                                    "at": 17,
+                                    "name": "C"
+                                },
+                                {
+                                    "at": 27,
+                                    "name": "G"
+                                }
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        },
+                        {
+                            "at": 27,
+                            "name": "G"
+                        },
+                        {
+                            "at": 45,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "I once was lost but now am found\nWas blind but now I see",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 7,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 16,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "Amen\nAmen and amen",
+                    "chords": []
+                }
+            ]
+        },
+        {
+            "song": "grace",
+            "title": "emptied and ended with Esc: nothing changes",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 8
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 8
+                    },
+                    "boxHolds": {
+                        "text": "G7",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Esc"
+                    },
+                    "asked": [],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 8
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 8,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        },
+                        {
+                            "at": 27,
+                            "name": "G"
+                        },
+                        {
+                            "at": 45,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "I once was lost but now am found\nWas blind but now I see",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 7,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 16,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "Amen\nAmen and amen",
+                    "chords": []
+                }
+            ]
+        },
+        {
+            "song": "grace",
+            "title": "a box opened where there is no chord, kept with nothing in it: nothing is asked of the song",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 13
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 13
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 13
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 13
+                    },
+                    "boxHolds": {
+                        "text": "",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 13
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Enter"
+                    },
+                    "asked": [],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 13
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "Amazing grace how sweet the sound\nThat saved a wretch like me",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 8,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 17,
+                            "name": "C"
+                        },
+                        {
+                            "at": 27,
+                            "name": "G"
+                        },
+                        {
+                            "at": 45,
+                            "name": "D"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "I once was lost but now am found\nWas blind but now I see",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "G"
+                        },
+                        {
+                            "at": 7,
+                            "name": "G7"
+                        },
+                        {
+                            "at": 16,
+                            "name": "C"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": "Twas grace that taught my heart to fear\nAnd grace my fears relieved",
+                    "chords": []
+                },
+                {
+                    "row": 3,
+                    "element": "D",
+                    "text": "Amen\nAmen and amen",
+                    "chords": []
+                }
+            ]
+        },
+        {
+            "song": "intro",
+            "title": "on a line of chords alone, a chord's box emptied and kept: that chord comes off and the others close up",
+            "steps": [
+                {
+                    "step": {
+                        "spot": {
+                            "row": 1,
+                            "at": 2
+                        },
+                        "press": "Enter"
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 2
+                    },
+                    "boxHolds": {
+                        "text": "G",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                },
+                {
+                    "step": {
+                        "typed": ""
+                    },
+                    "asked": [],
+                    "typing": true,
+                    "typingAt": {
+                        "row": 1,
+                        "at": 2
+                    },
+                    "boxHolds": {
+                        "text": "G",
+                        "selected": true
+                    },
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                },
+                {
+                    "step": {
+                        "finish": "Enter"
+                    },
+                    "asked": [
+                        {
+                            "ask": "setChordsAlone",
+                            "row": 0,
+                            "element": "A",
+                            "line": 0,
+                            "names": [
+                                "D",
+                                "A"
+                            ],
+                            "joined": false
+                        }
+                    ],
+                    "typing": false,
+                    "typingAt": null,
+                    "boxHolds": null,
+                    "spot": {
+                        "row": 1,
+                        "at": 2
+                    }
+                }
+            ],
+            "songAfter": [
+                {
+                    "row": 0,
+                    "element": "A",
+                    "text": "​ ​",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 2,
+                            "name": "A"
+                        }
+                    ]
+                },
+                {
+                    "row": 1,
+                    "element": "B",
+                    "text": "Holy holy holy\nLord God Almighty",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        },
+                        {
+                            "at": 15,
+                            "name": "G"
+                        }
+                    ]
+                },
+                {
+                    "row": 2,
+                    "element": "C",
+                    "text": " ",
+                    "chords": [
+                        {
+                            "at": 0,
+                            "name": "D"
+                        }
+                    ]
+                }
+            ]
         }
     ],
     "copyPaste": [

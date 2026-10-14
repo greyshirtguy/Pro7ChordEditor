@@ -1,0 +1,886 @@
+{
+    "about": "placeAfter(place, lineStart, was, now): where a place in a text box's words is once the line of chords alone that began at `lineStart` and was `was` units long has been made `now` units long, as the ends of the box's other ranges (custom attributes that are not chords: capitals, a gradient) are moved: spec/01-file-format.md, \"The box's other ranges\". For each case, the box `length` units long (as it was) and for every place in it, 0 to `length`, where it goes (`out`). Each end of a range is moved by itself.",
+    "cases": [
+        {
+            "about": "six units of words and a line break, then a line of two chords alone (3 units, from 6), a line break at 9 and more words from 10 to 14: the table in spec/01-file-format.md",
+            "length": 14,
+            "lineStart": 6,
+            "now": 1,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 7,
+                    "place": 8
+                },
+                {
+                    "out": 7,
+                    "place": 9
+                },
+                {
+                    "out": 8,
+                    "place": 10
+                },
+                {
+                    "out": 9,
+                    "place": 11
+                },
+                {
+                    "out": 10,
+                    "place": 12
+                },
+                {
+                    "out": 11,
+                    "place": 13
+                },
+                {
+                    "out": 12,
+                    "place": 14
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "six units of words and a line break, then a line of two chords alone (3 units, from 6), a line break at 9 and more words from 10 to 14: the table in spec/01-file-format.md",
+            "length": 14,
+            "lineStart": 6,
+            "now": 3,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 10,
+                    "place": 10
+                },
+                {
+                    "out": 11,
+                    "place": 11
+                },
+                {
+                    "out": 12,
+                    "place": 12
+                },
+                {
+                    "out": 13,
+                    "place": 13
+                },
+                {
+                    "out": 14,
+                    "place": 14
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "six units of words and a line break, then a line of two chords alone (3 units, from 6), a line break at 9 and more words from 10 to 14: the table in spec/01-file-format.md",
+            "length": 14,
+            "lineStart": 6,
+            "now": 5,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 11,
+                    "place": 9
+                },
+                {
+                    "out": 12,
+                    "place": 10
+                },
+                {
+                    "out": 13,
+                    "place": 11
+                },
+                {
+                    "out": 14,
+                    "place": 12
+                },
+                {
+                    "out": 15,
+                    "place": 13
+                },
+                {
+                    "out": 16,
+                    "place": 14
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "six units of words and a line break, then a line of two chords alone (3 units, from 6), a line break at 9 and more words from 10 to 14: the table in spec/01-file-format.md",
+            "length": 14,
+            "lineStart": 6,
+            "now": 7,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 13,
+                    "place": 9
+                },
+                {
+                    "out": 14,
+                    "place": 10
+                },
+                {
+                    "out": 15,
+                    "place": 11
+                },
+                {
+                    "out": 16,
+                    "place": 12
+                },
+                {
+                    "out": 17,
+                    "place": 13
+                },
+                {
+                    "out": 18,
+                    "place": 14
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "a box that holds nothing but a line of two chords alone (3 units, from 0), as most of those in Multitracks songs do, with a range over all of it in capitals",
+            "length": 3,
+            "lineStart": 0,
+            "now": 1,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 1,
+                    "place": 2
+                },
+                {
+                    "out": 1,
+                    "place": 3
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "a box that holds nothing but a line of two chords alone (3 units, from 0), as most of those in Multitracks songs do, with a range over all of it in capitals",
+            "length": 3,
+            "lineStart": 0,
+            "now": 3,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "a box that holds nothing but a line of two chords alone (3 units, from 0), as most of those in Multitracks songs do, with a range over all of it in capitals",
+            "length": 3,
+            "lineStart": 0,
+            "now": 5,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 5,
+                    "place": 3
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "a box that holds nothing but a line of two chords alone (3 units, from 0), as most of those in Multitracks songs do, with a range over all of it in capitals",
+            "length": 3,
+            "lineStart": 0,
+            "now": 7,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 7,
+                    "place": 3
+                }
+            ],
+            "was": 3
+        },
+        {
+            "about": "a line of one chord alone (1 unit, from 0), a line break at 1 and words from 2 to 12: a lead line over a verse",
+            "length": 12,
+            "lineStart": 0,
+            "now": 1,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 10,
+                    "place": 10
+                },
+                {
+                    "out": 11,
+                    "place": 11
+                },
+                {
+                    "out": 12,
+                    "place": 12
+                }
+            ],
+            "was": 1
+        },
+        {
+            "about": "a line of one chord alone (1 unit, from 0), a line break at 1 and words from 2 to 12: a lead line over a verse",
+            "length": 12,
+            "lineStart": 0,
+            "now": 3,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 3,
+                    "place": 1
+                },
+                {
+                    "out": 4,
+                    "place": 2
+                },
+                {
+                    "out": 5,
+                    "place": 3
+                },
+                {
+                    "out": 6,
+                    "place": 4
+                },
+                {
+                    "out": 7,
+                    "place": 5
+                },
+                {
+                    "out": 8,
+                    "place": 6
+                },
+                {
+                    "out": 9,
+                    "place": 7
+                },
+                {
+                    "out": 10,
+                    "place": 8
+                },
+                {
+                    "out": 11,
+                    "place": 9
+                },
+                {
+                    "out": 12,
+                    "place": 10
+                },
+                {
+                    "out": 13,
+                    "place": 11
+                },
+                {
+                    "out": 14,
+                    "place": 12
+                }
+            ],
+            "was": 1
+        },
+        {
+            "about": "a line of one chord alone (1 unit, from 0), a line break at 1 and words from 2 to 12: a lead line over a verse",
+            "length": 12,
+            "lineStart": 0,
+            "now": 5,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 5,
+                    "place": 1
+                },
+                {
+                    "out": 6,
+                    "place": 2
+                },
+                {
+                    "out": 7,
+                    "place": 3
+                },
+                {
+                    "out": 8,
+                    "place": 4
+                },
+                {
+                    "out": 9,
+                    "place": 5
+                },
+                {
+                    "out": 10,
+                    "place": 6
+                },
+                {
+                    "out": 11,
+                    "place": 7
+                },
+                {
+                    "out": 12,
+                    "place": 8
+                },
+                {
+                    "out": 13,
+                    "place": 9
+                },
+                {
+                    "out": 14,
+                    "place": 10
+                },
+                {
+                    "out": 15,
+                    "place": 11
+                },
+                {
+                    "out": 16,
+                    "place": 12
+                }
+            ],
+            "was": 1
+        },
+        {
+            "about": "a line of one chord alone (1 unit, from 0), a line break at 1 and words from 2 to 12: a lead line over a verse",
+            "length": 12,
+            "lineStart": 0,
+            "now": 7,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 7,
+                    "place": 1
+                },
+                {
+                    "out": 8,
+                    "place": 2
+                },
+                {
+                    "out": 9,
+                    "place": 3
+                },
+                {
+                    "out": 10,
+                    "place": 4
+                },
+                {
+                    "out": 11,
+                    "place": 5
+                },
+                {
+                    "out": 12,
+                    "place": 6
+                },
+                {
+                    "out": 13,
+                    "place": 7
+                },
+                {
+                    "out": 14,
+                    "place": 8
+                },
+                {
+                    "out": 15,
+                    "place": 9
+                },
+                {
+                    "out": 16,
+                    "place": 10
+                },
+                {
+                    "out": 17,
+                    "place": 11
+                },
+                {
+                    "out": 18,
+                    "place": 12
+                }
+            ],
+            "was": 1
+        },
+        {
+            "about": "a line of three chords alone (5 units, from 8) at the end of the box, after eight units of words and a line break",
+            "length": 13,
+            "lineStart": 8,
+            "now": 1,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 9,
+                    "place": 10
+                },
+                {
+                    "out": 9,
+                    "place": 11
+                },
+                {
+                    "out": 9,
+                    "place": 12
+                },
+                {
+                    "out": 9,
+                    "place": 13
+                }
+            ],
+            "was": 5
+        },
+        {
+            "about": "a line of three chords alone (5 units, from 8) at the end of the box, after eight units of words and a line break",
+            "length": 13,
+            "lineStart": 8,
+            "now": 3,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 10,
+                    "place": 10
+                },
+                {
+                    "out": 11,
+                    "place": 11
+                },
+                {
+                    "out": 11,
+                    "place": 12
+                },
+                {
+                    "out": 11,
+                    "place": 13
+                }
+            ],
+            "was": 5
+        },
+        {
+            "about": "a line of three chords alone (5 units, from 8) at the end of the box, after eight units of words and a line break",
+            "length": 13,
+            "lineStart": 8,
+            "now": 5,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 10,
+                    "place": 10
+                },
+                {
+                    "out": 11,
+                    "place": 11
+                },
+                {
+                    "out": 12,
+                    "place": 12
+                },
+                {
+                    "out": 13,
+                    "place": 13
+                }
+            ],
+            "was": 5
+        },
+        {
+            "about": "a line of three chords alone (5 units, from 8) at the end of the box, after eight units of words and a line break",
+            "length": 13,
+            "lineStart": 8,
+            "now": 7,
+            "places": [
+                {
+                    "out": 0,
+                    "place": 0
+                },
+                {
+                    "out": 1,
+                    "place": 1
+                },
+                {
+                    "out": 2,
+                    "place": 2
+                },
+                {
+                    "out": 3,
+                    "place": 3
+                },
+                {
+                    "out": 4,
+                    "place": 4
+                },
+                {
+                    "out": 5,
+                    "place": 5
+                },
+                {
+                    "out": 6,
+                    "place": 6
+                },
+                {
+                    "out": 7,
+                    "place": 7
+                },
+                {
+                    "out": 8,
+                    "place": 8
+                },
+                {
+                    "out": 9,
+                    "place": 9
+                },
+                {
+                    "out": 10,
+                    "place": 10
+                },
+                {
+                    "out": 11,
+                    "place": 11
+                },
+                {
+                    "out": 12,
+                    "place": 12
+                },
+                {
+                    "out": 15,
+                    "place": 13
+                }
+            ],
+            "was": 5
+        }
+    ],
+    "madeBy": "tools/make-vectors, from Simple Presenter's own code. Do not edit by hand: run it again."
+}
