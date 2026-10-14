@@ -614,7 +614,9 @@ struct ChordFromTheStripTests {
             #expect(grips.map(\.name) == sheet.inKey, "at \(width)")
             for (index, grip) in grips.enumerated() {
                 #expect(grip.bounds.width >= 34 && grip.bounds.height >= 26, "\(grip.name) is \(grip.bounds.size)")
-                #expect(grip.toolTip == "Puts \(grip.name) on the spot. The key \(index + 1) does the same. Or drag it onto a word.")
+                // (It says the name as the strip draws it, with signs: spec/03, rule 10a.
+                // What it carries is the name itself.)
+                #expect(grip.toolTip == "Puts \(model.drawn(grip.name)) on the spot. The key \(index + 1) does the same. Or drag it onto a word.")
             }
         }
         let (grips, window) = try strip(for: model)

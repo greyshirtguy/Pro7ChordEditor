@@ -10,7 +10,8 @@ as ChordPro text, its chords in square brackets among its words, to be typed in.
 Chords can be put where there are no words: on an intro's line of chords, and on a
 slide that is blank. Each change is saved as it is made, with a copy of the file as
 it was kept first, which can be seen and put back. A song's key can be set, and the
-key ProPresenter shows it in. Nothing is saved while ProPresenter is running. A guide
+key ProPresenter shows it in. Sharps and flats are drawn as ♯ and ♭ on the sheet (a
+setting turns that off); the song is saved with `#` and `b` either way. Nothing is saved while ProPresenter is running. A guide
 to all of it, one page with pictures of the app's own sheet, opens the first time the
 app is started, and is under Help ever after.
 

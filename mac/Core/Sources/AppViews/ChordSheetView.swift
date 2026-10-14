@@ -117,13 +117,18 @@ enum SheetLook {
 final class SheetMetrics: SheetMeasure {
     /// How many times its usual size everything is.
     let scale: Double
+    /// Whether a chord's sharps and flats are drawn as ♯ and ♭ (spec/03, rule 10a).
+    /// A name is measured as it is drawn, so its bubble fits what is in it; and the
+    /// sign is worked out once for each name, when it is first made into a line.
+    let signs: Bool
     let wordFont: NSFont
     let chordFont: NSFont
     let wordHeight: Double
     let chordHeight: Double
 
-    init(scale: Double) {
+    init(scale: Double, signs: Bool = false) {
         self.scale = scale
+        self.signs = signs
         wordFont = NSFont.systemFont(ofSize: SheetLook.wordSize * scale)
         chordFont = NSFont.boldSystemFont(ofSize: SheetLook.chordSize * scale)
         wordHeight = SheetLook.height(of: wordFont)
@@ -200,9 +205,14 @@ final class SheetMetrics: SheetMeasure {
         return edges
     }
 
+    /// A chord's name as it is drawn.
+    func drawn(_ name: String) -> String {
+        signs ? Chords.withSigns(name) : name
+    }
+
     func name(_ name: String) -> (line: CTLine, width: Double) {
         if let known = names[name] { return known }
-        let line = Self.line(name, font: chordFont)
+        let line = Self.line(drawn(name), font: chordFont)
         let made = (line, Self.width(of: line))
         names[name] = made
         return made
@@ -439,8 +449,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
     /// Shows a song's sheet: another song's from the top, the same one's where it was.
     /// With a `scale`, at that zoom.
     func show(_ shown: ChordSheet?, scale: Double? = nil) {
-        if let scale, scale != metrics.scale {
-            setScale(scale)
+        let signs = shown?.signs ?? false
+        if (scale ?? metrics.scale) != metrics.scale || signs != metrics.signs {
+            setLook(scale: scale ?? metrics.scale, signs: signs)
         }
         if shown !== sheet {
             sheet = shown
@@ -608,8 +619,13 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
 
     /// Draws everything so many times its usual size.
     func setScale(_ scale: Double) {
-        guard scale != metrics.scale else { return }
-        metrics = SheetMetrics(scale: scale)
+        setLook(scale: scale, signs: metrics.signs)
+    }
+
+    /// The same, and a chord's sharps and flats as signs or not.
+    func setLook(scale: Double, signs: Bool) {
+        guard scale != metrics.scale || signs != metrics.signs else { return }
+        metrics = SheetMetrics(scale: scale, signs: signs)
         if sheet != nil {
             layOutWhereItWas()
             if let sheet, sheet.typing {
@@ -638,10 +654,10 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
                 typingShown = sheet.typingsBegun
                 entry.isHidden = false
                 movingTheKeys = true
-                entry.begin(sheet.entry.text, selected: sheet.entry.selected, in: window)
+                entry.begin(sheet.inTheBox, selected: sheet.entry.selected, in: window)
                 movingTheKeys = false
-            } else if entry.field.stringValue != sheet.entry.text {
-                entry.set(sheet.entry.text)
+            } else if entry.field.stringValue != sheet.inTheBox {
+                entry.set(sheet.inTheBox)
             }
         } else if typingShown != nil {
             typingShown = nil
@@ -1236,8 +1252,9 @@ final class SheetCanvas: NSView, NSTextFieldDelegate, NSUserInterfaceValidations
         let caret = editor?.selectedRange().location ?? (typed as NSString).length
         let held = sheet.type(typed)
         if held != typed {
-            // Tidied, the caret stays where it was; undone, it goes back the one place
-            // the key had moved it.
+            // Tidied, or given its signs, the caret stays where it was (a sign is as
+            // long as what it stands for); undone, it goes back the one place the key
+            // had moved it.
             let tidied = Array(held.utf16).count == Array(typed.utf16).count
             entry.set(held, caret: tidied ? caret : max(0, caret - 1))
         }
@@ -1447,7 +1464,7 @@ final class SheetEntry: NSView {
         var x = 8.0
         var y = 8.0
         for name in offered {
-            let line = SheetMetrics.line(name, font: SheetLook.chipFont)
+            let line = SheetMetrics.line(metrics.drawn(name), font: SheetLook.chipFont)
             let text = SheetMetrics.width(of: line)
             let width = max(34, text + 16)
             if x > 8, x + width > SheetLook.entryWidth - 8 {
@@ -1673,7 +1690,7 @@ struct SheetStrip: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     chords
                 }
-                if key.isEmpty && Self.saysNoKey(in: given.size.width, chords: sheet.inKey) {
+                if key.isEmpty && Self.saysNoKey(in: given.size.width, chords: sheet.inKey.map(model.drawn)) {
                     Text(Self.noKey)
                         .font(.system(size: 12))
                         .foregroundStyle(Color(nsColor: SheetLook.caption))
@@ -1723,7 +1740,10 @@ struct SheetStrip: View {
     private var chords: some View {
         HStack(spacing: 8) {
             ForEach(Array(sheet.inKey.enumerated()), id: \.offset) { index, name in
-                let says = Self.says(of: name, number: index + 1)
+                // (Drawn with signs, if they are on: spec/03, rule 10a. What is carried
+                // is the name itself.)
+                let drawn = model.drawn(name)
+                let says = Self.says(of: drawn, number: index + 1)
                 // The button is there for the keyboard and for what reads the screen
                 // aloud. The mouse is taken by what lies over it, which makes a press
                 // let go the button's click and a press pulled away the chord picked
@@ -1731,12 +1751,12 @@ struct SheetStrip: View {
                 Button {
                     model.putOfKey(index + 1)
                 } label: {
-                    Self.chip(index + 1, name)
+                    Self.chip(index + 1, drawn)
                 }
                 .buttonStyle(.plain)
                 .help(says)
                 .overlay {
-                    KeyChordHandle(name: name, says: says, picture: { Self.picture(of: index + 1, name) },
+                    KeyChordHandle(name: name, says: says, picture: { Self.picture(of: index + 1, drawn) },
                                    clicked: { model.putOfKey(index + 1) }, lifted: { model.liftOfKey() }, ended: { model.carriedOfKeyEnded() })
                 }
             }

@@ -1,6 +1,7 @@
 // The settings (Command+comma), in sections: how chords are coloured in the two
-// editors, and the highlighted line of the chord sheet; and the copies that are kept
-// (spec/06-library.md, "Settings"; spec/07-backups.md, rule 18, for the second).
+// editors, the highlighted line of the chord sheet, and whether the sheet draws sharps
+// and flats as signs; and the copies that are kept (spec/06-library.md, "Settings";
+// spec/07-backups.md, rule 18, for the second).
 //
 // Each section is a tab of the system's settings window, which is as big as the tab
 // that is open. The copies were all there was here at first, and are AllCopies.swift
@@ -51,7 +52,8 @@ public struct SettingsWindow: View {
 }
 
 /// The colour of a chord in each of the two editors, and of the highlighted line of
-/// the chord sheet, each with what it looks like and a way back to the usual colour.
+/// the chord sheet, each with what it looks like and a way back to the usual colour;
+/// and the switch for the signs, with a chord as it is then drawn.
 struct ChordColourSettings: View {
     @Bindable var model: LibraryModel
 
@@ -109,6 +111,8 @@ struct ChordColourSettings: View {
                     .background(RoundedRectangle(cornerRadius: 4).fill(Color(nsColor: .textBackgroundColor)))
                     .overlay(RoundedRectangle(cornerRadius: 4).stroke(Color(nsColor: .separatorColor)))
             }
+            Divider()
+            signs
             Text("These are only how a song looks in this app. Nothing in a song\u{2019}s file says a colour, and ProPresenter shows chords in its own.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
@@ -116,6 +120,36 @@ struct ChordColourSettings: View {
         }
         .padding(22)
         .frame(width: 560)
+    }
+
+    /// Whether the sheet draws a chord's sharps and flats as ♯ and ♭ (spec/03, rule 10a),
+    /// and a chord drawn as it then is.
+    private var signs: some View {
+        HStack(alignment: .center, spacing: 14) {
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("Show sharps and flats as \u{266F} and \u{266D}", isOn: Binding(get: { model.chordSigns }, set: { model.setChordSigns($0) }))
+                    .font(.headline)
+                Text("On the chord sheet. Songs are saved with # and b either way.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 12)
+            HStack(spacing: 8) {
+                ForEach(["Bbm7", "F#", "Eb/G"], id: \.self) { name in
+                    Text(model.drawn(name))
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color(nsColor: onTheSheet))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: SheetLook.bubble)))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color(nsColor: SheetLook.bubbleEdge)))
+                }
+            }
+            .padding(10)
+            .frame(width: 190, alignment: .leading)
+            .background(RoundedRectangle(cornerRadius: 4).fill(Color(nsColor: SheetLook.card)))
+        }
     }
 
     /// One colour: its name, what it is the colour of where the name does not say,

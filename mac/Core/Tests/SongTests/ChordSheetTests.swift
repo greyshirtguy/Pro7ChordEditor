@@ -463,6 +463,53 @@ struct ChordSheetTests {
         #expect(song.asked.isEmpty)
     }
 
+    @Test("Mine, not a vector. With the signs drawn, the box shows them as they are typed and still holds # and b; a sign typed by hand is taken as # or b; what is kept is written with # and b (rules 10a and 30a)")
+    func theBoxWithSigns() throws {
+        let sharp = "\u{266F}", flat = "\u{266D}"
+        let (sheet, song) = try vectors.sheet("grace")
+        sheet.signs = true
+        sheet.setSpot(1, 13)
+        sheet.startTyping(seed: "F")
+        #expect(sheet.inTheBox == "F")
+        #expect(sheet.type("f#") == "F\(sharp)" && sheet.entry.text == "F#")
+        // A flat between the notes is drawn once its digit is there, and not before.
+        #expect(sheet.type("F\(sharp)m7b") == "F\(sharp)m7b" && sheet.entry.text == "F#m7b")
+        #expect(sheet.type("F\(sharp)m7b5") == "F\(sharp)m7\(flat)5" && sheet.entry.text == "F#m7b5")
+        // What could not be a chord is undone at once, to what was shown.
+        #expect(sheet.type("F\(sharp)m7\(flat)5!") == "F\(sharp)m7\(flat)5" && sheet.entry.text == "F#m7b5")
+        // A sign typed by hand is held as "#" or "b", wherever it is.
+        #expect(sheet.type("F\(sharp)m7\(flat)5/A\(flat)") == "F\(sharp)m7\(flat)5/A\(flat)")
+        #expect(sheet.entry.text == "F#m7b5/Ab" && sheet.taken() == "F#m7b5/Ab")
+        #expect(song.asked.isEmpty)
+        sheet.press(.enter)
+        #expect(sheet.chordAt(1, 13) == "F#m7b5/Ab")
+        #expect(song.asked.count == 1 && song.asked[0].contains("\"F#m7b5/Ab\"@") && !song.asked[0].contains("\\u"))
+        // Opened again on that chord, the box shows it drawn and holds it as it is; kept
+        // with nothing typed, it is kept as it was, with no sign.
+        song.asked = []
+        sheet.setSpot(1, 13)
+        sheet.startTyping()
+        #expect(sheet.entry.text == "F#m7b5/Ab" && sheet.inTheBox == "F\(sharp)m7\(flat)5/A\(flat)")
+        sheet.press(.enter)
+        #expect(sheet.chordAt(1, 13) == "F#m7b5/Ab")
+        #expect(song.asked.allSatisfy { !$0.contains("\\u") })
+        // What the sheet draws, and only that.
+        #expect(sheet.drawn("Bb") == "B\(flat)" && sheet.drawn("N.C.") == "N.C.")
+        #expect(sheet.inKey == Chords.diatonic(sheet.key))
+    }
+
+    @Test("Mine, not a vector. With the signs not drawn, the box is as it always was: a sign typed between the notes is kept (rule 10a)")
+    func theBoxWithoutSigns() throws {
+        let sharp = "\u{266F}", flat = "\u{266D}"
+        let (sheet, _) = try vectors.sheet("grace")
+        #expect(!sheet.signs)
+        sheet.setSpot(1, 13)
+        sheet.startTyping(seed: "F")
+        #expect(sheet.type("F\(sharp)m7b5") == "F#m7b5")
+        #expect(sheet.type("F\(sharp)m7\(flat)5") == "F#m7\(flat)5" && sheet.entry.text == "F#m7\(flat)5")
+        #expect(sheet.drawn("Bb") == "Bb")
+    }
+
     @Test("Mine, not a vector. Down and Up go through what is offered, round and round; Right takes the one picked into the box (rule 31)")
     func throughWhatIsOffered() throws {
         let (sheet, song) = try vectors.sheet("grace")

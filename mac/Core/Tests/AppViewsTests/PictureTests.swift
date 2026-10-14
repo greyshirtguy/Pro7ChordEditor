@@ -361,11 +361,13 @@ struct PictureTests {
         let model = await modelWithASongOpen(mac, editor: .sheet)
         // (On the window's own ground, which a settings window has under it.)
         let settings = ChordColourSettings(model: model).background(Color(nsColor: .windowBackgroundColor))
-        try draw(settings, named: "28 settings, the colours of chords", size: NSSize(width: 560, height: 440))
+        try draw(settings, named: "28 settings, the colours of chords", size: NSSize(width: 560, height: 540))
         model.setSheetChordColour("#7fe3ff")
         model.setTextChordColour("#c95fff")
         model.setSheetLineColour("#8cf58c")
-        try draw(settings, named: "29 settings, three colours chosen", size: NSSize(width: 560, height: 440), dark: true)
+        model.setChordSigns(false)
+        try draw(settings, named: "29 settings, three colours chosen and the signs off", size: NSSize(width: 560, height: 540), dark: true)
+        model.setChordSigns(true)
         model.setSheetLineColour(nil)
         try draw(LibraryWindow(model: model), named: "30 the sheet, another colour for chords", size: Self.sheetSize)
     }
@@ -387,6 +389,40 @@ struct PictureTests {
         model.setKey("C#")
         #expect(model.shown?.key == "C#" && model.shown?.shownKey == "C#")
         try draw(LibraryWindow(model: model), named: "65 a song in C sharp major", size: Self.sheetSize)
+    }
+
+    @Test("Sharps and flats drawn as signs: on the sheet, in the strip, in the song's keys and as a chord is typed; and all of it with the setting off (spec/03, rules 10a and 30a)")
+    func sharpsAndFlats() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, editor: .sheet)
+        let sheet = try #require(model.sheet)
+        #expect(model.chordSigns && sheet.signs)
+        model.setKey("Eb")
+        let line = try row("That saved a wretch like me", of: sheet)
+        for (at, name) in [(0, "Eb/G"), (5, "F#m7"), (11, "C7b9"), (13, "Abmaj7"), (20, "Dm7(b5)")] {
+            sheet.setSpot(line, at)
+            sheet.startTyping(seed: String(name.prefix(1)))
+            sheet.type(name)
+            sheet.press(.enter)
+            #expect(sheet.chordAt(line, at) == name)
+        }
+        try draw(LibraryWindow(model: model), named: "66 sharps and flats as signs", size: Self.sheetSize)
+        sheet.setSpot(try row("I once was lost but now am found", of: sheet), 2)
+        sheet.startTyping(seed: "B")
+        sheet.type("Bbm7b5/F")
+        #expect(sheet.inTheBox == "B\u{266D}m7\u{266D}5/F" && sheet.entry.text == "Bbm7b5/F")
+        try draw(LibraryWindow(model: model), named: "67 a chord typed, with its signs", size: Self.sheetSize)
+        model.setChordSigns(false)
+        #expect(!sheet.signs && sheet.inTheBox == "Bbm7b5/F")
+        // (Each picture is of a window of its own, and the last one's box, giving up the
+        // keyboard as its window goes, has kept what was typed: rule 39. So it is typed
+        // again, a line lower.)
+        sheet.setSpot(try row("Was blind but now I see", of: sheet), 4)
+        sheet.startTyping(seed: "B")
+        sheet.type("Bbm7b5/F")
+        #expect(sheet.inTheBox == "Bbm7b5/F")
+        try draw(LibraryWindow(model: model), named: "68 the same, the signs off", size: Self.sheetSize)
+        sheet.press(.escape)
     }
 
     // ---- The guide (spec/13-guide.md)

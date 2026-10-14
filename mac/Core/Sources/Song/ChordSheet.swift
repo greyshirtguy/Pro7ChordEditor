@@ -199,6 +199,12 @@ public final class ChordSheet {
     public var changed: () -> Void = {}
     /// Told when the spot was moved by the keys, and is to be brought into view.
     public var reveal: () -> Void = {}
+    /// Whether a chord's sharps and flats are drawn as the music signs, ♯ and ♭
+    /// (spec/03, rule 10a): the setting, which the window's model gives the sheet. Off
+    /// as a sheet is made, so that a sheet no window has made is as it always was.
+    /// Only drawing: all that the sheet works out, and all it asks of the song, is the
+    /// same either way.
+    public var signs = false
 
     public init(song: any SheetSong) {
         self.song = song
@@ -770,20 +776,38 @@ public final class ChordSheet {
         typingsBegun += 1
     }
 
+    /// A chord's name, or a key's, as the sheet draws it: with signs, if they are
+    /// drawn (`Chords.withSigns`), or as it is.
+    public func drawn(_ name: String) -> String {
+        signs ? Chords.withSigns(name) : name
+    }
+
+    /// What the box a chord is typed in shows: what it holds, drawn (spec/03, rule
+    /// 30a). A sign is one unit, as the character it stands for is, so a place in what
+    /// is shown is the same place in what is held.
+    public var inTheBox: String {
+        drawn(entry.text)
+    }
+
     /// What was typed in the box, as the box would have it now. Only what could be a
     /// chord gets in, and its notes are made capitals as they are typed. Answers with
-    /// what the box is to hold: what was typed tidied, or what it held before.
+    /// what the box is to show: what was typed tidied, or what it held before, drawn.
+    ///
+    /// While the signs are drawn, the box shows them, and what it shows is read with
+    /// each sign as "#" or "b" (`Chords.withoutSigns`) before anything else: so the
+    /// box holds what it always held, and a ♯ or ♭ typed by hand is taken as "#" or
+    /// "b" (rule 30a).
     @discardableResult
     public func type(_ text: String) -> String {
-        let tidy = Chords.tidied(text)
+        let tidy = Chords.tidied(signs ? Chords.withoutSigns(text) : text)
         guard Chords.couldBecome(tidy), tidy.utf16.count <= Self.longestTyped else {
             entry.text = entry.last
-            return entry.text
+            return inTheBox
         }
         entry.text = tidy
         entry.last = tidy
         entry.pick = -1
-        return tidy
+        return inTheBox
     }
 
     /// What Enter takes: the one picked from what is offered, or what is typed.

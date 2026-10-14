@@ -278,16 +278,18 @@ struct SongHeader: View {
     private var keys: some View {
         // (Each picker lists the song's own key before the twenty-six if it is not one
         // of them, and "None" before them if the song states none: `keysListed`. A
-        // picker whose choice is not in its list shows nothing.)
+        // picker whose choice is not in its list shows nothing. A key is drawn with
+        // signs while they are on, B♭ and F♯m, and chosen by its name: spec/06, rule
+        // 12.)
         Picker("Key", selection: Binding(get: { shown.key }, set: { model.setKey($0) })) {
-            ForEach(model.keysListed(for: shown.key), id: \.self) { Text($0.isEmpty ? "None" : $0).tag($0) }
+            ForEach(model.keysListed(for: shown.key), id: \.self) { Text($0.isEmpty ? "None" : model.drawn($0)).tag($0) }
         }
         .fixedSize()
         .disabled(!model.canChange)
         .help(shown.key.isEmpty ? "This song does not say what key it is in. Pick the key its chords are written in."
                                 : "The key the song's chords are written in. Changing it changes no chord.")
         Picker("Shown in", selection: Binding(get: { shown.shownKey }, set: { model.setShownKey($0) })) {
-            ForEach(model.keysListed(for: shown.shownKey), id: \.self) { Text($0.isEmpty ? "None" : $0).tag($0) }
+            ForEach(model.keysListed(for: shown.shownKey), id: \.self) { Text($0.isEmpty ? "None" : model.drawn($0)).tag($0) }
         }
         .fixedSize()
         .foregroundStyle(.secondary)

@@ -25,6 +25,7 @@ milestone; put right what has become untrue.
 | The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
 | The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day. **In the source and in no build**: the image of 1.0.3 has not these three | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
+| Sharps and flats drawn as ♯ and ♭ (2026-10-14, the maintainer's) | Done the same day. **In the source and in no build** | The rule, for all three apps: `spec/02`, "Sharps and flats drawn as signs", with `tools/signs.py` and `signs.json`, pushed at once. Drawn on the sheet, in the strip, in what is offered and in the box as it is typed, and in the song's two keys; never written. A switch in the settings, on as it comes (decision 95) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -929,6 +930,48 @@ And the same day, on how someone new is to find out what the sheet can do:
     to be asked again at each release. It is in `spec/10`, "Getting it to other
     people", for the Windows app's session, whose zip says the same. That was
     the second of the two things decision 91 left to ask, and the last.
+95. **Sharps and flats drawn as ♯ and ♭** (2026-10-14). The maintainer asked:
+    "Could we *smartly* render # as ♯ and b as ♭ when it is clear that is it a
+    shartp or flat note", on the sheet, the strip, the box and as it is typed,
+    "careful not to bother the user", with "no performance hit on a page with LOTs
+    of these chars (perhaps a font glyph is best for that??)", and in a way the
+    Windows app can do too. Shown a proposal, they said to hold it; then: "let's do
+    it for the GUI chord editor..(just a visual skin - not changing the underlying
+    data) and leave chordpro text unchanged/native/correct. and yes - a setting to
+    optional turn it off (default to on)". `spec/02`, "Sharps and flats drawn as
+    signs"; `spec/03`, rules 10a and 30a; `spec/06`, rules 12 and 20a.
+    - **Mine, in the proposal they took**: which `#` and `b` are clearly a sign.
+      Only in a name that is a chord and whose root is a capital: the root's and
+      the bass's, and between them one with a digit after it. The first draft
+      gave small-letter roots their signs too, and drew `b3/♭5` for a chord in
+      numbers that the vectors have. Over the 460 names with a `#` or `b` in
+      `testdata`, 263 get signs, and none looked wrong. Also mine: the two key
+      pickers drawn the same, and the switch's words and its three sample bubbles.
+    - **No font was needed.** The system font has both signs (checked: drawn
+      with its own, nothing standing in). SF Mono, the ChordPro text's, has
+      neither: Menlo stands in, thin, and 0.3 of a point narrower, which is one
+      more reason the text is left as it is. And a font could not tell a chord
+      from a word: it would draw the "b" of "Abide" as a flat.
+    - **How it is drawn.** `SheetMetrics` has the switch, and makes each name
+      into a line once, drawn, and measures the bubble from that, so the layout
+      fits what is drawn. The strip, the key pickers and the settings draw
+      `LibraryModel.drawn`. The box: `ChordSheet.signs`, `inTheBox`, and `type`,
+      which reads what the box shows with `withoutSigns` first (rule 30a). What
+      is carried from the strip, copied and kept is the name itself; the tests
+      read the file back and find `#` and `b`.
+    - **Speed, with the signs on** (`SpeedTests`): the pointer usually 1.4
+      thousandths of a second, nine times in ten under 6.6, at worst 13.2; a
+      chord dragged, at worst 8.5; the edge with the sheet shown, usually 14.4,
+      and with the ChordPro text 10.7. The same as "Now" in "What made the window
+      slow".
+    - **The guide's three pictures were drawn again**: the strip of a song in G
+      has F♯dim, and what is offered as D is typed has Dm7♭5. Looked at.
+    - **Found on the way, and left**: in `PictureTests` every picture is of a
+      window of its own, and the box of the one before, giving up the keyboard
+      as its window goes, keeps what was typed (rule 39). So "18 typing, the
+      second offered picked" shows no box, and did before this work too
+      (drawn from the commit before it). Picture 68 types again instead.
+    All 390 tests pass and the app builds. No build was made to try.
 
 ## How it is laid out, and why
 
@@ -2113,6 +2156,15 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
+- **Of the signs for sharps and flats (decision 95), tried by no hand**, there
+  being no build with them:
+  1. how they read at the sizes the sheet zooms to. The system font's ♭ is
+     small and raised, and its ♯ is close to a `#` at the bubble's size;
+  2. typing: `F#` shows F♯ as the `#` is typed, `C7b9` its ♭ once the 9 is, and
+     the caret never jumps;
+  3. the switch in Settings: the sheet, the strip and the song's keys change at
+     once, and stay as they were left when the app is started again;
+  4. the key pickers' lists, opened, with the signs.
 - **Of what was put right on 2026-10-14 (decision 93), tried by no hand**, there
   being no build with it:
   1. a song in a key that is not one of the twenty-six, C# major say: its key is

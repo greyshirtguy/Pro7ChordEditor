@@ -136,6 +136,11 @@ public final class LibraryModel {
     /// person is at (SheetHints.swift), kept the same way: nothing where it is the
     /// orange it comes as.
     public private(set) var sheetLineColour: String?
+    /// Whether the sheet draws a chord's sharps and flats as ♯ and ♭, and the song's two
+    /// keys over it the same (spec/03, rule 10a; spec/06, rule 20a): on as the app
+    /// comes. Only how they are drawn: nothing in a song's file, nor in the ChordPro
+    /// text, nor in what is copied, ever has a sign from it.
+    public private(set) var chordSigns = true
     /// How many times its usual size the ChordPro text is: one of the same steps, kept
     /// apart from the sheet's, since a size that suits a grid of slides is not the one
     /// that suits a page of text.
@@ -347,6 +352,8 @@ public final class LibraryModel {
         sheetChordColour = Self.colour(settings.sheetChordColour)
         textChordColour = Self.colour(settings.textChordColour)
         sheetLineColour = Self.colour(settings.sheetLineColour)
+        chordSigns = settings.chordSigns ?? true
+        sheet?.signs = chordSigns
         textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -642,6 +649,22 @@ public final class LibraryModel {
         }
     }
 
+    /// Turns the signs for sharps and flats on or off. It is remembered.
+    public func setChordSigns(_ on: Bool) {
+        chordSigns = on
+        sheet?.signs = on
+        sheetVersion += 1
+        if started {
+            remember()
+        }
+    }
+
+    /// A chord's name, or a key's, as the sheet and the song's header draw it: with
+    /// signs while they are on (`Chords.withSigns`), or as it is.
+    public func drawn(_ name: String) -> String {
+        chordSigns ? Chords.withSigns(name) : name
+    }
+
     /// A colour as it is kept: "#" and six of 0 to 9 and a to f, in small letters.
     /// Nothing for anything else.
     static func colour(_ written: String?) -> String? {
@@ -791,6 +814,7 @@ public final class LibraryModel {
     /// The sheet's song for a song just opened, or put back.
     private func makeSheet(of song: OpenSong) -> ChordSheet {
         let made = ChordSheet(song: song)
+        made.signs = chordSigns
         sheetIs(.nothing)
         made.pasteKeys = SheetHints.command + "V"
         made.refused = { [weak self] error in
@@ -1134,6 +1158,7 @@ public final class LibraryModel {
         settings.sheetChordColour = sheetChordColour
         settings.textChordColour = textChordColour
         settings.sheetLineColour = sheetLineColour
+        settings.chordSigns = chordSigns ? nil : false
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
         settings.guideShown = guideShown ? true : nil
         appData.settings = settings

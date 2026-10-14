@@ -619,6 +619,57 @@ struct ChordSheetViewTests {
         #expect(try mac.bytes(of: "Amazing Grace") == before)
     }
 
+    @Test("Sharps and flats drawn as signs: the box shows them as they are typed, the caret where it was; the file is written with # and b; a bubble is as wide as what it draws; and with the setting off there are none (spec/03, rules 10a and 30a)")
+    func sharpsAndFlatsAsSigns() async throws {
+        let flat = "\u{266D}"
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        #expect(model.chordSigns)
+        let (canvas, window) = view(for: model)
+        defer { window.close() }
+        let sheet = try #require(model.sheet)
+        let line = try row(Self.second, of: model)
+        canvas.pointerMoved(to: try #require(canvas.point(over: Spot(row: line, at: 5))), shift: false)
+        canvas.keyDown(with: try press("b", in: window))
+        let editor = try #require(canvas.entry.field.currentEditor() as? NSTextView)
+        try typeInBox("m7b5", of: canvas)
+        #expect(canvas.entry.field.stringValue == "Bm7\(flat)5" && sheet.entry.text == "Bm7b5")
+        #expect(editor.selectedRange() == NSRange(location: 5, length: 0))
+        // A flat typed after the root, with the caret there: drawn, and the caret after it.
+        editor.setSelectedRange(NSRange(location: 1, length: 0))
+        try typeInBox("b", of: canvas)
+        #expect(canvas.entry.field.stringValue == "B\(flat)m7\(flat)5" && sheet.entry.text == "Bbm7b5")
+        #expect(editor.selectedRange() == NSRange(location: 2, length: 0))
+        try pressInBox(#selector(NSResponder.insertNewline(_:)), of: canvas)
+        #expect(try chords(of: Self.second, in: mac, song: "Amazing Grace").contains(Chord(at: 5, name: "Bbm7b5")))
+        // The bubble is as wide as the name it draws, signs and all.
+        let metrics = canvas.metrics
+        let withSigns = SheetMetrics.width(of: SheetMetrics.line("B\(flat)m7\(flat)5", font: metrics.chordFont))
+        #expect(abs(metrics.bubble("Bbm7b5") - (withSigns + 2 * metrics.bubblePad)) < 0.01)
+        // Off, the sheet draws the names as they are.
+        model.setChordSigns(false)
+        canvas.show(model.sheet, scale: model.sheetZoom)
+        #expect(!canvas.metrics.signs)
+        let plain = SheetMetrics.width(of: SheetMetrics.line("Bbm7b5", font: canvas.metrics.chordFont))
+        #expect(abs(canvas.metrics.bubble("Bbm7b5") - (plain + 2 * canvas.metrics.bubblePad)) < 0.01)
+        #expect(plain != withSigns)
+    }
+
+    @Test("The setting for the signs: on as the app comes; turned off, remembered and given to the sheet; turned on again, nothing kept for it (spec/06, rule 20a)")
+    func theSettingForTheSigns() async throws {
+        let mac = try MadeUpMac()
+        let model = await open("Amazing Grace", on: mac)
+        let sheet = try #require(model.sheet)
+        #expect(model.chordSigns && sheet.signs && model.drawn("Bb") == "B\u{266D}")
+        model.setChordSigns(false)
+        #expect(!sheet.signs && model.drawn("Bb") == "Bb")
+        #expect(mac.appData.settings.chordSigns == false)
+        let again = await open("Amazing Grace", on: mac)
+        #expect(!again.chordSigns && again.sheet?.signs == false)
+        again.setChordSigns(true)
+        #expect(mac.appData.settings.chordSigns == nil && again.sheet?.signs == true)
+    }
+
     @Test("A letter opens the bubble with the keyboard in its box; what could not be a chord is undone; Return keeps the chord and gives the keyboard back")
     func typedInTheBubble() async throws {
         let mac = try MadeUpMac()
