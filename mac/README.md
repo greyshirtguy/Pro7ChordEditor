@@ -41,9 +41,7 @@ to come. Either way the Mac's part of "Try it" in
 [the README at the top](../README.md) is brought up to date in the same push: the
 link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
 "Getting it to other people", which has the steps). A release is made, changed or
-taken down on the maintainer's word and not otherwise. (This paragraph was brought
-up to what the maintainer said on 2026-10-14 by the Windows app's session, at their
-asking.)
+taken down on the maintainer's word and not otherwise.
 
 A build can be asked to write out its menus as it starts, for checking one with no
 hand on a mouse: start the program inside the app with `PRO7_SAY_MENUS` set, and it

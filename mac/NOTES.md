@@ -23,7 +23,7 @@ milestone; put right what has become untrue.
 | What the maintainer asked for after two days with 0.3, and version 1.0.0 | Built and given out, 2026-10-13, as the Mac's half of the release `v1.0.0`, GitHub's "Latest". **The line of hints is a first cut, to be tried and changed**; none of it has been seen by the maintainer yet | An empty box that is kept takes the chord off (decision 72). A line of hints under the sheet (73). The menus kept to what is of use, and closing the window quits (74, 75). About shows the icon (76). Earlier Versions in a colour, and a title over the places (77) |
 | What the maintainer said of 1.0.0, having tried it (2026-10-13) | Built the same day as 1.0.1, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | A text box's other ranges go with the words, as Simple Presenter has it (decision 79). The edge between the lists and the song starts half way, and is the app's own (80). The line of hints says nothing by the clock, and says the copying in the maintainer's words (81); the line the person is at is highlighted, in a colour of the settings (82) |
 | The window's speed, and the edge that is dragged (2026-10-13, the maintainer having tried 1.0.1) | Built the same day as 1.0.2, a build to try. **Never given out under that number**: what it brought went out in 1.0.3 | The pointer stalled a fifth of a second whenever the hints changed, and the edge was slow to drag with a song open: both were the song's header, which is now laid out once (decision 84). The edge is a bar that is seen, and AppKit's (85). "What made the window slow", below, has the measurements |
-| The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
+| The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -589,7 +589,8 @@ And the same day, on how someone new is to find out what the sheet can do:
     app adds its own. The maintainer asked for the release and for it to be the
     latest; its text says at the top where Windows' downloads are meanwhile. **To
     say to the maintainer**: that this is so, and that it can be made a pre-release
-    again until both are there.
+    again until both are there. (Overtaken on 2026-10-14: from then on the first
+    half of a number is made a pre-release, decision 92.)
 79. **A text box's other ranges go with the words** when a line of chords alone in
     it is made longer or shorter (`spec/01`, "The box's other ranges"; the
     maintainer's, 2026-10-13: "let's copy simple presenter for now"). What was
@@ -767,7 +768,9 @@ And the same day, on how someone new is to find out what the sheet can do:
     comment, to be taken out of it. **The picture is of 1.0.3, and what the page
     offers to download is 1.0.0**, which has not the blue line of hints nor the
     orange chords: said to the maintainer too. (No longer so: 1.0.3 was given out
-    the same day, decision 91.)
+    the same day, decision 91.) **Moved, 2026-10-14**: each app's picture is under
+    its own link in "Try it" now, and no longer under the page's first sentence
+    (decision 92).
 90. **The line of hints is agreed** (the maintainer, 2026-10-14, of 1.0.3: "tips are
     fine"). `spec/03` no longer says it is being tried and that the others are to
     wait: Windows is to build it as it is there, the highlighted line and its
@@ -791,19 +794,85 @@ And the same day, on how someone new is to find out what the sheet can do:
     - **the tag is on the commit of that read-me**, and not on "Version 1.0.3":
       three commits on, none of which changes a file the app is built from. The
       tag was pushed by itself first, so that GitHub's Mac build ran on that very
-      commit before anything was put on the page;
+      commit before anything was put on the page. (Moved since, to the commit
+      Windows' file was built from: decision 92);
     - **the release's text says "The Windows app's is to be added"**, and not a
       Windows build "of 1.0.3": the number that app is next built under is the
-      maintainer's to tell its session;
+      maintainer's to tell its session. (It was 1.0.3, and the text says now that
+      both are here: decision 92);
     - **it says what changed in a song's file since 1.0.0** (decision 79), and
       that a song in which 1.0.0 took a chord off a line of chords alone is not
       looked for or mended;
     - **1.0.0's page was left as it is.** Its text still says that the Windows
       build of 1.0.0 is to be added, which will not now be so under that number. A
-      release is changed on the maintainer's word: said to them;
+      release is changed on the maintainer's word: said to them. (Put right since,
+      at their word to the Windows app's session: decision 92);
     - **the README's sentences round "Try it"** no longer name a number for the
       Windows app that it has not got, and say that the release GitHub calls
-      "Latest" is to hold both downloads and so far has the Mac's.
+      "Latest" is to hold both downloads and so far has the Mac's. (It has both
+      since: decision 92.)
+92. **How a new number is given out from now on, and what became of the release
+    of 1.0.3 after the Mac's half** (the maintainer, 2026-10-14, to this session:
+    "I did some work on the windows version.. here is some handvoer for you to
+    align"; "Pull, then run git fetch --tags --force: the tag v1.0.3 was moved.
+    Read the new section "Giving a build out" in AGENTS.md, and
+    spec/10-platforms.md, "Getting it to other people". The README's pictures are
+    now under each app's link in "Try it"."). It was agreed between the maintainer
+    and the Windows app's session, which wrote it into `spec/10`, `AGENTS.md` and
+    `spec/11`, and into the paragraph on a release in `mac/README.md` at the
+    maintainer's asking; `windows/NOTES.md`, decisions 141 to 143, has their
+    words. **The rule: the release GitHub calls "Latest" always has both files.**
+    For this app:
+    - **when the Mac comes first to a number**, its release is made as a
+      pre-release and not as "Latest" (`gh release create v<number> <image>
+      --prerelease --latest=false --verify-tag`), and its text says that Windows'
+      is to come. "Latest" stays on the release before, which has both files.
+      1.0.0 and 1.0.3 were not done so (decisions 78 and 91): each was "Latest"
+      with the Mac's file alone, 1.0.3 for a day;
+    - **when the Mac comes second**, to a number Windows has made a pre-release
+      of, it is built under that number whether or not anything of its own has
+      changed. Then, in this order: the image is added (`gh release upload`); the
+      Mac's part is put into the text, Windows' being left as it came but for the
+      words that said the Mac's was to come; the tag is moved to the commit the
+      image was built from, by `git tag -f` and one forced push of that tag and
+      never by deleting it, and only if nothing the Windows app is built from
+      differs between the two commits (`git diff --stat <theirs> <ours>` of
+      `windows/` and of `proto`, its notes and its read-me apart: if something
+      does, the tag is left and the maintainer told); and the release is made no
+      pre-release and "Latest" (`gh release edit v<number> --prerelease=false
+      --latest`);
+    - **a session starts with `git fetch --tags --force`** and a look at the
+      Releases page. A pre-release with Windows' file alone in it is a number
+      that waits for the Mac, and is said to the maintainer. Tags are never
+      pushed all together;
+    - each half is still on the maintainer's word to the session that does it,
+      and each brings its own part of "Try it" up to date in the same push.
+    **What was done to `v1.0.3` after the Mac's half**, by the Windows app's
+    session at the maintainer's word, as it was found from here that day:
+    - **Windows' file is in it** (`Pro7ChordEditor-windows-1.0.3.zip`), and it is
+      "Latest" still and no pre-release. The Mac's image is as it was sent:
+      GitHub gives the same sum for it (`7faaf6dc…bfab`) and the same length, and
+      its address answers. Of the text the Mac's half sent, every line is on the
+      page but the first sentence, which said that Windows' was to be added and
+      says now that both are here;
+    - **the tag is on `b376e7f`**, the commit Windows' file was built from, and no
+      longer on `80497fa`. Between the two nothing the Mac app is built from
+      differs: under `mac/` only these notes, `proto` is at the same commit, and
+      nothing under `spec/`, `testdata/` or `tools/`. So the source at the tag is
+      still what the image was made from. This clone had the tag where it was
+      until it was fetched with `--force`;
+    - **1.0.0's page no longer says that a Windows build of 1.0.0 is to be
+      added** (the maintainer: "Just remove incorrect text"), which was the
+      first of the two things decision 91 left to ask;
+    - **the README's two pictures are under each app's link in "Try it"**, each
+      as wide as the page (the maintainer, of the two side by side under the
+      first sentence: "not working well visually"). The table of two rows is two
+      headed parts, and the Mac's gives the same file as before.
+    **Mine**: the paragraph on a release in `mac/README.md` was read and is as the
+    rule has it; the line in it that said which session had brought it up to
+    date was taken out, a read-me being no place for it, and is said here
+    instead. **Still to ask**: "An early build", the second line of the read-me
+    in the image. The read-me in Windows' zip says the same.
 
 ## How it is laid out, and why
 
@@ -1950,7 +2019,8 @@ the About text, a Developer ID, notarizing) is still to come.
 - **1.0.3, given out on 2026-10-14** at the maintainer's word ("Okay let's release
   1.0.3"), as the Mac's half of the release `v1.0.3`, GitHub's "Latest" (decision
   91). Version 1.0.3, build 7. The image is `Pro7ChordEditor-mac-1.0.3.dmg`,
-  sha256 `7faaf6dc…bfab`, made by the script from the commit the tag is on.
+  sha256 `7faaf6dc…bfab`, made by the script from the commit `80497fa`, which the
+  tag was on until it was moved (decision 92).
   **It is the second image of 1.0.3.** The first (sha256 `12a8819e…2c47`, built on
   2026-10-14 from what was committed half a minute later) is the one the
   maintainer tried, and the one this session started twice, shut in, with a new
@@ -1962,7 +2032,8 @@ the About text, a Developer ID, notarizing) is still to come.
   same again as the copy that was started. Checked besides, of what was given
   out: the script's own checks; the words of the hints as they are now, found in
   the program; all 378 tests, against the optimised code as well as the other;
-  GitHub's Mac build on the tag; and the file fetched back from the Releases page
+  GitHub's Mac build on the tag as it then was; and the file fetched back from
+  the Releases page
   and held against the one sent. **Not done again**: the app was not started from
   the second image, being the app that was; and nobody has gone through the
   read-me's steps for opening it with an image that came through a browser,
@@ -1983,11 +2054,11 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
-- **Of the release of 1.0.3, to ask the maintainer** (decision 91):
-  1. 1.0.0's page says the Windows build of 1.0.0 is to be added. Is it to say
-     instead that 1.0.3 is the newer, or to be taken down, as 0.1 was?
-  2. "An early build" is the second line of the read-me in the image. Is that
-     still what a 1.0 is to say of itself?
+- **Of the release of 1.0.3, to ask the maintainer** (decisions 91 and 92): "An
+  early build" is the second line of the read-me in the image, and of the one in
+  Windows' zip. Is that still what a 1.0 is to say of itself? (What 1.0.0's page
+  said of a Windows build was put right on 2026-10-14, at the maintainer's word
+  to the Windows app's session.)
 - **1.0.3 was tried by the maintainer on 2026-10-14** ("tips are fine"; the
   README's screenshot is of it), and then given out. Which of these were among
   what was tried was not said, so they stand (decisions 86 and 87):
