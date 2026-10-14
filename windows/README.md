@@ -87,6 +87,22 @@ dotnet publish App           # the app as the one file it is given out as
 The first time a newly built one is started it may be some seconds before its window
 shows; after that, one.
 
+To give it to someone else, `windows\make-zip.ps1` builds the app afresh and writes
+`windows\build\Pro7ChordEditor-windows-<version>.zip`: the app as one file, and
+[a read-me](zip/Read%20Me%20First.txt). The version is the app's own, in
+`Directory.Build.props`. The script makes a file and does nothing with it.
+
+A release is one for both apps, `v` and the number (`v1.0.3`), and the release GitHub
+calls "Latest" always has both files. If the Mac app has made the release of a number
+already, as a pre-release, the zip is added to it, the tag is moved to the commit the
+zip was built from, and the release is then made no pre-release and "Latest". If not,
+the release is made with the zip, as a pre-release, and its text says that the Mac's
+is to come. Either way the Windows part of "Try it" in
+[the README at the top](../README.md) is brought up to date in the same push: the
+link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
+"Getting it to other people", which has the steps). A release is made, changed or
+taken down on the maintainer's word and not otherwise.
+
 The app keeps its own things (what was chosen, a log of what it did, the copies of
 songs' files) in `%LOCALAPPDATA%\Pro7ChordEditor`, and nothing anywhere else.
 

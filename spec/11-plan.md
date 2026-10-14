@@ -30,7 +30,10 @@ machine, each through the same milestones.
   on: say in the report, in a few lines that can be passed on as they are, what a
   decision asks of it.)
 - Start a session by fetching: the other app's session may have changed `spec/` or
-  `testdata/` since.
+  `testdata/` since. Fetch the tags too, and forced (`git fetch --tags --force`): a
+  release's tag is moved when its second file is added
+  ([10](10-platforms.md), "Getting it to other people"), and an ordinary fetch
+  leaves a tag it already has where it was.
 
 ## The milestones
 
@@ -77,7 +80,7 @@ its turn comes, from the page that has it:
 | The edge between the lists and the song starts half way between its least and its most, and is a bar that is seen | [06](06-library.md), rule 6a |
 | Nothing in the window keeps the pointer waiting | [06](06-library.md), rule 6e |
 | A picture of each app under its own link in the README's "Try it", no longer side by side at the top (2026-10-14) | [10](10-platforms.md), "Getting it to other people" |
-| One newest release with both files: the app that comes second to a number brings its file in, and the tag is moved to its commit (2026-10-14; done so for 1.0.3) | [10](10-platforms.md), "Getting it to other people" |
+| **How a new number is given out, agreed 2026-10-14, for both sessions**: GitHub's "Latest" always has both files. The app that comes first to a number makes a pre-release; the one that comes second is built under that number, brings its file in, moves the tag to its commit, and makes the release "Latest". (The tag of 1.0.3 was moved so; fetch with `--tags --force`) | [10](10-platforms.md), "Getting it to other people"; [AGENTS.md](../AGENTS.md), "Giving a build out" |
 
 ## What the maintainer is asked for along the way
 

@@ -198,36 +198,67 @@ seen in a picture and ask the maintainer to try them.
   section", "no longer side by side - but in a Mac and Windows section".)
 - **One release holds both apps, from 0.3 on.** A release is one tag, `v` and the
   number (`v0.3`), with two files in it, each named for its app and that number:
-  `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`.
-  **From 1.0.0 it is no pre-release, and is the one GitHub calls "Latest"** (the
-  maintainer, 2026-10-13: "release to 1.0.0 (so these new versions become latest
-  release in the repo)"). The number has three parts from there on, and is above
-  the first editor's 0.9.5, so that the newest is not also the lowest. So the two
-  apps go by one number ([06-library.md](06-library.md), rule 6d), and a number is
-  used up once either app has been given out under it. Whichever app is ready first
-  makes the release with its own file, and says in its text that the other's is to
-  come; the other adds its file, its part of the text, and its part of "Try it".
-  **What a visitor is to find is one newest release with both files in it** (the
+  `Pro7ChordEditor-mac-0.3.dmg` and `Pro7ChordEditor-windows-0.3.zip`. The number
+  has three parts from 1.0.0 on, and is above the first editor's 0.9.5, so that the
+  newest is not also the lowest. So the two apps go by one number
+  ([06-library.md](06-library.md), rule 6d), and a number is used up once either app
+  has been given out under it. (The maintainer, 2026-10-13, of the Windows build: it
+  "will get added to the new release". Until then each app had releases of its own
+  and a number of its own: `mac-v0.2`, `windows-v0.2`.)
+- **What a visitor is to find is one newest release with both files in it**: the
+  release GitHub calls "Latest" always has the Mac's image and Windows' zip. (The
   maintainer, 2026-10-14: "I want the user experience to see a single latest release
-  with both builds attached"). The two apps are worked on in sessions of their own,
-  and neither waits for the other: when one has made the tag and the release of a
-  new number, the other's session builds its app under that number and brings its
-  file in ("bring in the new builds after one has made the new tag/release").
-  **The tag is then moved to the commit the second file was built from**, so that
-  the source at the tag is what both files were built from; but only if nothing the
-  first app is built from has changed between the two commits, and if something
-  has, the tag is left and the maintainer told. It is moved by one forced push of
-  the tag, and never by deleting it first, the release on GitHub being held by the
-  tag's name. (The maintainer, 2026-10-14, of 1.0.3, whose tag was on the Mac's
-  commit when the Windows file was added from a later one: "move the tag to make the
-  most sense". That it is done so each time is how the session that did it read
-  them, and is theirs to overrule.) It
-  is a pre-release still, and GitHub's "Latest" stays on the first editor, until the
-  maintainer says otherwise: with both files in one release that label can name both
-  apps, which it could not while each had a release of its own. (The maintainer,
-  2026-10-13, of the Windows build: it "will get added to the new release". Until
-  then each app had releases of its own and a number of its own: `mac-v0.2`,
-  `windows-v0.2`.)
+  with both builds attached"; and 2026-10-13: "release to 1.0.0 (so these new
+  versions become latest release in the repo)".) The two apps are worked on in
+  sessions of their own, and neither waits for the other ("I'll be making updates on
+  separate sessions mac/windows - bring in the new builds after one has made the new
+  tag/release"). **So a new number goes out in two halves**, each on the
+  maintainer's word to the session that does it:
+
+  1. **The app that comes first to the number** is built under it, pushed, and both
+     workflows seen to pass. The tag goes on the commit its file was built from, and
+     the release is made with that one file **as a pre-release, and not as
+     "Latest"** (`gh release create v1.0.4 <file> --prerelease --latest=false
+     --verify-tag`). Its text says that the other app's is to come. "Latest" stays
+     where it was, on the release before, which has both files.
+  2. **The app that comes second** is built under the same number, whether or not
+     anything of its own has changed since its last: the number is used up, and the
+     release is not whole without it. It is pushed, and both workflows seen to
+     pass. Then, in this order: its file is added (`gh release upload v1.0.4
+     <file>`); its part is put into the text, the other app's being left as it came
+     but for the words that said this one was to come; **the tag is moved** to the
+     commit its file was built from (below); and, both files being there, **the
+     release is made no pre-release and "Latest"** (`gh release edit v1.0.4
+     --prerelease=false --latest`).
+
+  In either half the file is fetched back from GitHub and held against the one that
+  was sent, and the app's own part of "Try it" is brought up to date, with the
+  sentence over the two parts if it no longer holds. (A file in a pre-release is
+  fetched by its link like any other, so each part of "Try it" gives the newest of
+  its app whichever half has been done.) **A session that finds a pre-release with
+  the other app's file alone in it** has found a number that waits for its own app,
+  and says so to the maintainer when it starts.
+
+  **The tag is moved each time**, to the commit the second file was built from, so
+  that the source at the tag is what both files were built from. (The maintainer,
+  2026-10-14, of 1.0.3, whose tag was on the Mac's commit when the Windows file was
+  added from a later one: "move the tag to make the most sense"; and of every time
+  after: "yes move the tag each time".) Look first that nothing the first app is
+  built from differs between the two commits (`git diff --stat <first> <second>`,
+  of that app's folder and of `proto`; its `NOTES.md` and its `README.md` are not
+  what it is built from). If something does, the tag would name a source the first file was
+  not built from: leave it where it is and tell the maintainer. It is moved by one
+  forced push (`git tag -f v1.0.4 <commit>`, then `git push --force origin
+  refs/tags/v1.0.4`) and never by deleting it first: the release is held by the
+  tag's name, and stayed as it was, published and with its files, when 1.0.3's was
+  moved so. **A clone that had the tag where it was keeps it there**, an ordinary
+  fetch leaving a tag it already has alone: so a session starts with `git fetch
+  --tags --force`, and never pushes its tags all together.
+
+  (Until 2026-10-14 the first half was made "Latest" at once, so that 1.0.0, and
+  1.0.3 for a day, were GitHub's newest with the Mac's file alone. The maintainer,
+  of making it a pre-release until the second file is in: "use the pre-release
+  idea".)
 - **Every push** should build both apps and run both sets of tests on GitHub's own
   Mac and Windows machines (`.github/workflows`). That is the referee the two apps
   share: neither can drift from the vectors without it showing. Set it up in the

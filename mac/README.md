@@ -32,14 +32,18 @@ The image holds the app, a way to Applications to drag it onto, and
 project.
 
 Since 0.3 a release is one for both apps, `v` and the number (`v1.0.0`), with the
-Mac's image and Windows' zip as its two files. If the Windows app has made it
-already, the image is added to it; if not, it is made with the image, and its text
-says that Windows' is to come. From 1.0.0 it is no pre-release, and is the one GitHub
-calls "Latest". Either way the Mac's row of "Try it" in
+Mac's image and Windows' zip as its two files, and the release GitHub calls "Latest"
+always has both. If the Windows app has made the release of a number already, as a
+pre-release, the image is added to it, the tag is moved to the commit the image was
+built from, and the release is then made no pre-release and "Latest". If not, the
+release is made with the image, as a pre-release, and its text says that Windows' is
+to come. Either way the Mac's part of "Try it" in
 [the README at the top](../README.md) is brought up to date in the same push: the
 link, the version and the size ([`spec/10-platforms.md`](../spec/10-platforms.md),
-"Getting it to other people"). A release is made, changed or taken down on the
-maintainer's word and not otherwise.
+"Getting it to other people", which has the steps). A release is made, changed or
+taken down on the maintainer's word and not otherwise. (This paragraph was brought
+up to what the maintainer said on 2026-10-14 by the Windows app's session, at their
+asking.)
 
 A build can be asked to write out its menus as it starts, for checking one with no
 hand on a mouse: start the program inside the app with `PRO7_SAY_MENUS` set, and it

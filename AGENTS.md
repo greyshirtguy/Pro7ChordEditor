@@ -90,6 +90,25 @@ These are not style. A change that breaks one of them is wrong however well it w
 - Words the user reads say plainly what a thing does. They never promise help, and
   never call the app a product.
 
+## Giving a build out
+
+The two apps go by one version number and share one release on GitHub, and they are
+built by two sessions that never meet. [spec/10-platforms.md](spec/10-platforms.md),
+"Getting it to other people", has the steps. In short:
+
+- **Nothing is published without the maintainer's word**: no tag, no release, no
+  file added to one, and none changed or taken down. Building a file for them to try
+  publishes nothing.
+- **The release GitHub calls "Latest" always has both apps' files.** So the app that
+  comes first to a new number makes its release as a pre-release. The app that comes
+  second is built under that same number, adds its file, moves the tag to the commit
+  its own file was built from, and only then makes the release "Latest".
+- **Start a session with `git fetch --tags --force`**, since a tag may have been
+  moved, **and look at the Releases page**: a pre-release with the other app's file
+  alone in it is a number that waits for yours. Say so to the maintainer.
+- Each app brings its own part of "Try it", in the README at the top, up to date in
+  the push that gives it out.
+
 ## Where things are
 
 | Path | What it is |

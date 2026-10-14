@@ -977,7 +977,41 @@ ProPresenter is for.
     the second file comes from a later commit **is how this session read
     them**, and is said there to be so. Between one app's release and the
     other's file being added, "Latest" holds one file, as 1.0.3 did for a day:
-    said to the maintainer.
+    said to the maintainer. (Both answered the same day: the next.)
+143. **How a new number is given out, agreed** (the maintainer, 2026-10-14: "yes
+    move the tag each time, and use the pre-release idea"; and "update the agent
+    instructions/rules/etc so that my other session on my mac will
+    align/follow the same rules going forward"). GitHub's "Latest" always has
+    both files: **the app that comes first to a number makes its release as a
+    pre-release; the one that comes second is built under that number, adds
+    its file, moves the tag to its own commit, and makes the release
+    "Latest".** Where it is written, for a session that remembers nothing:
+    - `spec/10`, "Getting it to other people": the two halves step by step,
+      with the commands, and the moving of the tag;
+    - `AGENTS.md`, a new section "Giving a build out": the same in four
+      lines, which every session is given before it starts;
+    - `spec/11`: a row under "Asked for since", and fetching the tags;
+    - `README.md` here and `mac/README.md`: the paragraph on a release. **The
+      Mac's was changed by this session**, which is not its own to change, at
+      the maintainer's asking, and says so in itself.
+    **Mine, in writing it down, and the maintainer's to overrule**:
+    - **the second app is built under the number whether or not anything of
+      its own has changed**: it follows from the two things agreed, since a
+      release with one file is never "Latest";
+    - **"Try it" gives the newest of each app in either half**, so its part
+      for the app that came first goes to a file in a pre-release until the
+      other is in. `spec/10` had each app's link fetch its newest file, and
+      that was left;
+    - **the tag is not moved if something the first app is built from has
+      changed between the two commits**, which will happen when its session
+      has gone on working: it is left, and the maintainer told;
+    - **a session starts with `git fetch --tags --force`**, an ordinary fetch
+      leaving a moved tag where the clone had it; and one that finds a
+      pre-release with the other app's file alone says so.
+    **Nothing on GitHub was changed for this**: `v1.0.3` is as the rule has
+    it already, "Latest" with both files and its tag on the second one's
+    commit. 0.2's page is still there as a pre-release, which nobody has said
+    to take down.
 
 ## How it is laid out, and why
 
