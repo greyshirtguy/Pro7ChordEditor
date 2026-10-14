@@ -20,7 +20,7 @@ struct VectorsCanBeReadTests {
         "carried.json", "chord-names.json", "chordpro.json", "completions.json", "diatonic.json",
         "key-fit.json", "keys.json", "layout.json", "line-break-shift.json", "notated.json",
         "parse-song.json", "ranges.json", "rtf-text.json", "sheet-model.json", "shown.json",
-        "stand-ins-in-rtf.json", "tidy.json", "transposed.json",
+        "signs.json", "stand-ins-in-rtf.json", "tidy.json", "transposed.json",
     ]
 
     @Test("Every vector file is there")

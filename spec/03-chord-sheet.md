@@ -164,6 +164,29 @@ Vectors: `sheet-model.json`, `rows`.
     wide that comes down to the character the chord stands at. From the top of a line
     to the top of the next is the bubble's height (its name's and 6), the tail's 6,
     the words' height and 6 more.
+10a. **Sharps and flats are drawn as signs**: F♯m7, B♭, C7♭9, E♭/G, as
+    `withSigns` has it ([02-chord-rules.md](02-chord-rules.md), "Sharps and flats
+    drawn as signs"). So wherever the sheet draws a chord's name: its bubble, the
+    bubble of a chord being dragged, the strip's chords (rule 14) and the picture
+    carried from one (rule 46a), what the typing bubble offers (rule 29) and its box
+    (rule 30a); in what a chord of the strip says of itself (rule 46h); and in the
+    song's two keys over the sheet ([06-library.md](06-library.md), rule 12), which
+    are shown the same way. A bubble is as wide as the name it draws, signs and all.
+    - **It is only drawn.** The name in the song, what is copied, what is carried,
+      and all that the sheet works out, are as they were, with `#` and `b`.
+    - **Not in the ChordPro text** ([04-chordpro-editor.md](04-chordpro-editor.md)),
+      which is left as ChordPro is written and read everywhere; nor in the lines of
+      Earlier Versions and Backups, which are written as it is.
+    - **A switch in the settings turns it off** ([06-library.md](06-library.md), rule
+      20a); it is on as it comes. Off, the sheet is in every way as it was before
+      there were signs, rule 30a too.
+    - The Mac's system font, which the sheet's names are drawn in, has both signs.
+      Where a font has not, the system draws them from another: look at a picture.
+
+    (**New**, the maintainer's, 2026-10-14: "let's do it for the GUI chord editor..(just
+    a visual skin - not changing the underlying data) and leave chordpro text
+    unchanged/native/correct. and yes - a setting to optional turn it off (default to
+    on)". It is **Simple Presenter's to follow**, and `signs.json` holds the rule.)
 11. **Where a bubble stands.** Its left edge is where its character starts. If that
     would run into the bubble before it on the line, it is pushed right until it clears
     that one by 4. Its tail still points at its own character. That is all of the
@@ -286,6 +309,13 @@ Vectors: `sheet-model.json`: `wordStarts`, `stops`, `stopAt`, `walks`.
 30. The box takes only what could be a chord (`couldBecome`). A key press that would
     make it otherwise is undone at once. What is typed is tidied as it is typed (`f`
     becomes `F`). At most sixteen characters.
+30a. **The box shows the signs as they are typed** (rule 10a), as it tidies: `F#` is
+    F♯ as soon as the `#` is typed, and `C7b` is C7♭9 once the 9 is. What the box
+    holds is read with `withoutSigns` before anything is done with it, so every rule
+    of typing works on `#` and `b` as it did, and a ♯ or ♭ typed by hand is taken as
+    `#` or `b`. (Those of the root and the bass always were, by `tidied`; now one
+    between them is too.) A sign is as long as the character it stands for, so the
+    caret never moves for it. (**New**, 2026-10-14, with rule 10a.)
 31. **Down and Up** go through what is offered, round and round; the one picked is lit
     in orange. **Right**, at the end of the box with one picked, puts that one in the
     box to be gone on with (for a bass note, say).

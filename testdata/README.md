@@ -16,9 +16,10 @@ it; [`spec/02-chord-rules.md`](../spec/02-chord-rules.md) says which rule each h
 | `sheet-model.json`, `layout.json` | What the chord sheet does with a song | `tools/make-vectors/sheet.js`, by running the functions of its `qml/ChordSheet.qml` and `qml/chordlayout.js` |
 | `key-fit.json` | Which key a song is likely in | `tools/keyfit.py`, which is the reference for that rule |
 | `line-break-shift.json` | One of the checks for mending | `tools/make-fixtures.py`, likewise |
+| `signs.json` | Which of a chord's sharps and flats the chord sheet draws as ♯ and ♭ ([`spec/02-chord-rules.md`](../spec/02-chord-rules.md), "Sharps and flats drawn as signs") | `tools/signs.py`, likewise |
 | `stand-ins-in-rtf.json` | The bytes a text box's RTF becomes when a line of chords alone is given more stand-ins or fewer, and the RTF made for a box that has no words ([`spec/01-file-format.md`](../spec/01-file-format.md), "Chords with no words") | `tools/standins.py`, likewise |
 
-The first three rows are a record of what Simple Presenter does. The last three are of
+The first three rows are a record of what Simple Presenter does. The last four are of
 rules that are new here. (Of the last, Simple Presenter has the first part too since
 2026-10-12, ported from `tools/standins.py` and held to the same file.)
 
@@ -123,6 +124,7 @@ cmake --build /tmp/make-vectors
 node tools/make-vectors/sheet.js /path/to/Simple-Presenter testdata/vectors
 python3 tools/keyfit.py testdata/vectors
 python3 tools/standins.py testdata/vectors
+python3 tools/signs.py testdata/vectors
 
 # 2. the clean presentations, with Simple Presenter itself (a build with its test hook)
 #    in an empty workspace of its own: tools/README.md has the whole of it
@@ -131,7 +133,8 @@ python3 tools/make-fixtures.py
 ```
 
 `tools/standins.py testdata/vectors` and step 3 need only Python and `protoc`, and
-run on any machine: neither reads anything of Simple Presenter's.
+`tools/signs.py testdata/vectors` only Python. They run on any machine: none reads
+anything of Simple Presenter's.
 
 `sheet.js` checks its own stand-ins against the vectors of step 1 and stops if they
 disagree; `make-fixtures.py` checks its reader of RTF the same way. Run them in that

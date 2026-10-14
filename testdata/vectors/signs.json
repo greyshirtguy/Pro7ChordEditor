@@ -1,0 +1,303 @@
+{
+    "about": "A chord's name as the chord sheet draws it, with the music signs U+266F and U+266D for the # and b that are clearly a sharp or a flat, and the other way: the rule at the top of tools/signs.py and in spec/02-chord-rules.md, \"Sharps and flats drawn as signs\". `withSigns`: for each `in`, what withSigns(in) is. `withoutSigns`: for each `in`, what withoutSigns(in) is. The `about` of each case says what it is there to show. Only drawing: a name with signs is never written anywhere.",
+    "madeBy": "tools/signs.py, which is itself the reference for this rule. Do not edit by hand: run it again.",
+    "withSigns": [
+        {
+            "about": "nothing to draw",
+            "in": "C",
+            "out": "C"
+        },
+        {
+            "about": "nothing to draw",
+            "in": "Am7",
+            "out": "Am7"
+        },
+        {
+            "about": "the root's sharp",
+            "in": "F#",
+            "out": "F♯"
+        },
+        {
+            "about": "the root's flat",
+            "in": "Bb",
+            "out": "B♭"
+        },
+        {
+            "about": "the root's flat, and nothing in the quality",
+            "in": "Bbm7",
+            "out": "B♭m7"
+        },
+        {
+            "about": "the root's flat",
+            "in": "Ebmaj7",
+            "out": "E♭maj7"
+        },
+        {
+            "about": "the root's flat; the quality's own letters are left",
+            "in": "Abadd9",
+            "out": "A♭add9"
+        },
+        {
+            "about": "the root's flat, and the s of sus left",
+            "in": "Bbsus4",
+            "out": "B♭sus4"
+        },
+        {
+            "about": "the root's sharp, and a flat before a digit",
+            "in": "C#m7b5",
+            "out": "C♯m7♭5"
+        },
+        {
+            "about": "the root's flat",
+            "in": "Gb",
+            "out": "G♭"
+        },
+        {
+            "about": "C flat: a root's flat however rare",
+            "in": "Cb",
+            "out": "C♭"
+        },
+        {
+            "about": "the rules read this as C flat with the quality 5",
+            "in": "Cb5",
+            "out": "C♭5"
+        },
+        {
+            "about": "E sharp minor",
+            "in": "E#m",
+            "out": "E♯m"
+        },
+        {
+            "about": "every one of the root's sharps",
+            "in": "F##",
+            "out": "F♯♯"
+        },
+        {
+            "about": "every one of the root's flats",
+            "in": "Bbb",
+            "out": "B♭♭"
+        },
+        {
+            "about": "the root's flat, and a bass with none",
+            "in": "Eb/G",
+            "out": "E♭/G"
+        },
+        {
+            "about": "the bass's flat",
+            "in": "C/Bb",
+            "out": "C/B♭"
+        },
+        {
+            "about": "the bass's sharp",
+            "in": "D/F#",
+            "out": "D/F♯"
+        },
+        {
+            "about": "both notes' sharps",
+            "in": "F#maj7/A#",
+            "out": "F♯maj7/A♯"
+        },
+        {
+            "about": "both notes' flats",
+            "in": "Ab/Gb",
+            "out": "A♭/G♭"
+        },
+        {
+            "about": "a flat before a digit",
+            "in": "C7b9",
+            "out": "C7♭9"
+        },
+        {
+            "about": "a sharp before a digit",
+            "in": "C7#9",
+            "out": "C7♯9"
+        },
+        {
+            "about": "a sharp before two digits",
+            "in": "Cmaj7#11",
+            "out": "Cmaj7♯11"
+        },
+        {
+            "about": "a flat in brackets, before a digit",
+            "in": "Dm7(b5)",
+            "out": "Dm7(♭5)"
+        },
+        {
+            "about": "two, each before a digit",
+            "in": "G7(#5b9)",
+            "out": "G7(♯5♭9)"
+        },
+        {
+            "about": "a flat before 13",
+            "in": "A7b13",
+            "out": "A7♭13"
+        },
+        {
+            "about": "half typed: no digit after the b yet",
+            "in": "Bm7b",
+            "out": "Bm7b"
+        },
+        {
+            "about": "half typed: no digit after the # yet",
+            "in": "C7#",
+            "out": "C7#"
+        },
+        {
+            "about": "Do Re Mi: the # follows a letter, not a digit, and the a is no flat",
+            "in": "Fa#m",
+            "out": "Fa#m"
+        },
+        {
+            "about": "Do Re Mi: a b at the end",
+            "in": "Dob",
+            "out": "Dob"
+        },
+        {
+            "about": "a slash and no bass: nothing to draw",
+            "in": "C6/9",
+            "out": "C6/9"
+        },
+        {
+            "about": "no bass, as more than a note follows the slash: the b is before a digit",
+            "in": "C/Bb7",
+            "out": "C/B♭7"
+        },
+        {
+            "about": "a bass whose letter is small is left",
+            "in": "C/bb",
+            "out": "C/bb"
+        },
+        {
+            "about": "a root whose letter is small: left",
+            "in": "bb",
+            "out": "bb"
+        },
+        {
+            "about": "a root whose letter is small: left",
+            "in": "f#m",
+            "out": "f#m"
+        },
+        {
+            "about": "a chord in numbers: left",
+            "in": "b3/b5",
+            "out": "b3/b5"
+        },
+        {
+            "about": "a chord in numbers: left",
+            "in": "bb7",
+            "out": "bb7"
+        },
+        {
+            "about": "no chord",
+            "in": "N.C.",
+            "out": "N.C."
+        },
+        {
+            "about": "no chord",
+            "in": "(x2)",
+            "out": "(x2)"
+        },
+        {
+            "about": "a space: not a chord, and left",
+            "in": "Bb riff",
+            "out": "Bb riff"
+        },
+        {
+            "about": "not a chord, and left",
+            "in": "C /// | Am ///",
+            "out": "C /// | Am ///"
+        },
+        {
+            "about": "a space after it: not a chord, and left",
+            "in": "Bb ",
+            "out": "Bb "
+        },
+        {
+            "about": "nothing",
+            "in": "",
+            "out": ""
+        },
+        {
+            "about": "a sign already there",
+            "in": "B♭",
+            "out": "B♭"
+        },
+        {
+            "about": "a sign already there, before a digit",
+            "in": "C7♭9",
+            "out": "C7♭9"
+        },
+        {
+            "about": "a sign and a #: both the root's",
+            "in": "F♯#",
+            "out": "F♯♯"
+        },
+        {
+            "about": "H is no note here",
+            "in": "H7",
+            "out": "H7"
+        },
+        {
+            "about": "the root's flat, and the little circle",
+            "in": "Bb°",
+            "out": "B♭°"
+        },
+        {
+            "about": "the root's sharp, and the half-diminished sign",
+            "in": "C#ø7",
+            "out": "C♯ø7"
+        },
+        {
+            "about": "a triangle for major seventh, and a flat before a digit",
+            "in": "EΔb9",
+            "out": "EΔ♭9"
+        },
+        {
+            "about": "a digit of another script is no digit 0 to 9",
+            "in": "C7b٣",
+            "out": "C7b٣"
+        },
+        {
+            "about": "a character beyond the first 65,536 is two units, neither a letter: not a chord",
+            "in": "Bb𝄫",
+            "out": "Bb𝄫"
+        }
+    ],
+    "withoutSigns": [
+        {
+            "about": "nothing to undo",
+            "in": "F#m7",
+            "out": "F#m7"
+        },
+        {
+            "about": "a sharp",
+            "in": "F♯m7",
+            "out": "F#m7"
+        },
+        {
+            "about": "a flat",
+            "in": "B♭",
+            "out": "Bb"
+        },
+        {
+            "about": "all three",
+            "in": "C♯m7♭5/G♯",
+            "out": "C#m7b5/G#"
+        },
+        {
+            "about": "half typed",
+            "in": "C7♭",
+            "out": "C7b"
+        },
+        {
+            "about": "signs alone are read so too",
+            "in": "♭♯",
+            "out": "b#"
+        },
+        {
+            "about": "nothing",
+            "in": "",
+            "out": ""
+        }
+    ]
+}

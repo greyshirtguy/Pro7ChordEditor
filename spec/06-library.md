@@ -170,7 +170,9 @@ song the width they took.)
     it out of "without" from under the person typing it. A song's marks are worked
     out again when it is saved.
 12. **The song** at the right: its name, its two keys
-    ([05-song-and-saving.md](05-song-and-saving.md)), and a switch between the chord
+    ([05-song-and-saving.md](05-song-and-saving.md); each shown with signs, B♭ and
+    F♯m, as the sheet shows a chord, while the setting for them is on:
+    [03-chord-sheet.md](03-chord-sheet.md), rule 10a), and a switch between the chord
     sheet and ChordPro. **The switch is in the middle of the song's header and is
     not small**: two buttons side by side, "Chords" and "ChordPro", each some 30 tall
     with a small picture before its name, the one that is shown filled with the
@@ -302,6 +304,12 @@ words; dropping a `.pro` file on the window to open it.
       "The line the pointer is on, on the chord sheet: where Ctrl+C copies from and
       Ctrl+V pastes to." (**New**, 2026-10-13, with the highlighted line, and
       agreed with it on 2026-10-14: the Windows app is to have it.)
+
+      And last, **a switch, "Show sharps and flats as ♯ and ♭"**, on as it comes.
+      Under it: "On the chord sheet. Songs are saved with # and b either way." Off,
+      the chord sheet and the song's two keys are shown as they were before
+      ([03-chord-sheet.md](03-chord-sheet.md), rule 10a). (**New**, the maintainer's,
+      2026-10-14: "a setting to optional turn it off (default to on)".)
     - **Backups**: the copies that are kept, all of them
       ([07-backups.md](07-backups.md), rule 18).
 
@@ -315,7 +323,8 @@ On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in
 
 - its settings: the folders chosen, the place and library last open, how the window
   was left (the sizes of the words, the colours of chords and of the highlighted
-  line, where the bar between the lists is, and how wide the lists are), and whether
+  line, where the bar between the lists is, and how wide the lists are), whether
+  sharps and flats are shown as signs, and whether
   the guide has been shown ([13-guide.md](13-guide.md), rule 2):
   all in `settings.json`; and the window's size, which the system keeps for it;
 - the marks it has worked out (rule 10; `marks.json`);

@@ -15,11 +15,12 @@
 //   ChordPro.swift         toChordPro, fromChordPro, chordsOf, withoutChords, placeholders
 //   ChordProSong.swift     parseSong, slidesOf
 //
-// and three that are not from chords.cpp, each under a name of its own:
+// and four that are not from chords.cpp, each under a name of its own but the last:
 //
 //   RTFWords.swift         RTFWords.words: the plain text of a text box's RTF
 //   KeyFit.swift           KeyFit.likely: which key a song's chords are most likely in
 //   OldEditorShift.swift   OldEditor: where the first Windows editor meant a chord to be
+//   Signs.swift            withSigns, withoutSigns: sharps and flats drawn as ♯ and ♭
 //
 // What to hold to, changing any of it:
 //

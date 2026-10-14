@@ -2,7 +2,8 @@
 
 What a chord is, what a key is, how a chord moves to another key, how it is written in
 ProPresenter's four notations, what is offered while one is typed, how a box's chords
-are kept in order, and how chords are written as ChordPro text.
+are kept in order, how chords are written as ChordPro text, and which of a chord's
+sharps and flats the sheet draws as signs.
 
 These are plain functions over strings and numbers. Nothing in them knows of a file or
 a window. In each app they are a module by themselves, with tests that read
@@ -193,6 +194,38 @@ library, Apple's Foundation, and that is why the list is written out.)
 
 Reading a whole ChordPro file is in [09-chordpro-files.md](09-chordpro-files.md).
 
+## Sharps and flats drawn as signs
+
+**New**: not in Simple Presenter. The maintainer's, 2026-10-14, for the chord sheet:
+"just a visual skin - not changing the underlying data", the ChordPro text left
+"unchanged/native/correct", and a setting to turn it off, on as it comes. Where the
+signs are drawn is in [03-chord-sheet.md](03-chord-sheet.md), rule 10a. The rule, its
+reasons and its reference are in `tools/signs.py`. Vectors: `signs.json`.
+
+`withSigns(name)`: the name as the sheet draws it, with the music signs ♯ (U+266F) and
+♭ (U+266D) for the `#` and `b` that are clearly a sharp or a flat. **What it gives is
+only ever drawn**: it is never written to a file, nor put into what is copied or
+carried, nor into the ChordPro text.
+
+- Only a name that `isChord` takes, and whose root's letter is a capital. Anything else
+  is given back as it is: `N.C.`, `Bb riff`, `C /// | Am ///`. So is a name whose root
+  is a small letter, which may be no note at all: in `b3/b5`, a chord written in
+  numbers, both are flats, and the rules would read the first as the note B.
+- The root's sharps and flats, every one: `F#` is F♯, `Bbm` is B♭m, `F##` is F♯♯.
+- The bass's, if it has a bass (as `parts` finds one) whose letter is a capital:
+  `Eb/G` is E♭/G, `C/Bb` is C/B♭.
+- Between the two, a `#` or a `b` that has a digit 0 to 9 straight after it: `C7b9` is
+  C7♭9, `Dm7(b5)` is Dm7(♭5), `Cmaj7#11` is Cmaj7♯11. No other: `Bm7b`, half typed,
+  keeps its `b` until the 5 comes.
+- A sign already in the name is left as it is, and so is everything else.
+
+A `#` and its sign are one UTF-16 unit each, and so are a `b` and its: a name drawn is as
+long as the name, and a place in one is the same place in the other.
+
+`withoutSigns(text)`: every ♯ as `#` and every ♭ as `b`, and nothing else changed. What
+the box a chord is typed in holds is read so first, while it shows the signs
+([03-chord-sheet.md](03-chord-sheet.md), rule 30a).
+
 ## Which key a song is most likely in
 
 **New**: not in Simple Presenter. The rule, its reasons and its reference are in
@@ -256,7 +289,8 @@ app, the first not written with Qt, had to pin down. Both apps do them as said h
 Each file is one JSON object with an `about` that says what is in it. The shapes are
 plain: `cases`, each with its inputs and an `out`. `transposed.json` and `notated.json`
 are tables instead, to keep them small: a list of `chords`, and rows whose `out` is the
-answer for each chord in that order.
+answer for each chord in that order. `signs.json` has a list for each of its two
+functions, `withSigns` and `withoutSigns`, in place of `cases`.
 
 Some strings hold characters that cannot be seen (U+200B, U+2001). Compare strings
 unit by unit, never by how they print.
