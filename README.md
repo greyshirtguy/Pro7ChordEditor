@@ -1,6 +1,11 @@
 <p align="center">
   <img src="pictures/ChordEditor.png" width="160" alt="The icon of Pro7 Chord Editor: a bubble with the chord Am7 in it, on orange">
 </p>
+
+
+https://github.com/user-attachments/assets/98ef407a-0b48-41ae-b145-7a986ec3251f
+
+
 <h1 align="center">Pro7 Chord Editor</h1>
 
 Puts chords on the songs of a ProPresenter 7 library, so that ProPresenter shows them
