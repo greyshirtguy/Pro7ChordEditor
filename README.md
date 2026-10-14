@@ -18,9 +18,8 @@ words, and lets them be put on, moved and changed.
 
 ## Try it
 
-The new editor, for [the Mac](#mac) and for [Windows](#windows), below: the Mac's
-is 1.0.4, and Windows' 1.0.3 until its 1.0.4 is added to the same release. Before you
-use one:
+The new editor, 1.0.4 of each app, in one release: for [the Mac](#mac) and for
+[Windows](#windows), below. Before you use one:
 
 - **Keep a backup of your ProPresenter library, and quit ProPresenter first.**
 - **Try it on a copy.** Copy one folder out of ProPresenter's `Libraries` to somewhere
@@ -43,9 +42,9 @@ It needs macOS 15 or later, on a Mac with Apple's own chip or Intel's.
 
 ### Windows
 
-**[Pro7ChordEditor-windows-1.0.3.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.3/Pro7ChordEditor-windows-1.0.3.zip)** (58 MB).
+**[Pro7ChordEditor-windows-1.0.4.zip](https://github.com/greyshirtguy/Pro7ChordEditor/releases/download/v1.0.4/Pro7ChordEditor-windows-1.0.4.zip)** (58 MB).
 It needs Windows 10 or 11, on a 64-bit PC. Nothing else has to be installed.
-[What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.3)
+[What is in it](https://github.com/greyshirtguy/Pro7ChordEditor/releases/tag/v1.0.4)
 
 ![Pro7 Chord Editor on Windows: the hymn Amazing Grace as a grid of its slides, with chords in orange over its words, and at the left the libraries and the songs of one](pictures/screenshot-windows.png)
 <!-- The Windows app's picture is what its window holds, drawn by one of its own tests
