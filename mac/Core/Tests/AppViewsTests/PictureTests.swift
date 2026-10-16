@@ -98,6 +98,19 @@ struct PictureTests {
         try draw(LibraryWindow(model: await modelWithASongOpen(mac, song: "Plain Song")), named: "2 dark, ProPresenter running", dark: true)
     }
 
+    @Test("Changes allowed while ProPresenter is running: the settings under Advanced, off and on, and the sheet with ProPresenter running and the band saying so (spec/06, rules 20 and 20a)")
+    func changesWhileProPresenterRuns() async throws {
+        let mac = try MadeUpMac()
+        let model = await modelWithASongOpen(mac, song: "Plain Song", editor: .sheet)
+        let advanced = AdvancedSettings(model: model).background(Color(nsColor: .windowBackgroundColor))
+        try draw(advanced, named: "69 settings, advanced", size: NSSize(width: 560, height: 200))
+        model.setChangesWhileProPresenterRuns(true)
+        try draw(advanced, named: "70 settings, advanced, changes allowed", size: NSSize(width: 560, height: 200), dark: true)
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        try draw(LibraryWindow(model: model), named: "71 the sheet, ProPresenter running and changes allowed", size: Self.sheetSize)
+    }
+
     @Test("A song ProPresenter wrote: no key, groups with their colours")
     func aFileProPresenterWrote() async throws {
         let mac = try MadeUpMac()

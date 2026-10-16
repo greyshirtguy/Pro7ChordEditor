@@ -1,6 +1,7 @@
 // The settings (Command+comma), in sections: how chords are coloured in the two
 // editors, the highlighted line of the chord sheet, and whether the sheet draws sharps
-// and flats as signs; and the copies that are kept (spec/06-library.md, "Settings";
+// and flats as signs; the copies that are kept; and, under Advanced, whether changes
+// are saved while ProPresenter is running (spec/06-library.md, "Settings" and rule 20;
 // spec/07-backups.md, rule 18, for the second).
 //
 // Each section is a tab of the system's settings window, which is as big as the tab
@@ -47,6 +48,8 @@ public struct SettingsWindow: View {
                 .tabItem { Label("Chords", systemImage: "paintpalette") }
             AllCopiesView(model: copies)
                 .tabItem { Label("Backups", systemImage: "clock.arrow.circlepath") }
+            AdvancedSettings(model: model)
+                .tabItem { Label("Advanced", systemImage: "gearshape.2") }
         }
     }
 }
@@ -179,6 +182,69 @@ struct ChordColourSettings: View {
             }
             Spacer(minLength: 12)
             sample()
+        }
+    }
+}
+
+/// Under Advanced: whether changes are saved while ProPresenter is open (spec/06, rules
+/// 20 and 20a). Off as the app comes. The warning is always under the switch, and is
+/// put again, as a question, before the switch is turned on; turning it off asks
+/// nothing. What it changes is in the window's model (`changesWhileProPresenterRuns`)
+/// and in the song's last check before every save (`Safeguards`).
+struct AdvancedSettings: View {
+    @Bindable var model: LibraryModel
+
+    static let name = "Allow changes while ProPresenter is open"
+    static let question = "Allow changes while ProPresenter is open?"
+    static let warning = "ProPresenter and this app could then both change the same song. If ProPresenter saves a song after it was changed here, that change is lost; and if both write the same file at the same moment, the file could be damaged. ProPresenter may also go on showing a song as it was until it reads it again. This app keeps a copy of each song before it first changes it, under Earlier Versions."
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Toggle(Self.name, isOn: Binding(get: { model.changesWhileProPresenterRuns }, set: { on in
+                if on {
+                    Self.ask { model.setChangesWhileProPresenterRuns(true) }
+                } else {
+                    model.setChangesWhileProPresenterRuns(false)
+                }
+            }))
+            .font(.headline)
+            HStack(alignment: .top, spacing: 8) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .accessibilityHidden(true)
+                Text(Self.warning)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.leading, 20)
+        }
+        .padding(22)
+        .frame(width: 560, alignment: .leading)
+    }
+
+    /// Asks before changes are allowed, with the warning again: on the window the
+    /// switch is in, if there is one. "Cancel" is added first, and so is what Esc
+    /// presses (being called that), and Return presses nothing: "Allow Changes" has
+    /// to be clicked (SEEN: NSAlert gives the first button Return unless it is called
+    /// "Cancel", which it gives Esc instead).
+    @MainActor
+    static func ask(then allow: @escaping () -> Void) {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = question
+        alert.informativeText = warning
+        alert.addButton(withTitle: "Cancel")
+        alert.addButton(withTitle: "Allow Changes").hasDestructiveAction = true
+        let answered: (NSApplication.ModalResponse) -> Void = { answer in
+            if answer == .alertSecondButtonReturn {
+                allow()
+            }
+        }
+        if let window = NSApp.keyWindow {
+            alert.beginSheetModal(for: window, completionHandler: answered)
+        } else {
+            answered(alert.runModal())
         }
     }
 }

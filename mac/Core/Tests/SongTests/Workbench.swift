@@ -16,6 +16,8 @@ final class Workbench {
     let folder: URL
     /// What the safeguards answer. A test sets these to try a refusal.
     var proPresenterIsRunning = false
+    /// Whether changes are allowed while it runs (spec/06, rule 20): the setting.
+    var savesWhileProPresenterRuns = false
     var copyCannotBeKept = false
     /// Every copy the song asked to have kept: the file's bytes at that moment, and why.
     private(set) var copiesKept: [Data] = []
@@ -40,6 +42,7 @@ final class Workbench {
     var safeguards: Safeguards {
         Safeguards(
             proPresenterIsRunning: { [unowned self] in proPresenterIsRunning },
+            savesWhileProPresenterRuns: { [unowned self] in savesWhileProPresenterRuns },
             keepCopy: { [unowned self] url, why in
                 if copyCannotBeKept { throw NoCopy() }
                 copiesKept.append(try Data(contentsOf: url))

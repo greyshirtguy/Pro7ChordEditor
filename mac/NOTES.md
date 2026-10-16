@@ -26,6 +26,7 @@ milestone; put right what has become untrue.
 | The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day, and **given out in 1.0.4** (decision 96) | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
 | Sharps and flats drawn as ♯ and ♭ (2026-10-14, the maintainer's) | Done the same day, and **given out on 2026-10-14 as the Mac's half of the release `v1.0.4`**, a pre-release until Windows' file is added (decision 96) | The rule, for all three apps: `spec/02`, "Sharps and flats drawn as signs", with `tools/signs.py` and `signs.json`, pushed at once. Drawn on the sheet, in the strip, in what is offered and in the box as it is typed, and in the song's two keys; never written. A switch in the settings, on as it comes (decision 95) |
+| Changes allowed while ProPresenter is running (2026-10-17, the maintainer's) | Done the same day. **In the source and in no build** | A switch under Advanced in the settings, off as it comes, with its warning under it and a question before it is turned on; the band stays while ProPresenter runs, in other words (decision 97) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -988,6 +989,46 @@ And the same day, on how someone new is to find out what the sheet can do:
     its own commit once `git diff --stat 09fb480 <its commit>` shows nothing changed
     in `mac/` but `NOTES.md` and `README.md`, nor in `proto`; then makes the release
     "Latest".
+
+97. **Changes can be allowed while ProPresenter is running** (the maintainer,
+    2026-10-17: "Let's add an "advanced" setting to enable editing while
+    ProPresenter is open (throw in a warning about potential data corruption if
+    propresenter this pro7chordediotr try to update the same file"). `spec/06`,
+    rules 20 and 20a, written first and pushed; the other pages that said nothing
+    is saved while ProPresenter runs, and that line of `AGENTS.md`, point to rule 20
+    now. How it is built:
+    - **The song's own last check asks it first.** `Safeguards` has
+      `savesWhileProPresenterRuns`, no unless told; `OpenSong.maySave` refuses for
+      ProPresenter only when that says no. The window's model hands it a box it
+      holds, so that a song opened before the switch was turned is asked what it is
+      now. Everything else in `maySave` and after it is as it was: the copy first,
+      the write beside the file, and the refusal over a file something else has
+      changed, which is what will tell of ProPresenter having saved the same song.
+    - **The window**: `canChange` is true while ProPresenter runs if the switch is
+      on, which unbars the text, the sheet, the keys and Earlier Versions; Command+S
+      and the words where a Save button would be follow `canChange`. The band stays
+      while ProPresenter runs, and says "ProPresenter is running. Changes here are
+      saved all the same (Settings, Advanced): leave alone any song it has open."
+      (`LibraryModel.band`). Turning it on takes away a refusal that was for
+      ProPresenter.
+    - **The settings**: a third tab, Advanced, with the one switch, and the warning
+      under it, always. Turning it on asks first (`AdvancedSettings.ask`, an alert
+      on the settings window): "Cancel" is added first and so is what Esc presses,
+      and Return presses nothing (SEEN: an alert gives Return to its first button
+      unless that is called "Cancel", which it gives Esc), so "Allow Changes" has
+      to be clicked. Off asks nothing. Kept in `settings.json` only when on.
+    - **Mine, and the maintainer's to overrule**: the name of the switch, the
+      words of the warning and of the band, that it asks before it is turned on,
+      that Enter does not allow, and that it is off as the app comes. The read-me in
+      the image and `mac/README.md` say it now too.
+    - **Not told apart**: a song ProPresenter may have open from one it cannot have,
+      which is what "Asked for by the maintainer, for later" thought of. The switch
+      is for everything; the careful way is still open there.
+    - Not tried with ProPresenter itself, by anyone: what it does with a song
+      changed under it is still **a guess** (rule 16). The tests stand in for
+      ProPresenter, as they always have.
+    393 tests pass (three new: the song's check, the window's model, and pictures
+    69 to 71, looked at), and the app builds.
 
 ## How it is laid out, and why
 
@@ -2182,6 +2223,16 @@ the About text, a Developer ID, notarizing) is still to come.
 
 ## Left rough, and what to ask
 
+- **Of changes allowed while ProPresenter is running (decision 97), tried by no
+  hand**, there being no build with them:
+  1. the Advanced tab, and the question when the switch is turned on: Esc and
+     Cancel leave it off, and only a click on "Allow Changes" turns it on;
+  2. with ProPresenter running, the band in its other words, and a chord put on
+     and the key set as with it quit;
+  3. **what ProPresenter does** with a song changed under it (`spec/06`, rule 16,
+     is still a guess): only the maintainer's ProPresenter can say, on a made-up
+     song in a copy of a library ("Asked for by the maintainer, for later", step 5,
+     has the ten minutes it would take).
 - **Of the signs for sharps and flats (decision 95), tried by no hand**: they are
   in 1.0.4, which nobody has opened yet:
   1. how they read at the sizes the sheet zooms to. The system font's ♭ is
@@ -2465,8 +2516,10 @@ the About text, a Developer ID, notarizing) is still to come.
 - **Saving while ProPresenter is running, where that is safe** (raised by the
   maintainer on 2026-10-11, and the same day put on hold: "hold off on the editing
   while pro is running (more thoughts to sort through ...) - just keep notes for when
-  I revisit this"). **Nothing of it is decided or built. `spec/06`, rules 16 to 20,
-  stand as they are.** What was said, for whoever picks it up:
+  I revisit this"). **Since 2026-10-17 there is a switch for it all** (decision 97:
+  the person allows changes everywhere, having been warned), and **what follows is
+  still not built**: telling the songs where it is safe from those where it is not.
+  What was said, for whoever picks it up:
   1. *What the rule is for.* Not our own save, which is safe already: the file is
      written beside itself and swapped in whole, and is refused if anything else has
      changed it since it was read (`spec/05`). The harm would be ProPresenter holding

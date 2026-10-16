@@ -160,6 +160,44 @@ struct LibraryModelTests {
         #expect(!log.contains("[G"))
     }
 
+    @Test("Changes allowed while ProPresenter is running: off as the app comes; turned on, what was refused can be done, it is saved, the band says so, and it is remembered; turned off, it is barred again (spec/06, rules 20 and 20a)")
+    func changesWhileProPresenterRuns() async throws {
+        let mac = try MadeUpMac()
+        let model = mac.model()
+        await model.start()
+        model.choose(library: mac.library("Songs"))
+        await model.marksAreWorkedOut()
+        model.open(song: mac.song("Plain Song"))
+        #expect(!model.changesWhileProPresenterRuns && mac.appData.settings.changesWhileProPresenterRuns == nil)
+        mac.proPresenterIsRunning = true
+        model.proPresenterMayHaveChanged()
+        #expect(!model.canChange && model.band == "ProPresenter is running. Quit it to change chords here.")
+        model.setKey("E")
+        #expect(model.refusal != nil && model.shown?.key == "G")
+
+        // Allowed: the refusal goes, the change is saved with ProPresenter running, a
+        // copy kept first, and the band stays, saying so.
+        model.setChangesWhileProPresenterRuns(true)
+        #expect(model.refusal == nil && model.canChange && model.proPresenterIsRunning)
+        #expect(model.band?.hasPrefix("ProPresenter is running. Changes here are saved all the same") == true)
+        #expect(model.savingCaption == "Autosave on" && model.sheetHints != SheetHints.cannotChange)
+        model.setKey("E")
+        #expect(model.shown?.key == "E" && model.refusal == nil)
+        #expect(try OpenSong(opening: mac.place.appendingPathComponent("Libraries/Songs/Plain Song.pro")).key == "E")
+        #expect(model.songsWithCopies.contains("Plain Song"))
+        #expect(mac.appData.settings.changesWhileProPresenterRuns == true)
+        let again = mac.model()
+        await again.start()
+        #expect(again.changesWhileProPresenterRuns)
+
+        // Barred again: refused as before, and nothing kept for it.
+        model.setChangesWhileProPresenterRuns(false)
+        #expect(!model.canChange && mac.appData.settings.changesWhileProPresenterRuns == nil)
+        model.setKey("A")
+        #expect(model.notice == "ProPresenter is running. Quit it to change chords here. Nothing was changed.")
+        #expect(try OpenSong(opening: mac.place.appendingPathComponent("Libraries/Songs/Plain Song.pro")).key == "E")
+    }
+
     @Test("The band comes and goes by itself: when the system says ProPresenter has started or quit it is asked again, whichever app is in front")
     func theBandGoesByItself() async throws {
         let mac = try MadeUpMac()

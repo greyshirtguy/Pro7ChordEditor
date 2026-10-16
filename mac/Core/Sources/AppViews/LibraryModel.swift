@@ -100,6 +100,25 @@ public final class LibraryModel {
     public private(set) var songID: ListedSong.ID?
     public private(set) var shown: ShownSong?
     public private(set) var proPresenterIsRunning = false
+    /// Whether changes are saved while ProPresenter is running, as the person may
+    /// allow under Advanced in the settings, having been warned (spec/06, rules 20 and
+    /// 20a). Off as the app comes. While it is on nothing is barred for ProPresenter's
+    /// sake, and the band over the song says so instead.
+    public private(set) var changesWhileProPresenterRuns = false
+    /// What the band over the song says while ProPresenter is running (spec/06, rules
+    /// 19 and 20); nothing while it is not.
+    public var band: String? {
+        guard proPresenterIsRunning else { return nil }
+        return changesWhileProPresenterRuns
+            ? "ProPresenter is running. Changes here are saved all the same (Settings, Advanced): leave alone any song it has open."
+            : "ProPresenter is running. Quit it to change chords here."
+    }
+    /// The same, as every song's safeguards ask it before each save: a box, so that a
+    /// song opened before the switch was turned is asked what it is now.
+    private let allowedWhileRunning = Allowed()
+    private final class Allowed {
+        var on = false
+    }
     /// The names of the songs of the library that have copies kept.
     public private(set) var songsWithCopies: Set<String> = []
     /// The panel of earlier versions, while it is open.
@@ -243,8 +262,9 @@ public final class LibraryModel {
     }
 
     /// Whether the song that is open can be changed just now: it was read, ProPresenter
-    /// is not running, and (for typing) its text can say it exactly.
-    public var canChange: Bool { openSong != nil && !proPresenterIsRunning }
+    /// is not running or changes are allowed while it is, and (for typing) its text
+    /// can say it exactly.
+    public var canChange: Bool { openSong != nil && (!proPresenterIsRunning || changesWhileProPresenterRuns) }
     public var canType: Bool { canChange && chordPro != nil && chordPro?.barred == nil }
 
     /// The keys a song can be said to be in, as the pickers list them.
@@ -354,6 +374,8 @@ public final class LibraryModel {
         sheetLineColour = Self.colour(settings.sheetLineColour)
         chordSigns = settings.chordSigns ?? true
         sheet?.signs = chordSigns
+        changesWhileProPresenterRuns = settings.changesWhileProPresenterRuns ?? false
+        allowedWhileRunning.on = changesWhileProPresenterRuns
         textZoom = Self.nearestZoom(to: settings.textZoom ?? Self.usualTextZoom)
         keptMarks = appData.marks
         // Copies that are kept no longer go now, when the app starts (spec/07, rule 12).
@@ -458,8 +480,10 @@ public final class LibraryModel {
             // With its safeguards: ProPresenter is asked after before every save, and a
             // copy is kept before the first.
             let copies = copies
+            let allowed = allowedWhileRunning
             let opened = try OpenSong(opening: song.url, safeguards: Safeguards(
                 proPresenterIsRunning: askWhetherProPresenterIsRunning,
+                savesWhileProPresenterRuns: { allowed.on },
                 keepCopy: { file, why in try copies.keep(file, of: kept, why: why) }))
             openSong = opened
             asOpened = opened.bytes
@@ -644,6 +668,25 @@ public final class LibraryModel {
     public func setSheetLineColour(_ colour: String?) {
         sheetLineColour = Self.colour(colour)
         sheetVersion += 1
+        if started {
+            remember()
+        }
+    }
+
+    /// Allows changes while ProPresenter is running, or bars them again (spec/06, rule
+    /// 20). The settings ask before it is turned on; this does as it is told. It is
+    /// remembered, and the log says so.
+    public func setChangesWhileProPresenterRuns(_ on: Bool) {
+        guard on != changesWhileProPresenterRuns else { return }
+        changesWhileProPresenterRuns = on
+        allowedWhileRunning.on = on
+        if on, refusedForProPresenter {
+            // What was refused because of it can be done now.
+            refusal = nil
+            refusedForProPresenter = false
+        }
+        sheetVersion += 1
+        appData.log(on ? "Changes while ProPresenter is running were allowed." : "Changes while ProPresenter is running were barred again.")
         if started {
             remember()
         }
@@ -977,7 +1020,8 @@ public final class LibraryModel {
 
     /// What stands at the right of the quiet line, where a Save button would be:
     /// there is nothing to save by hand, since every change is saved as it is made.
-    /// While ProPresenter is running nothing is saved at all.
+    /// While ProPresenter is running nothing is saved at all, unless changes are
+    /// allowed while it is.
     public var savingCaption: String {
         canChange ? "Autosave on" : "Autosave paused"
     }
@@ -987,7 +1031,7 @@ public final class LibraryModel {
     /// to do by hand.
     public func saveNow() {
         guard openSong != nil else { return }
-        guard !proPresenterIsRunning else {
+        guard canChange else {
             say("ProPresenter is running. Quit it to change chords here.")
             return
         }
@@ -1159,6 +1203,7 @@ public final class LibraryModel {
         settings.textChordColour = textChordColour
         settings.sheetLineColour = sheetLineColour
         settings.chordSigns = chordSigns ? nil : false
+        settings.changesWhileProPresenterRuns = changesWhileProPresenterRuns ? true : nil
         settings.textZoom = textZoom == Self.usualTextZoom ? nil : textZoom
         settings.guideShown = guideShown ? true : nil
         appData.settings = settings

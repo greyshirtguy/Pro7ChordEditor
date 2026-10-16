@@ -34,7 +34,8 @@
 //     back with everything else as it came. Never build a file from the parts this
 //     app knows.
 //   - The words of a song are not this app's to change. Only chords are.
-//   - Nothing is written while ProPresenter is running, nor before a copy of the file
-//     has been kept.
+//   - Nothing is written while ProPresenter is running, unless the person has allowed
+//     it, having been warned (spec/06, rule 20); nor before a copy of the file has
+//     been kept.
 //   - Tests never run on a real library: on testdata/files, or on copies in a
 //     temporary folder.

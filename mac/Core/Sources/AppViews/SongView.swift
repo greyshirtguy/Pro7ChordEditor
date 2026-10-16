@@ -22,10 +22,12 @@ struct SongPane: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if model.proPresenterIsRunning {
-                // While it is running, everything can be looked at and nothing changed.
-                // The band goes by itself when ProPresenter does.
-                Text("ProPresenter is running. Quit it to change chords here.")
+            if let band = model.band {
+                // While it is running, everything can be looked at and nothing changed;
+                // unless changes are allowed while it runs, when the band stays as a
+                // reminder (spec/06, rules 19 and 20). It goes by itself when
+                // ProPresenter does.
+                Text(band)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
                     .padding(.horizontal, 10)

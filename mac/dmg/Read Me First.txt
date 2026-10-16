@@ -15,7 +15,9 @@ ProPresenter and has nothing to do with Renewed Vision, who make ProPresenter.
 BEFORE YOU USE IT
 
 - Keep a backup of your ProPresenter library.
-- Quit ProPresenter first. Nothing is saved while ProPresenter is running.
+- Quit ProPresenter first. Nothing is saved while ProPresenter is running,
+  unless that is allowed in Settings, under Advanced: read the warning there
+  before allowing it.
 - Try it on a copy first: copy one folder out of ProPresenter's Libraries to
   somewhere else, and open the copy with Choose Folder.
 

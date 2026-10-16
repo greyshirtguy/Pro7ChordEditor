@@ -17,7 +17,8 @@
 //   - Setting the key leaves the key ProPresenter shows the song in alone, if someone
 //     had chosen another (rule 6). There the two are always set together.
 //   - There is a second request, for the key ProPresenter shows it in (rule 7).
-//   - A save is refused while ProPresenter is running, and when the file on disk is no
+//   - A save is refused while ProPresenter is running (unless the person has allowed
+//     it: spec/06, rule 20), and when the file on disk is no
 //     longer the one that was read (rule 10). There neither is asked.
 //   - A line of chords alone is given more or fewer stand-ins by changing the bytes of
 //     that line in the box's RTF and no others (spec/01, "Chords with no words").
@@ -468,7 +469,8 @@ public final class OpenSong {
     /// "Put This One Back" (spec/07-backups.md, rules 19 to 22): makes the song's file
     /// these bytes again, which are a copy of it kept earlier.
     ///
-    /// It is a save, and so is refused while ProPresenter is running and unless the
+    /// It is a save, and so is refused while ProPresenter is running (unless that was
+    /// allowed) and unless the
     /// file on disk is the one last read. First the file as it is now is copied, so that
     /// putting back can itself be taken back: undoing it is only putting back that
     /// copy, and there is no second mechanism. Then the bytes are written beside the
@@ -595,7 +597,7 @@ public final class OpenSong {
     /// 3). Answers with the safeguards, or throws the refusal.
     private func maySave() throws -> Safeguards {
         guard let safeguards else { throw Refusal.onlyForReading }
-        if safeguards.proPresenterIsRunning() { throw Refusal.proPresenterIsRunning }
+        if !safeguards.savesWhileProPresenterRuns(), safeguards.proPresenterIsRunning() { throw Refusal.proPresenterIsRunning }
         guard fileIsAsLastRead else { throw Refusal.changedByAnother }
         return safeguards
     }
@@ -603,7 +605,8 @@ public final class OpenSong {
     /// Saves a new state of the song, and only then makes it the song. In order:
     ///
     ///   1. A song with no safeguards saves nothing.
-    ///   2. Nothing is saved while ProPresenter is running.
+    ///   2. Nothing is saved while ProPresenter is running, unless the person has
+    ///      allowed it (spec/06, rule 20). Then 3 to 6 still hold, every one.
     ///   3. Nothing is saved over a file that something else has changed: the file must
     ///      be, in its size, its time of last change AND its bytes, what was last read
     ///      from it or written to it here. (The page asks for the first two. The bytes

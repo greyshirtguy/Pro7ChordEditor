@@ -54,6 +54,32 @@ struct RefusalsTests {
         #expect(song.key == "E" && song.canUndo)
     }
 
+    @Test("Mine, not a vector. With changes allowed while ProPresenter runs, they are saved as it runs; the copy is still kept first, a file something else has changed is still refused, and turned off again it refuses as before (spec/06, rule 20)")
+    func allowedWhileProPresenterIsRunning() throws {
+        let bench = try Workbench()
+        let song = try bench.open(Self.plainSong)
+        let before = try Data(contentsOf: song.url)
+        bench.proPresenterIsRunning = true
+        bench.savesWhileProPresenterRuns = true
+        try song.setKey("E")
+        #expect(song.key == "E")
+        #expect(try OpenSong(opening: song.url).key == "E")
+        // The copy was kept before the first change, as ever.
+        #expect(bench.copiesKept == [before])
+        try song.undo()
+        #expect(try OpenSong(opening: song.url).key == "G")
+
+        // Something else changes the file: still refused, ProPresenter or not.
+        let other = try OpenSong(opening: song.url, safeguards: bench.safeguards)
+        try other.setKey("D")
+        #expect { try song.setKey("A") } throws: { ($0 as? Refusal)?.reason == .changedByAnother }
+
+        // Turned off again, a song is refused while ProPresenter runs.
+        bench.savesWhileProPresenterRuns = false
+        #expect { try other.setKey("C") } throws: { ($0 as? Refusal)?.reason == .proPresenterIsRunning }
+        #expect(try OpenSong(opening: song.url).key == "D")
+    }
+
     @Test("Nothing is saved over a file that something else has changed")
     func changedByAnother() throws {
         let bench = try Workbench()

@@ -55,6 +55,10 @@ public struct AppData: Sendable {
         /// (spec/03-chord-sheet.md, rule 10a): false where it was turned off, nothing
         /// where they are drawn, as they are as the app comes.
         public var chordSigns: Bool?
+        /// Whether changes are saved while ProPresenter is running (spec/06-library.md,
+        /// rule 20): true where the person allowed it, nothing where they did not, as
+        /// the app comes.
+        public var changesWhileProPresenterRuns: Bool?
         /// How many times its usual size the ChordPro text is; nothing if it was never
         /// changed.
         public var textZoom: Double?
