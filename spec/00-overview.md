@@ -54,7 +54,9 @@ a way to find and mend what an earlier chord editor did to some files.
 
 - Change a song's words, its slides, its looks or its arrangement. ProPresenter does.
 - Show anything on a screen. It is not a presenter.
-- Run while ProPresenter has the library open.
+- Save while ProPresenter has the library open, unless the person has turned that on
+  in the settings, being warned of what can go wrong
+  ([06-library.md](06-library.md), rule 20).
 - Anything over a network.
 
 ## Decided already

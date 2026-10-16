@@ -548,7 +548,7 @@ nothing about it.
 
     | When | It says |
     | --- | --- |
-    | ProPresenter is running | Nothing can be changed here while ProPresenter is running. |
+    | ProPresenter is running, and changes are not allowed while it is ([06-library.md](06-library.md), rule 20) | Nothing can be changed here while ProPresenter is running. |
     | A chord is being typed, the box is empty, and there is a chord at that place | **Enter** Takes this chord off · **Esc** Leaves it as it was · Or type the chord that is to be here |
     | A chord is being typed, otherwise | **Enter** Keeps it · **Tab** Keeps it and goes on to the next word · **Up, Down** Choose from what is offered · **Esc** Throws it away · A click on another word keeps it too |
     | One of the key's chords is being carried in from the strip, over a place | Let go on a word to put this chord there |

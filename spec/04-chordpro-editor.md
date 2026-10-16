@@ -137,7 +137,8 @@ Since brackets are all there is to type:
     reads the song afresh from its file. (**New**: the reference leaves the text as
     typed, saying one thing while the song says another.) While ProPresenter is
     known to be running the text cannot be typed in at all
-    ([06-library.md](06-library.md), rule 19).
+    ([06-library.md](06-library.md), rule 19), unless changes are allowed while it
+    is (rule 20 there).
 
 ## Words that have brackets of their own
 

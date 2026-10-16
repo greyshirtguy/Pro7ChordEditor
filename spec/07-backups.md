@@ -108,7 +108,8 @@ idea finished. Nothing here has been built or tried.
 ## Getting one back
 
 19. **Put This One Back** makes the song's file that copy again. It is a save, and so
-    is refused while ProPresenter is running, and only done if the file on disk is the
+    is refused while ProPresenter is running (unless changes are allowed while it is:
+    [06-library.md](06-library.md), rule 20), and only done if the file on disk is the
     one the app last read ([05-song-and-saving.md](05-song-and-saving.md), rule 10).
 20. First the file as it is now is copied (rule 2). Then the copy chosen is written
     beside the file and swapped in ([01-file-format.md](01-file-format.md), Writing),

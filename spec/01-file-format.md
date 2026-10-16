@@ -624,7 +624,8 @@ guess**: it has not been tried in ProPresenter.
 
 Before the first of these for a file, a copy of it as it was is kept
 ([07-backups.md](07-backups.md)). None of them happens while ProPresenter is running
-([06-library.md](06-library.md)).
+([06-library.md](06-library.md)), unless the person has allowed it in the settings,
+having been warned (rule 20 there).
 
 ## Never touched
 

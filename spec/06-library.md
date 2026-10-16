@@ -201,13 +201,14 @@ song the width they took.)
     - the words **"Autosave on"**, where a Save button would be, for the eye that
       looks for one. Their tip says why there is none: "There is nothing to save by
       hand: every change is saved as it is made, with a copy of the song as it was
-      kept first." While ProPresenter is running the words are "Autosave paused".
+      kept first." While ProPresenter is running, and changes are not allowed while
+      it is (rule 20), the words are "Autosave paused".
     - **Ctrl+S**, for the hand that presses it out of habit, saves at once whatever
       was typed in the ChordPro text and is still waiting for its pause
       ([04-chordpro-editor.md](04-chordpro-editor.md), rule 13), and the quiet line
       says: "Saved. Every change here is saved as it is made: there is nothing to
-      save by hand." While ProPresenter is running it says what the band says, and
-      no more. **It is in no menu.** (On the Mac it was File > Save until 2026-10-13.
+      save by hand." While nothing can be saved, ProPresenter running (rule 19), it
+      says what the band says, and no more. **It is in no menu.** (On the Mac it was File > Save until 2026-10-13.
       The maintainer: "I am guessing the save menu is not needed". A Save in a menu
       says there is saving to do.) On the Mac Revert is under File.
 
@@ -253,7 +254,8 @@ words; dropping a `.pro` file on the window to open it.
 
 ## Whether ProPresenter is running
 
-16. Nothing is saved while ProPresenter is running. It has the library open, and what
+16. Nothing is saved while ProPresenter is running, unless the person has chosen
+    otherwise in the settings (rule 20). It has the library open, and what
     it does with a song that changes under it is not known; the old editor warned of
     damaged files. (That it does harm is **a guess**. That nobody wants to find out
     on their Sunday library is not.)
@@ -276,12 +278,35 @@ words; dropping a `.pro` file on the window to open it.
     across the top of the song says: "ProPresenter is running. Quit it to change
     chords here." The band goes by itself when ProPresenter does. If it was started
     without the app being told (the app was in front all the while), the next save is
-    refused, and the band is there from then.
-20. There is no way to switch this off in the app. (Whether the rule should hold for
-    a file that the running ProPresenter cannot have open, such as a copy of a
-    library somewhere else, was raised by the maintainer on 2026-10-11 and put on
-    hold. `mac/NOTES.md`, "Asked for by the maintainer, for later", has what was
-    thought. Until it is decided, rules 16 to 19 are the rule.)
+    refused, and the band is there from then. (With changes allowed while it runs,
+    rule 20, nothing is barred, and the band says so instead.)
+20. **Changes can be allowed while ProPresenter is running**, by a switch in the
+    settings, under Advanced (rule 20a), **off as it comes**. While it is on:
+    - nothing is barred and nothing refused for ProPresenter's sake: the text can be
+      typed in, chords put on and taken off, the keys set, a copy put back, and each
+      change is saved as it is made, whether or not ProPresenter is running;
+    - what else stands between a change and a song still does: a copy of the file
+      is kept before its first change ([07-backups.md](07-backups.md)); the file is
+      written beside itself and swapped in, so it is never half written
+      ([01-file-format.md](01-file-format.md), Writing); and nothing is saved over a
+      file that something else has changed since it was read
+      ([05-song-and-saving.md](05-song-and-saving.md), rule 10), which is what tells
+      of ProPresenter having saved the same song meanwhile;
+    - rule 18 is still asked, and while ProPresenter is running the band stays, as
+      a reminder, and says: "ProPresenter is running. Changes here are saved all the
+      same (Settings, Advanced): leave alone any song it has open." Nothing else
+      says it is running: the line of hints, the words where a Save button would be
+      and Ctrl+S are as they are with it quit.
+
+    It is for everything: a song ProPresenter may have open is not told from one it
+    cannot have. (**New**, the maintainer's, 2026-10-17: "Let's add an "advanced"
+    setting to enable editing while ProPresenter is open (throw in a warning about
+    potential data corruption if propresenter this pro7chordediotr try to update the
+    same file". Until then there was no way to switch rules 16 to 19 off. Whether
+    the rule should hold for a file that the running ProPresenter cannot have open,
+    such as a copy of a library somewhere else, was raised by the maintainer on
+    2026-10-11 and put on hold; `mac/NOTES.md`, "Asked for by the maintainer, for
+    later", has what was thought then, and it is still open.)
 
 ## Settings
 
@@ -314,6 +339,14 @@ words; dropping a `.pro` file on the window to open it.
       Presenter has it too, in these words.)
     - **Backups**: the copies that are kept, all of them
       ([07-backups.md](07-backups.md), rule 18).
+    - **Advanced**: one switch, **"Allow changes while ProPresenter is open"**, off
+      as it comes (rule 20). Under it, always, the warning:
+      "ProPresenter and this app could then both change the same song. If ProPresenter saves a song after it was changed here, that change is lost; and if both write the same file at the same moment, the file could be damaged. ProPresenter may also go on showing a song as it was until it reads it again. This app keeps a copy of each song before it first changes it, under Earlier Versions."
+      **Turning it on asks first**, with the same words, under the question "Allow
+      changes while ProPresenter is open?", and two buttons: "Allow Changes" and
+      "Cancel", which is the one Enter and Esc press. Turning it off asks nothing.
+      (**New**, 2026-10-17, with rule 20. The words and the asking are this app's;
+      the maintainer asked for "a warning about potential data corruption".)
 
     (**New**, 2026-10-11, asked for by the maintainer: until then the settings were
     the copies and nothing else.)
@@ -326,7 +359,8 @@ On the Mac in `~/Library/Application Support/Pro7ChordEditor`, on Windows in
 - its settings: the folders chosen, the place and library last open, how the window
   was left (the sizes of the words, the colours of chords and of the highlighted
   line, where the bar between the lists is, and how wide the lists are), whether
-  sharps and flats are shown as signs, and whether
+  sharps and flats are shown as signs, whether changes are allowed while
+  ProPresenter is running (rule 20), and whether
   the guide has been shown ([13-guide.md](13-guide.md), rule 2):
   all in `settings.json`; and the window's size, which the system keeps for it;
 - the marks it has worked out (rule 10; `marks.json`);

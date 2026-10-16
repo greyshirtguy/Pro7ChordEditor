@@ -145,7 +145,8 @@ A change of key is a step of undo like any other.
    "unsaved" state. This is what the editors were built round, and with a copy of the
    file kept first ([07-backups.md](07-backups.md)) and undo to hand, it is safe.
 10. A save is refused, and the change not made, if
-    - ProPresenter is running ([06-library.md](06-library.md)), or
+    - ProPresenter is running ([06-library.md](06-library.md), rule 16), and changes
+      are not allowed while it is (rule 20 there), or
     - the file on disk is no longer the one that was read (its size or its time of last
       change differs): something else has changed it. The person is told, and offered
       the song read again. Its bytes are compared as well, with what was last read from

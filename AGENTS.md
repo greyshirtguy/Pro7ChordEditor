@@ -32,7 +32,9 @@ These are not style. A change that breaks one of them is wrong however well it w
    everything else as it came, fields this app has never heard of included. Never build
    a file from the parts you know. The file is written beside itself and swapped in, a
    copy of what it was is kept first ([spec/07-backups.md](spec/07-backups.md)), and
-   nothing is written while ProPresenter is running.
+   nothing is written while ProPresenter is running, unless the person has turned
+   that on in the settings, having been warned
+   ([spec/06-library.md](spec/06-library.md), rule 20).
 2. **The words of a song are not this app's to change.** Only chords are. The one
    exception is spelt out in [spec/01-file-format.md](spec/01-file-format.md).
 3. **The rules are the vectors.** What a chord is, how it moves to another key, where
