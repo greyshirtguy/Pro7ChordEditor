@@ -344,7 +344,8 @@ words; dropping a `.pro` file on the window to open it.
       "ProPresenter and this app could then both change the same song. If ProPresenter saves a song after it was changed here, that change is lost; and if both write the same file at the same moment, the file could be damaged. ProPresenter may also go on showing a song as it was until it reads it again. This app keeps a copy of each song before it first changes it, under Earlier Versions."
       **Turning it on asks first**, with the same words, under the question "Allow
       changes while ProPresenter is open?", and two buttons: "Allow Changes" and
-      "Cancel", which is the one Enter and Esc press. Turning it off asks nothing.
+      "Cancel". Esc presses Cancel, and Enter does not allow: "Allow Changes" is to
+      be clicked. Turning it off asks nothing.
       (**New**, 2026-10-17, with rule 20. The words and the asking are this app's;
       the maintainer asked for "a warning about potential data corruption".)
 
