@@ -26,7 +26,7 @@ milestone; put right what has become untrue.
 | The tips refined, and a chord's colour (2026-10-14, the maintainer having tried 1.0.2: "It feels wonderful now! all smooth now.. and looks great") | Built the same day as 1.0.3, tried by the maintainer ("tips are fine"), and **given out on 2026-10-14 as the Mac's half of the release `v1.0.3`**, GitHub's "Latest" (decision 91). Windows' file was added to it the same day, and its tag moved (decision 92) | The tips in sentence case, Option's said on a chord and nowhere else, a tip over the key's chords, the copying under Command alone, the line blue and lighting up as it changes (decision 86). A chord's name orange as it comes (87). **Open, the maintainer's**: what a paste of a line's chords is to keep (88) |
 | What the Windows app's notes had for this session, and how a number is given out (2026-10-14) | Done the same day, and **given out in 1.0.4** (decision 96) | How a new number is given out, the first half as a pre-release (decision 92). Three things put right in which this app did other than `spec/` has it, found by the Windows app's session and never passed on: putting back what the file already is offers nothing to undo; a key that is not one of the twenty-six is first in its picker; what a ChordPro directive's name starts with is asked of its units (decision 93) |
 | Sharps and flats drawn as ♯ and ♭ (2026-10-14, the maintainer's) | Done the same day, and **given out on 2026-10-14 as the Mac's half of the release `v1.0.4`**, a pre-release until Windows' file is added (decision 96) | The rule, for all three apps: `spec/02`, "Sharps and flats drawn as signs", with `tools/signs.py` and `signs.json`, pushed at once. Drawn on the sheet, in the strip, in what is offered and in the box as it is typed, and in the song's two keys; never written. A switch in the settings, on as it comes (decision 95) |
-| Changes allowed while ProPresenter is running (2026-10-17, the maintainer's) | Done the same day. **In the source and in no build** | A switch under Advanced in the settings, off as it comes, with its warning under it and a question before it is turned on; the band stays while ProPresenter runs, in other words (decision 97) |
+| Changes allowed while ProPresenter is running (2026-10-17, the maintainer's) | Done the same day, and **given out the same day as the Mac's half of the release `v1.0.5`**, a pre-release until Windows' file is added (decision 98) | A switch under Advanced in the settings, off as it comes, with its warning under it and a question before it is turned on; the band stays while ProPresenter runs, in other words (decision 97) |
 | **M8** Mending | Next | |
 
 ## What the maintainer decided, 2026-10-10
@@ -1029,6 +1029,19 @@ And the same day, on how someone new is to find out what the sheet can do:
       ProPresenter, as they always have.
     393 tests pass (three new: the song's check, the window's model, and pictures
     69 to 71, looked at), and the app builds.
+
+98. **1.0.5 is given out, its first half** (the maintainer, 2026-10-17: "push it
+    and do a new release"), as decision 96 did 1.0.4: the release `v1.0.5` is a
+    pre-release and not "Latest", with the Mac's image alone, and its text says the
+    Windows app's 1.0.5 is to be added; 1.0.4, with both files, stays "Latest". The
+    tag is on "Version 1.0.5" (`afc890f`), which the image was made from, pushed by
+    itself once both of GitHub's builds of the branch had passed, and both passed on
+    it too. What is new in it: the switch of decision 97. **Waiting**: the Windows
+    app's half, which moves the tag once `git diff --stat afc890f <its commit>`
+    shows nothing changed in `mac/` but `NOTES.md` and `README.md`, nor in `proto`.
+    (This session's scratch folder had been emptied since 1.0.4: the rules of the
+    sealed start and the little program that counts its windows were made again,
+    as decision 70 has them, and the rules tried on a shell first.)
 
 ## How it is laid out, and why
 
@@ -2207,6 +2220,18 @@ the About text, a Developer ID, notarizing) is still to come.
   two builds of the branch and of the tag; and the file fetched back from the
   Releases page, the same bytes as the one sent. **Not done**: nobody has opened
   it by hand, nor through a browser's download.
+- **1.0.5, given out on 2026-10-17** as the Mac's half of the release `v1.0.5`, a
+  pre-release until Windows' file is added (decision 98). Version 1.0.5, build 9.
+  The image is `Pro7ChordEditor-mac-1.0.5.dmg`, sha256 `c2af1fdf…423e`, made by the
+  script from the commit `afc890f` with nothing else in the working tree. Checked
+  as 1.0.4 was: the script's own checks; the read-me read through, with its new
+  line on the switch; the app in the image the same, file for file, as the copy
+  started, its seal holding, and the switch's words in its program; started twice,
+  shut in, with a new made-up home, two windows the first time and one the second,
+  the settings it wrote saying nothing of the switch, which is off as it comes;
+  all 393 tests, against the optimised code as well as the other; GitHub's two
+  builds of the branch and of the tag; and the file fetched back from the Releases
+  page, the same bytes as the one sent. **Not done**: nobody has opened it by hand.
 - **A build can be asked for its menus.** Started with `PRO7_SAY_MENUS` set, the
   program writes its menu bar out as it is after the tidying, once at the start and
   once three seconds on. Shut in, 1.0.0 wrote: the app's own menu (About, Settings,
@@ -2224,7 +2249,7 @@ the About text, a Developer ID, notarizing) is still to come.
 ## Left rough, and what to ask
 
 - **Of changes allowed while ProPresenter is running (decision 97), tried by no
-  hand**, there being no build with them:
+  hand**: they are in 1.0.5, which nobody has opened yet:
   1. the Advanced tab, and the question when the switch is turned on: Esc and
      Cancel leave it off, and only a click on "Allow Changes" turns it on;
   2. with ProPresenter running, the band in its other words, and a chord put on
